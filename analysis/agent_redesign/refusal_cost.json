@@ -1,0 +1,3975 @@
+{
+ "window": [
+  "2026-11-09T00:00",
+  "2026-11-23T00:00"
+ ],
+ "unit": "input+output+cache read+cache write, deduplicated message ids",
+ "total_tokens": 4953460461,
+ "role_tokens": {
+  "main session": 1453520627,
+  "reviewers": 260266810,
+  "other agents": 442777848,
+  "mechanical workers": 34321156,
+  "owners": 2762574020
+ },
+ "refusal_tokens_by_role": {
+  "main session": {
+   "n": 525,
+   "lo": 174249757,
+   "hi": 466527161,
+   "share_of_role_hi": 0.32096356414486577,
+   "share_of_role_lo": 0.119881172487826
+  },
+  "owners": {
+   "n": 347,
+   "lo": 63702370,
+   "hi": 180840799,
+   "share_of_role_hi": 0.0654609786708991,
+   "share_of_role_lo": 0.023059063590267166
+  },
+  "other agents": {
+   "n": 63,
+   "lo": 9610564,
+   "hi": 28060621,
+   "share_of_role_hi": 0.06337403988647598,
+   "share_of_role_lo": 0.021705159920285804
+  },
+  "reviewers": {
+   "n": 4,
+   "lo": 179862,
+   "hi": 179862,
+   "share_of_role_hi": 0.0006910677546629937,
+   "share_of_role_lo": 0.0006910677546629937
+  },
+  "mechanical workers": {
+   "n": 61,
+   "lo": 1861872,
+   "hi": 1966783,
+   "share_of_role_hi": 0.05730526675733184,
+   "share_of_role_lo": 0.05424852239825488
+  }
+ },
+ "checks": [
+  {
+   "hook": "plan_check",
+   "check": "CONTEXT GUARD: the context is near compaction",
+   "n": 105,
+   "lo": 44507589,
+   "hi": 113903157,
+   "usd_hi": 26.11505960000001,
+   "dropped": 2,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 105,
+     "lo": 44507589,
+     "hi": 113903157,
+     "msgs_hi": 275,
+     "dropped": 2
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T10:43:25"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T11:11:31"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T23:32:11"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T23:34:02"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-10T00:09:10"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-10T00:14:49"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "<entry>: resume its owner _",
+   "n": 89,
+   "lo": 30316311,
+   "hi": 91578836,
+   "usd_hi": 22.517953799999997,
+   "dropped": 2,
+   "repeat": 15,
+   "roles": {
+    "main session": {
+     "n": 89,
+     "lo": 30316311,
+     "hi": 91578836,
+     "msgs_hi": 274,
+     "dropped": 2
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T15:41:32"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T22:50:58"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T22:51:26"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T23:50:43"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T23:52:03"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-10T02:23:03"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "<entry>: steps you leave uncovered",
+   "n": 39,
+   "lo": 7385570,
+   "hi": 54058469,
+   "usd_hi": 14.457675400000001,
+   "dropped": 9,
+   "repeat": 0,
+   "roles": {
+    "other agents": {
+     "n": 5,
+     "lo": 828816,
+     "hi": 7336336,
+     "msgs_hi": 35,
+     "dropped": 1
+    },
+    "owners": {
+     "n": 34,
+     "lo": 6556754,
+     "hi": 46722133,
+     "msgs_hi": 218,
+     "dropped": 8
+    }
+   },
+   "examples": [
+    [
+     "agent-a0636264613b51f22.jsonl",
+     "2026-11-16T20:25:48"
+    ],
+    [
+     "agent-a09a17fa36ad25dbd.jsonl",
+     "2026-11-21T04:43:10"
+    ],
+    [
+     "agent-a0f7f76dc1ed0520d.jsonl",
+     "2026-11-13T08:13:38"
+    ],
+    [
+     "agent-a0ffaf4de4b7f54ac.jsonl",
+     "2026-11-12T01:45:43"
+    ],
+    [
+     "agent-a134b21ae2a8a78ce.jsonl",
+     "2026-11-22T09:38:24"
+    ],
+    [
+     "agent-a1fa6513f1f301aca.jsonl",
+     "2026-11-12T00:27:18"
+    ]
+   ]
+  },
+  {
+   "hook": "review_backlog",
+   "check": "a commit while the <pillar> pillar is overdue and has uncommitted chan",
+   "n": 80,
+   "lo": 13958645,
+   "hi": 51568648,
+   "usd_hi": 30.08647869999999,
+   "dropped": 33,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 195411,
+     "hi": 195411,
+     "msgs_hi": 2,
+     "dropped": 1
+    },
+    "owners": {
+     "n": 68,
+     "lo": 11875753,
+     "hi": 47228975,
+     "msgs_hi": 495,
+     "dropped": 28
+    },
+    "other agents": {
+     "n": 9,
+     "lo": 1848927,
+     "hi": 4105708,
+     "msgs_hi": 30,
+     "dropped": 2
+    },
+    "mechanical workers": {
+     "n": 2,
+     "lo": 38554,
+     "hi": 38554,
+     "msgs_hi": 2,
+     "dropped": 2
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-21T16:50:06"
+    ],
+    [
+     "agent-a06276d2ba4ba402b.jsonl",
+     "2026-11-10T03:56:20"
+    ],
+    [
+     "agent-a0636264613b51f22.jsonl",
+     "2026-11-16T20:24:17"
+    ],
+    [
+     "agent-a0923cdbb41f6dbf2.jsonl",
+     "2026-11-17T14:38:49"
+    ],
+    [
+     "agent-a0923cdbb41f6dbf2.jsonl",
+     "2026-11-17T14:55:43"
+    ],
+    [
+     "agent-a0f7f76dc1ed0520d.jsonl",
+     "2026-11-13T07:22:47"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "<entry> has a question open for the user, but no message sent to them ",
+   "n": 54,
+   "lo": 20582686,
+   "hi": 48599694,
+   "usd_hi": 11.617110800000004,
+   "dropped": 0,
+   "repeat": 16,
+   "roles": {
+    "main session": {
+     "n": 54,
+     "lo": 20582686,
+     "hi": 48599694,
+     "msgs_hi": 133,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T11:13:56"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T23:08:06"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-10T00:18:49"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-10T00:49:30"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-10T06:54:38"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-11T20:53:26"
+    ]
+   ]
+  },
+  {
+   "hook": "brief_guard",
+   "check": "this brief lacks the rules block of _",
+   "n": 33,
+   "lo": 5536256,
+   "hi": 28430008,
+   "usd_hi": 13.105272199999998,
+   "dropped": 6,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 11,
+     "lo": 3012216,
+     "hi": 4057314,
+     "msgs_hi": 20,
+     "dropped": 0
+    },
+    "owners": {
+     "n": 8,
+     "lo": 1393933,
+     "hi": 18211594,
+     "msgs_hi": 133,
+     "dropped": 1
+    },
+    "other agents": {
+     "n": 14,
+     "lo": 1130107,
+     "hi": 6161100,
+     "msgs_hi": 49,
+     "dropped": 5
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-11T04:34:58"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-11T18:59:21"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-11T19:36:28"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T09:04:41"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-13T00:04:41"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-13T16:22:30"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "<entry>: no live owner: open events _",
+   "n": 21,
+   "lo": 6626148,
+   "hi": 28429608,
+   "usd_hi": 7.701700199999998,
+   "dropped": 0,
+   "repeat": 2,
+   "roles": {
+    "main session": {
+     "n": 21,
+     "lo": 6626148,
+     "hi": 28429608,
+     "msgs_hi": 93,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-10T04:29:03"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-10T07:05:52"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-11T02:05:33"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-11T02:07:44"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-11T10:31:46"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T09:14:25"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "no waiter is armed: run _ in the background",
+   "n": 22,
+   "lo": 7225858,
+   "hi": 25280204,
+   "usd_hi": 5.9616954,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 22,
+     "lo": 7225858,
+     "hi": 25280204,
+     "msgs_hi": 75,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T12:35:46"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T23:00:49"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-10T05:48:14"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-11T04:18:42"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-11T10:38:16"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T00:19:38"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "<entry>: no live owner: ready step _ of <entry> has no one working on ",
+   "n": 13,
+   "lo": 3972607,
+   "hi": 18285759,
+   "usd_hi": 4.788590199999998,
+   "dropped": 1,
+   "repeat": 1,
+   "roles": {
+    "main session": {
+     "n": 13,
+     "lo": 3972607,
+     "hi": 18285759,
+     "msgs_hi": 58,
+     "dropped": 1
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T15:44:41"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T23:07:21"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-10T08:44:57"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-11T02:03:10"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T00:01:34"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T14:38:27"
+    ]
+   ]
+  },
+  {
+   "hook": "sleep_guard",
+   "check": "foreground waiting",
+   "n": 90,
+   "lo": 13992550,
+   "hi": 14558557,
+   "usd_hi": 38.251225800000014,
+   "dropped": 50,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 8,
+     "lo": 2115363,
+     "hi": 2115363,
+     "msgs_hi": 16,
+     "dropped": 6
+    },
+    "owners": {
+     "n": 56,
+     "lo": 10072903,
+     "hi": 10566624,
+     "msgs_hi": 533,
+     "dropped": 29
+    },
+    "mechanical workers": {
+     "n": 21,
+     "lo": 648808,
+     "hi": 721094,
+     "msgs_hi": 85,
+     "dropped": 10
+    },
+    "other agents": {
+     "n": 5,
+     "lo": 1155476,
+     "hi": 1155476,
+     "msgs_hi": 96,
+     "dropped": 5
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T23:06:38"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-11T02:05:02"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-11T15:19:39"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T02:19:27"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T20:28:50"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-13T07:10:41"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "figures handed back for Joaquin not sent: _ send them",
+   "n": 23,
+   "lo": 5978518,
+   "hi": 13547619,
+   "usd_hi": 3.5259561999999995,
+   "dropped": 0,
+   "repeat": 3,
+   "roles": {
+    "main session": {
+     "n": 23,
+     "lo": 5978518,
+     "hi": 13547619,
+     "msgs_hi": 50,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T02:30:44"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T10:08:50"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T10:46:40"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T14:29:21"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T14:45:15"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T15:14:27"
+    ]
+   ]
+  },
+  {
+   "hook": "auto-mode classifier (not ours)",
+   "check": "permission denied",
+   "n": 61,
+   "lo": 11799405,
+   "hi": 12985276,
+   "usd_hi": 14.753615899999998,
+   "dropped": 34,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 17,
+     "lo": 5962354,
+     "hi": 5962354,
+     "msgs_hi": 34,
+     "dropped": 12
+    },
+    "mechanical workers": {
+     "n": 12,
+     "lo": 361617,
+     "hi": 361617,
+     "msgs_hi": 18,
+     "dropped": 9
+    },
+    "owners": {
+     "n": 26,
+     "lo": 4298943,
+     "hi": 5012244,
+     "msgs_hi": 204,
+     "dropped": 11
+    },
+    "other agents": {
+     "n": 6,
+     "lo": 1176491,
+     "hi": 1649061,
+     "msgs_hi": 21,
+     "dropped": 2
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T22:48:20"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T23:06:46"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T23:16:43"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T23:31:26"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T23:31:52"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T23:35:00"
+    ]
+   ]
+  },
+  {
+   "hook": "submit_guard",
+   "check": "placement",
+   "n": 53,
+   "lo": 9608402,
+   "hi": 12576342,
+   "usd_hi": 9.236483900000003,
+   "dropped": 5,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 47,
+     "lo": 9194370,
+     "hi": 12129685,
+     "msgs_hi": 173,
+     "dropped": 5
+    },
+    "mechanical workers": {
+     "n": 2,
+     "lo": 78228,
+     "hi": 110853,
+     "msgs_hi": 3,
+     "dropped": 0
+    },
+    "other agents": {
+     "n": 4,
+     "lo": 335804,
+     "hi": 335804,
+     "msgs_hi": 4,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "agent-a0923cdbb41f6dbf2.jsonl",
+     "2026-11-17T15:00:09"
+    ],
+    [
+     "agent-a0923cdbb41f6dbf2.jsonl",
+     "2026-11-17T15:00:14"
+    ],
+    [
+     "agent-a0a9411af0a5c385b.jsonl",
+     "2026-11-11T22:08:59"
+    ],
+    [
+     "agent-a0a9411af0a5c385b.jsonl",
+     "2026-11-11T22:15:07"
+    ],
+    [
+     "agent-a0f7f76dc1ed0520d.jsonl",
+     "2026-11-13T07:19:51"
+    ],
+    [
+     "agent-a0f7f76dc1ed0520d.jsonl",
+     "2026-11-13T07:19:59"
+    ]
+   ]
+  },
+  {
+   "hook": "submit_guard",
+   "check": "design",
+   "n": 15,
+   "lo": 2938293,
+   "hi": 9431376,
+   "usd_hi": 4.5933551999999995,
+   "dropped": 5,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 15,
+     "lo": 2938293,
+     "hi": 9431376,
+     "msgs_hi": 77,
+     "dropped": 5
+    }
+   },
+   "examples": [
+    [
+     "agent-a12bc0782d05c5fa8.jsonl",
+     "2026-11-12T15:52:25"
+    ],
+    [
+     "agent-a134b21ae2a8a78ce.jsonl",
+     "2026-11-22T10:34:20"
+    ],
+    [
+     "agent-a2021b8418347ee24.jsonl",
+     "2026-11-12T01:51:42"
+    ],
+    [
+     "agent-a2021b8418347ee24.jsonl",
+     "2026-11-12T01:51:59"
+    ],
+    [
+     "agent-a23f21cb7aaa2a595.jsonl",
+     "2026-11-11T20:49:38"
+    ],
+    [
+     "agent-a3907d6d36879af7b.jsonl",
+     "2026-11-10T09:11:30"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "<entry> is held by D_, which is not a hold in force that names it",
+   "n": 5,
+   "lo": 1582473,
+   "hi": 9313695,
+   "usd_hi": 2.3301355999999998,
+   "dropped": 0,
+   "repeat": 3,
+   "roles": {
+    "main session": {
+     "n": 5,
+     "lo": 1582473,
+     "hi": 9313695,
+     "msgs_hi": 29,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T00:29:44"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T00:31:52"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T00:33:09"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-13T07:23:16"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-13T07:24:40"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "<entry> is STALLED",
+   "n": 5,
+   "lo": 1746954,
+   "hi": 8643749,
+   "usd_hi": 2.1882878000000003,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 5,
+     "lo": 1746954,
+     "hi": 8643749,
+     "msgs_hi": 27,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-10T03:35:28"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-16T20:36:07"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-19T13:52:49"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-22T07:33:00"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-22T17:12:04"
+    ]
+   ]
+  },
+  {
+   "hook": "brief_guard",
+   "check": "a mechanical-worker brief carries the mechanical rules block of _",
+   "n": 12,
+   "lo": 2240848,
+   "hi": 7974870,
+   "usd_hi": 2.6473166000000004,
+   "dropped": 1,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 7,
+     "lo": 1367275,
+     "hi": 2887224,
+     "msgs_hi": 17,
+     "dropped": 0
+    },
+    "owners": {
+     "n": 4,
+     "lo": 788123,
+     "hi": 4828946,
+     "msgs_hi": 26,
+     "dropped": 1
+    },
+    "other agents": {
+     "n": 1,
+     "lo": 85450,
+     "hi": 258700,
+     "msgs_hi": 3,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T11:15:47"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-11T08:48:49"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T00:18:30"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T02:15:17"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T08:51:29"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-13T03:39:19"
+    ]
+   ]
+  },
+  {
+   "hook": "send_check",
+   "check": "a figure needs its axes named in the caption:",
+   "n": 23,
+   "lo": 5172730,
+   "hi": 7498646,
+   "usd_hi": 2.1679192000000005,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 23,
+     "lo": 5172730,
+     "hi": 7498646,
+     "msgs_hi": 32,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T12:35:02"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-10T03:44:30"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-10T08:50:01"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-10T08:50:01"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-11T15:09:16"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T02:18:27"
+    ]
+   ]
+  },
+  {
+   "hook": "submit_guard",
+   "check": "budget",
+   "n": 34,
+   "lo": 5595580,
+   "hi": 6348398,
+   "usd_hi": 6.623732000000004,
+   "dropped": 6,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 34,
+     "lo": 5595580,
+     "hi": 6348398,
+     "msgs_hi": 138,
+     "dropped": 6
+    }
+   },
+   "examples": [
+    [
+     "agent-a1441fe6f27448d3c.jsonl",
+     "2026-11-12T10:55:55"
+    ],
+    [
+     "agent-a14806e97524a48c9.jsonl",
+     "2026-11-10T05:58:39"
+    ],
+    [
+     "agent-a14806e97524a48c9.jsonl",
+     "2026-11-10T06:15:28"
+    ],
+    [
+     "agent-a1da55ce20b21fb74.jsonl",
+     "2026-11-12T02:54:31"
+    ],
+    [
+     "agent-a2a4836c90d93265b.jsonl",
+     "2026-11-10T03:43:53"
+    ],
+    [
+     "agent-a2a4836c90d93265b.jsonl",
+     "2026-11-10T03:44:03"
+    ]
+   ]
+  },
+  {
+   "hook": "send_check",
+   "check": "a figure must be one file drawn by a committed tool through ps.save, i",
+   "n": 22,
+   "lo": 5480707,
+   "hi": 6072730,
+   "usd_hi": 2.3031251999999998,
+   "dropped": 5,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 22,
+     "lo": 5480707,
+     "hi": 6072730,
+     "msgs_hi": 23,
+     "dropped": 5
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-17T01:58:33"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-17T01:58:33"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-17T01:58:33"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-17T02:23:34"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-17T02:45:47"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-17T02:45:47"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "a figure changed this turn lacks its other format",
+   "n": 5,
+   "lo": 1384433,
+   "hi": 4761366,
+   "usd_hi": 1.268622,
+   "dropped": 0,
+   "repeat": 2,
+   "roles": {
+    "main session": {
+     "n": 5,
+     "lo": 1384433,
+     "hi": 4761366,
+     "msgs_hi": 18,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T02:17:05"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T02:17:33"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-17T03:45:20"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-17T03:46:24"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-17T04:30:48"
+    ]
+   ]
+  },
+  {
+   "hook": "review_backlog",
+   "check": "_ belongs to the <pillar> pillar, which has ~_ unreviewed",
+   "n": 12,
+   "lo": 1707358,
+   "hi": 4750415,
+   "usd_hi": 14.415852400000006,
+   "dropped": 11,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 4,
+     "lo": 415451,
+     "hi": 415451,
+     "msgs_hi": 9,
+     "dropped": 4
+    },
+    "owners": {
+     "n": 4,
+     "lo": 730903,
+     "hi": 3773960,
+     "msgs_hi": 206,
+     "dropped": 3
+    },
+    "mechanical workers": {
+     "n": 1,
+     "lo": 13451,
+     "hi": 13451,
+     "msgs_hi": 1,
+     "dropped": 1
+    },
+    "other agents": {
+     "n": 3,
+     "lo": 547553,
+     "hi": 547553,
+     "msgs_hi": 12,
+     "dropped": 3
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-11T08:47:09"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-18T23:59:52"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-18T23:59:52"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-18T23:59:52"
+    ],
+    [
+     "agent-a1341471cb6caf07b.jsonl",
+     "2026-11-12T03:28:05"
+    ],
+    [
+     "agent-a3d362cbafc652839.jsonl",
+     "2026-11-12T01:35:43"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "a table of measured results went to Joaquin",
+   "n": 6,
+   "lo": 1769511,
+   "hi": 4393601,
+   "usd_hi": 1.0530704000000002,
+   "dropped": 0,
+   "repeat": 1,
+   "roles": {
+    "main session": {
+     "n": 6,
+     "lo": 1769511,
+     "hi": 4393601,
+     "msgs_hi": 13,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T02:04:17"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T02:04:35"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T15:15:33"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-13T03:28:38"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-14T01:01:31"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-21T11:24:19"
+    ]
+   ]
+  },
+  {
+   "hook": "send_check",
+   "check": "this file does not read on its own",
+   "n": 11,
+   "lo": 3499061,
+   "hi": 4182842,
+   "usd_hi": 1.5462742000000003,
+   "dropped": 4,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 11,
+     "lo": 3499061,
+     "hi": 4182842,
+     "msgs_hi": 18,
+     "dropped": 4
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-11T14:43:14"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T03:26:26"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T03:30:28"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T03:46:10"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T15:39:05"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-13T00:17:52"
+    ]
+   ]
+  },
+  {
+   "hook": "plan.py",
+   "check": "an ask must state first the one reason it is the user_Scope: <the scop",
+   "n": 4,
+   "lo": 884763,
+   "hi": 4177855,
+   "usd_hi": 1.40206,
+   "dropped": 1,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 4,
+     "lo": 884763,
+     "hi": 4177855,
+     "msgs_hi": 24,
+     "dropped": 1
+    }
+   },
+   "examples": [
+    [
+     "agent-a09a17fa36ad25dbd.jsonl",
+     "2026-11-21T04:50:49"
+    ],
+    [
+     "agent-a7b24b3d46311d66f.jsonl",
+     "2026-11-17T11:16:01"
+    ],
+    [
+     "agent-ab76a6886e2c96d3b.jsonl",
+     "2026-11-19T13:36:55"
+    ],
+    [
+     "agent-af2bc6219bb4a56b5.jsonl",
+     "2026-11-20T01:50:45"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "a result table went to Joaquin without its figure",
+   "n": 3,
+   "lo": 1220648,
+   "hi": 4034259,
+   "usd_hi": 1.0042164000000002,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 3,
+     "lo": 1220648,
+     "hi": 4034259,
+     "msgs_hi": 13,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-11T14:42:39"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-11T14:59:27"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-11T15:08:47"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: Joaquin",
+   "n": 3,
+   "lo": 704170,
+   "hi": 3276264,
+   "usd_hi": 0.8344252000000001,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 3,
+     "lo": 704170,
+     "hi": 3276264,
+     "msgs_hi": 12,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T21:29:14"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-13T07:29:33"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-16T22:39:04"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_files_guard",
+   "check": "a python script fed by a heredoc that writes a plan file",
+   "n": 1,
+   "lo": 107352,
+   "hi": 2933249,
+   "usd_hi": 0.9900068000000001,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "other agents": {
+     "n": 1,
+     "lo": 107352,
+     "hi": 2933249,
+     "msgs_hi": 23,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "agent-a5f2aff63bd28c5a8.jsonl",
+     "2026-11-09T23:19:05"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: I found one partial ",
+   "n": 1,
+   "lo": 324974,
+   "hi": 2618589,
+   "usd_hi": 0.6358524,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 324974,
+     "hi": 2618589,
+     "msgs_hi": 8,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-13T07:31:44"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: Fix committed, but t",
+   "n": 1,
+   "lo": 308613,
+   "hi": 2506101,
+   "usd_hi": 0.6327088000000001,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 308613,
+     "hi": 2506101,
+     "msgs_hi": 8,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T00:26:33"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: <entry>: no dan_per_",
+   "n": 1,
+   "lo": 534549,
+   "hi": 2144801,
+   "usd_hi": 0.48343020000000003,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 534549,
+     "hi": 2144801,
+     "msgs_hi": 4,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-17T20:59:13"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: ROUTINE: No fix was ",
+   "n": 1,
+   "lo": 519475,
+   "hi": 2091210,
+   "usd_hi": 0.538964,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 519475,
+     "hi": 2091210,
+     "msgs_hi": 4,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-17T11:23:55"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "REPLY CHECK: your question _ is not answered",
+   "n": 3,
+   "lo": 772519,
+   "hi": 2077381,
+   "usd_hi": 0.47935880000000003,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 3,
+     "lo": 772519,
+     "hi": 2077381,
+     "msgs_hi": 6,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T12:37:02"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T22:55:06"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T23:44:24"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: Joaquin, the _ offse",
+   "n": 1,
+   "lo": 517260,
+   "hi": 2074436,
+   "usd_hi": 0.4528704,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 517260,
+     "hi": 2074436,
+     "msgs_hi": 4,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-17T19:59:49"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "failed",
+   "n": 1,
+   "lo": 577898,
+   "hi": 2032590,
+   "usd_hi": 0.46827199999999997,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 1,
+     "lo": 577898,
+     "hi": 2032590,
+     "msgs_hi": 7,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "agent-a7b24b3d46311d66f.jsonl",
+     "2026-11-17T11:17:56"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: Joaquin, the second ",
+   "n": 1,
+   "lo": 596813,
+   "hi": 1792083,
+   "usd_hi": 0.38036380000000003,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 596813,
+     "hi": 1792083,
+     "msgs_hi": 3,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-18T02:59:14"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: <entry>: the B_ code",
+   "n": 1,
+   "lo": 564824,
+   "hi": 1697742,
+   "usd_hi": 0.37477,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 564824,
+     "hi": 1697742,
+     "msgs_hi": 3,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-18T00:38:08"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: B_ is in: training o",
+   "n": 1,
+   "lo": 558966,
+   "hi": 1684315,
+   "usd_hi": 0.39061080000000004,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 558966,
+     "hi": 1684315,
+     "msgs_hi": 3,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-18T00:34:47"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "figures handed back for Joaquin not sent: _",
+   "n": 1,
+   "lo": 269011,
+   "hi": 1671848,
+   "usd_hi": 0.5603514,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 269011,
+     "hi": 1671848,
+     "msgs_hi": 6,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-17T01:57:38"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "FA has active work items and the supervisor is not running",
+   "n": 2,
+   "lo": 654381,
+   "hi": 1642542,
+   "usd_hi": 0.38919840000000006,
+   "dropped": 0,
+   "repeat": 1,
+   "roles": {
+    "main session": {
+     "n": 2,
+     "lo": 654381,
+     "hi": 1642542,
+     "msgs_hi": 5,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-15T17:08:43"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-15T17:11:33"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: ROUTINE: _ acked: FA",
+   "n": 1,
+   "lo": 398194,
+   "hi": 1597239,
+   "usd_hi": 0.35668220000000006,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 398194,
+     "hi": 1597239,
+     "msgs_hi": 4,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-19T09:18:31"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "<entry> runs, but no approval in force names it",
+   "n": 1,
+   "lo": 312615,
+   "hi": 1574419,
+   "usd_hi": 0.36812600000000006,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 312615,
+     "hi": 1574419,
+     "msgs_hi": 5,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T23:27:33"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: I closed at the cont",
+   "n": 1,
+   "lo": 372261,
+   "hi": 1499342,
+   "usd_hi": 0.372525,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 372261,
+     "hi": 1499342,
+     "msgs_hi": 4,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-16T19:47:13"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: The distribution fig",
+   "n": 1,
+   "lo": 364960,
+   "hi": 1472637,
+   "usd_hi": 0.37284379999999995,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 364960,
+     "hi": 1472637,
+     "msgs_hi": 4,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-16T19:43:03"
+    ]
+   ]
+  },
+  {
+   "hook": "plan.py",
+   "check": "D_s approval for it with plan answer",
+   "n": 1,
+   "lo": 485367,
+   "hi": 1458403,
+   "usd_hi": 0.34660160000000007,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 485367,
+     "hi": 1458403,
+     "msgs_hi": 3,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-17T10:56:24"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: Joaquin, here is whe",
+   "n": 1,
+   "lo": 444145,
+   "hi": 1340014,
+   "usd_hi": 0.328566,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 444145,
+     "hi": 1340014,
+     "msgs_hi": 3,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T01:56:14"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "_",
+   "n": 2,
+   "lo": 656783,
+   "hi": 1313786,
+   "usd_hi": 0.28252,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 2,
+     "lo": 656783,
+     "hi": 1313786,
+     "msgs_hi": 4,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T21:58:46"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-19T03:23:06"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "<entry>: no live owner: step _ waited on FA-ccin_p_-_b_c FA-ccin_p_-_e",
+   "n": 1,
+   "lo": 322836,
+   "hi": 1304741,
+   "usd_hi": 0.37050780000000005,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 322836,
+     "hi": 1304741,
+     "msgs_hi": 4,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-11T02:29:06"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: The degree-_ log-inv",
+   "n": 1,
+   "lo": 213748,
+   "hi": 1302835,
+   "usd_hi": 0.3850686,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 213748,
+     "hi": 1302835,
+     "msgs_hi": 6,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T20:30:48"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: _ are both acked",
+   "n": 1,
+   "lo": 404418,
+   "hi": 1216010,
+   "usd_hi": 0.2737388,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 404418,
+     "hi": 1216010,
+     "msgs_hi": 3,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-13T10:18:33"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: _",
+   "n": 1,
+   "lo": 574450,
+   "hi": 1149169,
+   "usd_hi": 0.24250700000000003,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 574450,
+     "hi": 1149169,
+     "msgs_hi": 2,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-18T01:17:01"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "<entry>: no live owner: step _ waited on FA-ccin_p_-_cfff_c FA-ccin_p_",
+   "n": 1,
+   "lo": 188591,
+   "hi": 1139712,
+   "usd_hi": 0.282223,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 188591,
+     "hi": 1139712,
+     "msgs_hi": 6,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T22:38:02"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "<entry>: the design recorded _-_-_T_:_ has no verdict",
+   "n": 1,
+   "lo": 224287,
+   "hi": 1137462,
+   "usd_hi": 0.2865096,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 224287,
+     "hi": 1137462,
+     "msgs_hi": 5,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-21T17:37:16"
+    ]
+   ]
+  },
+  {
+   "hook": "plan.py",
+   "check": "_ already passes in the checkout: it would finish the entry with nothi",
+   "n": 1,
+   "lo": 158907,
+   "hi": 1127999,
+   "usd_hi": 0.2820846,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 1,
+     "lo": 158907,
+     "hi": 1127999,
+     "msgs_hi": 7,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "agent-afb073b8fc9460ec5.jsonl",
+     "2026-11-10T02:32:14"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA MAINTAIN - _ exited _: site: command exited _ on ",
+   "n": 2,
+   "lo": 530002,
+   "hi": 1060128,
+   "usd_hi": 0.2273004,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 2,
+     "lo": 530002,
+     "hi": 1060128,
+     "msgs_hi": 4,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-16T23:46:37"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-17T02:12:56"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: Joaquin: I closed at",
+   "n": 1,
+   "lo": 515386,
+   "hi": 1031029,
+   "usd_hi": 0.2145098,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 515386,
+     "hi": 1031029,
+     "msgs_hi": 2,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-19T13:27:22"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "<entry>: no live owner: ready steps _ of <entry> have no one working o",
+   "n": 1,
+   "lo": 253707,
+   "hi": 1022160,
+   "usd_hi": 0.23805079999999998,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 253707,
+     "hi": 1022160,
+     "msgs_hi": 4,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-17T01:21:27"
+    ]
+   ]
+  },
+  {
+   "hook": "md_guard",
+   "check": "refusing to create new doc file _.",
+   "n": 5,
+   "lo": 1001896,
+   "hi": 1001896,
+   "usd_hi": 6.228449800000001,
+   "dropped": 5,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 4,
+     "lo": 806343,
+     "hi": 806343,
+     "msgs_hi": 67,
+     "dropped": 4
+    },
+    "other agents": {
+     "n": 1,
+     "lo": 195553,
+     "hi": 195553,
+     "msgs_hi": 18,
+     "dropped": 1
+    }
+   },
+   "examples": [
+    [
+     "agent-a14a677afceccea59.jsonl",
+     "2026-11-13T07:01:29"
+    ],
+    [
+     "agent-a4d03f2a6af185e35.jsonl",
+     "2026-11-19T14:02:10"
+    ],
+    [
+     "agent-aaecb8d54f4939e0d.jsonl",
+     "2026-11-13T07:35:03"
+    ],
+    [
+     "agent-ab19284b896bafec4.jsonl",
+     "2026-11-17T10:42:07"
+    ],
+    [
+     "agent-aba79dc379109f4aa.jsonl",
+     "2026-11-10T02:31:18"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA ALERT - HOOK INCIDENT I-_fa_, for a mechanical-wo",
+   "n": 1,
+   "lo": 333189,
+   "hi": 1001825,
+   "usd_hi": 0.252002,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 333189,
+     "hi": 1001825,
+     "msgs_hi": 3,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-13T07:34:40"
+    ]
+   ]
+  },
+  {
+   "hook": "wait_guard",
+   "check": "a background command that polls or <entry> is refused: nobody waits on",
+   "n": 7,
+   "lo": 982383,
+   "hi": 982383,
+   "usd_hi": 0.7307495,
+   "dropped": 5,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 4,
+     "lo": 785626,
+     "hi": 785626,
+     "msgs_hi": 4,
+     "dropped": 2
+    },
+    "reviewers": {
+     "n": 1,
+     "lo": 49093,
+     "hi": 49093,
+     "msgs_hi": 1,
+     "dropped": 1
+    },
+    "owners": {
+     "n": 1,
+     "lo": 103753,
+     "hi": 103753,
+     "msgs_hi": 14,
+     "dropped": 1
+    },
+    "mechanical workers": {
+     "n": 1,
+     "lo": 43911,
+     "hi": 43911,
+     "msgs_hi": 2,
+     "dropped": 1
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-10T09:52:52"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-14T02:57:46"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-18T09:10:08"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-22T16:59:33"
+    ],
+    [
+     "agent-a0af33e5f98272099.jsonl",
+     "2026-11-11T19:48:01"
+    ],
+    [
+     "agent-a30d7264e9acbd802.jsonl",
+     "2026-11-12T13:12:42"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_files_guard",
+   "check": "awk on a plan file)",
+   "n": 9,
+   "lo": 968613,
+   "hi": 968613,
+   "usd_hi": 2.0335984,
+   "dropped": 3,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 95795,
+     "hi": 95795,
+     "msgs_hi": 7,
+     "dropped": 1
+    },
+    "other agents": {
+     "n": 3,
+     "lo": 95646,
+     "hi": 95646,
+     "msgs_hi": 3,
+     "dropped": 0
+    },
+    "owners": {
+     "n": 4,
+     "lo": 696208,
+     "hi": 696208,
+     "msgs_hi": 20,
+     "dropped": 1
+    },
+    "reviewers": {
+     "n": 1,
+     "lo": 80964,
+     "hi": 80964,
+     "msgs_hi": 6,
+     "dropped": 1
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-21T04:24:47"
+    ],
+    [
+     "agent-a2491e61fa26b7942.jsonl",
+     "2026-11-20T02:31:37"
+    ],
+    [
+     "agent-a595c4013ad39e6ca.jsonl",
+     "2026-11-19T13:03:51"
+    ],
+    [
+     "agent-a7c46aac0a7abd381.jsonl",
+     "2026-11-19T13:17:32"
+    ],
+    [
+     "agent-aa5836ca091e40268.jsonl",
+     "2026-11-22T05:23:06"
+    ],
+    [
+     "agent-abcb6d602d52098fc.jsonl",
+     "2026-11-19T13:16:49"
+    ]
+   ]
+  },
+  {
+   "hook": "wait_guard",
+   "check": "an agent's background command goes through the detacher, so that its e",
+   "n": 10,
+   "lo": 512715,
+   "hi": 961364,
+   "usd_hi": 0.48153080000000004,
+   "dropped": 5,
+   "repeat": 0,
+   "roles": {
+    "reviewers": {
+     "n": 2,
+     "lo": 49805,
+     "hi": 49805,
+     "msgs_hi": 4,
+     "dropped": 2
+    },
+    "mechanical workers": {
+     "n": 6,
+     "lo": 218719,
+     "hi": 218719,
+     "msgs_hi": 10,
+     "dropped": 3
+    },
+    "other agents": {
+     "n": 1,
+     "lo": 148431,
+     "hi": 597080,
+     "msgs_hi": 4,
+     "dropped": 0
+    },
+    "owners": {
+     "n": 1,
+     "lo": 95760,
+     "hi": 95760,
+     "msgs_hi": 1,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "agent-a0af33e5f98272099.jsonl",
+     "2026-11-11T19:48:06"
+    ],
+    [
+     "agent-a0af33e5f98272099.jsonl",
+     "2026-11-11T19:48:06"
+    ],
+    [
+     "agent-a2bd85c08c165b33b.jsonl",
+     "2026-11-11T04:06:18"
+    ],
+    [
+     "agent-a5f2aff63bd28c5a8.jsonl",
+     "2026-11-09T23:38:52"
+    ],
+    [
+     "agent-a7421d9fdb2d3a686.jsonl",
+     "2026-11-12T21:25:32"
+    ],
+    [
+     "agent-a7b3dc3cb75351068.jsonl",
+     "2026-11-17T11:20:35"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: The KIT searches did",
+   "n": 1,
+   "lo": 236941,
+   "hi": 959737,
+   "usd_hi": 0.2783392,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 236941,
+     "hi": 959737,
+     "msgs_hi": 4,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T21:21:22"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: Here are the five fi",
+   "n": 1,
+   "lo": 296572,
+   "hi": 897334,
+   "usd_hi": 0.2317866,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 296572,
+     "hi": 897334,
+     "msgs_hi": 3,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-17T02:22:58"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: Joaquin, the dimensi",
+   "n": 1,
+   "lo": 114232,
+   "hi": 854930,
+   "usd_hi": 0.39099700000000004,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 114232,
+     "hi": 854930,
+     "msgs_hi": 7,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-17T12:40:58"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_files_guard",
+   "check": "a python_ script fed by a heredoc that writes a plan file",
+   "n": 3,
+   "lo": 593977,
+   "hi": 852387,
+   "usd_hi": 3.4748285999999995,
+   "dropped": 2,
+   "repeat": 0,
+   "roles": {
+    "other agents": {
+     "n": 3,
+     "lo": 593977,
+     "hi": 852387,
+     "msgs_hi": 54,
+     "dropped": 2
+    }
+   },
+   "examples": [
+    [
+     "agent-a3433fbc56e65e68c.jsonl",
+     "2026-11-09T22:58:41"
+    ],
+    [
+     "agent-a3433fbc56e65e68c.jsonl",
+     "2026-11-09T22:59:50"
+    ],
+    [
+     "agent-a5f2aff63bd28c5a8.jsonl",
+     "2026-11-09T23:10:46"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: Fig",
+   "n": 1,
+   "lo": 398248,
+   "hi": 796527,
+   "usd_hi": 0.17211720000000003,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 398248,
+     "hi": 796527,
+     "msgs_hi": 2,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-17T04:18:58"
+    ]
+   ]
+  },
+  {
+   "hook": "send_check",
+   "check": "a figure must be drawn by a committed tool through ps.save, its legend",
+   "n": 5,
+   "lo": 779282,
+   "hi": 779282,
+   "usd_hi": 0.35070100000000004,
+   "dropped": 1,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 5,
+     "lo": 779282,
+     "hi": 779282,
+     "msgs_hi": 5,
+     "dropped": 1
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-16T22:41:19"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-16T22:55:08"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-16T23:11:11"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-16T23:11:11"
+    ],
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-16T23:11:26"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA ALERT - HOOK INCIDENT I-_fea_d_, for a mechanical",
+   "n": 1,
+   "lo": 257229,
+   "hi": 773585,
+   "usd_hi": 0.201728,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 257229,
+     "hi": 773585,
+     "msgs_hi": 3,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-20T01:59:19"
+    ]
+   ]
+  },
+  {
+   "hook": "plan.py",
+   "check": "<entry> step _ would wait on the user",
+   "n": 4,
+   "lo": 587138,
+   "hi": 745106,
+   "usd_hi": 0.2133136,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 4,
+     "lo": 587138,
+     "hi": 745106,
+     "msgs_hi": 5,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "agent-a09a17fa36ad25dbd.jsonl",
+     "2026-11-20T01:51:07"
+    ],
+    [
+     "agent-a0f7f76dc1ed0520d.jsonl",
+     "2026-11-13T08:12:14"
+    ],
+    [
+     "agent-a5644f3943a4f9a4f.jsonl",
+     "2026-11-22T10:32:03"
+    ],
+    [
+     "agent-ab76a6886e2c96d3b.jsonl",
+     "2026-11-19T13:36:33"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: ROUTINE: all six fai",
+   "n": 1,
+   "lo": 365388,
+   "hi": 731615,
+   "usd_hi": 0.1599214,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 365388,
+     "hi": 731615,
+     "msgs_hi": 2,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T16:07:54"
+    ]
+   ]
+  },
+  {
+   "hook": "git_verify_guard",
+   "check": "git pull",
+   "n": 4,
+   "lo": 728111,
+   "hi": 728111,
+   "usd_hi": 3.6824917999999998,
+   "dropped": 3,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 3,
+     "lo": 546833,
+     "hi": 546833,
+     "msgs_hi": 38,
+     "dropped": 2
+    },
+    "other agents": {
+     "n": 1,
+     "lo": 181278,
+     "hi": 181278,
+     "msgs_hi": 23,
+     "dropped": 1
+    }
+   },
+   "examples": [
+    [
+     "agent-a14a677afceccea59.jsonl",
+     "2026-11-13T07:00:01"
+    ],
+    [
+     "agent-a237615c421bbf029.jsonl",
+     "2026-11-10T01:22:56"
+    ],
+    [
+     "agent-a75868725fdec3ff2.jsonl",
+     "2026-11-13T01:40:08"
+    ],
+    [
+     "agent-a9e82ab69626a9a4f.jsonl",
+     "2026-11-13T04:32:18"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: Joaquin, the per-mul",
+   "n": 1,
+   "lo": 175232,
+   "hi": 703127,
+   "usd_hi": 0.1671408,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 175232,
+     "hi": 703127,
+     "msgs_hi": 4,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-18T23:37:38"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: ROUTINE: I took Joaq",
+   "n": 1,
+   "lo": 172904,
+   "hi": 695050,
+   "usd_hi": 0.1741354,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 172904,
+     "hi": 695050,
+     "msgs_hi": 4,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-13T03:39:53"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA ALERT - HOOK INCIDENT I-a_a_, for a mechanical-wo",
+   "n": 1,
+   "lo": 332923,
+   "hi": 665915,
+   "usd_hi": 0.1558756,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 332923,
+     "hi": 665915,
+     "msgs_hi": 2,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-15T17:12:46"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: The driver no longer",
+   "n": 1,
+   "lo": 323351,
+   "hi": 646746,
+   "usd_hi": 0.1358418,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 323351,
+     "hi": 646746,
+     "msgs_hi": 2,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T22:58:08"
+    ]
+   ]
+  },
+  {
+   "hook": "brief_guard",
+   "check": "the added text overrides the capacity and scope rules",
+   "n": 1,
+   "lo": 317401,
+   "hi": 636055,
+   "usd_hi": 0.1749484,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 317401,
+     "hi": 636055,
+     "msgs_hi": 2,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-22T04:06:45"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: Joaquin, the W paren",
+   "n": 1,
+   "lo": 310527,
+   "hi": 621087,
+   "usd_hi": 0.1349634,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 310527,
+     "hi": 621087,
+     "msgs_hi": 2,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-20T02:52:31"
+    ]
+   ]
+  },
+  {
+   "hook": "worktree_fold_guard",
+   "check": "worktree _ still holds results that",
+   "n": 2,
+   "lo": 596017,
+   "hi": 596017,
+   "usd_hi": 0.72369,
+   "dropped": 2,
+   "repeat": 0,
+   "roles": {
+    "other agents": {
+     "n": 2,
+     "lo": 596017,
+     "hi": 596017,
+     "msgs_hi": 9,
+     "dropped": 2
+    }
+   },
+   "examples": [
+    [
+     "agent-a74fb932acb5d82dc.jsonl",
+     "2026-11-09T23:51:14"
+    ],
+    [
+     "agent-a74fb932acb5d82dc.jsonl",
+     "2026-11-09T23:51:50"
+    ]
+   ]
+  },
+  {
+   "hook": "git_verify_guard",
+   "check": "a commit message attributing the work to an assistant",
+   "n": 14,
+   "lo": 581768,
+   "hi": 581768,
+   "usd_hi": 0.23415539999999999,
+   "dropped": 3,
+   "repeat": 0,
+   "roles": {
+    "mechanical workers": {
+     "n": 13,
+     "lo": 380768,
+     "hi": 380768,
+     "msgs_hi": 17,
+     "dropped": 3
+    },
+    "owners": {
+     "n": 1,
+     "lo": 201000,
+     "hi": 201000,
+     "msgs_hi": 1,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "agent-a17ffa580506b4012.jsonl",
+     "2026-11-12T14:47:59"
+    ],
+    [
+     "agent-a3dcdac97283ea06e.jsonl",
+     "2026-11-12T14:32:27"
+    ],
+    [
+     "agent-a5ac3cec986d0c033.jsonl",
+     "2026-11-20T02:07:00"
+    ],
+    [
+     "agent-a7b3dc3cb75351068.jsonl",
+     "2026-11-17T11:24:25"
+    ],
+    [
+     "agent-a7e4530717bfe0472.jsonl",
+     "2026-11-12T10:12:43"
+    ],
+    [
+     "agent-a9b44fa6a5d7f82ac.jsonl",
+     "2026-11-19T00:45:11"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: ROUTINE: _ are acked",
+   "n": 1,
+   "lo": 88512,
+   "hi": 566590,
+   "usd_hi": 0.24896080000000004,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 88512,
+     "hi": 566590,
+     "msgs_hi": 6,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T02:15:59"
+    ]
+   ]
+  },
+  {
+   "hook": "wait_guard",
+   "check": "a Monitor is refused: nobody waits on jobs",
+   "n": 3,
+   "lo": 562298,
+   "hi": 562298,
+   "usd_hi": 2.3678714,
+   "dropped": 3,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 2,
+     "lo": 323710,
+     "hi": 323710,
+     "msgs_hi": 37,
+     "dropped": 2
+    },
+    "other agents": {
+     "n": 1,
+     "lo": 238588,
+     "hi": 238588,
+     "msgs_hi": 3,
+     "dropped": 1
+    }
+   },
+   "examples": [
+    [
+     "agent-a0f7f76dc1ed0520d.jsonl",
+     "2026-11-13T07:25:24"
+    ],
+    [
+     "agent-a4b2e4f58e3b9081f.jsonl",
+     "2026-11-17T12:09:11"
+    ],
+    [
+     "agent-ac941999d5d09e98c.jsonl",
+     "2026-11-19T09:19:44"
+    ]
+   ]
+  },
+  {
+   "hook": "git_verify_guard",
+   "check": "merging sigma-gen into trunk brings changes no reviewer has passed",
+   "n": 1,
+   "lo": 69321,
+   "hi": 545308,
+   "usd_hi": 0.262216,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "other agents": {
+     "n": 1,
+     "lo": 69321,
+     "hi": 545308,
+     "msgs_hi": 7,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "agent-a1c22b0fc38cc284c.jsonl",
+     "2026-11-10T00:46:57"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: Joaquin's three poin",
+   "n": 1,
+   "lo": 170792,
+   "hi": 517298,
+   "usd_hi": 0.1395536,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 170792,
+     "hi": 517298,
+     "msgs_hi": 3,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-12T18:51:21"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: ROUTINE: Fixed the _",
+   "n": 1,
+   "lo": 254458,
+   "hi": 508971,
+   "usd_hi": 0.12442740000000002,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 254458,
+     "hi": 508971,
+     "msgs_hi": 2,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-17T15:20:42"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: Section",
+   "n": 1,
+   "lo": 162821,
+   "hi": 494300,
+   "usd_hi": 0.1486904,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 162821,
+     "hi": 494300,
+     "msgs_hi": 3,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-13T03:36:28"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: **Verdict: block.** ",
+   "n": 1,
+   "lo": 245353,
+   "hi": 490748,
+   "usd_hi": 0.10574140000000001,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 245353,
+     "hi": 490748,
+     "msgs_hi": 2,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-19T00:03:34"
+    ]
+   ]
+  },
+  {
+   "hook": "submit_guard",
+   "check": "data: _ of a job that trains on _ name the site _ gave, so its pools c",
+   "n": 1,
+   "lo": 244888,
+   "hi": 490474,
+   "usd_hi": 0.11198620000000001,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 1,
+     "lo": 244888,
+     "hi": 490474,
+     "msgs_hi": 2,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "agent-a2a4836c90d93265b.jsonl",
+     "2026-11-10T03:38:37"
+    ]
+   ]
+  },
+  {
+   "hook": "plan.py",
+   "check": "Joaquin_s rare terms and may already answer it",
+   "n": 2,
+   "lo": 484914,
+   "hi": 484914,
+   "usd_hi": 0.15343220000000002,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 2,
+     "lo": 484914,
+     "hi": 484914,
+     "msgs_hi": 2,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "agent-a7b24b3d46311d66f.jsonl",
+     "2026-11-17T11:16:16"
+    ],
+    [
+     "agent-af2bc6219bb4a56b5.jsonl",
+     "2026-11-20T01:53:38"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: <entry>: the hand-of",
+   "n": 1,
+   "lo": 211818,
+   "hi": 423699,
+   "usd_hi": 0.0958344,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 211818,
+     "hi": 423699,
+     "msgs_hi": 2,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-17T14:38:03"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA RUN_DONE <entry> _ run(s) recorded on <entry> fin",
+   "n": 1,
+   "lo": 211532,
+   "hi": 423177,
+   "usd_hi": 0.0956922,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 211532,
+     "hi": 423177,
+     "msgs_hi": 2,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T22:49:08"
+    ]
+   ]
+  },
+  {
+   "hook": "submit_guard",
+   "check": "rundir: _ of _ name the site _ gave, so _ can be checked there",
+   "n": 1,
+   "lo": 208985,
+   "hi": 418604,
+   "usd_hi": 0.10006860000000001,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 1,
+     "lo": 208985,
+     "hi": 418604,
+     "msgs_hi": 2,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "agent-a57c4c5a332c9e185.jsonl",
+     "2026-11-21T00:45:22"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_files_guard",
+   "check": "git on a plan file)",
+   "n": 3,
+   "lo": 401996,
+   "hi": 401996,
+   "usd_hi": 0.14346399999999998,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "mechanical workers": {
+     "n": 1,
+     "lo": 35655,
+     "hi": 35655,
+     "msgs_hi": 1,
+     "dropped": 0
+    },
+    "owners": {
+     "n": 2,
+     "lo": 366341,
+     "hi": 366341,
+     "msgs_hi": 2,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "agent-a5ac3cec986d0c033.jsonl",
+     "2026-11-20T02:07:04"
+    ],
+    [
+     "agent-ad22b7980a1852494.jsonl",
+     "2026-11-11T18:57:54"
+    ],
+    [
+     "agent-af87a27c4f768396f.jsonl",
+     "2026-11-12T17:22:35"
+    ]
+   ]
+  },
+  {
+   "hook": "plan.py",
+   "check": "<entry> has no next step _",
+   "n": 2,
+   "lo": 397974,
+   "hi": 397974,
+   "usd_hi": 0.0911144,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 2,
+     "lo": 397974,
+     "hi": 397974,
+     "msgs_hi": 2,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "agent-a0f7f76dc1ed0520d.jsonl",
+     "2026-11-13T08:11:49"
+    ],
+    [
+     "agent-a0f7f76dc1ed0520d.jsonl",
+     "2026-11-13T08:13:51"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: Joaquin, both figure",
+   "n": 1,
+   "lo": 189221,
+   "hi": 378497,
+   "usd_hi": 0.082873,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 189221,
+     "hi": 378497,
+     "msgs_hi": 2,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-18T23:46:35"
+    ]
+   ]
+  },
+  {
+   "hook": "plan.py",
+   "check": "<entry>: before ending your turn, put each of these in flight, under _",
+   "n": 2,
+   "lo": 354328,
+   "hi": 354328,
+   "usd_hi": 0.0946072,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 2,
+     "lo": 354328,
+     "hi": 354328,
+     "msgs_hi": 2,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "agent-a0f7f76dc1ed0520d.jsonl",
+     "2026-11-13T08:11:37"
+    ],
+    [
+     "agent-ab76a6886e2c96d3b.jsonl",
+     "2026-11-19T13:37:11"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA ALERT - HOOK INCIDENT I-_f_ca_, for the main sess",
+   "n": 1,
+   "lo": 99324,
+   "hi": 301226,
+   "usd_hi": 0.0928988,
+   "dropped": 1,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 99324,
+     "hi": 301226,
+     "msgs_hi": 3,
+     "dropped": 1
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-09T12:36:17"
+    ]
+   ]
+  },
+  {
+   "hook": "plan.py",
+   "check": "<entry> step _ waits on: FA-ccin_p_-c_b_ FA-ccin_p_-_f FA-ccin_p_-a_e_",
+   "n": 1,
+   "lo": 295526,
+   "hi": 295526,
+   "usd_hi": 0.2305532,
+   "dropped": 1,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 1,
+     "lo": 295526,
+     "hi": 295526,
+     "msgs_hi": 3,
+     "dropped": 1
+    }
+   },
+   "examples": [
+    [
+     "agent-a995230f58ebd3599.jsonl",
+     "2026-11-11T05:18:15"
+    ]
+   ]
+  },
+  {
+   "hook": "plan.py",
+   "check": "already answered: _ on <entry>, _-_-_T_:_",
+   "n": 1,
+   "lo": 282133,
+   "hi": 282133,
+   "usd_hi": 0.0692748,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 1,
+     "lo": 282133,
+     "hi": 282133,
+     "msgs_hi": 1,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "agent-a7b24b3d46311d66f.jsonl",
+     "2026-11-17T11:16:46"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: _ is redrawn by the ",
+   "n": 1,
+   "lo": 277288,
+   "hi": 277288,
+   "usd_hi": 0.060828400000000005,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 277288,
+     "hi": 277288,
+     "msgs_hi": 1,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-19T00:28:26"
+    ]
+   ]
+  },
+  {
+   "hook": "git_verify_guard",
+   "check": "merging pid_vs_qn into trunk brings changes no reviewer has passed",
+   "n": 1,
+   "lo": 276124,
+   "hi": 276124,
+   "usd_hi": 1.413305,
+   "dropped": 1,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 1,
+     "lo": 276124,
+     "hi": 276124,
+     "msgs_hi": 20,
+     "dropped": 1
+    }
+   },
+   "examples": [
+    [
+     "agent-aba79dc379109f4aa.jsonl",
+     "2026-11-10T02:32:52"
+    ]
+   ]
+  },
+  {
+   "hook": "plan.py",
+   "check": "hand-off of <entry> written",
+   "n": 1,
+   "lo": 270752,
+   "hi": 270752,
+   "usd_hi": 0.0659276,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 1,
+     "lo": 270752,
+     "hi": 270752,
+     "msgs_hi": 1,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "agent-a765e8d955c16a241.jsonl",
+     "2026-11-22T04:57:30"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_files_guard",
+   "check": "sed on a plan file)",
+   "n": 1,
+   "lo": 257300,
+   "hi": 257300,
+   "usd_hi": 0.061119200000000005,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "other agents": {
+     "n": 1,
+     "lo": 257300,
+     "hi": 257300,
+     "msgs_hi": 1,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "agent-a3433fbc56e65e68c.jsonl",
+     "2026-11-09T22:58:28"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_check",
+   "check": "open event: _-_:_ FA HANDBACK - hand-back from _: Joaquin, _",
+   "n": 1,
+   "lo": 122064,
+   "hi": 245726,
+   "usd_hi": 0.08185339999999999,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 122064,
+     "hi": 245726,
+     "msgs_hi": 2,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-18T05:43:41"
+    ]
+   ]
+  },
+  {
+   "hook": "submit_guard",
+   "check": "wall: _ v_het_long_best with --hdr=--time=_:_:_ is below the _ h its o",
+   "n": 1,
+   "lo": 232381,
+   "hi": 232381,
+   "usd_hi": 0.8909902000000001,
+   "dropped": 1,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 1,
+     "lo": 232381,
+     "hi": 232381,
+     "msgs_hi": 14,
+     "dropped": 1
+    }
+   },
+   "examples": [
+    [
+     "agent-a78702a7c3fd231ea.jsonl",
+     "2026-11-17T19:38:38"
+    ]
+   ]
+  },
+  {
+   "hook": "plan.py",
+   "check": "<entry> step _ waits on: FA-ccin_p_-_d_b_ FA-ccin_p_-e_d_ec",
+   "n": 1,
+   "lo": 228129,
+   "hi": 228129,
+   "usd_hi": 0.204408,
+   "dropped": 1,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 1,
+     "lo": 228129,
+     "hi": 228129,
+     "msgs_hi": 3,
+     "dropped": 1
+    }
+   },
+   "examples": [
+    [
+     "agent-a87ebdd2344eb92d7.jsonl",
+     "2026-11-12T01:10:13"
+    ]
+   ]
+  },
+  {
+   "hook": "plan.py",
+   "check": "target of d_rezero_uug_ttvirt on <entry>: _ h for _ jobs",
+   "n": 1,
+   "lo": 227335,
+   "hi": 227335,
+   "usd_hi": 0.064827,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 1,
+     "lo": 227335,
+     "hi": 227335,
+     "msgs_hi": 1,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "agent-aa8a9eef01c5d5c94.jsonl",
+     "2026-11-12T04:32:20"
+    ]
+   ]
+  },
+  {
+   "hook": "git_verify_guard",
+   "check": "merging lrcentre into trunk brings changes no reviewer has passed",
+   "n": 1,
+   "lo": 206456,
+   "hi": 206456,
+   "usd_hi": 0.09440440000000001,
+   "dropped": 1,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 1,
+     "lo": 206456,
+     "hi": 206456,
+     "msgs_hi": 2,
+     "dropped": 1
+    }
+   },
+   "examples": [
+    [
+     "agent-a30d7264e9acbd802.jsonl",
+     "2026-11-12T14:09:27"
+    ]
+   ]
+  },
+  {
+   "hook": "submit_guard",
+   "check": "epoch: _ v_het_default_ trains _ steps x batch _ = _e+_ events over a ",
+   "n": 1,
+   "lo": 204475,
+   "hi": 204475,
+   "usd_hi": 0.0568998,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 1,
+     "lo": 204475,
+     "hi": 204475,
+     "msgs_hi": 1,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "agent-a87ebdd2344eb92d7.jsonl",
+     "2026-11-12T00:29:31"
+    ]
+   ]
+  },
+  {
+   "hook": "git_verify_guard",
+   "check": "merging kit_protoA into trunk brings changes no reviewer has passed",
+   "n": 1,
+   "lo": 203780,
+   "hi": 203780,
+   "usd_hi": 0.7824026000000001,
+   "dropped": 1,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 1,
+     "lo": 203780,
+     "hi": 203780,
+     "msgs_hi": 13,
+     "dropped": 1
+    }
+   },
+   "examples": [
+    [
+     "agent-a06276d2ba4ba402b.jsonl",
+     "2026-11-10T03:57:00"
+    ]
+   ]
+  },
+  {
+   "hook": "brief_guard",
+   "check": "the step cuts the work",
+   "n": 1,
+   "lo": 200125,
+   "hi": 200125,
+   "usd_hi": 0.0747924,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "main session": {
+     "n": 1,
+     "lo": 200125,
+     "hi": 200125,
+     "msgs_hi": 1,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "71602535-0955-42ad-a58f-23dc320798dc.jsonl",
+     "2026-11-11T08:49:15"
+    ]
+   ]
+  },
+  {
+   "hook": "plan.py",
+   "check": "<entry> has no next step",
+   "n": 1,
+   "lo": 196041,
+   "hi": 196041,
+   "usd_hi": 0.0441214,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 1,
+     "lo": 196041,
+     "hi": 196041,
+     "msgs_hi": 1,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "agent-a0f7f76dc1ed0520d.jsonl",
+     "2026-11-13T08:12:24"
+    ]
+   ]
+  },
+  {
+   "hook": "plan.py",
+   "check": "<entry> next _: Close: write up in _ what the redesign changed and mea",
+   "n": 1,
+   "lo": 189976,
+   "hi": 189976,
+   "usd_hi": 0.073518,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 1,
+     "lo": 189976,
+     "hi": 189976,
+     "msgs_hi": 1,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "agent-ab33cfe08e8f1ac89.jsonl",
+     "2026-11-19T09:45:02"
+    ]
+   ]
+  },
+  {
+   "hook": "plan.py",
+   "check": "target of nooffshell on <entry>: _ h for _ jobs",
+   "n": 1,
+   "lo": 172411,
+   "hi": 172411,
+   "usd_hi": 0.048085800000000005,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 1,
+     "lo": 172411,
+     "hi": 172411,
+     "msgs_hi": 1,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "agent-acb06568a509d0cc2.jsonl",
+     "2026-11-10T08:38:11"
+    ]
+   ]
+  },
+  {
+   "hook": "plan.py",
+   "check": "finding recorded on <entry>",
+   "n": 1,
+   "lo": 159695,
+   "hi": 159695,
+   "usd_hi": 0.0462098,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 1,
+     "lo": 159695,
+     "hi": 159695,
+     "msgs_hi": 1,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "agent-a07b29701ce6d7a7c.jsonl",
+     "2026-11-22T07:51:35"
+    ]
+   ]
+  },
+  {
+   "hook": "submit_guard",
+   "check": "data: _ deletes under a data path on a site by hand",
+   "n": 1,
+   "lo": 71858,
+   "hi": 71858,
+   "usd_hi": 0.0330734,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "owners": {
+     "n": 1,
+     "lo": 71858,
+     "hi": 71858,
+     "msgs_hi": 1,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "agent-a54fe33a1743eb2d3.jsonl",
+     "2026-11-22T12:21:00"
+    ]
+   ]
+  },
+  {
+   "hook": "plan.py",
+   "check": "PLAN_TEST=_ needs PLAN_ROOT under _",
+   "n": 1,
+   "lo": 25039,
+   "hi": 25039,
+   "usd_hi": 0.012902700000000001,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "mechanical workers": {
+     "n": 1,
+     "lo": 25039,
+     "hi": 25039,
+     "msgs_hi": 1,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "agent-a4ee88ec4ff80b7f9.jsonl",
+     "2026-11-10T08:43:59"
+    ]
+   ]
+  },
+  {
+   "hook": "plan_files_guard",
+   "check": "for on a plan file)",
+   "n": 1,
+   "lo": 18477,
+   "hi": 18477,
+   "usd_hi": 0.0111436,
+   "dropped": 0,
+   "repeat": 0,
+   "roles": {
+    "other agents": {
+     "n": 1,
+     "lo": 18477,
+     "hi": 18477,
+     "msgs_hi": 1,
+     "dropped": 0
+    }
+   },
+   "examples": [
+    [
+     "agent-a2491e61fa26b7942.jsonl",
+     "2026-11-20T02:31:01"
+    ]
+   ]
+  },
+  {
+   "hook": "plan.py",
+   "check": "<entry> is not done:",
+   "n": 1,
+   "lo": 17122,
+   "hi": 17122,
+   "usd_hi": 0.0199005,
+   "dropped": 1,
+   "repeat": 0,
+   "roles": {
+    "mechanical workers": {
+     "n": 1,
+     "lo": 17122,
+     "hi": 17122,
+     "msgs_hi": 2,
+     "dropped": 1
+    }
+   },
+   "examples": [
+    [
+     "agent-ab963da2644a3b182.jsonl",
+     "2026-11-10T02:27:18"
+    ]
+   ]
+  }
+ ],
+ "verdicts": {
+  "sleep_guard": {
+   "short": 50,
+   "loop": 19,
+   "over_5s": 5,
+   "quoted_only": 16
+  },
+  "commit_block": {
+   "names_pillar_file": 63,
+   "unknown": 5,
+   "names_none": 12
+  },
+  "context_guard": {
+   "bounces_before": 121,
+   "compactions_before": 13,
+   "compactions_after": 3,
+   "bounces_after": 2
+  },
+  "question_replay": {
+   "passes_today": 24,
+   "refused_today": 36
+  }
+ }
+}
