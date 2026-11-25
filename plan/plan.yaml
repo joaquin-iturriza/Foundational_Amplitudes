@@ -46278,6 +46278,17 @@ entries:
       clean in 0.63 h of its 1.0 h target (every stage, CBS_UPD_ZNG_DONE); reader dl_read.py 4ab0987c8 with known-answer test;
       noise_scale.json fetch pending (CC ssh timeout). (4) wt-cbs-accum removed (remove_worktree.sh); wt-critbatch already
       gone.'
+  - at: '2026-11-25T14:34:45+00:00'
+    text: '2026-11-25 15:45 D560 part B, Z+4g read (dl_read.py 4ab0987c8..; data/zng4g_update_bdl.json, figs/zng4g_update_bdl.png;
+      run FA-ccin2p3-cedaa6dd, Adam hp1152, early stop ~step 1300, 26 dL reads, b = 64..1024): no B_dL. Every read at every
+      b has dL(b) < 0 (window means -3.8 to -96.7): one step of the update as defined (momentum 0, g/(sqrt(v_hat)+eps) x lr)
+      raises the loss on the other chunks; its first-order part A(b) is positive (0.50 to 6.2) and nearly flat in b, and the
+      second-order part (A - dL) is 5.7-22.5 times A at b=1024; dL(1024)/dL(64) = 0.64-1.23 (b-flat). By the design''s rule
+      fixed before the data, all 7 windows (200 steps; 400-step pooling the same) are listed apart, none fitted. Cause, as
+      read from the update map (base_experiment._update_map l.1789-1823): the momentum-0 step is lr g/sqrt(v_hat), while the
+      run''s Adam (beta1 0.99) puts (1 - beta1) = 1% of the current gradient into its step: the measured step is ~100x the
+      current batch''s share of the real step and sits past the quadratic''s turning point (A/(A-dL) = 0.04-0.15 of it would
+      still decrease the loss). Same b-independent overshoot as the pretraining smoke (dL -458, read then as an early effect).'
   handoff:
     state: 'Steps 2-4 in flight or stopped. Step 2 (D560 part B, pretraining): FA-ccin2p3-3e856594 runs v4_het_update_noise
       at the scan''s batch-16384 best hp 1333 (design passed 12:38 by a4f3d7192edf30268; code merged 5109b8182; smoke FA-ccin2p3-b587c065
