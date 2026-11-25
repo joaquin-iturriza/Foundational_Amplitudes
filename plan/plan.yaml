@@ -48713,7 +48713,7 @@ entries:
       goes into the D392 setup only below every trained momentum (coordinator, 2026-11-25)'
   owner:
     agent: acfbcee1963f1ac62
-    state: working
+    state: closed
     since: '2026-11-25T15:24:52+00:00'
     state_at: '2026-11-25T20:59:38.455000+00:00'
     context: 233348
@@ -49224,59 +49224,32 @@ entries:
     '3': detached srmin_recipe (support_rule.py minima, finale pools from recipes/transfer_finale.yaml; reads ~25 min after
       22:00)
   handoff:
-    state: 'Step 3 done: par:selres_split (33726387b, fig analysis/selective_rescale/figs/uug_split.png): rescale below x=0.1''s
-      u u~ g cost sits in the events it changes (softest x<0.1, 2304/100000 val events) 4.23x [3.50,5.10] / 8.56x [5.91,12.38]
-      at 1e4/1e5, rest 0.88x [0.68,1.13] / 1.61x [1.12,2.33]. Joaquin''s D561 then asked for the rescale only where it helps.
-      D561 test (design PASSED 2026-11-25 ~13:13, second round after a FIX): the D539 rescale only below x0=0.009, under the
-      softest x of every pool (support_minima.json: Z+4g train 0.00923, u u~ g 0.01107), so training and bulk validation are
-      exactly the no-rescale runs (zero bulk cost by construction); scored eval-only by kit-scoring the 12 no-rescale runs
-      without and with the rule (support_rule.py score, CC CPU jobs, REBUILD_SET in tools/rebuild_run.py). Result so far:
-      the 6 Z+4g runs skipped correctly (their kit has 0 events below x0: the rule changes nothing on Z+4g); the 6 u u~ g
-      scorings returned an error arm (the counts are right: the rule changes all 100000 events of the soft_x strata 1e-7..1e-3
-      and 95375 of 0.001-0.01, no coll_y event), whose text the reader cut off; print fixed at 13e6c491c. NEXT: (1) rerun
-      uug_1e4_42: site_python: SRKIT runs as a CPU job on ccin2p3 (its login nodes take no scripts); the same call again,
-      once the job has
-
-      uug_1e4_43: site_python: SRKIT runs as a CPU job on ccin2p3 (its login nodes take no scripts); the same call again,
-      once the job has
-
-      uug_1e4_44: site_python: SRKIT runs as a CPU job on ccin2p3 (its login nodes take no scripts); the same call again,
-      once the job has
-
-      uug_1e5_42: site_python: SRKIT runs as a CPU job on ccin2p3 (its login nodes take no scripts); the same call again,
-      once the job has
-
-      uug_1e5_43: site_python: SRKIT runs as a CPU job on ccin2p3 (its login nodes take no scripts); the same call again,
-      once the job has
-
-      uug_1e5_44: site_python: SRKIT runs as a CPU job on ccin2p3 (its login nodes take no scripts); the same call again,
-      once the job has
-
-      {"missing": ["uug_1e4_42", "uug_1e4_43", "uug_1e4_44", "uug_1e5_42", "uug_1e5_43", "uug_1e5_44"], "read": ["zng_1e4_42",
-      "zng_1e4_43", "zng_1e4_44", "zng_1e5_42", "zng_1e5_43", "zng_1e5_44"]} (it resubmits the 6 missing u u~ g jobs; a later
-      call reads them; run the re-read through tools/detach.py), read the printed error of each arm, fix it (likely in tools/kit_predict
-      --out or the REBUILD_SET rebuild path; the off arm errors too if it is the kit_predict path), resubmit; (2) readout
-      per the passed design''s outcome (pipeline checks: rule_model values asserted, off arm reproduces d539u_kit_raw.json
-      to |log10|<0.01, 0-changed strata equal; YES = deepest soft bin below no rescale by more than its seed spread 0.59/0.64
-      dec and no changed stratum above its own no-rescale seed spread), figure against no rescale (bulk Z+4g and u u~ g at
-      1e4/1e5 identical by construction, kit strata both arms), checked caption, write-up par after par:selres_split, hand
-      back. For Joaquin the hand-back must also carry, in two sentences: why the rescale was adopted (D374 kit input arms,
-      u u~ g 1e5, batch 16384, 8000 steps: deepest soft bin 14180 -> 0.393; the only in-range comparison was the u u~ g kit
-      bulk_test 8.2e-4 -> 5.4e-4, no Z+4g or other in-range validation before D392''s adoption) and why x0<=0.05 (an input-level
-      argument, never measured: ''no trained branch to extrapolate'') and the log side channel (measured by D374: pair logs
-      soft 19100 vs 14180) were dead ends.'
-    decisions: 'Joaquin''s: D552 (question), D561 (only where it helps, against no rescale; closes the replace/keep/drop question).
-      Mine (re-justify): x0=0.009 from the measured pool minima; eval-only rescoring because a rule below every trained momentum
-      leaves training unchanged; Z+4g scored only where its kit has events below x0 (it has none); stratum-level YES and pipeline
-      proof per the design reviewer''s FIX; ft_bcrit.py untracked again (236c530c2) as the critical_batch owner''s unfinished
-      work after a worker committed it (0a2ba9b0f); par:selres_split reads the final model after the sigma fit (D276), stage
-      2''s 2.90 is the curve best.'
-    ruled_out: 'Rescale below x=0.3 and the event gate (Z+4g bulk cost, dead ends); rescale below x=0.1 hurts the trained
-      soft events it changes (par:selres_split); earlier: x0<=0.05 by argument, two-input by D374''s pair-log measurement.'
-    running: none (the 12 CC CPU jobs ended; reader acked E9204)
-    files: analysis/selective_rescale/support_rule.py, data/support_minima.json, data/support_kit.json (Z+4g read), uug_split.py,
-      data/uug_split.json, figs/uug_split.png, tools/rebuild_run.py (REBUILD_SET), docs/results.tex par:selres_split
-    written: '2026-11-25T15:22:53+00:00'
+    state: 'D561 test done: rescale only below x0=0.009 (below every trained u u~ g and Z+4g momentum) scored eval-only on
+      the 6 no-rescale u u~ g runs: YES at both sizes (deepest soft kit bin 4924->1.44 at 1e4, 7580->0.93 at 1e5, -3.53/-3.91
+      dec vs spreads 0.59/0.64; all 5 changed strata fall; bulk and collinear identical; pipeline checks pass). Write-up par:selres_support
+      + fig:selres_support (d424ea5b0, notes-editor passed; fig analysis/selective_rescale/figs/support_rule.png, caption
+      checked). Step 3 (coordinator: settled by D561, ask withdrawn): put the rule into the D392 setup. The finale parent''s
+      log lists no pools, so minima now reads the finale''s 28 processes from recipes/transfer_finale.yaml (f5545dd50); running
+      as detached srmin_recipe. NEXT: (1) read data/support_minima.json finale (min over every key''s ''min''); (2) in scripts/job_datasaving_parent.sh
+      finale FIX add ++model.input_soft_x0=<x0>, x0 below min(finale minimum, Z+4g train 0.00923) (the parent''s fine-tunes
+      train on Z+4g), state its source in the header comment; flags=off still zeroes input_soft_eps; (3) test the flag build
+      (extract the case/FIX in bash, check x0 present and flags=off gives eps 0) and tests/test_input_reps.py::test_soft_x0_only_soft_momenta
+      in .venv-cpu; (4) add to par:selres_support that runs trained before the switch keep the full rescale, so comparisons
+      across it mix the two; with x0 below every trained momentum, D392-setup training equals no-rescale training and the
+      rescale acts only on out-of-range soft momenta; (5) notes-editor review (review_backlog.sh), commit, plan done --writeup.'
+    decisions: 'Joaquin''s: D552 (question), D561 (only where it helps; reference no rescale; per the coordinator it also
+      settles putting the rule into the D392 setup), D392 (incorporate what gives a gain). Mine (re-justify): x0=0.009 from
+      measured pool minima; eval-only scoring since the rule leaves training unchanged; own CPU job at 16G (site run --job
+      gives 2G, kit_predict OOM); site pick --only ccin2p3 (run dirs on CC only); full rescale kept out of the figure (reference
+      is no rescale), quoted in text as context; x0 for the D392 setup also below Z+4g train 0.00923 because its fine-tunes
+      train on Z+4g.'
+    ruled_out: Rescale below x=0.3 and the event gate (Z+4g bulk cost); rescale below x=0.1 (costs the trained soft events
+      it changes, par:selres_split); x0<=0.05 by argument; two-input by D374's pair-log measurement.
+    running: detached srmin_recipe (CC CPU job via site_python, minima on the finale recipe pools)
+    files: analysis/selective_rescale/support_rule.py (score/read/plot/minima/remote/jobs), scripts/job_support_rule.sh, data/support_kit.json,
+      support_read.json, support_jobs.json, support_minima.json, figs/support_rule.png, docs/results.tex par:selres_support,
+      scripts/job_datasaving_parent.sh (to change)
+    written: '2026-11-25T21:01:30+00:00'
   step_why:
     3:
       feeds: 'D392/D561: the D392 setup''s input map'
