@@ -45214,6 +45214,17 @@ entries:
       2048 at 3251, 4096 at 7409, 32768 at 918/3184/3769; timeouts at 2048 (18020/18190/19125, 3:27 limits set before the
       rate was measured) not rerun: none can change a batch''s best (each target reached by step 7100), rerun would cost ~19
       GPU-h.'
+  - at: '2026-11-25T12:22:29+00:00'
+    text: '2026-11-25 D560 part A (ft_bcrit.py 528910f43, data/ft_bcrit.json, figs/ft_regimes.png): the scan and the Z+4g
+      batch-128 gain measure different regimes. Scan: targets reached at 0.22-1.04 epochs of the 1.4e7-event pool at batch
+      2048 (0.83-3.2 at 16384): fresh data, optimisation-limited, B_crit 2500-6690. Z+4g 10^4 events x 400 epochs: best validation
+      MSE 2048 over 128 = 6.53 (Muon scratch, 0.0580 vs 0.00887), 1.57 (Adam scratch), 3.75 (fine-tune F), 1.98 (Fn), 4.53
+      (Sfx). Two-batch B_crit at matched loss in the stable phase: Adam 87-261 (8 levels, val MSE 0.25-0.05); Muon r = E2048/E128
+      = 31 and Sfx 36 at the only shared level, above the ceiling 16 any critical batch allows at fixed events; F 410, Fn
+      473 at one level each. At 2048 Muon memorises: train/val at the end of the stable phase 0.048 (Fn 0.004) against 0.38
+      (Fn 0.24) at 128, validation flat from ~50 epochs (Muon) or rising after 30-60 (Fn, best at 16% of the run, last 1.41x
+      above). Sfx at 2048 stalls without memorising (train/val 0.48). So the 6.5x is generalisation on repeated data, not
+      the critical batch.'
   handoff:
     state: 'Step 2 (batch-size scan, D532 under D536) is done and written up: par:cbs_scan + fig:cbs_readout in docs/results.tex
       sec:noisescale (145d14839), readout tool analysis/critical_batch/scan_state.py @8fb4916cb (collects the cbs_b<B> sweeps
