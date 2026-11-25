@@ -46472,7 +46472,10 @@ entries:
     - selective_rescale
   decisions:
   - D552
-  next: null
+  next:
+    3: 'On Joaquin''s answer to the open question (replace the full rescale in the D392 setup with rescale below x=0.1, keep
+      it, or drop it): record his decision and carry it into the D392 setup''s config default; with par:selres_split (u u~
+      g cost in the changed soft events 4.23x/8.56x, rest 0.88x/1.61x) sent with the question'
   done_when: null
   notes_ref: null
   match: selres_*
@@ -46938,3 +46941,9 @@ entries:
     (figure corrections), 2026-10-06T00:17 (transfer study plan), 2026-11-13T00:03 (two figures'' results)'
   blocks: replacing the full rescale in the D392 setup
   blocks_steps: *id004
+  step_why:
+    3:
+      feeds: 'D552: which input map the D392 setup keeps'
+      if:
+      - 'replace: set model.input_soft_x0=0.1 in the D392 setup'
+      - 'keep or drop: close the entry with the write-up'
