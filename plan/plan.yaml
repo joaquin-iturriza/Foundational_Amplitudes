@@ -41394,6 +41394,13 @@ entries:
       deletes anyway (branch save_last ab30d5798, tests/test_save_last.py OK), cutting the end peak to ~17.7 GB: EOS 28.8
       GB free >= 17.7 + 10. On PASS: merge, sync lxplus, condor_rm 13232063, resubmit 120 heads on lxplus with --hp training.save_last=false
       (same command otherwise).'
+  - at: '2026-11-25T02:45:25+00:00'
+    text: '2026-11-25 ~04:50 CET: training.save_last merged to trunk 58804b477 (repo review PASS a56d814b: nothing reads the
+      last model after training; warm-start readers need warm_start_idx, unset in single-fidelity trials; width config has
+      save_intermediate false and no monitor processes, so no _current/_best_all files). 120 heads resubmitted on lxplus as
+      FA-lxplus-e4c9641a (condor 13232084, code @58804b477, 11 CPUs as before, --hp training.save_last=false, otherwise the
+      same command): end disk peak ~17.7 GB against EOS ~28.8 GB free. FA-lxplus-25e06bc1 removed. It still starts only when
+      one of the ~11 matching 80 GB lxplus slots drains.'
   step_waits:
     '5': part (c) driver llmcmp_c_qperp_drive5 ending (its detach DONE event; wave 3 of 2 trials after trials 3 -5.816 and
       5 -5.938 of wave 2)
