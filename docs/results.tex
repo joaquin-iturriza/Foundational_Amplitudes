@@ -9208,8 +9208,8 @@ events batch $128$ reaches a validation MSE$(\log|\mathcal M|^2)$ several times 
 (par.~\ref{par:ftm_zng4g}); do the two disagree? They measure different regimes. The scan's best trials reach their
 targets after $0.224$ to $1.04$ passes over the $1.4\times10^7$-event pool at batch $2048$ and $0.827$ to $3.18$ at
 $16384$: fresh data, where only the number of steps is at stake. The $Z+4g$ searches run $400$ epochs of $10^4$ events
-at both batches, so batch $128$ takes $16$ times more steps over the same events. There the best trial at $2048$ ends
-$6.53$ times above the best at $128$ with Muon from scratch, $1.57$ with Adam, $3.75$ for the fine-tune from the
+at both batches, so batch $128$ takes $16$ times more steps over the same events. There the best validation MSE at $2048$ is
+$6.53$ times the best at $128$ with Muon from scratch, $1.57$ with Adam, $3.75$ for the fine-tune from the
 original parent and $1.98$ from the parent without the two input settings. McCandlish et al.'s law in events,
 $E=E_{\min}(1+B/B_{\rm crit})$, read through the two batches at a validation MSE both reach in the stable phase
 gives, for Adam, $B_{\rm crit}$ between $87$ and $261$ over $8$ levels; for Muon from scratch the events ratio
@@ -10589,6 +10589,53 @@ sizes and the untouched rest at $10^5$.
   only events left of it change under the rule.}
   \label{fig:selres_split}
 % allow: 2048 1953 43 44 0.1 2 because they are the batch size, steps, seeds, the threshold and the square of |M|
+\end{figure}
+
+% plan selective_rescale, step 4
+\paragraph{The rescale only below every trained momentum (D561, 2026-11-25)}\label{par:selres_support} The rescale
+below $x=0.1$ and the full rescale both cost the trained events they change (par.~\ref{par:selres_split}), so the rule is
+moved below them: the D539 log-rescale acts only on momenta with $x_i<0.009$, under the softest $x$ of every training,
+validation and test pool of $u\bar ug$ and $Z+4g$. No trained or validated momentum changes, so training and bulk
+validation under the rule are exactly those of no rescale, and the rule is tested by switching it on at evaluation of the
+six no-rescale $u\bar ug$ runs ($10^4$ and $10^5$ events, each search's chosen trial and seeds $43$, $44$), scored on the
+KIT strata in the same job with and without it (Fig.~\ref{fig:selres_support}). The no-rescale arm reproduces the
+stored scores and every stratum without an event below $x=0.009$ (all collinear strata, the bulk) is identical under both
+arms; the $Z+4g$ kit has no such event, so there the rule changes nothing. In the deepest soft stratum,
+$x\in[10^{-7},10^{-6}]$, the seed-median MSE$(\log_{10}|\mathcal M|^2)$ falls from $4924$ to $1.44$ at $10^4$
+($-3.53$ decades, against a three-seed spread of $0.59$) and from $7580$ to $0.93$ at $10^5$ ($-3.91$ against
+$0.64$); the full rescale reaches $0.11$ and $0.20$ there, at the bulk cost of par.~\ref{par:selres_split}. All five
+changed strata fall at the seed median, the least the shallowest, $x\in[10^{-3},10^{-2}]$, where $95375$ of its events change: $-1.00$
+decades at $10^4$ and $-0.67$ at $10^5$, inside that stratum's own seed spread of $0.98$ at $10^5$. The design's yes
+branch is met at both sizes: the soft-limit gain is kept, without cost on any stratum or on the bulk, and with
+$Z+4g$ untouched.
+% src: python3 analysis/selective_rescale/support_rule.py read @6214117b7
+% claim: 1e4.deep_off=4924
+% claim: 1e4.deep_rule=1.44
+% claim: 1e4.deep_dec=-3.53
+% claim: 1e4.deep_spread=0.59
+% claim: 1e5.deep_off=7580
+% claim: 1e5.deep_rule=0.93
+% claim: 1e5.deep_dec=-3.91
+% claim: 1e5.deep_spread=0.64
+% claim: 1e4.deep_full=0.11
+% claim: 1e5.deep_full=0.20
+% claim: 1e4.n_changed_strata=5
+% claim: 1e4.shallow_changed=95375
+% claim: 1e4.shallow_dec=-1.00
+% claim: 1e5.shallow_dec=-0.67
+% claim: 1e5.shallow_spread=0.98
+% allow: 0.009 0.1 10^4 10^5 43 44 10^{-7} 10^{-6} 10^{-3} 10^{-2} 4g 2 because they are the thresholds, the training sizes, the seeds, the strata edges, the process Z+4g and the square of |M|
+
+\begin{figure}[H]
+  \centering
+  \includegraphics{../analysis/selective_rescale/figs/support_rule.pdf}
+  \caption{\textbf{The rescale below every trained momentum keeps the soft-limit gain.} $e^+e^-\to u\bar ug$ trained on
+  $D_{\rm train}=10^4$ (left) and $10^5$ (right) events; MSE$(\log_{10}|\mathcal M|^2)$ per KIT soft stratum against
+  the log-centre of its range in the softest $x_i=2p_i\cdot Q/s$ (seed median, bars: seed range). No rescale: trained and
+  scored on raw momenta. Rescale below $x=0.009$: the same runs scored with the rescale on momenta with $x_i<0.009$ only,
+  below every pool's softest $x$.}
+  \label{fig:selres_support}
+% allow: 10^4 10^5 2 0.009 because they are the training sizes, the square of |M| and the threshold
 \end{figure}
 % ==========================================================================
 \section{Architecture and encoding ablations}\label{sec:arch}
@@ -18961,7 +19008,7 @@ Seed 42, first $10^4$ test events per process.}\label{fig:llmcmp_heldout}
 The question: on the same data, steps and test as part (a), does our latest setup (the emission-scale target, its
 inputs, MuonAdamW, the WSD schedule) after its own 8-trial search do better than part (a)'s searched LLoCa? Its best
 trial (lr $1.60\times10^{-3}$, FA-ccin2p3-29ce8950, all 60840 steps) is read like part (a), and its score reproduces the
-run's own test stage. It reaches \textbf{0.053} on the trained processes (part (a) 0.117, the LLM 0.321) and 0.068 on
+run's own test stage. Its pooled RMSE is \textbf{0.053} on the trained processes (part (a) 0.117, the LLM 0.321) and 0.068 on
 the 96 relabels (0.241, the LLM 0.341), below the LLM on every one of them, with a median per-process MSE of
 $7.1\times10^{-4}$ against the LLM's 0.079. On the 43 new processes it is 2.116 (part (a) 1.767, the LLM 1.193), with
 a median per-process MSE of 0.979 (1.144, the LLM 0.649) and 26 of them below the LLM. So the latest setup buys a
