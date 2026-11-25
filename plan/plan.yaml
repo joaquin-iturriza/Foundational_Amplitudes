@@ -45248,6 +45248,39 @@ entries:
       are exactly the tempfile.mkdtemp run_dir prefixes of the probe tools, so no zz_* outputs match; 3 days is above the
       48 h longest wall limit; paths asserted as direct children; manifest written before any deletion. Searched decisions
       for D550, D201, D96/D122, D544. Deviation for the report to Joaquin: D550''s ''loose job .out files'' are left in place.'
+  - at: '2026-11-25T00:45:04+00:00'
+    question: 'Free CC space without deleting any result Joaquin has not approved: (1) gzip in place the lhe_queue deletion
+      manifests Q/gc/* (~6.6 GiB of JSON that only tests read; lossless), (2) D208''s lhe_parts gc --parts on every queue
+      (only the part files of assembled processes; lhe_parts 1.47 GiB at most), (3) D136''s MadGraph *_events dirs via free_space.py
+      list/delete --kind events (18 paths, 0.94 GB), (4) D550''s old smoke runs: model files of runs/zz_smoke/* whose every
+      file is older than 3 days and whose name no committed file names (configs, logs, metrics kept). Job scripts/job_storage_frees.sh
+      at trunk c142fee58, one CPU job.'
+    prior: 'cc_disk inventory FA-ccin2p3-b949c4ee and read jobs ccj_3b5290531b03, ccj_e7fd8463789f (2026-11-25): lhe_queue
+      6.8 GiB of which catalog_v4_dsh_eea/gc 3236, default/gc 524, gridpack/gc 908 MiB; lhe_parts 1473 MiB; free_space.py
+      list: events 18 paths 0.94 GB, model 0; runs/zz_smoke* model files 7.52 GB (train max 0.13 h). D550 debris job FA-ccin2p3-67887dff
+      freed 5.85 GiB (manifest) / 5.77 GiB (df). git grep: the gc manifests are read only by tests/test_lhe_parts.py.'
+    measure: 'per stage, df used (MiB) before and after in the job log (DF lines), GC_MANIFESTS MiB before/after gzip, each
+      queue''s gc --parts JSON (freed_gb), free_space #BATCH line (deleted/skipped, GB), delete_debris ''deleted smoke_models''
+      GiB from its manifest SCRATCH/zz_cc_disk/deleted_smoke_models.tsv'
+    check: 'tests/test_delete_debris.py (3 passed @c142fee58): on a fake checkout smoke_models deletes the .pt/.ckpt files
+      of a 5-day-old unnamed smoke run and keeps its config.yaml and out_0.log, keeps the models of a smoke run written today
+      and of one named in the repo (zz_smoke_sweep_config_llmcmp_a_adamw_const_64771325); paths asserted under PROJECT_DIR/runs/zz_smoke;
+      tests/test_lhe_parts.py covers gc --parts (parts of assembled processes only, manifest first); free_space.py delete
+      refuses paths outside MG5 *_events, changed since the list, or written in the last 6 h'
+    fixed: 'no result deleted: runs other than runs/zz_smoke untouched, zz_catft*, zz_v4_*, runs_from_lxplus, datasets, caches
+      untouched; gzip only files older than 6 h (no live worker appends); gc --parts only assembled processes (unassembled
+      parts are the only copy); smoke runs of the last 3 days and named ones kept; a smoke_models listing over 2x 7.0 GiB
+      is skipped'
+    control: 'none: storage frees; each stage''s df change against its own reported size is the cross-check'
+    seeds: none
+    outcome: 'yes: STORAGE_FREES_DONE, df used down by about the sum (gzip ~5-6 GiB est., gc_parts <=1.47, events 0.94 GB,
+      smoke_models <=7.0 GiB), each reported; no: a stage fails or skips (logged), the others still report; the job reruns
+      safely (each stage recomputes what is still there)'
+    sources: 'D208 for gc --parts; D136 for the events dirs; D550 (''and yes, delete the debris.'') for old smoke runs; gzip:
+      Joaquin''s words in FA/CLAUDE.md, ''A problem whose fix is easy and loses nothing hard to get back is fixed at once'';
+      3 days: measured, the longest wall limit in scripts/*.sh and sweep/*.sh is #SBATCH --time=48:00:00; 2x: Joaquin''s words
+      in FA/CLAUDE.md, ''A margin above 2x ... is a finding to fix before it reaches me''; 6 h: measured, longer than any
+      lhe_parts worker''s run (job_lhe_parts.sh wall limit) and free_space.py''s RECENT window'
   findings:
   - at: '2026-11-24T14:32:44+00:00'
     text: '2026-11-24 login-node reads: /sps/lpnhe 512 GiB group space at 98% (498 GiB used, 15 GiB free), .disk_full flag
