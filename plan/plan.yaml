@@ -44226,6 +44226,34 @@ entries:
       at its best checkpoint.'
     sources: 1.38x <- the seed spread 10^0.14 measured on catalog_v4 (docs/results.tex v4_seed_spread ~l.4485); 30 GPU-h <-
       the GPU budget Joaquin set (CLAUDE.md)
+    fix_at: '2026-11-25T15:09:35+00:00'
+    fix: '(1) Not a repeat / prior (check 5): the prior lists the s_hat+coupling pretraining (results.tex par. ''The shared
+      and the s_hat+coupling pretrainings'', D83, same 1352/43 split) only for its post-hoc correction and then says ''no
+      such run exists''. But that run IS a level placed in the training target, and it already answers this design''s keep-or-override
+      question for that factor: its level share of the error on the 43 new is 0.90, the multi-Higgs processes sit 3.6-5.2
+      too high exactly where the factor misplaces them (the network kept the factor''s levels), and the text concludes ''a
+      better factor has to be in its training target''. The per-process pretraining hp58 (level removed from the target, read
+      with predicted statistics: median 1.27 on the 43, 0.46 with the true statistics) is a second prior of ''the network
+      keeps a given level''. Fix: state both results in prior, say what this run adds (his setup at trial 5''s HPs, a per-process
+      level from the diagram network instead of a per-event factor, versus his LLM) and why that difference can change the
+      answer; and, under check 0, say why a scoring-only re-read of hp58 with the diagram level file (about 1.5 GPU-h, no
+      training) does not answer it first, or do that read before the run. (2) One change (checks 1, 11, 18): sigma is ambiguous.
+      ''The pooled residual std as fit_affine_multiplicity computes it'' with mu_p in place of a+bN gives sqrt(within-process
+      variance + (m_p - mu_p)^2), about 2-2.5 instead of trial 5''s 5.316 (multiplicity_extrap.py l.79): the target would
+      be rescaled about 2x together with the level change. Fix: pin sigma to trial 5''s 5.316 (its data_stats.json) so only
+      the mean moves, or name the rescale as a second change with its reason; list sigma in the key-by-key diff. (3) Readout
+      from the exact config (check 15): the held-out read needs new code (the level file in parent_target_standardization,
+      used by tools/llm_score.py REREAD), and the smoke as designed stops at the test stage and plots. Fix: score the smoke''s
+      run dir with scripts/job_llm_score.sh REREAD and show the per-process score file and the log line that the 139 held-out
+      processes took their mean from the level file, before the full run. (4) Disk (check 14): no disk per job or free disk
+      is stated. Fix: give trial 5''s run-dir size (8 heads, ~0.14 GB final per the width finding), state that the memmap
+      cache is shared (target statistics not in the cache key), and the site''s free disk read at submission. Passing: measure
+      moves (post-hoc substitution in data/step15_level_source.json @868c56f2f: lvl_diag new bias^2 median 0.096 against trial
+      5''s 0.859; new median MSE 1.14 -> 0.58, about 2x, above the 1.38 held-out seed spread, results.tex l.4485 no_b.heldout
+      v4_seed_spread 0.14 dex); seeds match trial 5 (one); outcome thresholds sourced; level file inputs are process features
+      and diagram descriptors only (norm_explore3.py, ''sampled'' = the training pool mean as level target), no held-out label;
+      loss MSE and his z are the entry''s decided setting (his conditions); no sweep, no batch/step/optimizer change; ordering
+      reads each output.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
