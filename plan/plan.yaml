@@ -44178,9 +44178,9 @@ entries:
   step_waits:
     '3': notes-editor pass of the results.tex backlog (it blocks on sec:noisescale and fig:llmcmp_heldout, other entries'
       text; the repo-reviewer already passed the merge)
-    '5': the lab server answering again (503 from both models at 2026-11-25T00:05 UTC); then python3 tools/detach.py --entry
-      lab_llm_trial --name wake_review_replay --each 'python3 tools/lab_wake_trial.py run' --each 'python3 tools/lab_wake_trial.py
-      reviews-run'
+    '5': 'detach job wake_review_replay_qwen (Qwen half, running); DeepSeek half when it answers (500 at 2026-11-25T00:19
+      UTC): python3 tools/detach.py --entry lab_llm_trial --name wake_review_replay_deepseek --each ''python3 tools/lab_wake_trial.py
+      run --models deepseek'' --each ''python3 tools/lab_wake_trial.py reviews-run --models deepseek'''
     '6': the repo-reviewer on its overdue backlog (launched 2026-11-25)
   findings:
   - at: '2026-11-23T19:55:22+00:00'
