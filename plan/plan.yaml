@@ -43826,7 +43826,7 @@ entries:
       it is'
   owner:
     agent: a87f458be3245c0a6
-    state: working
+    state: closed
     since: '2026-11-24T18:49:45+00:00'
     state_at: '2026-11-25T12:02:29.858000+00:00'
     context: 291484
@@ -44458,33 +44458,36 @@ entries:
       (any agent''s untracked outputs being written by a detached job are exposed); routed to the coordinator for a hook.
       Also: 6 concurrent calls (my widening from the design''s 2) gave 219 timeouts at 600 s; relaunched at 3 with 1200 s.'
   handoff:
-    state: 'Hard round done (labllm 7a28103a4, summary.json, figs/lab_llm_hard.png): all ten multi-file fixes valid after
-      the sandbox fix (774147232: TMPDIR in run dir, fixcheck copies as git repos; baselines refreshed 571cf7014). First pass
-      10/10 for Sonnet, DeepSeek+plan and DeepSeek alone. Our tokens per fix: Sonnet 244k, DeepSeek+plan 254k (planner 172k
-      + Sonnet check 81k), DeepSeek alone 142k (Sonnet check only; 0.58x Sonnet; below Sonnet on 9/10 tasks); wall median
-      1.1 / 3.7 / 8.3 min. Sonnet checks matched the grader 19/20; the one refusal (emastart, DeepSeek alone: EMA rebuilt
-      on every run, losing a warm start''s EMA) is a real defect the tests miss (real fix and DeepSeek+plan guard on not warm_start;
-      Sonnet''s own fix lacks that guard on fine-tunes). Design outcome for fixes: no arm meets the <=0.3x token bar. Lookups:
-      DeepSeek 20/20 (two runs), 0 of our tokens, vs Opus-low Explore grep 9/10, grep2 10/10 at ~47k each: route code lookups
-      (outcome yes). Route demo: E8530 case answered (diverged at step 14242, quote and step found in log), E8491 case answered
-      on retry (labllm.py now falls back to 5000 log lines when site logs times out, trunk d0cda09eb); both still to be checked
-      against ack notes. Lab route wiring committed on trunk 9da3cc9d7; lookup runner refuses recall tasks 3558e18f3. Credential
-      audit of round one recorded as a finding (no credential read; three poolrow runs grepped/found over the whole home,
-      nothing returned).'
-    decisions: 'Joaquin''s: D541, D531 (2 opencode sessions). Mine: control-arm and check briefs carry one line that the Lab
-      route rule does not apply (the control must not route to DeepSeek); check tokens and planner tokens counted with lab_llm_report.transcript
-      (same method for every arm and for the lookup control, recounted from transcripts rather than lookup_trial.json''s own
-      count); the ledger-reading scenario left unscored by refreshing baselines with model_trial validate (its documented
-      live-state rule); backlogdepth plan trimmed to 60 lines by its planner (design cap); figure marks the check-refused
-      fix open. Question for Joaquin carried from the previous owner: after a checked DeepSeek log reading, should the owner
-      still read the whole log every time or only when the cause is left open.'
-    ruled_out: a wait-for-server loop in a detached job; merging trunk into labllm; site logs -n 100000 on very long logs
-      (ssh 120 s timeout)
-    running: 'none (E8638 to ack: route case E8491 answered)'
-    files: worktrees/wt-labllm/tools/lab_llm_trial.py (fixcheck, check_brief, grade_check), worktrees/wt-labllm/tools/lab_llm_report.py,
-      worktrees/wt-labllm/analysis/lab_llm_trial/{runs.jsonl,summary.json,planners.json,plans/,figs/lab_llm_hard.png}, tools/labllm.py,
-      ~/.local/share/fa_labllm/routed.jsonl, /tmp/claude-1000/lab_llm_trial/check_*.json
-    written: '2026-11-24T17:38:13+00:00'
+    state: 'Token-share answer done: par:labllm3 + fig:labllm3 committed ad9405eab (src tools/token_share.py @7ddc8128c, verify_claims
+      0 problems): over 2026-11-09..23, 4953M tokens ($2028), owners 55.8%, main 29.3%, reviewers 5.3% (10.0% of $); routed
+      kinds save up to 1.39% under D555 (logs up to 1.23%, fixes 0.17%, lookups 0). D551 trial (design passed 940251cb8 after
+      two FIX rounds): replay of 100 main-session routing wakes and 159 design-review rounds (two arms) to deepseek-v4-flash
+      and qwen3.8-27b, graded against the Opus actions/verdicts with Wilson baselines (do-nothing 71/100, always-FIX 89/159).
+      First launch lost data (another owner''s git stash -u at 01:06 UTC; 6 concurrent calls timed out); data now in ~/.local/share/fa_labllm/wake_trial
+      (review answers recovered: 105 good, Qwen 97, DeepSeek 8; wake answers 18). Relaunched resuming at 3 concurrent calls:
+      detach wake_replay2 (step 5, target 12 h) and review_replay2 (step 6, target 40 h); read with lab_wake_trial.py report
+      --json and reviews-report (split agreement by full design read vs slice, read every FIX missed and every miss on active
+      wakes by hand). Step 7: commit tools/lab_wake_trial.py (uncommitted: DATA dir outside checkout, timeout 1200 s) when
+      repo-reviewer ad976c1837d8c4c7d (holds the lock, asked to include it) passes. Step 3: plan done once the notes-editor
+      backlog passes (now includes par:labllm3).'
+    decisions: 'Joaquin''s: D541 (routes), D545 (cheap check), D551 (find larger shares; owner-reread question dropped, withdrawn),
+      D555 (owner reads the log only where the checked reading leaves the cause open). Mine: token unit input+output+cache
+      read+cache write, deduplicated message ids, merged records of one message (the trial''s unit); window 2026-11-09..23
+      (before the route); per-activity attribution by the message''s tool calls (a message''s cost is its context, so a share
+      counts steps in that context); trial candidates = main routing wakes and design reviews (the shares separable from a
+      big context); wake key grades whether an agent was messaged, not which (owner lookup untested, to test before any route);
+      review unit = one round; outcome bars only the trivial baselines'' Wilson upper bounds (no number of mine); concurrency
+      3 calls (D531 is about WSL memory, not a call limit; 6 overloaded the server); 10% redo share and 38.2k triage check
+      are assumptions.'
+    ruled_out: 6 concurrent lab calls (219 timeouts at 600 s); writing trial outputs inside the checkout (git stash -u by
+      other agents unlinks them); a wait-for-server loop in a detached job; the /openai/v1 endpoint (passthrough disabled,
+      use /api/chat/completions); numeric outcome bars without a source
+    running: detach wake_replay2 (lab_wake_trial.py run --models deepseek,qwen; 12 h target), detach review_replay2 (reviews-run
+      qwen; reviews-run deepseek; 40 h target), both from the working-tree tool
+    files: tools/token_share.py, tools/lab_wake_trial.py (uncommitted change), analysis/lab_llm_trial/token_share.json, analysis/lab_llm_trial/figs/token_share.png,
+      analysis/lab_llm_trial/figs/token_activity.png, ~/.local/share/fa_labllm/wake_trial/{wakes,reviews,wake_answers,review_answers}.jsonl,
+      docs/results.tex par:labllm3
+    written: '2026-11-25T12:09:10+00:00'
   targets:
   - batch: labllm_rerun
     wall_h: 2.5
