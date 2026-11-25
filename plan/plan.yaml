@@ -46067,6 +46067,7 @@ entries:
   step_waits:
     '4': detached driver zng_ep50_searches (pid 1376403, sweep/drive.py, 105 trials)
     '1': steps 2, 3 and 4 read and written up (pretraining update run, the repaired Z+4g measure, driver zng_ep50_searches)
+    '3': step 2's repaired design (one design for both arms)
   targets:
   - batch: noise_smoke
     wall_h: 0.4
