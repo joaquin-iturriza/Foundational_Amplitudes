@@ -40954,7 +40954,7 @@ entries:
     decision: D553
   owner:
     agent: adb62f6f78b642e72
-    state: working
+    state: closed
     since: '2026-11-25T14:39:21+00:00'
     state_at: '2026-11-25T15:01:39.962000+00:00'
     context: 175934
@@ -41583,36 +41583,43 @@ entries:
     '16': 'a reviewer: repo-reviewer on the trunk backlog + branch levelfile (design PASSED 2026-11-25 15:1x); then tests/test_level_file.py,
       merge, sync, smoke + score'
   handoff:
-    state: 'Part (a) DONE (par:llmcmp_a). Part (c) DONE: best hp1860 FA-ccin2p3-29ce8950 scored, par:llmcmp_c @1aa1030ec (seen
-      0.053, held out 1.178, relabels 0.068, new 2.116; LLM 0.321/0.721/0.341/1.193). Part (b) his setup: 16 heads done; 32
-      FA-ccin2p3-e9dfa8b9 and 64 FA-ccin2p3-623a3af6 running, 120 FA-ccin2p3-f0b997a2 pending (steps 12-14). FIGURES: every
-      held-out comparison is ONE figure, python analysis/llm_compare/heldout_per_process.py (no args; fixed names/colours
-      in ARMS, fixed y range; Joaquin 2026-11-25 on inconsistent figures), figs/all_arms_heldout_per_process.png; add each
-      new arm to ARMS (our setup widths: add ''our setup, 16/32/64/120 heads''). Step 15 (D564): split read done (finding
-      2026-11-25): on the 43 new processes our error is a misplaced level (bias^2 median share 0.75-0.86, bias^2 alone above
-      the LLM''s whole MSE on 15-32 of 43), shape right (rho ~0.9) except gg->tbW (rho 0.3-0.4, -0.1 in our setup); relabels
-      are floor; figure figs/all_arms_bias_heldout_per_process.png (--part bias). NEXT on 15: the level branch of the passed
-      design: configurations that change what sets a new family''s level (candidates: learned per-species embedding as his
-      pID vs our fixed property table; the coupling-order inputs already in our setup did not fix it; the multi-H-with-b sign
-      flip between setups), each its own design + review. Step 8 (D537): design PASSED (3rd review); smokes FA-ccin2p3-8acd3fc1
-      (16), -39f4ab2e (32), -e5265194 (64, save=false, checkpoint_blocks), -e1d1fbaf (120, same) in flight; then measured
-      GPU-h (est ~210) and the disk timing to Joaquin (D536): 16/32 full runs fit CC now, 64/120 wait for part (b)''s 120-head
-      run to end or space freed.'
-    decisions: 'Joaquin''s: D522-D528, D536, D537, D553, D564; 2026-11-25 figure-consistency comment (one figure, fixed names).
-      Mine (re-justify): (i) smokes at 16/32 save on (full path incl. sigma stage/plots, 0.9 GB), 64/120 save=false (disk)
-      - the passed design said save=false for all; (ii) y range fixed 1e-7..1e3 (MSE) and 1e-5..1e2 (|bias|), asserting instead
-      of clipping; (iii) the his-setup untuned control included in the all-arms figure; (iv) step-15 re-reads on H100 reproduce
-      per-process MSE to 1e-7 median, up to 14% only on MSE<=5e-3 processes (float noise), pooled to 1e-5; (v) part (b) choices
-      of the previous owner (80 GB floor, CC placement, save_last=false at 120).'
-    ruled_out: lxplus for GPU jobs (80 GB slots refuse by group filter); site sync --allow-dirty and git stash -u (denied/refused;
-      wait for owners to commit); target standardisation (his z = ours within 0.2%) and new multiplicities (none) as causes
-      of D564's gap.
-    running: FA-ccin2p3-e9dfa8b9 (b 32h), FA-ccin2p3-623a3af6 (b 64h), FA-ccin2p3-f0b997a2 (b 120h, pending), smokes FA-ccin2p3-8acd3fc1/-39f4ab2e/-e5265194/-e1d1fbaf
-      (step 8)
-    files: analysis/llm_compare/{heldout_per_process.py (ARMS, --part bias), family_gap.py, error_split.py, control_score.py,
-      b_width_curves.py}, analysis/llm_compare/data/{split/*, step15_family_gap.json, c_best_*}, tools/llm_score.py (level/scale/floor
-      split), scripts/job_llm_score.sh (ONLY=heldout), sweep/sweep_config_llmcmp_c_width.yaml, docs/results.tex par:llmcmp_c
-    written: '2026-11-25T14:36:57+00:00'
+    state: 'Part (a) DONE, part (c) DONE (par:llmcmp_c). Part (b) his setup: 16 heads done; 32 FA-ccin2p3-e9dfa8b9 running
+      (step 47,320/60,840 at 15:45, val 5.26e-4), 64 FA-ccin2p3-623a3af6 running (step 13,521), 120 FA-ccin2p3-f0b997a2 pending
+      (steps 12-14: score, add to the ONE all-arms figure heldout_per_process.py, hand back). Step 8 (our-setup widths): design
+      PASSED, smokes FA-ccin2p3-8acd3fc1/-39f4ab2e/-e5265194/-e1d1fbaf PENDING on CC gpu_h100; then measured GPU-h (~210 est.)
+      to Joaquin (D536). Step 15 (D564) existing-data read DONE (finding 2026-11-25 ''what sets a new family''s level'', level_source.py
+      @868c56f2f): our new-family error is the level; a level read from the process alone with diagram descriptors (norm_explore3
+      B|diag|sampled) has median bias^2 0.096 on the 43 new vs ours 0.21-1.32 and the LLM''s whole MSE 0.649; the LLM''s per-process
+      error ranks with the content-only level error (Spearman 0.57), our his-setup level error grows with width (0.86 -> 1.32
+      at 8 -> 16 heads) - prediction for steps 12-14; substituting that level post hoc takes the new median MSE 1.14 -> 0.58
+      (8 heads), 0.98 -> 0.51 (our searched), pooled 1.77 -> 1.31 (LLM 0.649 / 1.193). Figure figs/all_arms_bias_heldout_per_process.png
+      (caption check OK; level arms ''level from process'' and ''level from process, diagrams'' fixed in ARMS). Step 16 (level
+      in the training target, his setup at trial 5''s HPs, data.level_file): design PASSED (2nd review); code on branch levelfile
+      (worktrees/wt-levelfile @a14e8ee52: experiment.py level_file block with sigma = fit_affine_multiplicity''s, parent_target_standardization(names=),
+      config level_file: null, analysis/catalog_daniel/data/level_file_B_diag.json for all 1491 processes); repo-reviewer
+      launched on the whole trunk backlog (DUE 597 lines) plus the levelfile diff, verdict pending; after it advances: write
+      tests/test_level_file.py (text drafted in my transcript: coverage of catalog_daniel_train/heldout names + parent_target_standardization
+      level_file branch), run it in .venv-cpu, merge levelfile into trunk, remove the worktree with scripts/remove_worktree.sh,
+      site sync, smoke (job_config_smoke.sh, save on) then job_llm_score.sh REREAD of the smoke (check sigma log line = trial
+      5''s 5.316 and the held-out ''level_file'' parent line), then the run (trial_job.sh --detached --hp-idx 7001, trial
+      5''s HPs + data.affine_multiplicity_std=false data.level_file=analysis/catalog_daniel/data/level_file_B_diag.json),
+      target recorded first.'
+    decisions: 'Joaquin''s: D522-D528, D536, D537, D553, D564; 2026-11-25 one-figure fixed-names comment. Mine (re-justify):
+      (i)-(v) of the previous hand-off; (vi) the level networks drawn as two extra fixed arms in the --part bias figure only
+      (they are level predictors, not amplitude networks); (vii) step 16 run in HIS setup (target is log|M|^2 with per-process
+      mean, the same quantity the level network predicts; our setup''s emission-scale target would need the level refitted
+      on the factorised target); (viii) sigma pinned to the affine fit''s (design review FIX 2); (ix) level file = final networks''
+      in-sample predictions for train processes, unseen for held-out.'
+    ruled_out: 'As before; plus: a scoring-only re-read of hp58 with the level file (equals the post-hoc substitution already
+      measured); Monitor/foreground waits on local CPU work (hooks refuse; run CPU-bound sklearn single-threaded: OMP_NUM_THREADS=1,
+      20 threads made norm_explore3 >15 min instead of <5).'
+    running: FA-ccin2p3-e9dfa8b9, FA-ccin2p3-623a3af6, FA-ccin2p3-f0b997a2 (part b); smokes FA-ccin2p3-8acd3fc1/-39f4ab2e/-e5265194/-e1d1fbaf
+      (step 8); repo-reviewer subagent a3cecd844515d9849 (trunk backlog + levelfile branch).
+    files: analysis/llm_compare/{level_source.py, heldout_per_process.py (ARMS incl. lvl_feat/lvl_diag), data/step15_level_source.json,
+      data/split/lvl_*_heldout.json, figs/all_arms_bias_heldout_per_process.png}, analysis/catalog_daniel/{norm_explore3.py,
+      data/norm_explore3.json}, worktrees/wt-levelfile (branch levelfile @a14e8ee52), scratchpad design16.py (the passed design's
+      text)
+    written: '2026-11-25T15:12:23+00:00'
   designs:
   - at: '2026-11-22T04:13:14+00:00'
     question: 'Part (a), D525: in the conditions of Suprio''s LLM pID run (D524, D526, D527: our catalog_daniel regeneration
