@@ -45351,6 +45351,12 @@ entries:
     units: null
     start: '2026-11-24T23:50:05+00:00'
     at: '2026-11-24T23:50:05+00:00'
+  - batch: storage_frees
+    wall_h: 1.0
+    jobs: 1
+    units: null
+    start: '2026-11-25T00:49:35+00:00'
+    at: '2026-11-25T00:49:35+00:00'
   ask: 'Scope: deleting costly results on CC goes beyond D550, and D133 makes which studies count as concluded your call.
     What I call costly results is everything that took GPU time or that analyses read: model files, fine-tune runs, prediction
     files, and the only copy of a run. Our own leftovers from D550 are gone: 5.85 GiB, so CC now has 12.8 GiB free of 512
