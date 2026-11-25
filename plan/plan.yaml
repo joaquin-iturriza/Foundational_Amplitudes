@@ -41702,6 +41702,21 @@ entries:
       tree on HH(X) and ZZZ, worse on WWW and ttX; both are above the regressor on 4 of 6 families (tree below it on Wqq''
       and ttX). Flat shift, regressor / tree / network: HH(X) 0.56 / 0.60 / 0.098; Htau 0.14 / 0.17 / 0.11; ZZZ 0.035 / 0.11
       / 0.069; WWW 0.17 / 0.017 / 0.083; Wqq'' 0.18 / 0.15 / 0.048; ttX 0.17 / 0.088 / 0.14.'
+  - at: '2026-11-25T21:35:22+00:00'
+    text: '2026-11-25 step 18 (D567 follow-up), does the gg->ttH two-group split follow the emission-scale target''s per-event
+      factor F? Re-read FA-ccin2p3-996866f8 (our setup, searched, llmcmp_c_qperp/trial_1860 on CC, llm_score.py --events-out
+      with log F, held-out pooled RMSE 1.178), read by analysis/llm_compare/factor_split.py @2e8d4d366 as a CC CPU job (the
+      26 MB CSV does not pass site fetch/run), data/c_best_factor_split.json, figure figs/c_best_factor_split.png (pred -
+      true against log F, 2D histogram, gg->ttH/tt gamma/ttZ/g tt). Answer: no. On gg->ttH, d = pred - true (first 5000 test
+      events) splits by 2-means into 52% at mean -3.59 and 48% at +1.21 (gap 12x the within-group sd: two groups), MSE 7.55,
+      bias -1.28; log F does not separate them: AUC 0.52 (0.5 = none), Spearman(d, log F) 0.10, share of var(d) explained
+      by log F in 20 quantile bins 0.048; log F barely varies on gg->ttH (sd 0.33 vs 1.6-1.8 on tt gamma and g tt), both bands
+      run over its whole range 12-13.5. Other gg->ttX: one band each; d follows log F mildly on tt gamma (Spearman +0.37,
+      eta2 0.16) and ttZ (-0.43, 0.21). Over all 139 held-out: median |Spearman| 0.064, median eta2 0.008; the largest eta2
+      are the ZZZ processes (0.26-0.38, one band shifted). Self-check on synthetic data: AUC 1.00/eta2 0.97 when log F decides
+      the group, 0.51/0.005 when not. The split''s cause stays open; an input only our setup has (e.g. the signed-log off-shellness
+      of internal top lines, offshell_per_event, whose sign flips between s- and t-channel virtualities) is a candidate, not
+      checked.'
   step_waits:
     '8': FA-ccin2p3-8acd3fc1 FA-ccin2p3-39f4ab2e FA-ccin2p3-e5265194 FA-ccin2p3-e1d1fbaf
     '13': FA-ccin2p3-623a3af6
