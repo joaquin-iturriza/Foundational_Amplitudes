@@ -48,7 +48,10 @@ ARMS = {"a_trial5": ("his setup, 8 heads", ps.C.blue, "o"),
         "b_h64": ("his setup, 64 heads", ps.C.vermillion, "s"),
         "b_h120": ("his setup, 120 heads", ps.C.yellow, "P"),
         "c_control": ("our setup, control", ps.C.green, "<"),
-        "c_best": ("our setup, searched", ps.C.orange, "^")}
+        "c_best": ("our setup, searched", ps.C.orange, "^"),
+        # --part bias only (level_source.py): a small network's level error from the process alone, no events
+        "lvl_feat": ("level from process", "#999999", "h"),
+        "lvl_diag": ("level from process, diagrams", "#8c564b", "p")}
 YLIM = (1e-7, 1e3)   # one range for every figure: his 1e-3..1e3 extended below our lowest point; never data-dependent
 # --part bias (step 15): our arms' level offset |bias| = |mean(pred - true)| in log|M|^2 (tools/llm_score.py's split,
 # data/split/<tag>_heldout.json) beside the LLM's whole RMSE (an upper bound on its own |bias|); its own fixed range

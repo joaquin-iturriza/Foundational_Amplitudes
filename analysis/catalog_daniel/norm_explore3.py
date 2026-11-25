@@ -6,7 +6,8 @@ leading diagram's massive internal lines and the most any diagram has. Level: as
 reweighted flat in log s_hat (the mean over the 20 bins of norm_moments2.py, each bin one weight), the second less
 tied to how the pool drew s_hat. Network: sklearn MLPRegressor 2x64, 3 seeds averaged, cross-fitted by relabelling
 class on the training processes; scored on the 43 new held-out processes by the level error against the same level
-definition. Output data/norm_explore3.json.
+definition. Output data/norm_explore3.json (per key also each held-out process's signed level error, predicted minus
+true, and its std).
     python analysis/catalog_daniel/norm_explore3.py
 """
 import json, math, os, sys
@@ -77,15 +78,17 @@ def main():
                                      for r in range(3)], 0)
                 sc = StandardScaler().fit(Xtr)
                 nets = [mlp(r).fit(sc.transform(Xtr), ytr) for r in range(3)]
-                lv = {}
+                lv, signed = {}, {}
                 for n in ho:
                     p = np.mean([m_.predict(sc.transform(feats(n, diag)[None]))[0] for m_ in nets])
-                    lv[n] = (p - (L[n][0] - M)) ** 2 / L[n][1] ** 2
+                    signed[n] = float(p - (L[n][0] - M))
+                    lv[n] = signed[n] ** 2 / L[n][1] ** 2
                 cfl = (cf - ytr) ** 2 / sd ** 2
                 key = f"{target}|{'diag' if diag else 'nodiag'}|{'flat' if flat else 'sampled'}"
                 out[key] = dict(crossfit=float(np.median(cfl)), crossfit90=float(np.quantile(cfl, .9)),
                                 new=float(np.median([lv[n] for n in new])), new90=float(np.quantile([lv[n] for n in new], .9)),
                                 rel=float(np.median([lv[n] for n in ho if n in rel])),
+                                signed=signed, sd={n: L[n][1] for n in ho},
                                 worst=sorted(((meta[n]["process"], lv[n]) for n in new), key=lambda t: -t[1])[:5])
                 v = out[key]
                 print(f"{key:24s} cross-fit {v['crossfit']:.3g} (90% {v['crossfit90']:.3g}) | 43 new {v['new']:.3g} "
