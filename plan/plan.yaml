@@ -46367,11 +46367,13 @@ entries:
   match: selres_*
   evidence:
     runs: []
-    commit: 85b7c45f7
+    commit: c5c19c279
     paths:
     - analysis/selective_rescale/data/input_check.json
+    - analysis/selective_rescale/data/stage1.json
     - analysis/selective_rescale/input_check.py
     - analysis/selective_rescale/seed_chunks/stage1_submitted.txt
+    - analysis/selective_rescale/stage1_read.py
     - wrappers.py
   dead_ends: []
   asks: []
