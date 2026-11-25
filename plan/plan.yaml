@@ -44790,6 +44790,25 @@ entries:
     sources: '0.19 <- a measured spread: the regressor''s 10-ensemble spread 0.016-0.19, results.tex l.8510 (as step 17''s
       passed design); 2x bootstrap noise <- a measured noise: the job''s 30-resample bootstrap std of the shift (step 17:
       0.026-0.037)'
+    fix_at: '2026-11-25T20:09:27+00:00'
+    fix: '(1) HP search size (check 12): 12 trials with 5 random start-up trials, where the project''s sibling sweeps use
+      8 trials with 3 start-up (the template''s waves 3,3,2). ''Raised for 4-5 dimensional spaces'' is the agent''s own choice;
+      no words of Joaquin''s ask for it. Fix: 8 trials with 3 start-up for both models, still equal in size. The local test
+      already uses n_startup=3. Also state when each job finishes. (2) Time per fit and job limit (check 15): the ~6 min per
+      network fit and ~1.5 min per tree fit are step 17''s rates at its default settings (2x64, batch 4096; tree 300 iterations,
+      63 leaves). The search reaches settings that cost more: batch 1024 (4x the updates per epoch), width 128 at depth 3,
+      and the tree at 1000 iterations with 255 leaves (up to ~10x per fit). So the ~8 h and ~2 h targets are not read from
+      runs of the same settings. The design also gives no --time, and scripts/job_perevent_level.sh defaults to 03:00:00,
+      below the network''s own 8 h estimate. Fix: bound the cost of the slowest corner of each space (time one fit at that
+      corner, or take an upper bound from the step 17 logs scaled by updates and leaves), state each job''s wall-time target
+      from it, and pass --hdr=--time with room. (3) Thresholds and outcome (check 4): the proxy check''s ''within 10x of their
+      new-set values'' has no source; give one or drop the factor and keep only the ranking. The outcome leaves a case open:
+      one model''s median level error on the 43 new is at or below 0.19 but its flat shift is not below the regressor''s by
+      more than 2x the bootstrap noise. State what that result means and what it changes (for example: level placed but no
+      gain in following the sample, so no go to (C)). Passing as they stand: the measure moves with the change (new-set level
+      error 3.64 tree against 1.63 network, perevent_level{,_mlp}.json; per-process network 0.04-0.53 across sizes, results.tex
+      l.8514), the 0.19 bar and the shift noise 0.026-0.037 are sourced, the control is matched, the readout is identical
+      to step 17, and no prior search on this question was found.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
