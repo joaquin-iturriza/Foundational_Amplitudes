@@ -1,6 +1,6 @@
 # critical_batch D563 (Joaquin 2026-11-25: "repeat these trainings at ~50 epochs ... retuning some HPs"): tp_zng_d1e4_muon_b2048_zgggg
 # at 50 epochs of its 1e4 events (244 steps at batch 2048, was 1953), the same space, seed, waves and trial count;
-# the lr window moved by HPO rule 2's horizon factor (an estimate); everything else as tp_zng_d1e4_muon_b2048_zgggg.
+# the lr window set by HPO rule 2 (see its search_space line); everything else as tp_zng_d1e4_muon_b2048_zgggg.
 # zng_uq_benchmark D507 protocol follow-up ('...go with less data, say 1e4 points.'): one cell of the 2x2
 # {MuonAdamW+WSD, Adam+plateau} x {batch 2048, 128} at 1e4 training events of Z+4g, 400 epochs (1953 steps at
 # batch 2048), MuonAdamW; single-fidelity DyHPO over the B1 template's space, 8 trials, waves 3,3,2, mu_mse selection.
