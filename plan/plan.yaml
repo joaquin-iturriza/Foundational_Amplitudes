@@ -41717,6 +41717,29 @@ entries:
       the group, 0.51/0.005 when not. The split''s cause stays open; an input only our setup has (e.g. the signed-log off-shellness
       of internal top lines, offshell_per_event, whose sign flips between s- and t-channel virtualities) is a candidate, not
       checked.'
+  - at: '2026-11-25T21:35:30+00:00'
+    text: '2026-11-25 Suprio''s own per-process numbers (his cond_figures bundle, sent to Joaquin 2026-11-25; copied to analysis/llm_compare/data/suprio_cond/
+      @dfa26d84c: pID-embedding-only seeds 0-2 amplitude_metrics.json, test_split.json; loader suprio.py). (a) Same base:
+      his ln|M|^2 and our log|M|^2 are both natural log (his affine target fit b = -6.713, sigma = 5.303; ours, part (a) trial
+      5, -6.701, 5.316; his intercept differs by 13.38 = 2b, his N counts final-state particles). Same split: names = ours
+      without dc_; his 139 held out = 96 interpolation (his 24 same-sign cb counted as interpolation, as his README and our
+      panels do) + 43 extrapolation; his 10 2->1 processes have no metrics; 1352 seen. His seed 0 rmse^2 equals the values
+      read off his figure on all 139 (ratio 1.0000); seeds 1-2 differ per process x0.12 to x113. He scores 16384 test events
+      per process, we the first 1e4. (b) heldout_per_process.py @2e8d4d366: the LLM is now the median over his seeds 0-2 with
+      a min-max bar, MSE = rmse^2, |bias| = |level|, MSE-bias^2 = shape^2 (no upper bound), legend ''pID emb. only (Suprio)'';
+      previous versions kept as figs/*_heldout_per_process_readoff.png. (c) Recomputed against his own split (error_split.py,
+      level_source.py, family_gap.py @2e8d4d366; median over seeds, per-seed counts in brackets). New 43: LLM median bias^2
+      0.231, shape^2 0.368, MSE 0.94 (seed 0 alone 0.649); pooled RMSE per seed 1.193/1.390/1.054; LLM pooled bias^2 share
+      sum(level^2)/sum(rmse^2) 0.66/0.64/0.47 (ours 0.85-0.89). Our bias^2 above the LLM''s own on 39 [40,33,39] (his setup
+      8 heads), 38 (16), 38 (32), 29 [31,26,31] (our control), 26 [29,21,30] (our searched) of 43; our MSE-bias^2 below the
+      LLM''s shape^2 on 31 [23,36,29], 31, 23, 30, 29 of 43 (against his whole MSE before: 37, 35, -, 40, 36). Relabels 96:
+      LLM median bias^2 0.0081, shape^2 0.076, pooled bias^2 share 0.12/0.41/0.39; our MSE-bias^2 below his shape^2 on 88,
+      93, 76, 91, 96; bias^2 above his on 31, 25, 51, 36, 1. level_source (new): LLM''s own median bias^2 0.231 (/var 0.127)
+      against level-from-process network 0.789, + diagrams 0.096, our control 0.209, searched 0.314, his setup 0.86/1.32/2.73;
+      LLM signed level vs content-only network error Pearson -0.65, Spearman -0.58. This changes step 15''s reading (1) (the
+      LLM placing new levels about as well as a content-only regressor, 0.649 vs 0.79, from its whole MSE as an upper bound):
+      its own level error is 3.4x below the content-only network''s and about our control''s; per CLAUDE.md the text of that
+      reading stands until Joaquin has the question with the figure.'
   step_waits:
     '8': FA-ccin2p3-8acd3fc1 FA-ccin2p3-39f4ab2e FA-ccin2p3-e5265194 FA-ccin2p3-e1d1fbaf
     '13': FA-ccin2p3-623a3af6
