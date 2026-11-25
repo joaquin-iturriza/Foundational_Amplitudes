@@ -40978,7 +40978,7 @@ entries:
     decision: D553
   owner:
     agent: a8f6ab7f00481cd0b
-    state: working
+    state: closed
     since: '2026-11-25T21:15:16.146000+00:00'
     state_at: '2026-11-25T22:05:38.990000+00:00'
     context: 257944
@@ -41780,38 +41780,40 @@ entries:
     '20': FA-lxplus-affc2e5a FA-lxplus-c894babe
     '21': the design reviewer
   handoff:
-    state: 'Part (a) DONE, part (c) DONE. Part (b) his setup: 8/16/32 heads read (32 heads FA-ccin2p3-e9dfa8b9 scored @fa6e51441:
-      pooled RMSE seen 0.107, all 139 held out 1.170 vs 16 heads 0.103/0.990, 8 heads 0.117/1.003; relabels median MSE-bias^2
-      0.030 vs 0.0074/0.0143; new 0.333 vs 0.241/0.287; best val 4.06e-4 above 16 heads'' 3.74e-4, spike ~36500, one seed);
-      all-arms MSE/bias/shape figures redrawn with 32 heads (|bias| legend in the bottom panel @1bd9d3152). 64 heads FA-ccin2p3-623a3af6
-      (step 13) and 120 heads FA-ccin2p3-f0b997a2 (step 14) RUNNING: readout = Val loss lines to data/b_val_h<H>.txt, b_width_curves.py,
-      score REREAD with job_llm_score.sh EVENTS=1 (read JSONs with site run cat if site fetch brings only the csv), data/b_h<H>_{seen,heldout}.json
-      + data/split/, add b_h<H> to ARMS of heldout_per_process.py if missing, redraw --part mse/bias/shape, error_split.py
-      --tag a_trial5 b_h16 b_h32 b_h<H> c_control c_best. Step 17 DONE (finding 2026-11-25: tree 3.64, network 1.63 vs gate
-      0.19; network shift 0.084 vs regressor 0.176 passes (ii); figs/perevent_level.png). Step 20 (D566 B matched search,
-      design passed 20:15): network FA-lxplus-affc2e5a (target 6 h, limit 36 h) and tree FA-lxplus-c894babe (target 2 h, limit
-      8 h) on lxplus @764af94d05: when both end, PEL_JSON lines into analysis/catalog_daniel/data/perevent_level{_mlp}_search.json,
-      check the proxy (default_sig_cv ranks network < tree?), perevent_level_fig.py (adds tuned arms), apply the three-case
-      outcome of the design. Step 19: untuned his-setup control retrain FA-ccin2p3-0165aa58 on CC (trial_9000, identical flags,
-      target 19.9 h): compare best val to 6.79e-4, then job_llm_score.sh RUN=runs/llmcmp_a_adamw_const/trial_9000 EVENTS=1,
-      add to shape figures. Step 8 smokes (-8acd3fc1/-39f4ab2e reached sigma stage; -e5265194/-e1d1fbaf pending), step 16
-      run FA-ccin2p3-89671610, step 18 re-read FA-ccin2p3-996866f8 as in the earlier hand-off. shape_dists.py now one representative
-      (median-spread) process per new family, 6 panels @041084987 (repo review PASS, watermark 041084987).'
-    decisions: 'Joaquin''s: D522-D528, D536, D537, D553, D564, D566, D567. Mine (re-justify): (i)-(xvi) of earlier hand-offs,
-      except (xiv) replaced: shape_dists picks per family the median-spread process (repo reviewer: extremes unrepresentative);
-      (xvii) untuned control retrain as a repair inside D564/D567 at original cost (26 GPU-h counted); (xviii) step 20 objective
-      folds by final-state content signature, not relabelling class (step 17 tree cross-fit 0.036 vs new 3.64), 8 trials 3
-      start-up per model (design reviewer); (xix) figure legends: |bias| figure legend in the extrapolation panel lower left
-      (fixed y range forbids make_room), perevent and shape_dists legends ncol=2 to bring the font down.'
-    ruled_out: As before; plus relabelling-class cross-fit as the selection objective for per-event maps (does not track new
-      families); a 7th legend cell in shape_dists (leaves an empty cell or overflows page width).
-    running: FA-ccin2p3-623a3af6 (step 13), FA-ccin2p3-f0b997a2 (step 14), FA-ccin2p3-8acd3fc1/-39f4ab2e/-e5265194/-e1d1fbaf
-      (step 8), FA-ccin2p3-89671610 (step 16), FA-ccin2p3-996866f8 (step 18), FA-ccin2p3-0165aa58 (step 19), FA-lxplus-affc2e5a
-      and FA-lxplus-c894babe (step 20)
-    files: analysis/catalog_daniel/{perevent_level.py (--search), perevent_level_fig.py}, scripts/job_perevent_level.sh (PEL_SEARCH),
-      tests/test_perevent_search.py, analysis/llm_compare/{heldout_per_process.py, shape_dists.py, error_split.py, data/b_h32_*.json,
-      data/split/}, analysis/catalog_daniel/data/perevent_level{,_mlp}.json
-    written: '2026-11-25T21:01:38+00:00'
+    state: 'Part (a) DONE, part (c) DONE. Suprio''s own per-process metrics (pID only, seeds 0-2) now drive every LLM comparison:
+      data/suprio_cond/ + suprio.py @dfa26d84c; heldout_per_process.py (MSE / |bias| = his |level| / MSE-bias^2 = his shape^2,
+      median with min-max seed bar), error_split.py, level_source.py, family_gap.py @2e8d4d366; redraws sent to Joaquin with
+      the step-15 question (his own new-set level error 0.231 vs content-only network 0.79: reading (1) of step 15 changes;
+      text unchanged until he answers). Step 18 DONE: gg->ttH split not log F (AUC 0.52). Step 21 DONE: the split is the sign
+      of the internal-top off-shellness input (offshell_6), both our-setup arms, AUC 1.00, eta2 0.93 (finding 2026-11-25;
+      figs/c_{best,control}_factor_split_offshell_6.png). NEXT (step 21 in the list, the matched test, labelled 22): design
+      recorded, design-reviewer FIX (revise once, else dead end): (1) baseline = part (c) best trial_1860 (FA-ccin2p3-29ce8950,
+      lr 1.6e-3, clean), not the blown-up control d34535b0 (261 non-finite steps, val NLL 1.2e7 at 33462); time/step from
+      29ce8950''s log; (2) split measure: both 2-means groups with a real share (ttH 0.518/0.482) with a sourced bar, and
+      the arm''s d against the baseline CSV''s offshell_6 joined row by row over the same 5000 events (checked on true_logm2);
+      (3) thresholds from measured spread (part (b) widths 0.287/0.241/0.333 ~1.4x, data/split/error_split.json), drop 0.5
+      from his setup, state the mixed outcomes; (4) prior: results.tex l.16536 (off-shellness-off lever arm on transfer, levers_accum
+      (b), D2) and l.9750 (input-scale mismatch on tt, D400: a rival scale reading); (5) flag off changes the derived-inputs
+      cache key: prebuild as CPU job (~2.8 GB train + 0.3 GB held out), read CC df (/sps was 26 G free 23:00), show smoke
+      and run open the same key; (6) smoke also through job_llm_score.sh EVENTS=1 ONLY=heldout + factor_split.py; (7) list
+      keys differing from 29ce8950''s config.yaml (Hydra --cfg job). Step 8: 64/120-head smokes resubmitted with outputs saved
+      (save=false had left the sigma stage no checkpoint): FA-ccin2p3-1969f226, -caf1170e, queued on CC (64G fits nowhere
+      now).'
+    decisions: 'Joaquin''s: D522-D528, D536, D537, D553, D564, D566, D567. Mine (re-justify): earlier hand-offs'' (i)-(xix);
+      (xx) LLM compared at the median over his seeds 0-2 with per-seed counts beside (his seeds spread x0.12-x113 per process);
+      our bias^2 vs his level^2 and MSE-bias^2 vs his shape^2 (like for like); his figure''s x order kept from draft_pid_by_process.json;
+      (xxi) factor_split.py run on the site holding the CSV (CC CPU job / lxplus site run, ~10 s) since 26 MB does not pass
+      site fetch/run cat from CC; (xxii) llm_score --events-out writes the standardized off-shellness slot (exp._offshell_cols
+      in both data paths, test_memmap_data compares); (xxiii) step 8 smokes resubmitted on CC with --allow-unfit (repair inside
+      step 8''s approval).'
+    ruled_out: As before; plus log F (emission-scale factor) as the cause of the gg->ttH split (step 18); the blown-up control
+      d34535b0 as a matched baseline (design reviewer).
+    running: FA-ccin2p3-623a3af6 (step 13), FA-ccin2p3-f0b997a2 (step 14), FA-ccin2p3-89671610 (step 16), FA-ccin2p3-0165aa58
+      (step 19), FA-lxplus-affc2e5a (step 20; tree c894babe done), FA-ccin2p3-1969f226 and -caf1170e (step 8 smokes)
+    files: analysis/llm_compare/{suprio.py, data/suprio_cond/, factor_split.py, data/c_{best,control}_factor_split.json, heldout_per_process.py,
+      error_split.py, level_source.py, family_gap.py}, tools/llm_score.py (--events-out offshell columns), experiment.py/data_mmap.py
+      (_offshell_cols)
+    written: '2026-11-25T22:14:58+00:00'
   designs:
   - at: '2026-11-22T04:13:14+00:00'
     question: 'Part (a), D525: in the conditions of Suprio''s LLM pID run (D524, D526, D527: our catalog_daniel regeneration
