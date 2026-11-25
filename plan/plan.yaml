@@ -45449,6 +45449,18 @@ entries:
       2x on the pair''s MSE-bias^2 <- measured spread 3.51/3.60 vs 4.74/4.85 c_control vs c_best (1.35x), 2.83-3.73 over widths
       (1.3x); 1.5x on new-43 medians <- measured spread 0.241/0.287/0.333 over widths (1.38x), 0.106 vs 0.135 c_control vs
       c_best (1.27x)'
+    passed_at: '2026-11-25T23:07:09+00:00'
+    reviewer: 'Re-check after the prebuild refusal: the arm now sets data.offshell_per_event=false and data.internal_mass_scalars=false
+      (sweep_config_llmcmp_c_nooffshell.yaml @fa499b8c0, diff against d2137361b: that flag and the header comment only). The
+      second flag removes the same input, read in the code at fa499b8c0. experiment._internal_mass_row adds only the internal-mass
+      slot (constant per process, length 0 when off). On the memmap path data_mmap._open_run (l.1134-1145) overwrites the
+      whole slot per batch with the standardized off-shellness when want_offshell, so in the baseline the slot carried only
+      the off-shellness. experiment.py l.522 refuses the slot holding GeV masses under dimensionless_inputs. The offshell_zero
+      note (l.2299-2305) equates zero columns with both flags false, and tools/kit_precision_check.py uses the same pair.
+      So the arm still differs from trial_1860 in the off-shellness input alone (4 input columns fewer). The design''s fixed
+      field states both flags. The rest stands as passed at 22:47: checks 2 and 3 on c_best_factor_split.json (gg->ttH offshell_6
+      eta2 0.934, separation 12.14; gg->t b W pair bias^2 30.7/32.1 against spread 1.03-1.8x), check 5 terms offshell/off-shell/off-shellness/offshell_per_event/held/zero-shot/without/ablat
+      plus internal_mass_scalars.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
