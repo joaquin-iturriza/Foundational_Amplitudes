@@ -45411,6 +45411,20 @@ entries:
       days: the census window of the 2026-11-24 inventory under D147''s ''the last days''; CLAUDE.md, Joaquin''s words, ''A
       memmap cache (amp_mmap_cache) on a site is deleted only when no running job and no recipe of an open plan entry reads
       it'''
+    fix_at: '2026-11-25T01:24:23+00:00'
+    fix: 'Re-check of fix commit 6feea6e1f. The memmap link is fixed: cache_readers.py now matches each key''s key_doc train-pool
+      recipe_ids against cache_census.pools_of of the in-use recipes and prints the matching recipes, and set -f keeps the
+      globs intact. One defect remains (checks 0, 6, 7): open_recipes_2026-11-25.txt still misses 14 recipes that exist under
+      recipes/ and are named in the plan.yaml record of not-done entries. Two belong to running entries: pp13v4_uc_cggu.yaml
+      (agent_redesign) and pretrain25_zs.yaml (optimizations_recap). Twelve belong to held entries: catalog_v3_pp_test, catalog_v3_shared_heldout,
+      catalog_v4_default25_eeonly_train, catalog_v4_heldout_H7c, catalog_v4_heldout_default_H5_processes, catalog_v4_heldout_default_processes
+      and catalog_v4_r1_regen (catalog_coverage); catalog_v3_twin_train (kit_benchmark); catalog_loop_probes (zng_uq_benchmark);
+      ref_solo_ee_uu, vob_ee_ttbar_nlo and vob_ee_uu_nlo (pretrain_data_saving). Matching recipe stems against ''plan show''
+      text of owned entries misses entries without an owner and the fields plan show does not print. Fix: build the open-recipe
+      list from the full plan/plan.yaml record of every entry whose status is not done or withdrawn, matching every recipe
+      stem under recipes/ as a whole word. Best done inside the job from the checkout''s plan/plan.yaml, so the list is current
+      at run time. Then confirm these 14 are in it. The fine-tune model deletion stays as it passed before. Terms searched:
+      the stems of every recipes/**/*.yaml against plan/plan.yaml entries with status not done/withdrawn/closed.'
   findings:
   - at: '2026-11-24T14:32:44+00:00'
     text: '2026-11-24 login-node reads: /sps/lpnhe 512 GiB group space at 98% (498 GiB used, 15 GiB free), .disk_full flag
