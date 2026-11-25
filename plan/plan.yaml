@@ -44567,6 +44567,10 @@ entries:
     2: 'D560: explain why B_simple (~55 events) sits ~80x below the scan''s B_crit (~4420), explain the batch-128 gain of
       the Z+4g fine-tunes (par:ftm_*, zng4g_ftnoset_b128) against the scan, and give a batch rule usable before a run, checked
       on both settings (existing data first; new jobs only under a passed design)'
+    3: 'D560 part B, Z+4g arm (secondary): read smoke FA-ccin2p3-0ac97e10 (scripts/job_cbs_update_zng.sh smoke, d2d9efc9b:
+      every stage, noise_scale.json with dL_b64..dL_b1024), then site pick and submit the full run (job_cbs_update_zng.sh
+      full, target upd_noise_zng_adam 0.3 h), then read B_dL over its stable phase against the Adam two-batch B_crit 87-261
+      (band [87/2, 261x2])'
   done_when: null
   notes_ref: null
   match: zz_cbs_*,cbs_*
@@ -45280,6 +45284,11 @@ entries:
       if:
       - 'a candidate rule predicts both settings: write it up with its figure and propose it as the batch rule'
       - 'no candidate predicts both: report what each explains, and design the smallest scan that settles it'
+    3:
+      feeds: 'D560: whether the dL rule extends to repeated-data runs or is restricted to fresh data'
+      if:
+      - 'smoke ran every stage: submit the full Z+4g run'
+      - 'smoke broke: read its log, fix, resmoke'
   step_waits:
     '1': repo-reviewer aee7e3b6b89d84945 and the notes-editor backlog (par:cbs_scan)
     '2': FA-ccin2p3-b587c065 FA-ccin2p3-0ac97e10
