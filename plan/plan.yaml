@@ -41771,6 +41771,24 @@ entries:
       sides of the top pole different levels, by up to ~5 units of log|M|^2 on gg->ttH; his setup has no off-shellness input
       and no split. Not yet tested whether the input causes it (matched arm needed: our setup with offshell_per_event off
       or offshell_zero, a retrain).'
+  - at: '2026-11-25T22:51:56+00:00'
+    text: '2026-11-25 step 22 (list step 21, no-off-shellness arm): design PASS after two FIX rounds (design-reviewer, 22:47
+      design; reviewer note: split gone with eta2<=0.25 but gg->ttH MSE-bias^2 > 2.97 reads as ''input causes the split, the
+      remaining ttH error has another source''). Arm config sweep/sweep_config_llmcmp_c_nooffshell.yaml @d2137361b (diff vs
+      llmcmp_c_latest: sweep_name, data.offshell_per_event false); factor_split.py --vars-from joins the baseline CSV''s offshell
+      columns, true_logm2 checked (self-check on synthetic CSVs passed). Placed on lxplus by site pick (CC 0 GPUs fit 20G,
+      ~33 h wait); EOS user quota ~26 GB free, need ~2.5 GB. Chain: (0) prebuilds in flight FA-lxplus-e48ee20a (train) / -b43687b7
+      (held out), scripts/job_mmap_prebuild.sh with the config''s fixed_params (+ data.processes_file=recipes/catalog_daniel_heldout.yaml);
+      (1) smoke: site submit lxplus FA scripts/job_config_smoke.sh --hdr=--mem=20G --hdr=--time=02:00:00 -- sweep/sweep_config_llmcmp_c_nooffshell.yaml
+      50; (2) on SMOKE_EXIT 0: job_llm_score.sh --env RUN=<smoke dir> --env ONLY=heldout --env EVENTS=1, then factor_split.py
+      --csv <smoke CSV> --vars-from runs/llmcmp_c_qperp/trial_1860/llm_events_heldout.csv on lxplus; (3) the run: site submit
+      lxplus FA sweep/trial_job.sh --hdr=--mem=20G --hdr=--time=22:00:00 --hdr=--cpus-per-task=4 --hdr=--gpu-min-mem=32G --
+      --sweep-config sweep/sweep_config_llmcmp_c_nooffshell.yaml --detached --trial-idx 1860 --hp-idx 1860 --t-steps 60840
+      --hp training.lr=0.001603605 --hp training.muon_weight_decay=0.02796892 --hp training.regularization_lambda=4.685537e-08
+      --hp training.cosanneal_warmup_frac=0.1908437 --hp training.cosanneal_eta_min=4.115949e-09 --hp ema=true --hp training.ema_decay=0.9831303,
+      wall target 16 h; each log must open the same feat_ key as the prebuild; (4) job_llm_score.sh EVENTS=1 ONLY=heldout,
+      factor_split --vars-from, error_split.py, heldout_per_process.py. Baseline rate: trial_1860 735.8 min training (0.672
+      s/step) + 2.39 h sigma stage.'
   step_waits:
     '8': FA-ccin2p3-1969f226 FA-ccin2p3-caf1170e
     '13': FA-ccin2p3-623a3af6
