@@ -45378,6 +45378,39 @@ entries:
       read *_result.json, which stays. The deletion can stay in the same job. Checks 1-3, 8-18 do not apply (no training,
       control or seeds). Disk: the outputs are small TSVs and the job frees space. Terms searched: zz_catft, catft_lowloss,
       amp_data_cache, amp_mmap_cache, D147, D556, the recipe names in plan/plan.yaml.'
+  - at: '2026-11-25T01:22:23+00:00'
+    question: 'D556 (''Yes, you also mentioned there were a bunch of caches that were relatively big, are they all needed?''):
+      (1) delete the model files (*.pt, *.pt.gz, *.ckpt, *.pth) of the superseded fine-tune sets zz_catft, zz_catft_lowloss2,
+      zz_catft_lowloss3 (~15.1 GiB; results files, logs, configs stay); (2) read, without deleting, who reads each memmap
+      key and each training-cache entry. In use = the recipes of the last 14 days'' run and sweep configs (runs/ and SWEEP_DIR,
+      queued trials included) plus every recipe the 35 not-done plan entries name, held ones included (analysis/storage/open_recipes_2026-11-25.txt:
+      52 recipe stems found in plan show text plus the catalog_v4_datasaving_* family). Per memmap key: its train pools''
+      recipe_ids matched against the in-use recipes'' train pools (cache_census.pools_of), live jobs, last_used, recent logs.
+      Training cache: cache_census.py --in-use <that set> --days 14. The cache deletions come in a second job from this read
+      (delete_from_manifest.py skips anything read or changed since). Job scripts/job_ccdisk_d556.sh at trunk 6feea6e1f.'
+    prior: 'Read jobs ccj_3b5290531b03/ccj_e7fd8463789f: zz_catft 10217 MiB, lowloss2 1739, lowloss3 3478 apparent; curves
+      collected in committed catft_curves.json (collect_catft_curves.py and ema_start_audit read only *_result.json). Inventory
+      FA-ccin2p3-b949c4ee: amp_mmap_cache 36.8 GiB (format-2 keys 4.0 GiB since deleted), amp_data_cache 58.7 GiB all kept
+      by census --in-use ''*'' (every recipe in use). D147; CLAUDE.md memmap rule. First review of this design (FIX 2026-11-25):
+      in-use list missed recipes of open and held entries; no key-to-recipe link.'
+    measure: CATFT listed count and GiB (deleted_catft.tsv) and df before/after; per memmap key the MMAP line (GiB, last used,
+      live jobs, recent logs, train pools and how many belong to in-use recipes, which); census totals per decision, delete
+      GiB per recipe, keep GiB per reason
+    check: 'cache_readers.py on a fake SCRATCH: a key whose train pool has a made-up recipe_id prints ''1 train pools, 0 of
+      in-use recipes -''; with the recipe_id of catalog_v3_sep_probes.yaml''s first train pool (2cffc1972a9b73d9, from pools_of)
+      and that recipe in the in-use file it prints ''1 of in-use recipes catalog_v3_sep_probes.yaml''; the six recipes the
+      reviewer named for running entries and the seven held examples are all in open_recipes_2026-11-25.txt'
+    fixed: only the three superseded catft sets' model files are deleted; zz_catft_sep, zz_catft_emafix, zz_catft_refit_emafix
+      untouched; no cache file deleted by this job
+    control: 'none: a deletion and a read; the df change against the manifest''s total is the cross-check'
+    seeds: none
+    outcome: 'yes: D556_READ_DONE, CATFT ~15 GiB listed and df down by about as much, cache_readers and census written; no:
+      the job stops before D556_READ_DONE (the catft manifest says what was listed; a rerun lists only what is left)'
+    sources: 'D556 (Joaquin''s yes, quoted) for the catft sets and the cache question; D147 (''do delete the unused caches'',
+      covers: not used by any run in the last days and not needed by a running or planned entry) for the training cache; 14
+      days: the census window of the 2026-11-24 inventory under D147''s ''the last days''; CLAUDE.md, Joaquin''s words, ''A
+      memmap cache (amp_mmap_cache) on a site is deleted only when no running job and no recipe of an open plan entry reads
+      it'''
   findings:
   - at: '2026-11-24T14:32:44+00:00'
     text: '2026-11-24 login-node reads: /sps/lpnhe 512 GiB group space at 98% (498 GiB used, 15 GiB free), .disk_full flag
