@@ -44329,6 +44329,16 @@ entries:
       at its best checkpoint.'
     sources: 1.38x <- the seed spread 10^0.14 measured on catalog_v4 (docs/results.tex v4_seed_spread ~l.4485); 30 GPU-h <-
       the GPU budget Joaquin set (CLAUDE.md)
+    passed_at: '2026-11-25T15:11:23+00:00'
+    reviewer: 'Re-check after one FIX: all four fixed. Prior now has the s_hat+coupling pretraining (kept its factor''s levels,
+      level share 0.90) and hp58 (1.27 vs 0.46), with what this run adds and why an hp58 re-read is the post-hoc substitution
+      already measured. Sigma pinned: experiment.py level_file block @a14e8ee52 calls fit_affine_multiplicity on the same
+      train statistics (trial 5''s 5.316), checked in the smoke log. Smoke scored by job_llm_score.sh REREAD with the held-out
+      level_file log line. Disk 0.14 GB per run with a shared memmap cache. Check 2: step15_level_source.json @868c56f2f,
+      diagram-level new bias^2 median 0.096 vs trial 5 0.859, post-hoc new median MSE 1.14 -> 0.58 (about 2x). Check 3: one
+      seed as trial 5, held-out seed spread 10^0.14 = 1.38 (results.tex l.4485). Check 5 terms: level, normalized by the predictor,
+      predicted level, context vector, s_hat+coupling, per-process pretraining (results.tex l.7800-8010, entry findings, decisions
+      D83/D105/D564).'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
