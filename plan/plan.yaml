@@ -41594,7 +41594,7 @@ entries:
     '14': FA-ccin2p3-f0b997a2
     '15': 'the next owner (this owner closes near the context limit after step 8''s smokes go out): design the level-branch
       configurations (finding 2026-11-25 split read)'
-    '16': repo-reviewer a3cecd844515d9849 advance (critical_batch dl_read.py fix)
+    '16': FA-lxplus-02e87d7e
   handoff:
     state: 'Part (a) DONE, part (c) DONE (par:llmcmp_c). Part (b) his setup: 16 heads done; 32 FA-ccin2p3-e9dfa8b9 running
       (step 47,320/60,840 at 15:45, val 5.26e-4), 64 FA-ccin2p3-623a3af6 running (step 13,521), 120 FA-ccin2p3-f0b997a2 pending
