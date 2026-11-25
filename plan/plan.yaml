@@ -16518,9 +16518,9 @@ entries:
     '34': 2026-11-26 (the first real lxplus submit; read its submit file and gpu_window charge)
   owner:
     agent: a43d971069d45144e
-    state: stopped
+    state: closed
     since: '2026-11-24T13:15:27+00:00'
-    state_at: '2026-11-24T18:33:57.728000+00:00'
+    state_at: '2026-11-25T01:17:50+00:00'
     context: 274288
     context_at: '2026-11-24T18:49:32+00:00'
   designs:
