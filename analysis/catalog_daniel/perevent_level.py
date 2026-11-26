@@ -229,6 +229,20 @@ ANCH = {"C_s": ("L",), "C_sqE": ("L", "q", "E"), "C_sqEP": ("L", "q", "E", "logP
 # process's own typical point (little leverage) and no statistic of the scored dataset enters. *_own (x0_p = the pool's
 # own median, a statistic of the scored pool) is a diagnostic of the anchor map's error only.
 ANCH_D = {"D_s": ("L",), "D_sqE": ("L", "q", "E"), "D_s_own": ("L",), "D_sqE_own": ("L", "q", "E")}
+# D566 attempt E (--anchor map): attempt D's + invariants form, the anchor map replaced: the regressor's own network
+# (ten seeds averaged, E_sqE_net), the same network with the final state's kinematic descriptors added (E_sqE_kin), a
+# boosted tree on those (E_sqE_hgb); D_sqE (ridge) and D_sqE_own beside them on the same events
+ANCH_E = {"D_sqE": ("L", "q", "E"), "E_sqE_net": ("L", "q", "E"), "E_sqE_kin": ("L", "q", "E"),
+          "E_sqE_hgb": ("L", "q", "E"), "D_sqE_own": ("L", "q", "E")}
+
+
+def kin(meta):
+    """the final state's kinematic descriptors (Daniel's run card cuts pT > 10 GeV on every massless visible leg):
+    log of (sum of final masses + 10 GeV per cut leg)^2, the number of cut legs, the number of neutrinos"""
+    fin = meta["process"].split(">")[1].split()
+    ncut = sum(p not in sn.MASS and sn.KIND[p] != "v" for p in fin)
+    return [np.log((sum(sn.MASS.get(p, 0.0) for p in fin) + 10.0 * ncut) ** 2), ncut,
+            sum(sn.KIND[p] == "v" for p in fin)]
 SUBSETS = ("all", "s_lo", "s_hi", "q_hard", "q_soft")
 NENS = 10
 
@@ -252,7 +266,7 @@ def anchor_fit(X, y, lam=1e-3):
 
 
 def anchored(D, tr, ho, new, rel, meta, grp, pfeat, lev, events, nboot=30, mode="global"):
-    ANCH = globals()["ANCH"] if mode == "global" else ANCH_D
+    ANCH = {"global": globals()["ANCH"], "process": ANCH_D, "map": ANCH_E}[mode]
     rng = np.random.default_rng(0)
     Xs = rng.normal(size=(500, 2)); assert np.allclose(anchor_fit(np.column_stack([Xs, np.ones(500)]),
                                                                  1.5 + Xs @ [2.0, -1.0], 1e-9), [1.5, 2, -1, 0], atol=1e-6)
@@ -279,18 +293,26 @@ def anchored(D, tr, ho, new, rel, meta, grp, pfeat, lev, events, nboot=30, mode=
                       for r in seeds], 0).reshape(len(ho), -1) * ts + tm
         return {**dict(zip(tr, cf)), **dict(zip(ho, hp))}
 
-    def anchor_map(med):  # x0_p from the process alone: cross-fit on train, full fit for the held out
+    Kp_tr = np.column_stack([Xp_tr, [kin(meta[n]) for n in tr]]); Kp_ho = np.column_stack([Xp_ho, [kin(meta[n]) for n in ho]])
+
+    def anchor_map(med, how="ridge"):  # x0_p from the process alone: cross-fit on train, full fit for the held out
         a = np.zeros((len(D), med.shape[1]))
         it = {n: i for i, n in enumerate(D)}
         itr, iho = [it[n] for n in tr], [it[n] for n in ho]
-        def fit(i):
-            sc = StandardScaler().fit(Xp_tr[i])
-            return sc, RidgeCV(alphas=np.logspace(-3, 3, 13)).fit(sc.transform(Xp_tr[i]), med[i])
-        for i, j in GroupKFold(5).split(Xp_tr, med, grp):
-            sc, r = fit(i)
-            a[np.array(itr)[j]] = r.predict(sc.transform(Xp_tr[j])).reshape(len(j), -1)
-        sc, r = fit(np.arange(len(tr)))
-        a[iho] = r.predict(sc.transform(Xp_ho)).reshape(len(ho), -1)
+        Ftr, Fho = (Kp_tr, Kp_ho) if how in ("kin", "hgb") else (Xp_tr, Xp_ho)
+        mm, ms = med.mean(0), med.std(0) + 1e-12
+        def fit(i, Fj):
+            sc = StandardScaler().fit(Ftr[i])
+            Z, Zj, t = sc.transform(Ftr[i]), sc.transform(Fj), (med[i] - mm) / ms
+            if how == "ridge":
+                return RidgeCV(alphas=np.logspace(-3, 3, 13)).fit(Z, med[i]).predict(Zj).reshape(len(Fj), -1)
+            if how == "hgb":
+                return np.column_stack([HistGradientBoostingRegressor(random_state=0).fit(Z, t[:, c]).predict(Zj)
+                                        for c in range(t.shape[1])]) * ms + mm
+            return np.mean([mlp(r).fit(Z, t).predict(Zj).reshape(len(Fj), -1) for r in range(10)], 0) * ms + mm
+        for i, j in GroupKFold(5).split(Ftr, med, grp):
+            a[np.array(itr)[j]] = fit(i, Ftr[j])
+        a[iho] = fit(np.arange(len(tr)), Fho)
         return {n: a[it[n]] for n in D}
 
     X, T = {}, {}
@@ -303,7 +325,8 @@ def anchored(D, tr, ho, new, rel, meta, grp, pfeat, lev, events, nboot=30, mode=
         elif tag.endswith("_own"):
             x0p = own
         else:
-            x0p = anchor_map(np.array([own[n] for n in tr]))
+            x0p = anchor_map(np.array([own[n] for n in tr]), {"E_sqE_net": "net", "E_sqE_kin": "kin",
+                                                              "E_sqE_hgb": "hgb"}.get(tag, "ridge"))
             out.setdefault("anchor_err", {})[tag] = {   # the map's miss of the pool's own median, in units of sx
                 g: np.median(np.abs((np.array([x0p[n] for n in ns]) - np.array([own[n] for n in ns])) / sx), 0).tolist()
                 for g, ns in (("new", new), ("train_crossfit", tr))}
@@ -324,7 +347,7 @@ def anchored(D, tr, ho, new, rel, meta, grp, pfeat, lev, events, nboot=30, mode=
     # ten 3-seed ensembles (seeds 3k..3k+2), as norm_explore4's read of the regressor (results.tex l.8510-8514: its
     # 0.045 is one draw, ten ensembles median 0.087, 0.016 to 0.19); regressor_ens = the same network on the pool mean
     ens = {c: [] for c in ["regressor_ens"] + list(ANCH) + [t + "_trueb" for t in ANCH]
-           + ([t + "_bcls" for t in ANCH] if mode != "global" else [])}
+           + ([t + "_bcls" for t in ANCH] if mode == "process" else [])}
     # attempt D: slopes shrunk fully to the mean true slope of the training processes with the same multiplicity
     bcls = {t: {k: np.mean([T[t][n][1:] for n in tr if meta[n]["n_out"] == k], 0) for k in {meta[n]["n_out"] for n in tr}}
             for t in ANCH}
@@ -336,7 +359,7 @@ def anchored(D, tr, ho, new, rel, meta, grp, pfeat, lev, events, nboot=30, mode=
             Th = net_fit(np.array([T[tag][n] for n in tr]), seeds)
             P[tag] = {n: Th[n][0] + X[tag][n] @ Th[n][1:] for n in D}
             P[tag + "_trueb"] = {n: Th[n][0] + X[tag][n] @ T[tag][n][1:] for n in D}   # level predicted, slopes true
-            if mode != "global":
+            if mode == "process":
                 P[tag + "_bcls"] = {n: Th[n][0] + X[tag][n] @ bcls[tag][meta[n]["n_out"]] for n in D}
         for c, pc in P.items():
             ens[c].append({g: {s: float(np.median([e_of(pc, n)[s] for n in ns])) for s in SUBSETS}
@@ -376,7 +399,8 @@ def anchored(D, tr, ho, new, rel, meta, grp, pfeat, lev, events, nboot=30, mode=
     out["families"] = {c: {g: {s: float(np.median([R[c][n][s] for n in ns])) for s in SUBSETS} | {"n": len(ns)}
                            for g, ns in fams.items()} for c in cands}
     out["per_process_new"] = {meta[n]["process"]: {c: R[c][n] for c in cands} for n in new}
-    json.dump(out, open(os.path.join(HERE, "data", "perevent_anchored" + ("_C" if mode == "global" else "_D") + ".json"), "w"),
+    json.dump(out, open(os.path.join(HERE, "data", "perevent_anchored_" + {"global": "C", "process": "D", "map": "E"}[mode]
+                        + ".json"), "w"),
               indent=1)
     for c in cands:
         print(c, {g: {s: round(v, 4) for s, v in summ[c][g].items() if s != "boot_sd"} for g in ("new", "relabels")})
@@ -390,8 +414,9 @@ def main():
     ap.add_argument("--mmap", nargs="+", help="read each process's first train-role events from these memmap base "
                     "caches (data_mmap: <key>/<depth> dirs) instead of $SCRATCH/amp_data_cache's pools")
     ap.add_argument("--anchored", action="store_true", help="D566 attempt C, output data/perevent_anchored_C.json")
-    ap.add_argument("--anchor", choices=("global", "process"), default="global", help="--anchored's x0: one constant "
-                    "(attempt C) or a process-intrinsic x0_p (attempt D, output data/perevent_anchored_D.json)")
+    ap.add_argument("--anchor", choices=("global", "process", "map"), default="global", help="--anchored's x0: one "
+                    "constant (attempt C), a process-intrinsic x0_p by ridge (attempt D, output "
+                    "data/perevent_anchored_D.json) or by network / tree maps (attempt E, perevent_anchored_E.json)")
     ap.add_argument("--search", type=int, default=0, help="step 20: DyHPO GP trials on the content-signature "
                     "cross-fit (1 network seed per fit), then the best read as candidate B[_mlp]_tuned")
     a = ap.parse_args()

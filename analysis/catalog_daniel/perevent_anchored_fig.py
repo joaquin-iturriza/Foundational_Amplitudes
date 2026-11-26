@@ -4,9 +4,9 @@ invariant, its singular fifth), for the per-process level from process and diagr
 anchored per-event levels c^ + b^.(x - x0) (data/perevent_anchored_C.json, perevent_level.py --anchored). Points: the
 median over ten 3-seed network ensembles of the new-set median level error; bars: the ensembles' min to max; the
 pool's own true mean (one number per pool, no network) beside them.
-    python analysis/catalog_daniel/perevent_anchored_fig.py [D]
+    python analysis/catalog_daniel/perevent_anchored_fig.py [D|E]
 Output: figs/perevent_anchored.{png,pdf}; with D, attempt D (process-intrinsic anchor, data/perevent_anchored_D.json)
-beside the same control: figs/perevent_anchored_D.{png,pdf}.
+beside the same control: figs/perevent_anchored_D.{png,pdf}; with E, attempt E's anchor maps (_E.json): figs/perevent_anchored_E.
 """
 import json, os, sys
 
@@ -27,11 +27,18 @@ ARMS_D = (("regressor_ens", "one level per process", ps.C.blue, "s"),
           ("D_s_bcls", r"$\log\hat s$, class slope", ps.C.sky, "<"),
           ("D_sqE", "per event: + invariants", ps.C.orange, "^"),
           ("D_sqE_bcls", "+ invariants, class slope", ps.C.vermillion, ">"))
+# attempt E: the + invariants form, one arm per anchor map, the pool's own median (a diagnostic) last
+ARMS_E = (("regressor_ens", "one level per process", ps.C.blue, "s"),
+          ("D_sqE", "anchor: ridge", ps.C.orange, "^"),
+          ("E_sqE_net", "anchor: network", ps.C.green, "v"),
+          ("E_sqE_kin", "anchor: network + kinematics", ps.C.sky, "<"),
+          ("E_sqE_hgb", "anchor: tree + kinematics", ps.C.vermillion, ">"),
+          ("D_sqE_own", "anchor: pool's own median", ps.C.purple, "D"))
 
 
 def main():
-    sfx = "_D" if sys.argv[1:] == ["D"] else ""
-    arms = ARMS_D if sfx else ARMS
+    sfx = "_" + sys.argv[1] if sys.argv[1:] in (["D"], ["E"]) else ""
+    arms = {"": ARMS, "_D": ARMS_D, "_E": ARMS_E}[sfx]
     d = json.load(open(os.path.join(HERE, "data", "perevent_anchored" + (sfx or "_C") + ".json")))
     E, S = d["ensembles"], d["summary"]
     x = np.arange(len(SUBS))
