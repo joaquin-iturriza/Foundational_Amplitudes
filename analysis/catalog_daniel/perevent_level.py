@@ -206,7 +206,7 @@ def mmap_pools(dirs):
                 segs[sg["name"]] = sg
         for sg in segs.values():
             MMAP_ROLE[sg["name"]] = sg["role"]
-            def rows(k, sg=sg):
+            def rows(k, sg=sg, mom=mom, pdg=pdg, amp=amp):  # bound now: the next cache rebinds the names
                 k, P = min(k, sg["n"]), sg["P"]
                 mo = np.asarray(mom[sg["p0"]: sg["p0"] + k * P], np.float64).reshape(k, 4 * P)
                 pd = np.asarray(pdg[sg["p0"]: sg["p0"] + k * P], np.float64).reshape(k, P)
