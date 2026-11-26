@@ -42126,8 +42126,18 @@ entries:
       (share only words like level, gap, family, rerun, measured in other contexts: none says anything about seeds of this
       arm).'
     blocks: step 16's verdict only
-    blocks_steps: &id004
+    blocks_steps:
     - 16
+  - ask: 'GPU budget: ~180 GPU-h for the four width runs of our setup (16/32/64/120 heads at part (c)''s best HPs, D537 ''We
+      then also widen the best HPs for our setup''; 64 heads measured by its smoke at ~46 GPU-h, 120 heads ~99), above the
+      100 GPU-h line of D536. Go?'
+    at: '2026-11-26T15:07:36+00:00'
+    searched: 'D536 sets the 100 GPU-h line; D537 asks for the widening without a cost; part (a)''s budget answer covered
+      part (a)''s search, not step 8''s widths. 2026-11-14T04:31: the paper draft''s LaTeX source he pasted, no budget call.
+      2026-11-16T20:00: the writing-style skill message, about prose, not GPU budget.'
+    blocks: step 8 only
+    blocks_steps: &id004
+    - 8
   owner:
     agent: a017802b37deeafec
     state: closed
@@ -46981,21 +46991,14 @@ entries:
       diverges shouldn't wake you and it's owning agent up.
     said_at: '2026-11-24T10:33:58.174000+00:00'
     at: '2026-11-24T11:23:35+00:00'
-  ask: 'Scope: a second seed (seed 43) of part (a) trial 5 and of step 16''s level-file arm, ~4 GPU-h per H100 run, ~8 GPU-h
-    in total. The same-setup rerun spread re-measured on held out (analysis/llm_compare/rerun_spread.py @e7fbadada) is 1.07x
-    seen, 2.5x relabels, 5.2x on the new-family median, and step 16''s kept-level outcome needs a gap of 1.98x at most, so
-    with one seed it cannot resolve. Run the second seeds, or read step 16 as unresolved?'
-  waiting_since: '2026-11-26T08:33:40+00:00'
-  searched: 'D564/D566 set the level branch, not its seeds; D372 makes the seed count Joaquin''s call. Read: 2026-11-06T22:31
-    (one seed for the scaling grid, and in general a single known seed-to-seed noise such as 5%: does not settle, it assumed
-    a small consistent spread, while the re-measured held-out spread here is 2.5x to 5.2x for relabels and new families, so
-    a one-seed gap under 1.98x is unreadable); 2026-10-26T13:12 (skip the second seeds mentioned then: about the fine-tune
-    cells, not this arm); 2026-10-06T00:17 (two extra seeds at every fine-tune cell''s best point: transfer study, not this
-    arm); 2026-09-30T02:14 (no multiple seeds for now, to see how noisy results are: an early call on another sweep, before
-    this spread was measured); 2026-11-14T04:31 (draft text with seed counts: not a call on this arm); 2026-10-22T13:03, 2026-10-27T02:14,
-    2026-11-10T02:08, 2026-11-13T01:18, 2026-11-16T20:00, 2026-11-17T11:15, 2026-11-25T13:11, 2026-09-28T15:30 (share only
-    words like level, gap, family, rerun, measured in other contexts: none says anything about seeds of this arm).'
-  blocks: step 16's verdict only
+  ask: 'GPU budget: ~180 GPU-h for the four width runs of our setup (16/32/64/120 heads at part (c)''s best HPs, D537 ''We
+    then also widen the best HPs for our setup''; 64 heads measured by its smoke at ~46 GPU-h, 120 heads ~99), above the 100
+    GPU-h line of D536. Go?'
+  waiting_since: '2026-11-26T15:07:36+00:00'
+  searched: 'D536 sets the 100 GPU-h line; D537 asks for the widening without a cost; part (a)''s budget answer covered part
+    (a)''s search, not step 8''s widths. 2026-11-14T04:31: the paper draft''s LaTeX source he pasted, no budget call. 2026-11-16T20:00:
+    the writing-style skill message, about prose, not GPU budget.'
+  blocks: step 8 only
   blocks_steps: *id004
 - id: lab_llm_trial
   title: Lab LLMs in place of some subagents
