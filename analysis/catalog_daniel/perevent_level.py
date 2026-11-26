@@ -223,6 +223,7 @@ def mmap_pools(dirs):
 # per event: c^ + b^ . (x - x0).
 ANCH = {"C_s": ("L",), "C_sqE": ("L", "q", "E"), "C_sqEP": ("L", "q", "E", "logP")}
 SUBSETS = ("all", "s_lo", "s_hi", "q_hard", "q_soft")
+NENS = 10
 
 
 def subsets(d):
@@ -257,49 +258,72 @@ def anchored(D, tr, ho, new, rel, meta, grp, pfeat, lev, events, nboot=30):
         pred["regressor"][n] = np.full(k, lev[n])
         pred["oracle_const"][n] = np.full(k, D[n]["y"].mean())   # the best any one number per pool can do on the pool
     Xp_tr = np.array([pfeat(n, True) for n in tr]); Xp_ho = np.array([pfeat(n, True) for n in ho])
-    for tag, cols in ANCH.items():
-        allx = np.concatenate([np.column_stack([D[n][c] for c in cols]) for n in tr])
-        x0, sx = np.median(allx, 0), allx.std(0)
-        out.setdefault("anchor", {})[tag] = {"x0": x0.tolist(), "scale": sx.tolist()}
-        X = {n: (np.column_stack([D[n][c] for c in cols]) - x0) / sx for n in D}
-        T = {n: anchor_fit(X[n], D[n]["y"]) for n in D}
-        Ttr = np.array([T[n] for n in tr]); tm, ts = Ttr.mean(0), Ttr.std(0) + 1e-12
+
+    def net_fit(Ttr, seeds):  # the regressor's network on a (vector) per-process target: cross-fit train, full fit held out
+        tm, ts = Ttr.mean(0), Ttr.std(0) + 1e-12
         cf = np.zeros_like(Ttr)
         for i, j in GroupKFold(5).split(Xp_tr, Ttr, grp):
             sc = StandardScaler().fit(Xp_tr[i])
             cf[j] = np.mean([mlp(r).fit(sc.transform(Xp_tr[i]), (Ttr[i] - tm) / ts).predict(sc.transform(Xp_tr[j]))
-                             for r in range(3)], 0).reshape(len(j), -1) * ts + tm
+                             for r in seeds], 0).reshape(len(j), -1) * ts + tm
         sc = StandardScaler().fit(Xp_tr)
         hp = np.mean([mlp(r).fit(sc.transform(Xp_tr), (Ttr - tm) / ts).predict(sc.transform(Xp_ho))
-                      for r in range(3)], 0).reshape(len(ho), -1) * ts + tm
-        That = {**dict(zip(tr, cf)), **dict(zip(ho, hp))}
-        pred[tag] = {n: That[n][0] + X[n] @ That[n][1:] for n in D}
-        pred[tag + "_fit"] = {n: T[n][0] + X[n] @ T[n][1:] for n in D}                  # the form's own floor
-        pred[tag + "_trueb"] = {n: That[n][0] + X[n] @ T[n][1:] for n in D}             # level predicted, slopes true
-    cands = list(pred)
+                      for r in seeds], 0).reshape(len(ho), -1) * ts + tm
+        return {**dict(zip(tr, cf)), **dict(zip(ho, hp))}
+
+    X, T = {}, {}
+    for tag, cols in ANCH.items():
+        allx = np.concatenate([np.column_stack([D[n][c] for c in cols]) for n in tr])
+        x0, sx = np.median(allx, 0), allx.std(0)
+        out.setdefault("anchor", {})[tag] = {"x0": x0.tolist(), "scale": sx.tolist()}
+        X[tag] = {n: (np.column_stack([D[n][c] for c in cols]) - x0) / sx for n in D}
+        T[tag] = {n: anchor_fit(X[tag][n], D[n]["y"]) for n in D}
+        pred[tag + "_fit"] = {n: T[tag][n][0] + X[tag][n] @ T[tag][n][1:] for n in D}   # the form's own floor
     sub = {n: subsets(D[n]) for n in D}
 
-    def e_of(c, n, idx=None):
-        y, p = D[n]["y"], pred[c][n]
+    def e_of(p_, n, idx=None):
+        y, p = D[n]["y"], p_[n]
         S = sub[n] if idx is None else subsets({"L": D[n]["L"][idx], "q": D[n]["q"][idx]})
         if idx is not None:
             y, p = y[idx], p[idx]
         sd = D[n]["y"].std()
         return {s: float((p[m] - y[m]).mean() ** 2 / sd ** 2) for s, m in S.items()}
 
-    R = {c: {n: e_of(c, n) for n in D} for c in cands}
+    # ten 3-seed ensembles (seeds 3k..3k+2), as norm_explore4's read of the regressor (results.tex l.8510-8514: its
+    # 0.045 is one draw, ten ensembles median 0.087, 0.016 to 0.19); regressor_ens = the same network on the pool mean
+    ens = {c: [] for c in ["regressor_ens"] + list(ANCH) + [t + "_trueb" for t in ANCH]}
+    ybar = np.array([[D[n]["y"].mean()] for n in tr])
+    for k in range(NENS):
+        seeds = range(3 * k, 3 * k + 3)
+        P = {"regressor_ens": {n: np.full(len(D[n]["y"]), v[0]) for n, v in net_fit(ybar, seeds).items()}}
+        for tag in ANCH:
+            Th = net_fit(np.array([T[tag][n] for n in tr]), seeds)
+            P[tag] = {n: Th[n][0] + X[tag][n] @ Th[n][1:] for n in D}
+            P[tag + "_trueb"] = {n: Th[n][0] + X[tag][n] @ T[tag][n][1:] for n in D}   # level predicted, slopes true
+        for c, pc in P.items():
+            ens[c].append({g: {s: float(np.median([e_of(pc, n)[s] for n in ns])) for s in SUBSETS}
+                           for g, ns in (("new", new), ("train_crossfit", tr))})
+            if k == 0:
+                pred[c] = pc
+        print(f"ensemble {k}: " + ", ".join(f"{c} {ens[c][-1]['new']['all']:.3g}" for c in ens), flush=True)
+    out["ensembles"] = {c: {g: {s: {"median": float(np.median([e[g][s] for e in v])),
+                                    "min": float(min(e[g][s] for e in v)), "max": float(max(e[g][s] for e in v)),
+                                    "all": [e[g][s] for e in v]} for s in SUBSETS} for g in ("new", "train_crossfit")}
+                        for c, v in ens.items()}
+    cands = list(pred)
+    R = {c: {n: e_of(pred[c], n) for n in D} for c in cands}
     for c in cands:
         for n in D:
             R[c][n]["spread"] = float((pred[c][n] - D[n]["y"]).std() / D[n]["y"].std())
     rel_ho = [n for n in ho if n in rel]
     summ = {c: {g: {s: float(np.median([R[c][n][s] for n in ns])) for s in SUBSETS + ("spread",)}
                 for g, ns in (("new", new), ("relabels", rel_ho), ("train_crossfit", tr))} for c in cands}
-    # event-bootstrap noise of the new-set medians (predictions fixed, events resampled, subsets redrawn)
+    # event-bootstrap noise of the new-set medians (ensemble 0's predictions fixed, events resampled, subsets redrawn)
     bs = {c: {s: [] for s in SUBSETS} for c in cands}
     for _ in range(nboot):
         idx = {n: rng.integers(0, len(D[n]["y"]), len(D[n]["y"])) for n in new}
         for c in cands:
-            ee = [e_of(c, n, idx[n]) for n in new]
+            ee = [e_of(pred[c], n, idx[n]) for n in new]
             for s in SUBSETS:
                 bs[c][s].append(np.median([x[s] for x in ee]))
     for c in cands:
