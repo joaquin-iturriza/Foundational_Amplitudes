@@ -29916,6 +29916,7 @@ entries:
     '25': FA-ccin2p3-1b18c76c
     '31': FA-ccin2p3-58bc2125
     '30': FA-ccin2p3-42ae3468
+    '32': FA-ccin2p3-6eb41dd6 FA-ccin2p3-76945fa6 FA-ccin2p3-44f737bc
   handoff:
     state: '2026-11-26 ~17:15. ORDER (coordinator): package, then slide-11 MC test, then slide 5-9 figures, D575 runs alongside.
       (1) PACKAGE (D573/D574): code committed and reviewed (9032d1238, d5e9f0b87, 45a1e906b; predict.py writes log10_me2 /
