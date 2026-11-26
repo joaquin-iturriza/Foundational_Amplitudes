@@ -47231,7 +47231,7 @@ entries:
     blocks_steps: &id004 []
   owner:
     agent: a7b288b537965af86
-    state: working
+    state: closed
     since: '2026-11-25T15:23:33+00:00'
     state_at: '2026-11-26T03:48:24.396000+00:00'
     context: 218167
@@ -48441,30 +48441,27 @@ entries:
       to Joaquin. Train/val at stable end 0.24-0.26 except Muon 128 0.63, Adam 2048 0.94. Figure figs/ft_ep50.png, caption
       check OK.'
   handoff:
-    state: 'D560 part B settled NO on existing data (finding 16:40, dead end of the step-size rerun after design FIX by a4f3d7192edf30268):
-      B_simple 55.5, first-order B_A 28-111 (Z+4g 6-51), optimal-step B_q 48-137 (one window 1082; Z+4g 3-196) against B_crit
-      2500-6690 (Z+4g 87-261); the momentum-0 step overshoots (dL<0 at every b). Reader analysis/critical_batch/dl_read.py
-      (40f9a2997, tests/test_dl_read.py), data/{pretrain,zng4g}_update_bdl.json, raw reads data/{pretrain,zng4g}_update_noise_scale.json,
-      figs/{pretrain,zng4g}_update_bdl.png (captions in the 16:05 hand-back; B_q not drawn yet). Step 2 = write par:cbs_update
-      + report to Joaquin. Step 4 (D563): driver zng_ep50_searches running (pid 1376403, log ~/.local/share/ccorch/detached/20261125-150854_zng_ep50_searches.log;
-      42 of 105 trials collected by 16:45, all on CC; windows 9e28b161d by HPO rule 2, design passed); when it ends extend
-      ft_bcrit.py to read sweeps_local/*_ep50*/results (per-cell bests, r50 vs r400, E50 vs E400, lr-edge flags, figure).
-      Step 1: close after 2 and 4. Repo backlog clear at 989f440df; noise-update code merged 4237a0be1 (update_scales, _noise_dl_losses
-      RNG fix).'
-    decisions: 'Joaquin''s: D532, D536, D560, D563. Mine, to re-justify: D563 lr windows (Adam on lr*(t,1e4) surface, Muon/Fn
-      on own best x surface t-factor 0.5855/3.170); ft_bcrit reads Adam (plateau) cells over the whole run; 100x-median exploding-read
-      rule; B_q from Q = A - dL(1) (quadratic model) taken as the part-B read instead of a rerun (design FIX option a); update_scales
-      kept in code as a no-op default; noise_scale.json files copied into analysis/critical_batch/data because site fetch
-      timed out on CC; plus the previous owner''s list (hp 1333 arm, brute reads, 1.22 threshold, edge best as a bound, Jean
-      Zay left out of D563).'
-    ruled_out: 'the t-only lr_c(t) window factor; rerunning the update runs at reduced step sizes (dead end: existing reads
-      settle it); the smoke''s dL as scatter; extending an edge lr window with extra trials; A(b) alone; D507 CC result dirs
-      as curve source'
-    running: D563 driver zng_ep50_searches (sweep/drive.py, 6 searches, 105 trials, CC)
-    files: analysis/critical_batch/dl_read.py, analysis/critical_batch/ft_bcrit.py, analysis/critical_batch/data/{pretrain,zng4g}_update_{bdl,noise_scale}.json,
-      sweep/sweep_config_*_ep50*.yaml, sweeps_local/*_ep50*, base_experiment.py _noise_update/_noise_dl_losses, scripts/job_cbs_update_zng.sh,
-      scripts/job_catalog_v3_short.sh (v4_het_update_*), docs/results.tex par:cbs_regimes/par:cbs_scan
-    written: '2026-11-25T15:10:48+00:00'
+    state: 'D560 part B written: par:cbs_update + fig:cbs_update (e05fc9e32, claims verified; NO: no in-run measure finds
+      B_crit, the scan''s B_crit stands, rule a short batch scan; momentum-aware measure not tested). D563 read done (ft_bcrit.py
+      ep50 ae99a4010, data 98cf81a0c, all 105 trials at design counts): best val MSE 50 vs 400 epochs, b2048/b128: Muon 0.0676
+      vs 0.0580 / 0.0147 vs 0.00888; Adam 0.235 vs 0.0503 / 0.0238 vs 0.0321; Fn 0.0219 vs 0.0214 / 0.0151 vs 0.0108; r50
+      4.60/9.86/1.45 against r400 6.53/1.57/1.98, all > 1.22: the batch-128 gain persists at 50 epochs. Fn 128 at the lower
+      lr edge (2% of window): a bound, question to Joaquin recorded (blocks nothing). Figure figs/ft_ep50.png, caption checked
+      OK, handed back 2026-11-26. Next: step 1 write par:cbs_horizon, then notes-editor on both paragraphs, then close.'
+    decisions: 'Joaquin''s: D532, D536, D560, D563. Mine, to re-justify: the D563 lost Muon b128 trial (hp515, FA-ccin2p3-516f820f)
+      recollected with drive.py --recollect rather than rerun (its log held RESULT_JSON; the driver read it too early); ft_bcrit
+      ep50 epoch axis from each result''s validate_every; Adam cells read over the whole run (no WSD cooldown); dl_read fixes
+      (exploding flag max(|dL|,|A|), Q<=0 listed apart) and figure changes (B_q in the left panel, --ref-label, exploding
+      markers at the bottom); par:cbs_update split into two paragraphs so each number has a claim from its own src; notes-editor
+      review batched with the D563 write-up; plus the previous owner''s list (lr windows by HPO rule 2, 100x exploding rule,
+      B_q from Q=A-dL(1), Jean Zay left out of D563, which was down throughout).'
+    ruled_out: the t-only lr_c(t) window; rerunning the update runs at reduced step sizes; extending an edge lr window inside
+      D563 without Joaquin; retrying the CC collection job in a loop while /sps is full
+    running: none
+    files: analysis/critical_batch/ft_bcrit.py, analysis/critical_batch/dl_read.py, analysis/critical_batch/data/ft_bcrit_ep50{,_raw}.json,
+      analysis/critical_batch/data/{pretrain,zng4g}_update_bdl.json, analysis/critical_batch/figs/{ft_ep50,pretrain_update_bdl,zng4g_update_bdl}.png,
+      docs/results.tex par:cbs_update, sweeps_local/*_ep50*, sweep/sweep_config_*_ep50*.yaml, tests/test_dl_read.py
+    written: '2026-11-26T03:53:41+00:00'
   ask: 'Scope: one extra 16-trial search of a single D563 cell, beyond the sibling cells'' counts. The fine-tune from the
     parent without the two input settings, at batch 128 and 50 epochs, has its best trial at the lower edge of its learning-rate
     window (lr 8.05e-3 at 2% of [7.67e-3, 6.90e-2] on a log scale), so its best (0.0151) is an upper bound. The batch-128
