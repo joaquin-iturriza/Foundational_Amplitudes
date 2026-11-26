@@ -29937,7 +29937,7 @@ entries:
   step_waits:
     '24': FA-lxplus-828d67d6
     '20': 'next owner: event E9622 (arm smokes done), then site pick + SCR-A2 and V/B arms'
-    '29': FA-ccin2p3-58bc2125 FA-ccin2p3-42ae3468
+    '29': FA-lxplus-828d67d6
     '31': FA-ccin2p3-58bc2125
     '30': 'next owner: event E9620 (FA-ccin2p3-42ae3468 failed, log to read)'
     '32': FA-ccin2p3-aacf91cc FA-ccin2p3-706a0f6f
