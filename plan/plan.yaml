@@ -29676,6 +29676,14 @@ entries:
       sent to the MG5 backend builder; fixed datagen.ensure_backend @bd560787d; plus 3 MG5 clean_template errors under 64
       auto-workers on EOS, not fixed), refused on CC (FA-ccin2p3-ba10aeb9, 5.9 GB < 20 GB margin); rerun on lxplus FA-lxplus-a6f69040
       @f6789adf1.'
+  - at: '2026-11-26T08:18:40+00:00'
+    text: '2026-11-26 ~09:30. Step 20: prebuild FA-lxplus-637c9017 built every pool (162/162 chunks, 3 KIT pools from file,
+      47 cached). Smoke parent FA-lxplus-0caa53bf failed at init: model.input_asym_factor refuses a signedlog target, and
+      uubar_ddbar_nlo (QCD one loop) has 31.1% negative values (lxplus val pool, 5000 events; ee_uu_nlo, uubar_ZZ_nlo, uubar_ttbar_nlo
+      0%). Recipe recipes/transfer_finale_kit_fairnlo.yaml @b93c2e524 drops it (3 one-loop bulk pools left, within Bakar''s
+      0-10), as the previous owner dropped the EW one-loop pools. Old smoke dir cannot be removed by hand: new tag kit_fairnlo_a2_smoke2,
+      smoke FA-lxplus-fc131d66; arm smokes read runs/data_saving/dsave_parent_finale_kit_fairnlo_a2_smoke2; the real parent
+      keeps tag kit_fairnlo_a2. Chain on lxplus (data only there).'
   step_why:
     20:
       feeds: the KIT NLO statement in the draft
