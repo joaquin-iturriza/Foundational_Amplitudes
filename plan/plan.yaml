@@ -28319,18 +28319,10 @@ entries:
     24: 'Step 20 fine-tunes: when the fair-NLO parent FA-ccin2p3-a3bc3374 (runs/data_saving/dsave_parent_finale_kit_fairnlo_a2,
       10 h target) ends, submit FT at every D (fairnlo_arms.py with that parent, FT lines, limit from the arm smokes'' s/step),
       then read FT vs SCR-A2 vs V/B per D on the hard bins (design PASS 2026-11-26T02:27)'
-    25: 'D573 export for KIT (''Okay, then let''s give them the checkpoint and an easy way to run things so that they do it
-      themselves''): a self-contained package of the three MC-test A2 models (runs/kit/kit_A_ee_{uug_me2,uugg_me2,tt_virt_finite}_n100000_t1831_hpo_asym_cont
-      on CC, 13.6 MB checkpoints each), one predict.py (their HDF5 layout in, |M|^2 float64 out), README (install CPU/GPU,
-      one command per process, expected output on a few bulk_test events of their files, limits: bulk only with s_ij/s>0.01,
-      sqrt s 1 TeV massless, tt sqrt s 353-1739 GeV), tested from a clean local venv on CPU to float64 precision; tarball
-      in analysis/kit_benchmark/export/ (gitignored). Plan: extend tools/kit_package.py build with --standalone: ship kit_data/<stem>.h5
-      holding only bulk_train[:n_train] (+ a few bulk_val events, recipes'' n_val cut to them: stats are train-only, asserted
-      by rebuild_run against data_stats.json) so KIT_HARDPS_DIR points inside the package; top-level predict.py wrapping tools/kit_predict.predict
-      (KIT_THREADS=1, DATA_DIR/SCRATCH temp, relocate) and writing <split>/<stratum>/me2 = 10**log10; examples/ with 5 bulk_test
-      events per process and their expected me2; build+check as a CPU job on CC (scripts/job_kit_package.sh), bring the tarball
-      home with site fetch <run> --what all --dir <out> (implemented 2026-11-26 in ~/.local/bin/site, backup site.bak-20261126-fetchall;
-      untested), then the clean-venv local test'
+    25: 'D573/D574 standalone KIT package v7 (A2 models of sec:kit-mc; predict.py writes log10_me2 / log10_abs_virt_finite
+      + the value under the benchmark''s names; @1d050c7c37): build+check CPU job FA-ccin2p3-5c3fb7fa -> runs/kit_export/fa_kit_surrogates_v7.tar.gz;
+      on PACKAGE_OK fetch the tarball (site fetch --what all), clean local venv per README on examples/*, copy to analysis/kit_benchmark/export/,
+      hand Joaquin path and size'
     27: 'Bakar slides 5-9 his-layout figures (tools/kit_bakar_figs.py, drawn 11-12 with the pre-A2 transformer): redraw with
       the A2 models beside his MLP'
     29: 'Slide-10 metrics never reported: bias, 99th percentile, |M|^2-weighted relative error per bin and the azimuth harmonic
@@ -29855,10 +29847,10 @@ entries:
       - 'FT below SCR-A2 and V/B per D past the design''s 1/7 bar: report the recipe as the fair-NLO answer to KIT'
       - 'FT not below them: report per D where it loses, with the parent''s curves'
     25:
-      feeds: 'D573: KIT runs our surrogates through their own Monte Carlo'
+      feeds: 'D573/D574: KIT runs our surrogates in their own MC'
       if:
-      - 'the package reproduces our predictions from a clean venv: hand Joaquin the tarball path and size'
-      - 'it does not: find which stage differs (stats, threads, dtype) and fix in kit_package/kit_predict'
+      - 'check reproduces log10 within 2e-6 and clean venv matches: hand back tarball'
+      - 'a stage differs: locate (stats, threads, dtype, relocation), fix, rebuild'
     27:
       feeds: showing Joaquin Bakar's asks done his way (slides 10, 13)
       if:
@@ -29877,7 +29869,6 @@ entries:
   step_waits:
     '24': step 20's real fair-NLO parent run (tag kit_fairnlo_a2, not yet submitted)
     '20': FA-ccin2p3-3895a2a7 FA-ccin2p3-e0587622 FA-lxplus-abac4281
-    '25': the repo-reviewer pillar run (blocks the commit of tools/kit_package.py --standalone, uncommitted in trunk)
     '27': a new owner (the previous closed at its context limit, 2026-11-26 ~15:30); after step 25/26's package
     '29': a new owner (the previous closed at its context limit, 2026-11-26 ~15:30); after step 25/26's package
     '30': a new owner (the previous closed at its context limit, 2026-11-26 ~15:30); after step 25/26's package
