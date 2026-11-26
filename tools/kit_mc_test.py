@@ -168,7 +168,7 @@ def main():
     print("KITMC " + json.dumps(res))
 
 
-PROC = {"ee_uug": r"$e^+e^-\to u\bar u g$", "ee_uugg": r"$e^+e^-\to u\bar u gg$", "ee_tt": r"$e^+e^-\to t\bar t$, one loop"}
+PROC = {"ee_uug": r"$e^+e^-\to u\bar u g$", "ee_uugg": r"$e^+e^-\to u\bar u gg$", "ee_tt": r"$e^+e^-\to t\bar t$"}
 ORDER = ["ee_uug", "ee_uugg", "ee_tt"]
 
 
@@ -183,21 +183,23 @@ def plot(res, base):
         r, h = rs[f], rs[f]["hist_log10x"]
         e = np.array(h["edges"])
         dens = np.array(h["share_surr"]) / np.diff(e)
-        ax.stairs(np.where(dens > 0, dens, np.nan), e, color=ps.C.blue, label="surrogate-weighted events")
+        ax.stairs(np.where(dens > 0, dens, np.nan), e, color=ps.C.blue, label="events")
         ax.axvline(e[-1], color=ps.C.vermillion, ls="--", label="largest $x$")
-        ax.axvline(np.log10(r["x_q"]), color=ps.C.green, ls=":", label="0.999 quantile of $x$")
+        ax.axvline(np.log10(r["x_q"]), color=ps.C.green, ls=":", label="0.999 quantile")
         ax.set_yscale("log")
         ax.set_xlabel(r"$\log_{10} x$, $x = w_{\rm exact}/w_{\rm surr}$")
         ax.set_ylabel(r"$d\sigma_{\rm surr}/\sigma_{\rm surr}\,/\,d\log_{10}x$")
         ps.process_label(ax, PROC[f])
-    ps.legend(cells[0], "upper left")
+    ps.legend(cells[2], "upper left")
     ax = axs[1][1]
     k = np.arange(len(ORDER))
     for key, lab, col, mk in [("eff_exact", "exact $|\\mathcal{M}|^2$", "k", "o"),
                               ("eff_surr", "surrogate, first stage", ps.C.blue, "s"),
                               ("eff_x", "second stage", ps.C.vermillion, "^"),
                               ("eff_two", "surrogate, both stages", ps.C.green, "D")]:
-        ax.plot(k, [rs[f][key] for f in ORDER], ls="none", marker=mk, color=col, label=lab)
+        # exact drawn hollow and last: its values sit on the surrogate's and would be hidden
+        ax.plot(k, [rs[f][key] for f in ORDER], ls="none", marker=mk, color=col, label=lab,
+                mfc="none" if key == "eff_exact" else col, zorder=3 if key == "eff_exact" else 2)
     ax.set_xticks(k, [r"$u\bar u g$", r"$u\bar u gg$", r"$t\bar t$"])
     ax.set_xlim(-0.5, len(ORDER) - 0.5)
     ax.set_yscale("log")
