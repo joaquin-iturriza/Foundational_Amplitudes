@@ -48183,7 +48183,6 @@ entries:
   step_waits:
     '4': 'the detached ep50_collect2 (pid 2901036) ending: COLLECTED -> ft_bcrit.py ep50 read and figure; FAILED (CC /sps
       full) -> wait on the cc_disk owner''s freeing, then one resubmission'
-    '2': the notes-editor review of par:cbs_update (e05fc9e32), batched with the D563 write-up
   targets:
   - batch: noise_smoke
     wall_h: 0.4
