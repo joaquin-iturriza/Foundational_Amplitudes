@@ -161,8 +161,17 @@ def collect_searched(base, out):
     d = json.load(open(base))
     for site in sorted({s for s, _ in SEARCHED.values()}):
         models = {p: [("transformer", [r])] for p, (s, r) in SEARCHED.items() if s == site}
-        part = site_python(SITE, [shlex.quote(json.dumps(models)), shlex.quote(json.dumps({})), str(PER_DECADE)],
-                           "KITBAKAR", site=site, timeout=3600)
+        try:
+            part = site_python(SITE, [shlex.quote(json.dumps(models)), shlex.quote(json.dumps({})), str(PER_DECADE)],
+                               "KITBAKAR", site=site, timeout=3600)
+        except SystemExit as err:
+            if "CPU job" in str(err):   # a job still to read: the same call again
+                raise
+            # a site down: its processes drawn without a transformer, never with another run under that name
+            print(f"!! {site} not read ({str(err)[-200:]}): no transformer on {sorted(models)}")
+            for p in models:
+                drop_model(d[p], "transformer")
+            continue
         for p, n in part.items():
             o = d[p]
             o["result"]["transformer"] = n["result"]["transformer"]
@@ -180,6 +189,16 @@ def collect_searched(base, out):
                 o["azimuth"][st]["event"]["transformer"] = a["event"]["transformer"]
     json.dump(d, open(out, "w"))
     print(f"-> {out}")
+
+
+def drop_model(o, lab):
+    """a process's collect entry without model `lab`"""
+    o["result"].pop(lab, None)
+    for b in list(o["bins"].values()) + ([o["vb"]] if o["vb"] else []):
+        for k in [k for k in b if k.split("#")[0] == lab]:
+            del b[k]
+    for a in o["azimuth"].values():
+        a["rms"].pop(lab, None); a["event"].pop(lab, None)
 
 
 def seeds(d, lab):
@@ -215,7 +234,7 @@ def plot(path, figs):
     for lab in present(vb):
         draw(ax, x, seeds(vb, lab), lab)
     ax.plot(x, CF * np.pi * ALPHA_S / (2 * x), "k--", label=r"$C_F\pi\alpha_s/(2\beta)$")
-    ax.axvspan(0.2, 1.0, color=ps.C.grey, alpha=0.2, lw=0)
+    ax.axvspan(0.2, 1.0, color=ps.C.grey, alpha=0.2, lw=0, label="training range")   # beta > 0.2 in training
     ax.set_xscale("log"); ax.set_yscale("log")
     ax.set_xlabel(XLAB["threshold_beta"]); ax.set_ylabel(r"median $V/B$")
     ps.process_label(ax, PROCESS["ee_tt_virt_finite"])
@@ -252,7 +271,7 @@ def plot(path, figs):
     for lab in [l for l in labs if l in rows[0]["rms"]]:
         draw(a2, y, [np.median(v["rms"][lab]) for v in rows], lab)   # true values, no floor
     a2.set_xscale("log"); a2.set_yscale("log"); a2.xaxis.set_minor_formatter(NullFormatter())
-    a2.set_xlabel(XLAB["coll_gg_y"]); a2.set_ylabel(r"rms over events of $h$")
+    a2.set_xlabel(XLAB["coll_gg_y"]); a2.set_ylabel(r"rms of $\cos2\varphi$ amplitude")
     for a in (a1, a2):
         ps.process_label(a, PROCESS["ee_uugg_me2"])
     _legend([a1, a2], None, PROCESS["ee_uugg_me2"], (1, "upper left"))
