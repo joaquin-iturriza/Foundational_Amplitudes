@@ -1,0 +1,19 @@
+{
+ "max_abs_dec": {
+  "uug_1e4_42_nu/off": 0.0,
+  "uug_1e4_42_nu/rule": 0.0,
+  "uug_1e4_43_nu/off": 0.0,
+  "uug_1e4_43_nu/rule": 0.0,
+  "uug_1e4_44_nu/off": 0.0,
+  "uug_1e4_44_nu/rule": 0.0,
+  "uug_1e5_42_nu/off": 0.00017733500317568154,
+  "uug_1e5_42_nu/rule": 0.00017733500317568154,
+  "uug_1e5_43_nu/off": 0.00011986465122553814,
+  "uug_1e5_43_nu/rule": 3.382418532773568e-05,
+  "uug_1e5_44_nu/off": 0.0,
+  "uug_1e5_44_nu/rule": 0.0
+ },
+ "problems": [],
+ "max_dec": 0.00017733500317568154,
+ "outcome": "SAME"
+}

@@ -167,6 +167,7 @@ def read_nu():
             out["max_abs_dec"][f"{lab}/{arm}"] = float(d)
             if d >= 0.01:
                 out["problems"].append(f"{lab} {arm}: max |log10 new/old| {d:.3g}")
+    out["max_dec"] = max(out["max_abs_dec"].values())
     out["outcome"] = "SAME" if not out["problems"] else "DIFFERENT"
     json.dump(out, open(os.path.join(HERE, "data", "support_nu.json"), "w"), indent=1)
     print(json.dumps(out))
@@ -295,7 +296,11 @@ def minima(cached):
                       "finale_below_0.009": sum(n for v in soft for n in v["below_0.009_by_pid"].values()),
                       "finale_below_0.009_pids": sorted({q for v in soft for q in v["below_0.009_by_pid"]}),
                       "finale_min_others": min(v["min"] for v in fin if not v["below_0.009_by_pid"]),
-                      "zng_train_min": res["zng"]["train"]["min"], **enter}))
+                      "zng_train_min": res["zng"]["train"]["min"],
+                      # momenta wrappers._soft_rescale changes at x0=0.009 with neutrinos kept, over every pool
+                      "n_pools": sum(len(res[g]) for g in ("finale", "zng", "uug")),
+                      "moved_nu_exempt": sum(v["moved_x0_0.009_nu_exempt"] for g in ("finale", "zng", "uug") for v in res[g].values()),
+                      **enter}))
 
 
 if __name__ == "__main__":
