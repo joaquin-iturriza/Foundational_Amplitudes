@@ -42439,9 +42439,9 @@ entries:
       untouched
   owner:
     agent: a85970e976cb8ac83
-    state: stopped
+    state: working
     since: '2026-11-26T19:32:24+00:00'
-    state_at: '2026-11-26T20:10:39.458000+00:00'
+    state_at: '2026-11-26T20:44:21.389000+00:00'
     context: 150245
     context_at: '2026-11-26T19:57:40+00:00'
   step_why:
@@ -47662,9 +47662,9 @@ entries:
       it is'
   owner:
     agent: a5ba353786b0cf99d
-    state: working
+    state: stopped
     since: '2026-11-25T13:58:11.325000+00:00'
-    state_at: '2026-11-26T20:33:36.638000+00:00'
+    state_at: '2026-11-26T20:37:06.043000+00:00'
     context: 138979
     context_at: '2026-11-26T20:44:31+00:00'
   designs:
