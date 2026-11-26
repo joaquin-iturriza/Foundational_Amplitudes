@@ -353,8 +353,7 @@ class Sweep:
             args.append("--hdr=--gpu-min-mem=%s" % self.gpu_min_mem)
         if s == "jeanzay":
             args += ["--est-gpu-hours", "%.2f" % self.hours, "--allow-jeanzay"]
-        if a.disk_gb is not None:
-            args += ["--disk-gb", str(a.disk_gb)]
+        args += ["--disk-gb", str(a.disk_gb)]
         args += ["--", "--sweep-config", self.config_rel, "--detached", "--trial-idx", str(idx),
                  "--hp-idx", str(hp_idx), "--t-steps", str(t_steps)]
         for k, v in hp.items():
@@ -657,7 +656,7 @@ def main():
     ap.add_argument("--sites", nargs="*")
     ap.add_argument("--item", required=True, help="the work item these trials belong to (`site items FA`)")
     ap.add_argument("--allow-jeanzay", action="store_true")
-    ap.add_argument("--disk-gb", type=float, help="one trial's peak disk in GB (site submit refuses without it; "
+    ap.add_argument("--disk-gb", type=float, required=True, help="one trial's peak disk in GB (site submit refuses without it; "
                     "from an earlier trial of the same setup, e.g. du of runs/<sweep>/trial_* on its site)")
     ap.add_argument("--poll", type=int, default=60)
     ap.add_argument("--stop-after", type=int, default=6,
