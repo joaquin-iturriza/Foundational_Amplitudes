@@ -28531,7 +28531,7 @@ entries:
     agent: a753fb41b3f480c1d
     state: working
     since: '2026-11-26T02:44:45.162000+00:00'
-    state_at: '2026-11-26T03:10:27.665000+00:00'
+    state_at: '2026-11-26T03:24:08.440000+00:00'
     context: 213813
     context_at: '2026-11-26T03:24:23+00:00'
   findings:
@@ -41433,9 +41433,9 @@ entries:
     decision: D553
   owner:
     agent: af3bc45721454618c
-    state: stopped
+    state: working
     since: '2026-11-26T01:21:30.914000+00:00'
-    state_at: '2026-11-26T02:31:57.042000+00:00'
+    state_at: '2026-11-26T03:24:10.115000+00:00'
     context: 189359
     context_at: '2026-11-26T02:43:31+00:00'
   step_why:
@@ -47174,9 +47174,9 @@ entries:
     blocks_steps: &id003 []
   owner:
     agent: a7b288b537965af86
-    state: stopped
+    state: working
     since: '2026-11-25T15:23:33+00:00'
-    state_at: '2026-11-26T02:44:28.258000+00:00'
+    state_at: '2026-11-26T03:24:11.710000+00:00'
     context: 200441
     context_at: '2026-11-25T22:27:12+00:00'
   designs:
