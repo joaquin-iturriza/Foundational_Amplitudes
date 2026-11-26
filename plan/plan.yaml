@@ -34025,6 +34025,28 @@ entries:
       0.45 vs 0.78. Check 3: 1/7 and 7 against rerun spread 0.78-6.96, one seed (D315). HETEROSC; <= 44 GPU-h under D570.
       Searched: sign head, sign_head, het sign, sign row, abslog, signedlog in results.tex; plan kit_benchmark; decisions
       D287, D570-D572.'
+  - at: '2026-11-26T14:23:43+00:00'
+    question: 'D573/D574 export (CPU only, no training): does a self-contained package of the three MC-test A2 models (runs/kit/kit_A_ee_{uug_me2,uugg_me2,tt_virt_finite}_n100000_t1831_hpo_asym_cont),
+      with predict.py writing Bakar''s slide-11 interface (momenta in, float64 log10_me2 / log10_abs_virt_finite plus the
+      value under the target name), reproduce our own predictions of those runs?'
+    prior: 'Searched results.tex (kit package, sec:kit-mc), plan kit_benchmark, decisions D573 D574. Package v5/v6 (tools/kit_package.py
+      @817d0d0c4) built and checked on CC: at KIT_THREADS=1 the package reproduces the runs'' predictions exactly (v5: FA-ccin2p3-d56c5264
+      vs 83880457); thread count moves A2 predictions up to 5.5e-3 log10 at 4 threads. New here: --standalone (training events
+      shipped so stats rebuild without the benchmark files, predict.py, examples) @9032d1238/d5e9f0b87.'
+    measure: 'kit_package.py check: max |delta log10| of the package''s predictions against each run''s own kit_benchmark/predictions.h5
+      on the first 200 events per stratum (all strata, bulk and hard), plus the standalone predict.py on examples/<proc>_bulk5.h5
+      against examples/*.expected.txt (log10 from the runs'' predictions).'
+    check: The same check measured 0 (exact) at 1 thread and 5.5e-3 at 4 threads on v5 (it moves with the setup it tests);
+      the import-closure test tests/test_kit_package_imports.py passes @d5e9f0b87.
+    fixed: The three trained A2 models unchanged (checkpoints, config, data_stats); float64; KIT_THREADS=1; CPU job on CC
+      (data and runs there), scripts/job_kit_package.sh --standalone, 4 CPUs, 2 h limit (v5 build+check ~30-40 min); disk
+      ~0.2 GB (3 x 13.6 MB ckpts + 3 x 1e5 training events).
+    control: Each run's own predictions.h5 written by its training job (the numbers in results.tex sec:kit-mc).
+    seeds: 'none: no training (D574)'
+    outcome: 'PASS: every delta <= 2e-6 (TOL, the package README''s CPU-GPU rounding limit) -> fetch the tarball, test it
+      from a clean local CPU venv on examples, hand it to Joaquin. FAIL: locate the stage (stats rebuild, threads, dtype,
+      relocation) and fix in kit_package/kit_predict, rebuild.'
+    sources: TOL 2e-6 <- tools/kit_package.py README (measured CPU-GPU rounding, 546dd9c22); D573, D574 Joaquin's words
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
