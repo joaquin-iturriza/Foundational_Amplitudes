@@ -43393,8 +43393,7 @@ entries:
       on CC, interactive score 21:56 CET, tools/llm_score.py) against c_best''s 0.0533 (data/c_best_seen.json): 2.4x worse
       in distribution without the input (val_loss_no_reg -5.718 vs -6.03). Step 22 read complete; the encoding question goes
       to Joaquin (design''s branch ''groups gone, pole dependence kept'').'
-  step_waits:
-    '24': FA-ccin2p3-df622fc5
+  step_waits: {}
   handoff:
     state: 'Part (a), part (c), steps 16, 19 DONE (as before). Step 21/22 no-off-shellness arm FA-ccin2p3-1b480869 trained
       clean (V100, 60,840 steps 13.45 h + sigma 1.78 h; best val_loss_no_reg -5.718 at validation 20/20 vs baseline trial_1860
