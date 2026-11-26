@@ -28529,7 +28529,7 @@ entries:
       cost 19.2 GPU-h, under the 30 GPU-h line (main session, 2026-11-26)
   owner:
     agent: a753fb41b3f480c1d
-    state: working
+    state: closed
     since: '2026-11-26T02:44:45.162000+00:00'
     state_at: '2026-11-26T03:24:08.440000+00:00'
     context: 213813
@@ -29677,32 +29677,39 @@ entries:
       pid 2843282)
     '24': FA-lxplus-cdc7fee9
   handoff:
-    state: '2026-11-26 ~03:40 UTC. Step 20 (D570): design PASS 2026-11-26T02:27, nothing submitted. Every site sync/submit
-      is refused by critical_batch''s uncommitted files (analysis/critical_batch/figs/{pretrain,zng4g}_update_bdl.pdf, data/ft_bcrit_ep50{,_raw}.json);
-      --allow-dirty was refused by the permission classifier, git stash -u by the git guard; sent to the main session (D568).
-      Once clear: (1) smoke parent: site submit ccin2p3 FA scripts/job_datasaving_parent.sh --item kit_benchmark --hdr=--time=01:00:00
-      -- finale recipe=recipes/transfer_finale_kit_fairnlo.yaml flags=off lr=1.89e-3 iters=50 tag=kit_fairnlo_a2_smoke ++model.input_asym_factor=true
-      ++model.net.frames_gamma_max=4 data.target_physics_factor=false data.target_physics_orders=false data.affine_multiplicity_std=true;
-      (2) then arm smokes at D=1e4 from it: python3 analysis/kit_benchmark/fairnlo_arms.py ccin2p3 runs/data_saving/dsave_parent_finale_kit_fairnlo_a2_smoke
-      01:00:00 --smoke (afterok); their s/step sets the arm limits (8500 x rate x 1.3 + 0.3 h; plan target); (3) real parent
-      (same as (1) without iters, tag=kit_fairnlo_a2, --hdr=--time=14:00:00), SCR-A2 + VB at once from the smoke parent config,
-      FT (fairnlo_arms.py with the real parent) after it. Step 23 (D571): design FIX once (outcome), revised and re-recorded,
-      tool @1eb2b1a1; the same reviewer is re-checking. On PASS: one CPU job site run --job ccin2p3 FA --item kit_benchmark
-      -- python tools/kit_mc_test.py runs/kit/kit_A_ee_{uug_me2,uugg_me2,tt_virt_finite}_n100000_t1831_hpo_asym_cont --out
-      analysis/kit_benchmark/data/kit_mc_test.json (needs the same sync).  Step 22 waits on the main session''s narrowing
-      (cost 19.2 GPU-h is under 30).'
+    state: '2026-11-26 ~04:35 UTC. Step 23 (D571) DONE: MC test PASS on all three (bias below the exact sigma''s MC error:
+      uug -1.65e-3 vs 1.21e-2, uugg -3.31e-3 vs 1.12e-2, tt +5.83e-4 vs 1.90e-3; second-stage eff 0.886/0.562/0.967), results.tex
+      sec:kit-mc @d871ce55a, fig analysis/kit_benchmark/figs/mc_test/kit_mc_test.png, tool tools/kit_mc_test.py @cbb51408c.
+      Step 20 (D570): the CC smoke parent FA-ccin2p3-a0194ee9 failed at init_data (require_cache: recipe transfer_finale_kit_fairnlo
+      pools never prebuilt on CC); dependents cancelled, E9399-E9402 acked. CC /sps/lpnhe is 100% full (512G/512G, 0 free;
+      sweeps not writable, site pick AVOIDs CC): told to the main session. site pick now gives lxplus, so the chain moves
+      there, step by step (HTCondor has no afterok): prebuild FA-lxplus-cdc7fee9 (recipes/transfer_finale_kit_fairnlo.yaml
+      seed 42) running. When it ends: site pick FA --jobs 1, then the smoke parent on the picked site: site submit <site>
+      FA scripts/job_datasaving_parent.sh --item kit_benchmark --est-gpu-hours 1 --hdr=--time=01:00:00 -- finale recipe=recipes/transfer_finale_kit_fairnlo.yaml
+      flags=off lr=1.89e-3 iters=50 tag=kit_fairnlo_a2_smoke ++model.input_asym_factor=true ++model.net.frames_gamma_max=4
+      data.target_physics_factor=false data.target_physics_orders=false data.affine_multiplicity_std=true; when it ends cleanly:
+      the three arm smokes (python3 analysis/kit_benchmark/fairnlo_arms.py <site> runs/data_saving/dsave_parent_finale_kit_fairnlo_a2_smoke
+      01:00:00 --smoke, add --est-gpu-hours 1; run each with </dev/null, site submit eats a loop''s stdin) and the real parent
+      (same as smoke without iters, tag=kit_fairnlo_a2, --hdr=--time=14:00:00, --est-gpu-hours 14; target fairnlo_parent 10
+      h recorded); then SCR-A2 + V/B at all five D with limits 8500 x smoke s/step x 1.3 + 0.3 h, FT after the parent (step
+      24). The data must be on the site the chain runs on (all of a chain on one site). Step 22: on the main session''s go
+      (D570, NO branch of the 10:47 design) two 16-trial tt virtual searches run through sweep/drive.py (detached kit_hpo_tt_divform_rezero;
+      configs sweep/sweep_config_kit_hpo_ttvirt_thr_{divform,rezero}.yaml @057b40d47, targets 2 h each); read best against
+      hp0131 of kit_hpo_ttvirt_thr on val mu-MSE then the hard strata (job_kit_rescore.sh) when the driver ends.'
     decisions: 'Joaquin''s: D570 (ladder recipe, extrapolating config, fine-tune vs scratch, no HPO), D571 (we run the MC
-      test), D402 superseded by D570, D391 horizons for D-scans. Mine (re-justify): ladder+star finale recipe, not the catalog
-      fair-NLO parent d0b132b6/03ea3719 (catalog parents lose to scratch on tt V, S=0.45); the extrapolating config = KIT
-      A2 (plain target, flags off, gamma<=4) with affine_multiplicity_std; EW one-loop pools out (signed, refused by A2);
-      u u~ -> t t~ one loop kept; KIT tt Born with its hard tree points in; stage-2 search bests per D as HPs, cosine; D391
-      horizons rather than D425''s 300 epochs (600 steps at batch D/2); VB on the parent''s config with the factor off; MC
-      test on the flat bulk_test only (the hard strata have no flat measure), weights w=f (RAMBO) and f beta/s (tt).'
-    ruled_out: Catalog fair-NLO parent for step 20; HPO (D570); --allow-dirty and stash -u to clear the sync blocker (refused).
-    running: none (step 23 design reviewer re-check in progress; it records its own verdict)
-    files: recipes/transfer_finale_kit_fairnlo.yaml, analysis/kit_benchmark/fairnlo_arms.py, tools/kit_mc_test.py, scripts/job_datasaving_parent.sh,
-      scripts/job_kit.sh
-    written: '2026-11-26T02:41:42+00:00'
+      test), D428 (16 trials), D391 horizons. Main session''s: step 22 run now (ask withdrawn, D570). Mine (re-justify): MC
+      region variable over gluon pairs only (reviewer note); MC JSON written under runs/ on CC (an untracked file in analysis/
+      blocked sync); step 22 searches on tt only (both arms are clear NOs there; uug div-form and ReZero-collinear were inconclusive,
+      not searched: +9.6 GPU-h each if wanted); chain moved to lxplus because site pick AVOIDs full CC; plus the previous
+      owner''s choices (ladder+star finale recipe, A2 with affine_multiplicity_std, EW one-loop pools out, VB on the parent''s
+      config with the factor off).'
+    ruled_out: Catalog fair-NLO parent for step 20; HPO for step 20 (D570); running the chain on CC while /sps/lpnhe is full.
+    running: FA-lxplus-cdc7fee9 (prebuild, step 20/24 wait on it); drive.py kit_hpo_ttvirt_thr_divform + _rezero (detached,
+      step 22)
+    files: recipes/transfer_finale_kit_fairnlo.yaml, analysis/kit_benchmark/fairnlo_arms.py, scripts/job_datasaving_parent.sh,
+      scripts/job_kit.sh, tools/kit_mc_test.py, sweep/sweep_config_kit_hpo_ttvirt_thr_divform.yaml, sweep/sweep_config_kit_hpo_ttvirt_thr_rezero.yaml,
+      analysis/kit_benchmark/data/kit_mc_test.json
+    written: '2026-11-26T03:30:43+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
