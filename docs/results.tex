@@ -9289,12 +9289,11 @@ three loss targets $B_q$ is $102$, $112$ and $137$, below a third of $B_{\rm cri
 
 For $q\bar q\to Z+4g$ at $10^4$ training events, Adam from scratch at batch $2048$ read at $b=64$ to $1024$, the
 step raises the loss in all $7$ windows (Fig.~\ref{fig:cbs_update}, bottom); $B_A$ lies between $5.86$ and $50.8$
-and $B_q$ between $2.72$ and $196$, mostly below the two-batch range of par.~\ref{par:cbs_regimes}. The reason is that
+and $B_q$ between $2.72$ and $196$, mostly below the two-batch range of par.~\ref{par:cbs_regimes}. A likely reason, not tested, is that
 the step we read carries no momentum, while Adam ($\beta_1=0.99$) and the AdamW part of MuonAdamW ($\beta_1=0.9$) put
 the current batch into the real step at $1\%$ and $10\%$ of that size. So none of the reads along one run, the noise
 scale, the first-order step or the optimal step, finds the critical batch; the scan's $B_{\rm crit}$ is the number to
-use, and a new setup takes its batch from a short batch scan of its own. A measure that follows the momentum is not
-tested.
+use, and a new setup takes its batch from a short batch scan of its own.
 % src: python3 analysis/critical_batch/dl_read.py analysis/critical_batch/data/zng4g_update_noise_scale.json zng4g_update_bdl --ref 87 261 @ada4a16c8
 % claim: n_dL_nonpositive=7
 % claim: n_windows=7
@@ -9339,13 +9338,16 @@ at $2048$ over that at $128$, $r_{50}$, is at most $1.22$, the largest best-to-t
 searches. It is not the horizon (Fig.~\ref{fig:cbs_horizon}): $r_{50}$ is $4.60$ for Muon, $9.86$ for Adam and $1.45$
 for the fine-tune, against $6.53$, $1.57$ and $1.98$ at $400$ epochs, so batch $128$ wins at both horizons in every
 arm. Per cell, the best at $50$ epochs over the best at $400$ is $1.17$ (Muon) and $1.02$ (fine-tune) at $2048$,
-within the $1.22$ spread, and $4.68$ for Adam, whose $244$ steps leave it far from converged (train over validation
-MSE $0.939$ at the end of its stable phase). At $128$, $50$ epochs is worse for Muon ($1.66$) and the fine-tune
-($1.39$) and better for Adam ($0.743$). The fine-tune's best at $128$ sits at the lower edge of its learning-rate
+within the $1.22$ spread, and $4.68$ for Adam, whose $244$ steps stay far above its $400$-epoch best (train over
+validation MSE $0.939$ at the end of its stable phase: no memorisation). At $128$, $50$ epochs is worse for Muon ($1.66$), at most $1.39$ for
+the fine-tune, whose best sits at the window's lower edge (below), so worse or equal, and better for Adam
+($0.743$). The fine-tune's best at $128$ sits at the lower edge of its learning-rate
 window, a fraction $0.0220$ of its log width, so $0.0151$ is an upper bound on that cell; a lower value only raises its
-$r_{50}$. The trials' spread, the third-best over the best, is at most $1.30$ in every cell. So the batch-$128$ gain
-on $10^4$ repeated events does not come from training too long: at $50$ epochs, where batch $2048$ no longer
-memorises (train over validation between $0.237$ and $0.939$ at $2048$), it still ends several times above batch $128$ for both
+$r_{50}$. The trials' spread, the third-best over the best, is at most $1.30$ in every cell; in both Adam cells it
+exceeds the $1.22$ of the $400$-epoch searches, which flips neither Adam reading. So the batch-$128$ gain
+on $10^4$ repeated events does not come from training too long: at $50$ epochs, where batch $2048$ memorises far
+less than at $400$ epochs (train over validation between $0.237$ and $0.939$ at $2048$, against the values of
+par.~\ref{par:cbs_regimes}), it still ends several times above batch $128$ for both
 optimizers from scratch.
 % src: python3 analysis/critical_batch/ft_bcrit.py ep50 @ae99a4010
 % claim: arms.muon.r50=4.60
