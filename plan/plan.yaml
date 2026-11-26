@@ -28563,7 +28563,7 @@ entries:
     agent: a8f9a3b8d28dab422
     state: closed
     since: '2026-11-26T03:33:40.885000+00:00'
-    state_at: '2026-11-26T08:43:55.616000+00:00'
+    state_at: '2026-11-26T08:47:46+00:00'
     context: 227085
     context_at: '2026-11-26T08:19:07+00:00'
   findings:
