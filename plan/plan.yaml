@@ -28622,7 +28622,7 @@ entries:
     withdrawn_why: 'D574: no more trainings for today''s reply; a pretrained held-out uug/uugg run is training'
   owner:
     agent: a5e0d67ea7865caa5
-    state: working
+    state: closed
     since: '2026-11-26T15:20:32.503000+00:00'
     state_at: '2026-11-26T15:54:25.273000+00:00'
     context: 224349
@@ -29926,34 +29926,29 @@ entries:
     '31': FA-ccin2p3-58bc2125
     '30': FA-ccin2p3-42ae3468
   handoff:
-    state: '2026-11-26 ~17:15. ORDER (coordinator): package, then slide-11 MC test, then slide 5-9 figures, D575 runs alongside.
-      (1) PACKAGE (D573/D574): code committed and reviewed (9032d1238, d5e9f0b87, 45a1e906b; predict.py writes log10_me2 /
-      log10_abs_virt_finite + value under KIT names); build+check CPU job FA-ccin2p3-5c3fb7fa (runs/kit_export/fa_kit_surrogates_v7)
-      PENDING on htc Resources since 15:25; on its end: site fetch --what all (untested), clean local venv per README on examples/*,
-      tarball to analysis/kit_benchmark/export/, hand Joaquin path+size. Possible issue: if the tt A2 model is V/B the example
-      files (momenta only) are refused. (2) SLIDE-11 MC TEST: design PASS; tools/kit_mc_madgraph.py @ece0b1c76 tested locally
-      end to end on uug; NOT SUBMITTED: next step has the exact commands; add the reviewer''s two asserts first. (3) FIGURES:
-      drawn @a01085ff8 in analysis/kit_benchmark/figs/bakar_a2 (redraw once at the committed code so the producer hash matches,
-      look at each at low res, captions with check_caption.py); summary numbers in finding 17:15. (4) D575: fair one-loop
-      real parent FA-lxplus-828d67d6 running (lxplus, 14 h limit); arm smokes FT FA-ccin2p3-3895a2a7 / SCR-A2 FA-ccin2p3-e0587622
-      pending on CC; then SCR-A2+V/B at all D (step 20), FT after parent (24). D575 design PASS (B + held-out): smokes FA-ccin2p3-58bc2125
-      (B tt A2) and FA-ccin2p3-42ae3468 (held-out qqg parent, recipe transfer_finale_kit_heldout_qqg.yaml) pending on CC (~7.6
-      h queue); steps 31 and 30. Sites: CC only up; lxplus needs Joaquin''s 2FA (cluster_up lxplus); Jean Zay relay down.'
-    decisions: 'Joaquin''s: D573 package, D574 answer today from existing models, D575 all of Bakar''s requests run (fair
-      chain, protocol B on A2, held-out A2 for uug/uugg), D570, D572, D315 one seed. Mine (re-justify): package ships empty
-      sites/sites.yaml (no cluster paths to KIT); predict.py writes the value too (sign included) beside log10; held-out parent
-      = fair A2 recipe minus ee_uug/uugg/bbbarg/bbbargg (a non-A2 checkpoint cannot start an A2 model); FT at lr_scale 1 and
-      0.1 (reviewer FIX); B = 3000-step continuation as the 11-10 B; MC test reweights MadEvent''s exact-|M|^2 sample by u
-      instead of a MadEvent run on the surrogate (stated as a difference from slide 11), tt via the threshold scan quadrature
-      (covers 346-432 GeV only); figures drop the pre-A2 no-frames ablations.'
-    ruled_out: Fine-tuning A2 from the non-A2 kit_pretrain_heldout parent (readout row and standardization differ); flat-bulk
-      reweighting as the slide-11 test (the gap Joaquin named).
-    running: FA-ccin2p3-5c3fb7fa (package CPU), FA-lxplus-828d67d6 (fair parent), FA-ccin2p3-3895a2a7, FA-ccin2p3-e0587622
-      (arm smokes), FA-ccin2p3-58bc2125 (B smoke), FA-ccin2p3-42ae3468 (held-out parent smoke)
-    files: tools/kit_package.py, tools/kit_predict.py, scripts/job_kit_package.sh, tools/kit_mc_madgraph.py, scripts/job_kit_mc_madgraph.sh,
-      tools/kit_bakar_figs.py, recipes/transfer_finale_kit_heldout_qqg.yaml, analysis/kit_benchmark/data/kit_bakar_figs_a2.json,
-      analysis/kit_benchmark/figs/bakar_a2/
-    written: '2026-11-26T15:08:54+00:00'
+    state: '2026-11-26 ~20:30 @4bc95aba2. D574 items done and relayed: (1) KIT package v9 analysis/kit_benchmark/export/fa_kit_surrogates_v9.tar.gz
+      (83.4 MB, PACKAGE_OK, standalone 6-7e-8 vs repo 1-thread predictor; GPU deltas in README; clean-venv test passed with
+      torch 2.15 since pip overrides the README''s 2.1.2 pin; DATA_DIR unset writes a 10-event val pool to ~/datasets: open
+      warts). (2) Slide-11 MadGraph MC test read (figure analysis/kit_benchmark/figs/kit_mc_madgraph.png, findings 19:00):
+      bias -1.62e-3 uug / -1.35e-3 uugg (systematic), eps2 max 0.965/0.402; tt integrated virtual -29% at threshold. Differences
+      from slide 11: MadEvent grid and first unweighting adapted to the exact |M|^2 (surrogate sample = reweighting by u),
+      tt only by quadrature on the threshold scan 346-432 GeV. (3) Slides 5-8 A2 redrawn @96c9ea7bb, captions checked. Repo-reviewer
+      launched by the main session on 80dbb06ac d9e647f6c dd2b2fd1b 7537eff46 96c9ea7bb. D575: steps 30/31 wait on CC smokes
+      FA-ccin2p3-42ae3468 / 58bc2125; 20/24 on arm smokes FA-ccin2p3-3895a2a7 / e0587622 and the lxplus parent FA-lxplus-828d67d6
+      (lxplus needs Joaquin''s cluster_up); step 29 (slide-10 metrics for fine-tunes) waits on them.'
+    decisions: 'Joaquin''s: D573 package, D574 answer today from existing models, D575 all Bakar''s requests run, D570, D572,
+      D315 one seed. Mine (re-justify): package gate = standalone vs repository''s 1-thread CPU predictor (the GPU predictions
+      are not reproducible on CPU by the repo itself, FA-ccin2p3-297e9b10), GPU deltas stated in README; package kit_data
+      carries source_sha256 so pool identity and mom_div match the run; MC test reweights the exact-|M|^2 MadEvent sample
+      by u (stated difference from slide 11); slide 7/8 legends two columns.'
+    ruled_out: Fine-tuning A2 from the non-A2 kit_pretrain_heldout parent; flat-bulk reweighting as the slide-11 test; a 2e-6
+      gate against GPU predictions.h5 for A2 models (unreachable on CPU).
+    running: FA-ccin2p3-42ae3468, FA-ccin2p3-58bc2125, FA-ccin2p3-3895a2a7, FA-ccin2p3-e0587622 (pending CC), FA-lxplus-828d67d6
+      (lxplus, unreachable)
+    files: tools/kit_package.py, tools/kit_hardps.py, tools/kit_mc_madgraph.py, tools/kit_bakar_figs.py, analysis/kit_benchmark/data/kit_mc_madgraph_ee_uugg.json,
+      analysis/kit_benchmark/data/kit_threshold_scan_mcmg.json, analysis/kit_benchmark/figs/kit_mc_madgraph.png, analysis/kit_benchmark/figs/bakar_a2/,
+      analysis/kit_benchmark/export/
+    written: '2026-11-26T16:06:38+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
