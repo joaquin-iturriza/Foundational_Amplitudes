@@ -47354,6 +47354,20 @@ entries:
       0.45 <- measured: content-only network''s new median 0.448 (norm_explore3.json B|nodiag|sampled), as attempts C, D;
       every subset <- Joaquin''s words D566 ''this has to perform correctly in individual events regardless of that''; 2 bootstrap
       sd <- measured noise (event bootstrap in the job)'
+    passed_at: '2026-11-26T22:42:23+00:00'
+    reviewer: 'Attempt E (step 25) checked against attempt D''s passed design and data/perevent_anchored_D.json, and against
+      the diff at 579d356ad. Only the anchor map changes: events, split, c,b network, seeds 0-29, folds, subsets and bootstrap
+      are all fixed, and ridge D_sqE and own-median D_sqE are re-run in the same job. Net vs kin differ only in features,
+      kin vs hgb only in model. No label leaks: kin() reads only the process string, every map is cross-fitted by GroupKFold
+      on weak_key and fitted on training processes only for the held out. Check 2, confirmed in D''s JSON: on the new 43,
+      D_sqE ensemble median 0.383 with the ridge anchor (miss 0.158/0.464/0.211 sx in L, q, E) against 0.182 with the own
+      median (miss 0). The measure moves by 0.20 with the anchor alone, beyond the bar''s distance (0.369). Check 3: ten ensembles
+      as in D, regressor_ens min-max 0.098-0.369 re-measured in the job as the bar, event bootstrap 30. Outcome thresholds
+      keep D''s sources: bar = the measured control max, 0.45 = the content-only network''s 0.448, the subsets from D566''s
+      own words. CPU job, no training, no HPO: loss, preprocessing, sweep and lr checks do not apply. Disk is trivial. D''s
+      job finished well inside the 3 h limit. Searched for: anchor map, anchor, phase-space median, reference median, attempt
+      E, HistGradientBoosting, kinematic descriptor in docs/results.tex, plan.yaml and site decisions, plus the entry''s dead
+      ends A-D. Nothing found beyond attempts C and D (the matches are the unrelated e+e- collider anchor).'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
