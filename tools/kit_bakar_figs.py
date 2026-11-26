@@ -171,6 +171,7 @@ def collect_searched(base, out):
             print(f"!! {site} not read ({str(err)[-200:]}): no transformer on {sorted(models)}")
             for p in models:
                 drop_model(d[p], "transformer")
+                d[p].setdefault("missing", {})["transformer"] = site   # the plot says so in the legend
             continue
         for p, n in part.items():
             o = d[p]
@@ -222,6 +223,12 @@ def plot(path, figs):
     _, tc, _, tls = model_style("truth")
     truth = dict(ls=tls, color=tc, label=MODELS["truth"][0])
 
+    def gap(ax, proc):
+        """a legend entry per model of `proc` its collection could not read (collect_searched: site down)"""
+        for lab, site in d[proc].get("missing", {}).items():
+            name, c, mk, ls = model_style(KEY[lab])
+            ax.plot([], [], marker=mk, ls=ls, color=c, mfc="white", label=f"{name}: not available\n(run on {site}, down)")
+
     def draw(ax, x, y, lab, **kw):
         name, c, mk, ls = model_style(KEY[lab])
         ax.plot(x, y, marker=mk, ls=ls, color=c, label=name, **kw)
@@ -233,6 +240,7 @@ def plot(path, figs):
     ax.plot(x, vb["truth"], **truth)
     for lab in present(vb):
         draw(ax, x, seeds(vb, lab), lab)
+    gap(ax, "ee_tt_virt_finite")
     ax.plot(x, CF * np.pi * ALPHA_S / (2 * x), "k--", label=r"$C_F\pi\alpha_s/(2\beta)$")
     ax.axvspan(0.2, 1.0, color=ps.C.grey, alpha=0.2, lw=0, label="training range")   # beta > 0.2 in training
     ax.set_xscale("log"); ax.set_yscale("log")
@@ -249,6 +257,7 @@ def plot(path, figs):
         ax.plot(x, b[f]["truth"], **truth)
         for lab in present(b[f]):
             draw(ax, x, seeds(b[f], lab), lab)
+        gap(ax, "ee_uug_me2")
         ax.set_xscale("log"); ax.xaxis.set_minor_formatter(NullFormatter())
         ax.set_xlabel(XLAB[f]); ax.set_ylabel(MED_LAB)
         ps.process_label(ax, PROCESS["ee_uug_me2"])
@@ -270,6 +279,7 @@ def plot(path, figs):
     a2.plot(y, [v["rms"]["truth"] for v in rows], **truth)
     for lab in [l for l in labs if l in rows[0]["rms"]]:
         draw(a2, y, [np.median(v["rms"][lab]) for v in rows], lab)   # true values, no floor
+    gap(a2, "ee_uugg_me2")
     a2.set_xscale("log"); a2.set_yscale("log"); a2.xaxis.set_minor_formatter(NullFormatter())
     a2.set_xlabel(XLAB["coll_gg_y"]); a2.set_ylabel(r"rms of $\cos2\varphi$ amplitude")
     for a in (a1, a2):
@@ -294,6 +304,7 @@ def plot(path, figs):
             ax.plot(xs, [v for _, v in st], marker=mk, ls=dash, color=c, label=name + (", Bakar" if his else ""))
             if "bulk" in rows:
                 ax.axhline(rows["bulk"], color=c, ls=":")
+        gap(ax, proc)
         ax.plot([], [], ls=":", color=ps.C.grey, label="bulk (dotted, same colour)")
         lo = min([r["bulk"] for _, r, _ in table_rows(d[proc]) if "bulk" in r] + [ax.get_ylim()[0]])
         ax.set_yscale("log"); ax.set_ylim(lo / 3, None)     # the bulk lines are inside the axes, as on his slide
