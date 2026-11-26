@@ -2120,10 +2120,10 @@ def cmd_reopen(a):
         e.setdefault("history", []).append({"at": now().isoformat(), "was": "done", "writeup": e.pop("writeup", None),
                                             "why": a.why})
         e["status"] = "running"
-        dd = next((x for x in (decision(i) for i in reversed(e.get("decisions", []))) if x and x["in_force"]
-                   and x["kind"] in ("approve", "scope", "release") and covers_name(x, a.id)), None)
-        if dd:
-            ensure_item(e, dd["id"])
+        did = next((i for i in reversed(e.get("decisions", [])) if (x := decision(i)) and x["in_force"]
+                    and x["kind"] in ("approve", "scope", "release") and covers_name(x, a.id)), None)
+        if did:
+            ensure_item(e, did)
     print("plan: %s reopened" % a.id)
 
 
