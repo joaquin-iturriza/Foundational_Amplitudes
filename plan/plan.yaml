@@ -28329,8 +28329,6 @@ entries:
       tags a2B (limit 1:30), then B vs B_bulk per family'
     32: 'Slide 11 exact (design PASS 16:45): read FA-ccin2p3-aacf91cc (uug), 706a0f6f (uugg: MadEvent on the A2 surrogate)
       and 12d32b55 (tt virtual over the bulk window 353-1739 GeV); figure_exact; hand to Joaquin'
-    33: 'Slide 11 exact, tt part: read FA-ccin2p3-12d32b55 (kit_threshold_scan --window bulk, A2 tt virtual over 353-1739
-      GeV): sigma[V_hat]/sigma[V]-1 per sqrt s and integrated; figure_exact tt with the threshold scan; hand to Joaquin'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -29937,11 +29935,6 @@ entries:
       - 'sigma_hat/sigma within 3 MC errors of E_exact[u] (wiring sound): report slide-11 numbers, eps2 quantiles, tt integrated
         bias to Joaquin'
       - 'beyond 3 errors: KITSURR path fault, fix and rerun before any number goes out'
-    33:
-      feeds: 'D571/D575: slide 11 one-loop, bias of the integrated correction over KIT''s whole tt range'
-      if:
-      - 'build checks pass and the collect ran: report the per-sqrt s and integrated bias'
-      - 'MadLoop check or predict fails: read the log, fix, resubmit'
   step_waits:
     '24': FA-lxplus-828d67d6
     '20': FA-ccin2p3-3895a2a7 FA-ccin2p3-e0587622
@@ -29949,7 +29942,6 @@ entries:
     '31': FA-ccin2p3-58bc2125
     '30': FA-ccin2p3-42ae3468
     '32': FA-ccin2p3-aacf91cc FA-ccin2p3-706a0f6f
-    '33': FA-ccin2p3-5343481a
   handoff:
     state: '2026-11-26 ~20:30 @4bc95aba2. D574 items done and relayed: (1) KIT package v9 analysis/kit_benchmark/export/fa_kit_surrogates_v9.tar.gz
       (83.4 MB, PACKAGE_OK, standalone 6-7e-8 vs repo 1-thread predictor; GPU deltas in README; clean-venv test passed with
