@@ -29879,6 +29879,7 @@ entries:
     '27': a new owner (the previous closed at its context limit, 2026-11-26 ~15:30); after step 25/26's package
     '28': a new owner (the previous closed at its context limit, 2026-11-26 ~15:30); after step 25/26's package
     '29': a new owner (the previous closed at its context limit, 2026-11-26 ~15:30); after step 25/26's package
+    '30': a new owner (the previous closed at its context limit, 2026-11-26 ~15:30); after step 25/26's package
   handoff:
     state: '2026-11-26 ~15:00 UTC. Step 20 (D570 + D572 signed A2, design PASS 13:00): parent smoke FA-lxplus-f7c30433 clean
       (0.58 s/it over 50 steps incl. start-up; kit_sign_read wrong sign after 50 steps 0.37/0.32/0.18 on uubar_ddbar_nlo/ee_mumu_ew_nlo/ee_uu_ew_nlo:
