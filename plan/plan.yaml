@@ -29639,7 +29639,8 @@ entries:
       - 'bias beyond the MC error or efficiency far below: report with numbers per process and which phase-space region drives
         it'
   step_waits:
-    '20': '2026-11-14'
+    '20': critical_batch's uncommitted files (analysis/critical_batch/figs/{pretrain,zng4g}_update_bdl.pdf, data/ft_bcrit_ep50{,_raw}.json)
+      blocking site sync, sent to the main session 2026-11-26 (D568); then the D395 smoke (design PASS 2026-11-26T02:27)
   handoff:
     state: '2026-11-17 @224c7920. Step 23 done: attempts figure fine-tunes split by parent (2 tops held out, triangles; 4
       tops added, diamonds), redrawn, deck talks/kit_nov2026/main.pdf rebuilt, repo-reviewer cleared the item. Steps 20/22
