@@ -34203,6 +34203,51 @@ entries:
       lr. Recipe diff @6a6ca8839 removes only ee_uug/uugg/bbbarg/bbbargg. HETEROSC, A2 with plain momenta as in the KIT A2
       models, memmap off, <=25 GPU-h under D575. Searched: kit_pretrain_heldout, A_ft, heldout, lr_scale, asym_cont, flags=off,
       6.96 in results.tex, plan.yaml, D570-D575.'
+  - at: '2026-11-26T15:01:01+00:00'
+    question: 'Slide 11 of Bakar''s benchmark slides (the end-user test), done as specified (D571, D574, D575; Joaquin asked
+      why our MC test was not what KIT asked): ''We run importance-sampled integration and two-stage unweighting with MadGraph.
+      Tree level: cross-section bias sigma_hat/sigma - 1, when the surrogate is used without correction; second-stage efficiency
+      eps2 = <r>/r_max, with r = |M|^2/|M_hat|^2, on events distributed as |M_hat|^2 [...] One-loop virtual: bias of the integrated
+      correction. eps2 is reported with its r_max quantile, since tails set it.'' For the three packaged A2 models (runs/kit/kit_A_ee_{uug_me2,uugg_me2,tt_virt_finite}_n100000_t1831_hpo_asym_cont):
+      what are sigma_hat/sigma - 1 and eps2 (with r_max quantiles) on MadEvent''s importance-sampled events at the KIT settings,
+      and the integrated one-loop correction''s bias for tt?'
+    prior: 'Searched results.tex sec:kit-mc, plan kit_benchmark (step 23, D571), the KIT emails/slides (analysis/kit_benchmark/source).
+      The earlier test (sec:kit-mc, tools/kit_mc_test.py @cbb51408c) reweighted the flat bulk_test events (no MadGraph, no
+      new phase-space points): bias -1.65e-3 uug, -3.31e-3 uugg, 5.83e-4 tt against MC errors 1.21e-2, 1.12e-2, 1.90e-3; second-stage
+      efficiency 0.886, 0.562, 0.967. Its design said Bakar''s email was not in the repo; that was the gap. The tt threshold
+      scan (tools/kit_threshold_scan.py, analysis/kit_benchmark/data/kit_threshold_scan_asym.json) already integrates the
+      virtual exactly (Gauss-Legendre in cos theta) per sqrt s for exact and surrogate V, with MadLoop checked against KIT''s
+      virt_finite; the packaged tt A2 model is not yet in it.'
+    measure: 'tools/kit_mc_madgraph.py @ece0b1c76. Tree (uug, uugg): MadEvent (MG5_aMC 3.x, model sm) at sqrt s = 1 TeV, alpha_s
+      0.118 fixed (scale M_Z), 1/alpha 132.507, the KIT bulk ''s_ij/s > 0.01 for every singular pair'' in dummy_cuts (run-card
+      cuts off), N = 1e5 unweighted events each, distributed as the exact |M|^2 by MadEvent''s importance-sampled multichannel
+      integration and unweighting; exact |M|^2 per event by the same process''s standalone, asserted equal to KIT''s me2 on
+      1000 bulk_test events (rel 1e-6); u = |M_hat|^2/|M|^2 per event: sigma_hat/sigma - 1 = mean(u) - 1 with bootstrap band
+      and std(u)/sqrt N; eps2 = <r>/r_max on the |M_hat|^2-distributed sample (these events weighted by u): <r> = 1/mean(u),
+      r_max the maximum and the u-weighted 0.99, 0.999, 0.9999 quantiles of r (slide 11: ''eps2 is reported with its r_max
+      quantile''), with sigma''s share above each cap. One loop (tt): sigma[V_hat](sqrt s)/sigma[V](sqrt s) - 1 on the threshold
+      scan''s 32 energies (beta 1e-3..0.6) by kit_threshold_scan predict + collect with the packaged A2 run (REREAD of that
+      run). Figure: |bias| per process with its MC error, eps2 against 1 - q, tt bias against sqrt s.'
+    check: 'The quantities move with the surrogate: on the flat bulk_test the same u-ratio gave bias -1.65e-3 / -3.31e-3 and
+      second-stage efficiency 0.886 / 0.562 for uug / uugg (sec:kit-mc), and the threshold scan''s sigma[V_surr]/sigma[V]
+      differed across the surrogates in kit_threshold_scan_asym.json; the metrics code has a self-check (bias = c - 1 and
+      eps2 = 1 for |M_hat|^2 = c |M|^2; eps2 rises with lower quantile caps) that passes in .venv-cpu.'
+    fixed: 'The three A2 models unchanged; KIT settings from each file''s metadata (asserted); MadEvent defaults otherwise
+      (sm param card, its VEGAS grid and unweighting), iseed 11; surrogate float64 on CPU at 8 threads (thread rounding <=
+      5.5e-3 log10 only on tt Sudakov bins, 2.6e-5 on uug: far below the effects measured); CPU jobs on CC (scripts/job_kit_mc_madgraph.sh,
+      8 CPUs, 6 h limit): one per tree process (gen, predict, metrics), one for tt (scan predict + collect). Disk < 0.2 GB.
+      Differs from slide 11: MadEvent''s grid and first unweighting follow the exact |M|^2 and the |M_hat|^2-distributed sample
+      is that sample reweighted by u (same sigma_hat and eps2 in expectation, the surrogate''s tail seen where the exact one
+      puts events), not a MadEvent run on the surrogate; tt one loop: the integrated correction per sqrt s by exact quadrature
+      on the threshold scan, not an MC over the bulk window. No verdict threshold: every quantity is reported.'
+    control: Each event's exact |M|^2 (MadGraph standalone, equal to KIT's truth); the MC error of the estimator on the same
+      events; beside, the earlier flat-reweighting numbers of sec:kit-mc.
+    seeds: No training; MadEvent iseed 11, bootstrap seed 0 (1000 resamples).
+    outcome: 'Reported, no verdict bar from Joaquin or Bakar: |bias| below its own MC error on 1e5 events -> the surrogate
+      integrates within MC precision at that sample size (n_star = (std/bias)^2 given); above -> bias quoted as a systematic.
+      eps2 near 1 at the 0.999 quantile -> exact second stage costs little; eps2 at the maximum far below that -> tails set
+      it, quoted with the sigma share above the cap. tt: bias per sqrt s, read at threshold (beta < 0.1) and above.'
+    sources: D571, D574, D575
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
