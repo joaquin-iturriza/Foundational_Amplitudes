@@ -41950,12 +41950,6 @@ entries:
   - D576
   - D578
   next:
-    14: 'Part (b) readout, 120 heads (FA-lxplus-25e06bc1; D553 "show the results as they come"): when it ends, save its "Val
-      loss (combined)" lines to analysis/llm_compare/data/b_val_h120.txt (runs/llmcmp_b_width/trial_0120/out_0.log), score
-      it REREAD=FA-lxplus-25e06bc1 with scripts/job_llm_score.sh on its site, copy llm_score_{seen,heldout}.json to data/b_h120_{seen,heldout}.json;
-      figures: b_width_curves.py (validation MSE of z per width beside trial 5) and heldout_per_process.py --tag a_trial5
-      <widths done> (Suprio layout); pooled RMSE seen/held out/relabels/new and median per-process MSE via control_score.py
-      against trial 5 (0.117 / 1.003 / 0.241 / 1.767) with the 1.38 margin; hand back to Joaquin'
     15: 'D564 (''So despite the llm being so much worse at training and at relabels, it seems to extrapolate better, we should
       understand why this is the case''): find why Suprio''s LLM extrapolates to the 43 new-family held-out processes better
       than our LLoCa (pooled RMSE new 1.193 vs ours 1.756-1.767 at 8 and 16 heads) while ours wins seen (0.103-0.117 vs 0.321)
@@ -42207,14 +42201,6 @@ entries:
     context: 209652
     context_at: '2026-11-26T11:35:05+00:00'
   step_why:
-    14:
-      feeds: 'D522/D537 part (b): whether muP width toward the LLM''s 359.6M parameters closes the held-out gap at part (a)''s
-        best HPs'
-      if:
-      - 'held-out MSE below trial 5''s by more than 1.38x: width helps at 120 heads, read beside the other widths'
-      - 'within 1.38x of trial 5: no resolvable width gain at 120 heads (one seed); a seed-43 pair is Joaquin''s call'
-      - 'above trial 5 by more than 1.38x or curves not falling: read curves first; muP transfer or training failure, an HPO
-        there is Joaquin''s call'
     15:
       feeds: 'D564: why the LLM extrapolates better than our LLoCa'
       if:
@@ -43116,7 +43102,6 @@ entries:
       pre-smoke 12/22 GPU-h: step 8 in all ~180 GPU-h, above 100: goes to Joaquin (D536) before the full runs. Smoke dir deleted
       (debris, 1.4 GB).'
   step_waits:
-    '14': FA-ccin2p3-f0b997a2
     '15': list step 21's run FA-ccin2p3-1b480869 (step 16 read 2026-11-26)
     '21': FA-ccin2p3-1b480869
   handoff:
