@@ -29672,7 +29672,7 @@ entries:
       - 'FT below SCR-A2 and V/B per D past the design''s 1/7 bar: report the recipe as the fair-NLO answer to KIT'
       - 'FT not below them: report per D where it loses, with the parent''s curves'
   step_waits:
-    '20': FA-ccin2p3-e95803a9 FA-ccin2p3-cecec366 FA-ccin2p3-9e3d7ae5
+    '20': FA-lxplus-cdc7fee9
     '22': drive.py searches kit_hpo_ttvirt_thr_divform and kit_hpo_ttvirt_thr_rezero (detached kit_hpo_tt_divform_rezero,
       pid 2843282)
     '24': FA-ccin2p3-a3bc3374
