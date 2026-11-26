@@ -51588,8 +51588,9 @@ entries:
   match: kit_reply_deck_*
   evidence:
     runs: []
-    commit: fe50d1b28
+    commit: 51a5e49f6
     paths:
+    - analysis/kit_benchmark/data/kit_bakar_figs_searched.json
     - analysis/kit_benchmark/figs/reply_deck
     - talks/kit_reply_nov2026/main.pdf
   dead_ends: []
