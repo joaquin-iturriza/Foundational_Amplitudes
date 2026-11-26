@@ -29726,6 +29726,10 @@ entries:
       (target_stats=own needed one parent mean; the A2 parent has mu_N per multiplicity): fixed (mu_N at the run''s own N),
       resubmitted FA-lxplus-da06f228 (_smoke3); step 20 waits on it. drive.py prebuild now passes --disk-gb (--prebuild-disk-gb,
       default 20).'
+  - at: '2026-11-26T11:07:59+00:00'
+    text: 2026-11-26 ~12:00. Step 20 FT smoke FA-lxplus-da06f228 (@a569fc3fd) clean through every stage on H100 NVL, 0.16
+      s/iter (50-step mean); head mapped from the A2 parent at mu_4 = -2.536 (mu row x4.372, bias -2.827). All three arm smokes
+      (FT, SCR-A2, V/B) pass D395. The real parent and then the arms wait only on Joaquin's uubar_ddbar_nlo question.
   step_why:
     20:
       feeds: the KIT NLO statement in the draft
