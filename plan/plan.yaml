@@ -42924,7 +42924,6 @@ entries:
     '14': FA-ccin2p3-f0b997a2
     '15': list step 21's run FA-ccin2p3-1b480869 (step 16 read 2026-11-26)
     '21': FA-ccin2p3-1b480869
-    '8': FA-ccin2p3-e0a1abe4
   handoff:
     state: 'Part (a) DONE, part (c) DONE. Step 19 DONE (untuned control retrain scored; bias/shape all-arms and shape_dists
       redrawn beside *_before_untuned; data @77f6a8741; retrain vs first run held-out per-process MSE median 1.89x: same-setup
