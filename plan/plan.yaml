@@ -42473,7 +42473,7 @@ entries:
     '8': FA-ccin2p3-1cdc28b2
     '13': FA-ccin2p3-623a3af6
     '14': FA-ccin2p3-f0b997a2
-    '15': 'its branches'' readouts: step 16 (score FA-ccin2p3-2240c052) and list step 21 (run FA-ccin2p3-1b480869)'
+    '15': list step 21's run FA-ccin2p3-1b480869 (step 16 read 2026-11-26)
     '21': FA-ccin2p3-1b480869
   handoff:
     state: 'Part (a) DONE, part (c) DONE. Step 19 DONE (untuned control retrain scored; bias/shape all-arms and shape_dists
