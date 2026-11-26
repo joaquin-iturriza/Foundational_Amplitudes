@@ -51565,7 +51565,7 @@ entries:
     - every figure of the KIT reply deck redrawn in one coherent style
   decisions:
   - D582
-  next: redraw the deck's figures in one style, rebuild the deck, hand back the PDF
+  next: null
   done_when: null
   notes_ref: null
   match: kit_reply_deck_*
