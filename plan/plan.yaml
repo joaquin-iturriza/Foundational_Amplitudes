@@ -33592,6 +33592,21 @@ entries:
       KIT model, designed then). Efficiencies are reported numbers with no pass bar (no source gives one).'
     sources: 'MC error std(w)/mean(w)/sqrt N <- measured noise: the exact cross section''s own statistical error on the same
       events; 16-84% band <- a measured spread: the bootstrap over the 2e5 events'
+    passed_at: '2026-11-26T02:41:50+00:00'
+    reviewer: 'Re-check after FIX, tool @1eb2b1a1 (self-check passes locally). Outcome now decides: PASS per process if |bias|
+      and its 16-84% band are below the exact sigma''s MC error std(w)/mean(w)/sqrt N on the same 2e5 events (measured noise),
+      FAIL otherwise, with each branch''s consequence; n_star added; efficiencies reported with no bar (no source), all also
+      at the 0.999 max reduction; region split in the same job. Weights checked against KIT README/generate.py/ps.py on CC
+      (flat RAMBO with rejection cut: w=f; tt sqrt s uniform, cos theta and phi flat, symmetric beams: w=f beta/s); two-stage
+      definitions as arXiv:2301.13562 (eff_x=(sum w_e/sum w_s)/max x, eff_two=eff_surr*eff_x). Check 2: existing per-event
+      bulk biases of the three runs (kit_fig_A_hpo_arms.json: -7.4e-4, +1.47e-3, +2.5e-4 decades, about -0.17%, +0.34%, +0.06%
+      in sigma) are of the order of the MC error at 2e5 events, so PASS/FAIL can go either way; bulk log10-MSE 1.98e-6, 6.29e-5,
+      1.36e-7 confirmed. Check 3: no training (D315), bootstrap 1000. predictions.h5 present on CC for all three (Nov 13),
+      CC 17 GB free. Check 5 searched: unweight, cross section, Monte Carlo, MC test, 2301.13562, event generation in results.tex,
+      plan.yaml, site decisions: none on KIT. Note for the job owner (not blocking the main outcome): the region variable
+      takes min s_ij/s over ALL final pairs including u-ubar, which is not cut, so events with s_uubar/s < 0.01 fall below
+      the first edge 0.01 and drop out of the region split; use the singular pairs (as ps.singular_pairs) or a first edge
+      of 0, and check the region shares sum to 1.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
