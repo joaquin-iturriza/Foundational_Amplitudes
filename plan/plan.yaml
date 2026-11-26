@@ -49024,7 +49024,8 @@ entries:
   step_waits:
     '2': 'step 3''s freed GB (it reads ccj_4f7a6e6248e3, ccj_a92263be3b0c, ccj_d7c7455d61ad): the write-up carries the E9422
       frees'
-    '3': ccj_4f7a6e6248e3 ccj_a92263be3b0c ccj_d7c7455d61ad (detached reader scr_read, pid 2914609)
+    '3': 'ccj_f90b0e0a28bb (detached reader scr_read2): SCRATCH top entries and 2-day growth; prune pass of 04:xx read (0.5
+      GiB)'
   targets:
   - batch: disk_inventory
     wall_h: 1.0
