@@ -47257,6 +47257,17 @@ entries:
       2026-11-13T06:45, 2026-11-18T23:35, 2026-11-17T11:33, 2026-11-20T01:46, 2026-10-05T19:49, 2026-11-24T13:41, 2026-10-02T23:46,
       2026-11-22T02:55, 2026-10-06T00:17 (other studies'' results, plots and plans, matched on common words)'
     blocks: nothing
+    blocks_steps: []
+  - ask: 'Scope: one extra 16-trial search of a single D563 cell: the fine-tune at batch 128 and 50 epochs has its best at
+      the lower edge of its lr window (8.05e-3 in [7.67e-3, 6.90e-2]), so its 0.0151 is an upper bound; the gain persists
+      either way (r50 1.45 > 1.22). Run it over the window extended 3x downward (about 3 GPU-h), or leave the cell as a bound?'
+    at: '2026-11-26T04:12:57+00:00'
+    searched: site decisions --project FA (D563 approves the ep50 repeat with DyHPO retuning, silent on extending an edge
+      window; D560 on the batch rule); plan show critical_batch has no open ask. Joaquin's messages 2026-11-14T04:31 (pasted
+      SciPost template, text only), 2026-10-06T00:17 (finish the transfer study's plan in results.tex, other work), 2026-10-07T15:37
+      (asks whether a zggg cell holds the extended run, a different cell and question), 2026-10-12T15:31 (asks what a plot's
+      x axis is) do not settle it.
+    blocks: nothing
     blocks_steps: &id005 []
   owner:
     agent: ae57975291d4a5284
@@ -48492,26 +48503,23 @@ entries:
       analysis/critical_batch/data/{pretrain,zng4g}_update_bdl.json, analysis/critical_batch/figs/{ft_ep50,pretrain_update_bdl,zng4g_update_bdl}.png,
       docs/results.tex par:cbs_update, sweeps_local/*_ep50*, sweep/sweep_config_*_ep50*.yaml, tests/test_dl_read.py
     written: '2026-11-26T03:53:41+00:00'
-  ask: 'Scope: one extra 16-trial search of a single D563 cell, beyond the sibling cells'' counts. The fine-tune from the
-    parent without the two input settings, at batch 128 and 50 epochs, has its best trial at the lower edge of its learning-rate
-    window (lr 8.05e-3 at 2% of [7.67e-3, 6.90e-2] on a log scale), so its best (0.0151) is an upper bound. The batch-128
-    gain persists for that arm either way (r50 = 1.45 > 1.22; a lower best at 128 only raises it). Run that search over the
-    window extended 3x downward (about 3 GPU-h at ~0.2 h per trial), or leave the cell as a bound?'
-  waiting_since: '2026-11-26T03:52:50+00:00'
-  searched: 'D563 design (passed 2026-11-25 14:04: edge cells reported as a bound, a wider search asked, not run); site decisions
-    D563, D560; docs/results.tex par:cbs_regimes; Joaquin''s messages flagged by the tool, none settling it: 2026-11-16T21:18
-    (describing figures in text, not search extensions); 2026-10-07T15:37 (whether a zggg cell had its extended run, a fact
-    question); 2026-11-14T04:31 (a pasted LaTeX template); 2026-11-12T01:19, 2026-11-10T02:08, 2026-10-14T16:48, 2026-10-12T15:31,
-    2026-11-13T06:45, 2026-11-18T23:35, 2026-11-17T11:33, 2026-11-20T01:46, 2026-10-05T19:49, 2026-11-24T13:41, 2026-10-02T23:46,
-    2026-11-22T02:55, 2026-10-06T00:17 (other studies'' results, plots and plans, matched on common words)'
-  blocks: nothing
-  blocks_steps: *id005
+  ask: 'Scope: one extra 16-trial search of a single D563 cell: the fine-tune at batch 128 and 50 epochs has its best at the
+    lower edge of its lr window (8.05e-3 in [7.67e-3, 6.90e-2]), so its 0.0151 is an upper bound; the gain persists either
+    way (r50 1.45 > 1.22). Run it over the window extended 3x downward (about 3 GPU-h), or leave the cell as a bound?'
+  waiting_since: '2026-11-26T04:12:57+00:00'
+  searched: site decisions --project FA (D563 approves the ep50 repeat with DyHPO retuning, silent on extending an edge window;
+    D560 on the batch rule); plan show critical_batch has no open ask. Joaquin's messages 2026-11-14T04:31 (pasted SciPost
+    template, text only), 2026-10-06T00:17 (finish the transfer study's plan in results.tex, other work), 2026-10-07T15:37
+    (asks whether a zggg cell holds the extended run, a different cell and question), 2026-10-12T15:31 (asks what a plot's
+    x axis is) do not settle it.
   checked_before: 8fb4916cb900b337b6aa8434704ad8126953100a
   history:
   - at: '2026-11-26T04:12:38+00:00'
     was: done
     writeup: 4b744779f
     why: two open questions to Joaquin
+  blocks: nothing
+  blocks_steps: *id005
 - id: cc_disk
   title: What uses disk on CC and what can be deleted
   question: 'What is using the disk on CC (checkout runs/sweeps, datasets, memmap caches, scratch, MG5 work dirs), against
