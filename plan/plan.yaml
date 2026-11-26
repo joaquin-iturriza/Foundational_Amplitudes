@@ -18012,6 +18012,16 @@ entries:
       transcript (both launched 8 s apart) and recorded it; the hook was not at fault. Tests: send_check_axes 10, check_caption
       2, mechanical_brief 3, redesign_d 56/59 (3 failures predate: D3 context push, D4 model ''inherit'', STALLED note), setup_scenarios
       questions/open_questions (open_questions'' STALLED failures predate).'
+  - at: '2026-11-26T00:06:03+00:00'
+    text: '2026-11-26 step 34 done: lxplus costing fix confirmed on 10 real submits 11-24 16:43..11-25 23:50 (ledger gpu_window
+      vs each site submit --hdr=--time= in the transcripts): charge = own limit x 1 GPU every time (0:30->0.5 h, 1->1, 2->2,
+      12->12, 24->24, 26->26, 72->72, 167->167); before the fix (11-23) charges were flavour times (24, 8, 2, 1). 26.00 h
+      is no flavour value, so the gate read +MaxRuntime (93600 s) from the submit file. Step 31 part (a) works live: broken
+      search trials folded with no event (E9276 FA-lxplus-7d2180f8 FAILED, E8630, E9321 batch runs), and a repeat failure
+      kind in one item opened an event (E9273 ec7d9427). Not checked: the supervisor sorts COMPLETED-without-end-marker trials
+      as ''broke, folded'' (E9258, E8964, E8568), then the same run can reach a second record (7d2180f8 COMPLETED then FAILED)
+      - left for the next owner to read. Part (b) has no real case yet: the only lxplus ssh failure since 11-24 was a connection
+      reset during a maintain prune (E9213), not a down probe.'
   handoff:
     state: 'D558 step done 2026-11-25: refusal cost per role and check (tools/token_share.py --refusals @e1b708a35; write-up
       74b362473 par:refusal-cost, fig:refusal-cost, analysis/agent_redesign/figs/refusal_cost.png, data refusal_cost.json
