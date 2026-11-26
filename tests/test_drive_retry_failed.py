@@ -35,5 +35,16 @@ def test_recollect_and_retry_lost_by_id():
     assert 1 not in s.sampler.algorithm.observations and 3 not in s.sampler.algorithm.observations
 
 
+def test_lost_wave_holds_the_next():
+    trials = {str(i): dict(idx=i, status=st) for i, st in enumerate(["observed", "failed", "lost"])}
+    s = types.SimpleNamespace(st={"trials": trials}, waves=[3, 2], n_trials=5)
+    s.trials = lambda *st: [t for t in trials.values() if not st or t["status"] in st]
+    s.issued = lambda: len(trials)
+    s.finished = lambda: len(s.trials("observed", "failed", "lost"))
+    assert drive.Sweep.may_issue(s, 0) == 0          # the lost trial of wave 1 holds wave 2
+    trials["2"]["status"] = "observed"
+    assert drive.Sweep.may_issue(s, 0) == 2
+
+
 if __name__ == "__main__":
-    test_retry_failed_matches_only(); test_recollect_and_retry_lost_by_id(); print("ok")
+    test_retry_failed_matches_only(); test_recollect_and_retry_lost_by_id(); test_lost_wave_holds_the_next(); print("ok")

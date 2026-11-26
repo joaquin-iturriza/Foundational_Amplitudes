@@ -28,7 +28,8 @@ Issuing trials: the order of sweep/ordering.py, the same as sweep_manager.py's (
   waves (default; --wave-sizes 3,3,2 or `dyhpo.waves` in the sweep config name them, the flag wins; else
       ordering.wave_sizes: the n_startup random trials, the rest in two guided waves): trials go
       out in whole waves, and wave k+1 is suggested and submitted only once EVERY trial of waves 1..k
-      has finished (observed, or failed/lost and reported to the sampler), counted from this driver's
+      has returned a result (observed, or failed and reported to the sampler; a lost trial holds it until
+      --retry-lost), counted from this driver's
       own driver_state.json, never from a scheduler's view. The first wave should be the n_startup
       random trials; each later wave is the surrogate's picks given every earlier result. The sizes
       must add up to n_trials. This is the likelihoods project's rule: trials that run together are
@@ -274,7 +275,9 @@ class Sweep:
             for w in self.waves:
                 start, end = end, end + w
                 if self.issued() < end:
-                    return end - self.issued() if self.finished() >= start else 0
+                    # a lost trial (site fault, no result) holds the next wave until retried: released on it, the
+                    # wave would be suggested from penalties alone (kit_hpo_ttvirt_thr_*, CC disk full 2026-11-26)
+                    return end - self.issued() if len(self.trials("observed", "failed")) >= start else 0
             return 0
         room = parallel - len(self.in_flight())
         if room <= 0:
