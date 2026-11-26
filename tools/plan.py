@@ -2193,7 +2193,7 @@ def entry_status(d, st, events=None):
         if e.get("status") not in ("running", "waiting_user"):
             continue
         eid = e["id"]
-        if e.get("status") == "waiting_user" or (open_question(e) and set(step_keys(e)) <= blocked_steps(e)):
+        if e.get("status") == "waiting_user" or (open_question(e) and {k for k, _ in nexts(e)} <= blocked_steps(e)):  # step_keys() is [1] with no step
             out.append((eid, "WAITING ON YOU", 'asked: "%s"' % (e.get("ask") or "").strip()))
             continue
         jobs = {}

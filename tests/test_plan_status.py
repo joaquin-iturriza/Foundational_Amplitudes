@@ -162,3 +162,18 @@ def test_brief_lists_open_question(tmp_path):
     assert r.returncode == 0, r.stderr
     assert "WAITING ON JOAQUIN, do not do:" in r.stdout
     assert "Redraw the zero-shot arms on option A or B?" in r.stdout and "the redraw of arms_zero_shot_a/b" in r.stdout
+
+
+def test_open_ask_without_next_steps_is_not_stalled(tmp_path):
+    """A running entry with no next step and one open ask (blocks nothing) is WAITING ON YOU, never STALLED."""
+    env = world(tmp_path)
+    p = tmp_path / "plan" / "plan.yaml"
+    d = yaml.safe_load(open(p))
+    e = next(x for x in d["entries"] if x["id"] == "catalog_coverage")
+    e.update(next=None, step_waits={}, ask="Scope: keep the canonical batch?", waiting_since="2026-11-26T04:13:27+00:00",
+             blocks="nothing", blocks_steps=[])
+    yaml.safe_dump(d, open(p, "w"))
+    out = subprocess.run([sys.executable, os.path.join(REPO, "tools", "plan.py"), "status"], env=env,
+                         capture_output=True, text=True).stdout
+    line = next(l for l in out.splitlines() if l.startswith("catalog_coverage"))
+    assert "WAITING ON YOU" in line and "STALLED" not in line, out
