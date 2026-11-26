@@ -103,6 +103,7 @@ on the sites (`~/work/CLAUDE.md`).
 - Every scaling fit uses `L(C) = A·C^(−α) + L_∞`; the bare power law is a labelled diagnostic only.
 - A feature is judged against the existing baseline (the best of a short HPO sweep, never retrained): first at the baseline's best HPs, done if better; else the same sweep for the feature, best against best, on `val_loss_no_reg`, re-based when preprocessing differs.
 - A figure I sent as the model for a result is redrawn in its layout (panels, grouping, order, axes, markers), our arm beside it; its brief carries its path.
+- The figures of one comparison sent to me (total, bias, shape, ...) carry one arm set, in the same order, colours and markers; a new arm goes into all of them, redrawn and sent together, never as a separate pair.
 - Every figure is saved as both `.png` and `.pdf`, and no run is configured with plotting off.
 - A figure comparing many arms, processes or groups orders them so the comparison reads (best to worst, or by a grouping that means something) and shows absolute values on a log scale rather than only ratios to a control; an error level is made concrete by a few representative examples (the delta histogram, true against predicted distributions with a ratio panel).
 
