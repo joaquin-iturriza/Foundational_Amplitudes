@@ -347,6 +347,26 @@ def section3_predict(d, tmp):
     print(f"section 3: kit_predict on a 20-step float64 run: {len(keys)} strata scored, bulk predictions in file order")
 
 
+def section4_prebuild(tmp):
+    """prebuild_recipes.py on a recipe with KIT processes: their pools are read from the file, never sent to the
+    MadGraph backend builder or the chunked generator (FA-lxplus-cdc7fee9, FA-lxplus-91319d3e failed on both)."""
+    import subprocess
+    spec = os.path.join(tmp, "kit_prebuild.yaml")
+    with open(spec, "w") as f:
+        f.write("processes:\n"
+                "  - {name: kit_ee_tt__born, sqrts: [353, 1739], n_train: 150, n_val: 50, n_test: 50}\n"
+                "  - {name: kit_ee_tt__virt_finite, sqrts: [353, 1739], n_train: 150, n_val: 50, n_test: 50}\n")
+    r = subprocess.run([sys.executable, os.path.join(ROOT, "prebuild_recipes.py"), spec, "--workers", "1",
+                        "--min-free-gb", "0"], cwd=ROOT, capture_output=True, text=True)
+    assert r.returncode == 0, r.stdout[-2000:] + r.stderr[-2000:]
+    import datagen
+    for name in ("kit_ee_tt__born", "kit_ee_tt__virt_finite"):
+        for role, n in (("train", 150), ("val", 50), ("test", 50)):
+            p = datagen.ensure_dataset(name, 353, 1739, n, role=role, seed=42, require_cache=True)
+            assert np.load(p).shape[0] == n, (name, role)
+    print("section 4: prebuild_recipes.py builds KIT pools from the file (no backend, no chunks) OK")
+
+
 def main():
     tmp = tempfile.mkdtemp(prefix="kit_test_")
     d = os.path.join(tmp, "kit")
@@ -363,6 +383,7 @@ def main():
     section1_pools(d)
     section2_float64(d, tmp)
     section3_predict(d, tmp)
+    section4_prebuild(tmp)
 
 
 if __name__ == "__main__":

@@ -275,6 +275,10 @@ def main():
             if mg.is_lhe_pp(name):
                 lhe_jobs.setdefault(name, []).append((recipe, out))
                 continue
+            if mg.is_kit(name):   # a KIT pool is a read of its HDF5 file (seconds), never chunked generation
+                datagen.ensure_dataset(name, smin, smax, n_ev, role, args.seed, dest_dir=dest)
+                print(f"  [kit   ] [{role:5s}] {name}")
+                continue
             if datagen.is_reweightable_virt_scan(name):
                 # plan the stripped parent (dedup across this base's α_s points)
                 parent = mg.PROCESSES[name]["scan_base"]
