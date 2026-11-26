@@ -33528,6 +33528,54 @@ entries:
       results.tex, plan.yaml, decisions for unweight, cross section, Monte Carlo, 2301.13562, event generation). Bakar''s
       2026-11-09 email (pasted by Joaquin 2026-11-10, in the session transcript) asks only for ''the cross-section bias and
       unweighting efficiency'' in a Monte Carlo, so the scope matches.'
+  - at: '2026-11-26T02:40:47+00:00'
+    question: 'Step 23 (D571, ''Also please do 2, not make them do it, we run it.''): the Monte Carlo test of our KIT models
+      (package v6: the three asymptotic-factor models runs/kit/kit_A_ee_{uug_me2,uugg_me2,tt_virt_finite}_n100000_t1831_hpo_asym_cont
+      on CC): on each KIT process''s flat bulk phase space, how biased is the cross section computed with the surrogate instead
+      of the exact |M|^2, and what unweighting efficiencies does it give (with the exact |M|^2, with the surrogate, and the
+      second stage of an unbiased surrogate unweighting)? Feeds: the MC-usability statement KIT asked for, run by us instead
+      of them (D571).'
+    prior: 'Searched docs/results.tex (unweighting, cross section, Monte Carlo, 2301.13562), plan show kit_benchmark, plan.yaml,
+      site decisions (D571 and earlier): no cross-section or unweighting measurement of any KIT model exists; the entry''s
+      per-bin scores (log-MSE, bias, p99, |M|^2-weighted error from Bakar''s evaluate.py) are per-event, not integrated. Literature
+      definition: arXiv:2301.13562 (Janssen, Maitre, Schumann, Siegert, Truong), two-stage unweighting with x = w_exact/w_surr.
+      Bakar''s 2026-11-09 email is not stored in the repo, so the MC is defined here from the benchmark''s own bulk definition
+      (README metadata): uug/uugg flat massless RAMBO at 1 TeV with s_ij/s > 0.01, tt sqrt s flat in [353.1,1738.7] GeV with
+      cos theta, phi flat.'
+    measure: 'tools/kit_mc_test.py @1eb2b1a1 on the three package runs (their own kit_benchmark/predictions.h5, bulk_test/bulk,
+      2e5 events each): weights w = f (RAMBO) or w = f beta/s (tt two-body, flat sqrt s), f exact or 10^pred with the truth''s
+      sign; bias = sum w_surr/sum w_exact - 1 with its 16-84% bootstrap band (1000 resamples) and the MC error of sigma_exact
+      on the same events; eff_exact = <w>/max w; eff_surr; eff_x = E_surr[x]/max x and at the 0.999 surrogate-measure quantile
+      of x with the overweight share of sigma it leaves; eff_two = eff_surr eff_x; every efficiency also at the 0.999 reduction
+      of its maximum (eff_*_q), so gains compare like with like; n_star = (std(w)/mean(w)/|bias|)^2; per region (min s_ij/s
+      bins 0.01-0.02-0.05-0.1-0.2-1 for uug/uugg, sqrt s bins 353-500-700-1000-1400-1739 GeV for tt) the bias, sigma share
+      and overweight share. The tt sigma is sigma(sqrt s) integrated over the flat window, not at one energy; the gain counts
+      exact |M|^2 evaluations only, not the surrogate''s cost. JSON analysis/kit_benchmark/data/kit_mc_test.json; figure:
+      per process the x = w_exact/w_surr distribution (log axis) and the three efficiencies.'
+    check: 'Self-check in the tool (--selfcheck, passes): surrogate = exact gives bias 0, eff_x 1, no overweights; surrogate
+      = 2 x exact gives bias +1, eff_x 1 (a constant factor is unweighted away). The measure moves with model quality on existing
+      predictions: the bulk log10-MSE of these models (uug 2.0e-6, uugg 6.3e-5, tt 1.4e-7) against the plain transformer from
+      scratch (1.8e-5, 1.1e-4, 6.1e-8) implies per-event x spreads of 10^sqrt(MSE): 0.3-2% (factor) and up to 2.4% (scratch),
+      which sets eff_x through max x. No GPU: predictions exist.'
+    fixed: 'Events: the KIT bulk_test (2e5 per file), the models'' saved predictions (package v6, PACKAGE_OK: package = runs''
+      own predictions to 0.00e+00), no retraining, no new phase-space points (the exact one-loop |M|^2 is only available on
+      KIT''s events). One CPU job on CC: site run --job ccin2p3 FA --item kit_benchmark -- python tools/kit_mc_test.py runs/kit/kit_A_ee_uug_me2_n100000_t1831_hpo_asym_cont
+      runs/kit/kit_A_ee_uugg_me2_n100000_t1831_hpo_asym_cont runs/kit/kit_A_ee_tt_virt_finite_n100000_t1831_hpo_asym_cont
+      --out analysis/kit_benchmark/data/kit_mc_test.json (~2 min, timeout 900 s). Hard strata are out: their events are log-uniform
+      in the singular variable per bin, not a flat measure, so they carry no cross-section weight without the bin''s phase-space
+      density; stated.'
+    control: 'The exact |M|^2 on the same events (each number is surrogate against exact on identical points). Beside: the
+      MC error of sigma_exact on those events (the scale a bias must exceed to matter) and eff_exact (what unweighting costs
+      with no surrogate).'
+    seeds: No training. Bootstrap seed 0, 1000 resamples.
+    outcome: 'Per process: PASS if |bias| and its 16-84% band lie below the MC error of sigma_exact on the same 2e5 events
+      (std(w)/mean(w)/sqrt N): the surrogate cross section is as good as the exact one at this sample size; FAIL otherwise.
+      n_star says up to what production size a PASS holds. PASS on all three -> the models are reported usable for event generation
+      at <= n_star events, with the efficiency gains; FAIL on a process -> the region split names the bins that carry the
+      bias (bulk edge or interior), reported, and the next step is that process''s bias in those bins (a repair inside the
+      KIT model, designed then). Efficiencies are reported numbers with no pass bar (no source gives one).'
+    sources: 'MC error std(w)/mean(w)/sqrt N <- measured noise: the exact cross section''s own statistical error on the same
+      events; 16-84% band <- a measured spread: the bootstrap over the 2e5 events'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
