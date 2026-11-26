@@ -28543,7 +28543,7 @@ entries:
     agent: a8f9a3b8d28dab422
     state: working
     since: '2026-11-26T03:33:40.885000+00:00'
-    state_at: '2026-11-26T05:30:30.079000+00:00'
+    state_at: '2026-11-26T06:48:53.979000+00:00'
     context: 197014
     context_at: '2026-11-26T06:49:02+00:00'
   findings:
