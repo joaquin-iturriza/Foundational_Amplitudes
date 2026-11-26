@@ -29651,6 +29651,7 @@ entries:
     '23': the design reviewer of the step-23 MC design (recorded 2026-11-26), then the same site-sync blocker as step 20
     '22': 'the main session''s narrowing of 2026-11-26 (step 22 stays as it is, not part of D570); note: its cost, 2 x ~9.6
       = 19.2 GPU-h, is under the 30 GPU-h confirm bar'
+    '24': FA-ccin2p3-a3bc3374
   handoff:
     state: '2026-11-26 ~03:40 UTC. Step 20 (D570): design PASS 2026-11-26T02:27, nothing submitted. Every site sync/submit
       is refused by critical_batch''s uncommitted files (analysis/critical_batch/figs/{pretrain,zng4g}_update_bdl.pdf, data/ft_bcrit_ep50{,_raw}.json);
