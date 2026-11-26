@@ -15,8 +15,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(os.path.dirname(HERE)))
 import plot_style as ps  # noqa: E402
 
-SUBS = (("all", "full pool"), ("s_lo", r"low $\sqrt{\hat s}$"), ("s_hi", r"high $\sqrt{\hat s}$"),
-        ("q_hard", "harder cut"), ("q_soft", "singular fifth"))
+SUBS = (("all", "full"), ("s_lo", r"low $\hat s$"), ("s_hi", r"high $\hat s$"), ("q_hard", "hard cut"),
+        ("q_soft", "singular"))
 ARMS = (("regressor_ens", "one level per process", ps.C.blue, "s"),
         ("C_s", r"per event: $\log\hat s$", ps.C.green, "v"),
         ("C_sqE", "per event: + invariants", ps.C.orange, "^"),
@@ -27,20 +27,21 @@ def main():
     d = json.load(open(os.path.join(HERE, "data", "perevent_anchored.json")))
     E, S = d["ensembles"], d["summary"]
     x = np.arange(len(SUBS))
-    fig, ax = ps.figure()
+    fig, (ax, lax) = ps.figure(ncols=2)
     for k, (c, lab, col, mk) in enumerate(ARMS):
         off = (k - len(ARMS) / 2) * 0.14
         m = np.array([E[c]["new"][s]["median"] for s, _ in SUBS])
         lo = np.array([E[c]["new"][s]["min"] for s, _ in SUBS]); hi = np.array([E[c]["new"][s]["max"] for s, _ in SUBS])
         ax.errorbar(x + off, m, yerr=[m - lo, hi - m], fmt=mk, color=col, label=lab, capsize=2)
-    ax.plot(x + (len(ARMS) / 2) * 0.14, [S["oracle_const"]["new"][s] for s, _ in SUBS], "x", color="k",
+    # the pool's own mean has no level error on its full pool by construction: drawn on the subsets only
+    ax.plot(x[1:] + (len(ARMS) / 2) * 0.14, [S["oracle_const"]["new"][s] for s, _ in SUBS[1:]], "x", color="k",
             label="the pool's own mean")
-    ax.set_xticks(x, [t for _, t in SUBS])
+    ax.set_xticks(x, [t for _, t in SUBS], rotation=30)
     ax.set_xlabel("events scored")
     ax.set_yscale("log")
     ax.set_ylabel(r"level error $\langle\hat y-y\rangle^2/\sigma_p^2$")
+    ps.legend_cell(lax, [ax])
     ps.layout(fig)
-    ps.legend_free(ax)
     ps.save(fig, os.path.join(HERE, "figs", "perevent_anchored"))
 
 
