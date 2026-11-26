@@ -43431,6 +43431,16 @@ entries:
       out): contrast -1.09 (ttH), -1.25 (ttA), -1.39 (ttZ), -0.22 (g t t~), all near-pole lower. MSEs reproduce the lxplus
       read exactly (36.79/35.73). Next (design branch): a configuration testing the transfer of the resonance''s level, its
       own design.'
+  - at: '2026-11-26T23:42:26+00:00'
+    text: '2026-11-27 step 26: data.target_propagators now runs on the memmap path (1ca3514c0: experiment._tp_settings/_tp_props/_tp_logF
+      shared by both paths; data_mmap tp_<key>/logTP keyed by masks, widths, straddle, train caps; synthetic memmap = in-memory
+      identical with tp and tp+physics factor, in-memory bitwise unchanged; repo-reviewer PASS, backlog advanced at a0367ad38
+      after fixing two blockers in earlier llm_compare commits: scripts/submit_interactive.sh removed, shape_dists.py missing-arm
+      assert restored). Arm config sweep/sweep_config_llmcmp_c_tprop.yaml @581530563; design PASS 23:40 after one FIX (contrast
+      spread over 8 existing arms -0.62..-2.49, same-setup spread 1.21/1.34, data/pole_contrast_spread @21727e59c; tp-meta
+      gate; feature-rule No branch; disk 2.6 of 16 GB; smoke + wall 16 h). Prebuilds FA-ccin2p3-6fa10d57 (train) / -a1f973ec
+      (held out) running; next: gate on tp meta props of dc_gg_tbxwm/btxwp and the q q~ twins, then the 50-step smoke, its
+      held-out score, then the run.'
   step_waits:
     '25': FA-ccin2p3-d34fae85
     '26': FA-ccin2p3-6fa10d57 FA-ccin2p3-a1f973ec
