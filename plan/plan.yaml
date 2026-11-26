@@ -29885,6 +29885,13 @@ entries:
       the A2 models differs from the training job''s GPU predictions (the README''s ''reproduces exactly'' was false for them).
       Fix d9e647f6c: examples'' expected from the repo predictor at 1 thread (gate: package = repository), GPU deltas reported
       and stated in the README. v9 build FA-ccin2p3-6d36ce17.'
+  - at: '2026-11-26T16:01:30+00:00'
+    text: '2026-11-26 ~20:15 @4bc95aba2. KIT package v9 (FA-ccin2p3-6d36ce17, code d9e647f6c) PACKAGE_OK: standalone predict.py
+      on examples vs the repository''s 1-thread predictor 6.7e-8/7.4e-8/6.3e-8 (uug/uugg/tt); GPU predictions vs package 2.57e-5/6.56e-5/5.47e-3
+      (reported, in README). Fetched to analysis/kit_benchmark/export/fa_kit_surrogates_v9.tar.gz (83361414 bytes); clean
+      local venv per README (python 3.11 + pip): pip resolves torch 2.15.0+cpu despite the README''s torch==2.1.2 step; predict.py
+      runs on all three examples and reproduces expected to 6.3e-8..7.4e-8. Wart: with DATA_DIR unset the run writes its 10-event
+      val pool to ~/datasets.'
   step_why:
     20:
       feeds: 'D570: FT vs SCR-A2 vs V/B on the KIT hard bins'
