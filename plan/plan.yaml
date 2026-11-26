@@ -42438,7 +42438,7 @@ entries:
       untouched
   owner:
     agent: a85970e976cb8ac83
-    state: working
+    state: closed
     since: '2026-11-26T19:32:24+00:00'
     state_at: '2026-11-26T22:20:34.798000+00:00'
     context: 231662
@@ -43409,33 +43409,32 @@ entries:
       to Joaquin (design''s branch ''groups gone, pole dependence kept'').'
   step_waits: {}
   handoff:
-    state: 'Part (a), part (c), steps 16, 19 DONE (as before). Step 21/22 no-off-shellness arm FA-ccin2p3-1b480869 trained
-      clean (V100, 60,840 steps 13.45 h + sigma 1.78 h; best val_loss_no_reg -5.718 at validation 20/20 vs baseline trial_1860
-      -6.03); its score FA-ccin2p3-1b0cbd8a (job_llm_score.sh EVENTS=1 seen+held out, REREAD) pending on CC; steps 21 and
-      15 wait on it; then factor_split.py --csv runs/llmcmp_c_nooffshell/trial_1860/llm_events_heldout.csv --vars-from runs/llmcmp_c_qperp/trial_1860/llm_events_heldout.csv
-      as a CC CPU job (site run --job), error_split.py, read against the design''s outcomes; NOT added to Joaquin''s final
-      figures (D579 arm set). Step 23 (Joaquin 2026-11-26 bias-removed distributions): shape_dists.py @3ccc6b2cc restricted
-      to the final arm set; level_file events re-read FA-ccin2p3-2461cbe0 pending (step 23 waits on it); a mechanical worker
-      is redrawing shape_dists.py from a_trial5/c_best and exporting for Suprio (its files, uncommitted: shape_dists.py, export_for_suprio.py:
-      not mine to touch); LLM has no per-event predictions (data/suprio_cond per-process only). D566 attempt C DONE as a dead
-      end (FA-ccin2p3-444f056d, data/perevent_anchored.json @c00b40d98, figs/perevent_anchored.png): C_s keeps the level (0.248
-      vs control 0.219, range 0.098-0.369) but is not correct on the re-sampled subsets (0.42/0.28/0.44/0.96 vs constant 0.18/0.24/0.23/0.58);
-      the form with true per-process coefficients is sampling-robust (0.0003-0.018), the predicted anchored intercept carries
-      the error (leverage at a global anchor). Next: step 24 attempt D (process-intrinsic anchor), to design, review and run:
-      perevent_level.py --anchored is the base (add an anchor mode), same ensembles/control/subsets/bars as attempt C''s passed
-      design. Repo-reviewer backlog: FIX FIRST on tools/kit_bakar_figs.py collect_searched except SystemExit (kit_benchmark''s,
-      not ours); lock held, not advanced; D566 files passed.'
-    decisions: 'Joaquin''s: D522-D528, D536, D537, D553, D564, D566, D567, D576-D579. Mine (re-justify): earlier (i)-(xxxvii);
-      (xxxviii) step 21 arm scored seen + held out (design measure 3 needs seen pooled RMSE; step text said ONLY=heldout);
-      (xxxix) factor_split join against the baseline''s CC CSV (the one c_best_factor_split.json was read from), not the lxplus
-      re-read''s; (xl) D566 attempts read on the memmap base caches'' first 2000 train-role events (CC has no train pools;
-      same events as the pools'' first 2000; float32 momenta not checked against step 17''s float64); (xli) attempt C bars
-      per its passed design (control''s ten-ensemble max; all four subsets, Joaquin''s ''regardless of that'')'
-    ruled_out: 'As before, plus D566 attempt C (global-anchor conditional form): dead end recorded 2026-11-26'
-    running: FA-ccin2p3-1b0cbd8a (step 21 score), FA-ccin2p3-2461cbe0 (step 23 level_file events)
-    files: analysis/catalog_daniel/{perevent_level.py (--anchored, --mmap), perevent_anchored_fig.py, data/perevent_anchored.json},
-      analysis/catalog_daniel/figs/perevent_anchored.png, scripts/job_perevent_level.sh (PEL_ANCHORED, PEL_MMAP), analysis/llm_compare/shape_dists.py
-    written: '2026-11-26T19:22:46+00:00'
+    state: 'Part (a), part (c), steps 16, 19, 21/22, 23 DONE. Step 22 (no off-shellness input, FA-ccin2p3-1b480869): gg->ttH
+      split gone (separation 3.57 vs 12.1, MSE-bias^2 0.681 vs 5.94) but d still depends on |off-shellness| on both pole sides
+      (eta2 0.565): design branch ''groups gone, pole dependence kept''; gg->tbW bias^2 43.8/42.1 vs 30.7/32.1 (pair no);
+      new-43 median MSE-bias^2 0.209 vs 0.135; seen pooled 0.129 vs 0.0533; the encoding question (Scope: ...) handed to the
+      main session to send and record (plan ask needs each flagged message named). Step 23: shape_dists with all three final
+      models, export_for_suprio.zip 871,452 bytes (export_for_suprio.py @cbd8eb718). MSE/bias/shape all from data/split (one
+      pass, heldout_per_process.py @a5ecf4790). D566: attempts A, B, C, D dead ends; D''s diagnosis: the D_sqE form with the
+      pool''s own median as anchor passes everything (0.182; subsets 0.19-0.22), with the ridge anchor map it is sampling-robust
+      but its level is only partly kept (0.383 vs bar 0.369): the anchor map is the error. Next: step 25 attempt E (better
+      anchor map: the regressor''s own network over many seeds, cross-fitted; or a reference phase-space median), design (perevent_level.py
+      --anchor gets a new mode, output perevent_anchored_E.json; fig perevent_anchored_fig.py with an E arm set), review,
+      CPU job on htc via job_perevent_level.sh (PEL_ANCHOR). Then step 15 (D564 investigation), which no longer waits.'
+    decisions: 'Joaquin''s: D522-D528, D536, D537, D553, D564, D566, D567, D576-D579, D584-D588. Mine (re-justify): earlier
+      (i)-(xli); (xxxix) CORRECTED: the baseline''s CC CSV had no offshell columns; baseline re-read on CC with them 2026-11-26
+      21:54 (interactive), the join used that; (xlii) one scoring pass (data/split) for MSE/bias/shape in every figure and
+      the export (the two passes differ only by float32 noise at MSE ~1e-6); (xliii) step 22 seen set scored (design measure
+      3) on CC interactive; (xliv) attempt D''s ridge anchor with RidgeCV leave-one-out alpha; (xlv) attempt D read on the
+      same events as C (memmap first 2000 train-role events).'
+    ruled_out: As before, plus D566 attempt D (ridge process anchor), dead end 2026-11-26
+    running: none of mine (the interactive scores and attempt D ended)
+    files: analysis/catalog_daniel/{perevent_level.py (--anchored --anchor global|process), perevent_anchored_fig.py [D],
+      data/perevent_anchored{,_D}.json}, analysis/catalog_daniel/figs/perevent_anchored_D.png, scripts/job_perevent_level.sh
+      (PEL_ANCHOR), analysis/llm_compare/{heldout_per_process.py, shape_dists.py, export_for_suprio.py, factor_split.py, data/c_nooffshell_factor_split.json,
+      data/step22_nooffshell_read.json, data/split/c_nooffshell_heldout.json}, figs/{shape_dists, step22_nooffshell_*_heldout_per_process,
+      c_nooffshell_factor_split_offshell_6}.png
+    written: '2026-11-26T22:23:28+00:00'
   designs:
   - at: '2026-11-22T04:13:14+00:00'
     question: 'Part (a), D525: in the conditions of Suprio''s LLM pID run (D524, D526, D527: our catalog_daniel regeneration
