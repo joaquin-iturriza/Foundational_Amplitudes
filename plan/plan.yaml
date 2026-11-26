@@ -29773,6 +29773,15 @@ entries:
       threshold 0.023, Sudakov 0.077) both are far behind. Wave 2 of both searches was unguided (open question to Joaquin).
       Figures analysis/kit_benchmark/figs/step22/kit_{mse,median}_searched_ee_tt_virt_finite.png. Design outcome: div-form
       dropped (STAYED where A2 is FIXED); ReZero not MOVED by the design''s bar, not kept.'
+  - at: '2026-11-26T13:05:29+00:00'
+    text: '2026-11-26 ~14:10 @9fd82418d. D572: the A2 model now takes sign-changing one-loop pools: the sign head''s existing
+      treatment (log max(|x|,s), s the pool''s 1% train quantile of |x|, plus a sign logit; under HETEROSC a readout row)
+      combined with A2''s factor on log|V|, readout [mu, alpha, sign, sigma] (models/lloca.py, experiment.py @62bb84df6; tests/test_input_reps.py::test_asym_factor:
+      mu and sigma bit-equal to the A2 model without the row). Recipe recipes/transfer_finale_kit_fairnlo.yaml @62bb84df6
+      restores uubar_ddbar_nlo, ee_mumu_ew_nlo, ee_uu_ew_nlo (= transfer_finale.yaml + KIT tt Born; 6 one-loop pools bulk).
+      Design reviewed FIX (disk, sign readout tool, unlike per-pool comparison) then PASS 13:00; tools/kit_sign_read.py for
+      the wrong-sign fraction. lxplus EOS quota 976/1000 GB used (~24 GB free; batch needs ~2.4 GB). Parent smoke FA-lxplus-f7c30433
+      submitted; arm smokes, real parent and arms follow it.'
   step_why:
     20:
       feeds: whether the fair one-loop fine-tune with sign-changing pools in beats scratch A2 and the V/B baseline on the
