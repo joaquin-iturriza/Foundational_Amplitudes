@@ -29872,6 +29872,17 @@ entries:
       added dd2b2fd1b (bulk_test and MadEvent events pass the coded cut; LHE weights equal); jobs FA-ccin2p3-6eb41dd6 (uug),
       76945fa6 (uugg), 44f737bc (tt). Slides 5-8 redrawn at 96c9ea7bb (slide 7/8 legends had covered curves), looked at, captions
       check_caption OK.'
+  - at: '2026-11-26T15:38:18+00:00'
+    text: '2026-11-26 ~19:00 @7537eff46. Slide-11 MC test with MadGraph (design PASS 15:06), A2 models: all asserts passed
+      (standalone |M|^2 vs KIT me2 max rel 3.7e-13 uug / 1.2e-13 uugg; every bulk_test and MadEvent event passes the coded
+      cut; LHE weights equal). MadEvent sigma 0.121861 pb uug, 0.0198228 pb uugg, 1e5 events each. sigma_hat/sigma-1 = -1.62e-3
+      (MC error 5.2e-6, band [-1.626,-1.616]e-3) uug; -1.35e-3 (MC error 1.2e-4) uugg: both systematic, visible above ~1 (uug)
+      / ~820 (uugg) events. eps2 at r_max = max / q0.9999 / q0.999 / q0.99: uug 0.965/0.972/0.990/0.996; uugg 0.402/0.598/0.731/0.872
+      (sigma share above cap 1.6e-5/1.2e-4/9.0e-4 at q 0.9999/0.999/0.99). Earlier flat-bulk reweighting: bias -1.65e-3/-3.31e-3,
+      eps2 0.886/0.562. tt (threshold scan quadrature, 346-432 GeV): integrated virtual sigma[V_hat]/sigma[V]-1 = -0.292 at
+      beta 1e-3, -0.252 at 0.012, -0.153 at 0.041, -0.049 at 0.076, +0.047 at 0.14, +1.7e-4 at 0.26, +6.4e-4 at 0.6; NLO ratio
+      -0.291 at beta 1e-3: the packaged tt model''s coherent -0.152 decade offset in the deepest threshold bin (slide-10 bias)
+      integrates to a ~29% low virtual at threshold. Figure analysis/kit_benchmark/figs/kit_mc_madgraph.png.'
   step_why:
     20:
       feeds: 'D570: FT vs SCR-A2 vs V/B on the KIT hard bins'
