@@ -43406,7 +43406,7 @@ entries:
       in distribution without the input (val_loss_no_reg -5.718 vs -6.03). Step 22 read complete; the encoding question goes
       to Joaquin (design''s branch ''groups gone, pole dependence kept'').'
   step_waits:
-    '25': FA-ccin2p3-fb348771
+    '25': FA-ccin2p3-d34fae85
   handoff:
     state: 'Part (a), part (c), steps 16, 19, 21/22, 23 DONE. Step 22 (no off-shellness input, FA-ccin2p3-1b480869): gg->ttH
       split gone (separation 3.57 vs 12.1, MSE-bias^2 0.681 vs 5.94) but d still depends on |off-shellness| on both pole sides
