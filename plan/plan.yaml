@@ -28326,9 +28326,10 @@ entries:
       the A2 models beside his MLP'
     29: 'Slide-10 metrics never reported: bias, 99th percentile, |M|^2-weighted relative error per bin and the azimuth harmonic
       h (computed by his evaluate.py, kit_result.json) into the slide-9-style summary for A2 (fine-tunes when they exist)'
-    30: 'Protocol A pretrained with the target held out for uug/uugg with A2: exists only for tt (and without A2); the fair
-      one-loop chain covers tt only, so uug/uugg pretrained-held-out A2 is NOT in any design; to design within the entry''s
-      approval'
+    30: 'Protocol A pretrained, ee_qqg/qqgg families held out, A2, uug/uugg (D575, design PASS): parent smoke FA-ccin2p3-42ae3468
+      (recipe transfer_finale_kit_heldout_qqg.yaml @6a6ca8839); on its clean end the real parent (tag kit_heldoutqqg_a2, limit
+      14 h, target 10 h) + FT1/FT0.1/SCR-A2 50-step smokes from the smoke parent; SCR-A2 real arms once the parent''s config
+      exists, FT1/FT0.1 at the parent''s end'
     31: 'Protocol B on the three A2 models (D575, design PASS ~16:40): smoke FA-ccin2p3-58bc2125 (B, tt A2, 50 steps); on
       its clean end site pick + 6 runs job_kit.sh B and B_bulk 3000 steps with --env KIT_FROM=runs/kit/kit_A_ee_{uug_me2,uugg_me2,tt_virt_finite}_n100000_t1831_hpo_asym_cont,
       tags a2B (limit 1:30), then B vs B_bulk per family'
@@ -29872,10 +29873,10 @@ entries:
       - 'metrics present for every A2 run: summary drawn'
       - 'a run lacks them: rescore it (REREAD)'
     30:
-      feeds: Bakar's protocol A (pretrained, family held out) for every KIT process
+      feeds: 'Bakar''s most interesting test: limits without hard data when pretrained with the target family held out'
       if:
-      - 'pretrained A2 beats scratch A2 on uug/uugg hard bins: report'
-      - 'not: report as level/loses'
+      - 'best FT beats SCR-A2: positive transfer per family'
+      - 'neither: fine-tune search best against best before any no-transfer statement'
     31:
       feeds: 'Bakar''s protocol B on the models we report: do hard points still teach A2'
       if:
@@ -29888,7 +29889,6 @@ entries:
       it wakes)
     '29': FA-ccin2p3-5c3fb7fa (read the CC CPU job ccj_03dedf7197c8 of kit_bakar_figs collect -> kit_bakar_figs_a2.json when
       it wakes)
-    '30': a new owner (the previous closed at its context limit, 2026-11-26 ~15:30); after step 25/26's package
     '25': FA-ccin2p3-5c3fb7fa
   handoff:
     state: '2026-11-26 ~15:00 UTC. Step 20 (D570 + D572 signed A2, design PASS 13:00): parent smoke FA-lxplus-f7c30433 clean
