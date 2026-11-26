@@ -42143,6 +42143,8 @@ entries:
       the level at the process''s own typical point (little leverage) and b_p carries the sampling dependence; slopes optionally
       shrunk toward the multiplicity-class mean; variants C_s and C_sqE (log P dropped: lost the level); same ten ensembles,
       control, subsets and bars as attempt C''s passed design'
+    25: 'attempt E (step 25): the D_sqE form with a better process-intrinsic anchor map, designed, reviewed and run as a CPU
+      job on htc'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -42458,6 +42460,14 @@ entries:
       if:
       - 'D keeps the level and is correct on all four subsets: report, then its training-run design'
       - 'D fails: read _fit/_trueb again; next a nonlinear per-process form or a network target taken against c^+b^.x'
+    25:
+      feeds: 'D566: a per-event level from the process and its diagrams that keeps the level on new families and is correct
+        regardless of sampling'
+      if:
+      - 'E''s D_sqE keeps the level (<= regressor_ens max) and passes all four subsets: report to Joaquin, then its training-run
+        design (per-event level replacing the level file)'
+      - 'E fails with the own-median anchor still passing: anchor maps are the bottleneck; try the reference phase-space anchor
+        (median x of the process under a fixed flat sampling with its cuts)'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
