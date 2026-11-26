@@ -42304,8 +42304,7 @@ entries:
     '13': FA-ccin2p3-623a3af6
     '14': FA-ccin2p3-f0b997a2
     '15': the RUN event of FA-ccin2p3-89671610 (step 16's run)
-    '16': the RUN event of FA-ccin2p3-89671610 (stopped at ~41k of 60,840 steps with no error in .out; worker triage, then
-      this owner)
+    '16': '2026-11-26'
     '21': FA-ccin2p3-1b480869
   handoff:
     state: 'Part (a) DONE, part (c) DONE. Step 20 DONE: D566 candidate (B) dead end (matched 8-trial searches: tuned tree
