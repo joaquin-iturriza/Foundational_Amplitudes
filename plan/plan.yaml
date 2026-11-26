@@ -47164,6 +47164,63 @@ entries:
       Check 5 searched: anchored, conditional mean, intercept, per-process slope, c_p, sampling-independent, per-event level,
       window restriction (results.tex, plan.yaml, D566): hybrid c_p l.5820 and catalog_v4 kshot affine are other questions.
       Float32 memmap momenta stated not checked; comparison matched on the same events.'
+  - at: '2026-11-26T19:42:32+00:00'
+    question: 'D566 attempt D (step 24; Joaquin 2026-11-25: a per-process level ''depends on how that data was sampled ...
+      this has to perform correctly in individual events regardless of that. I believe there is a way to marry these two ideas''):
+      does the anchored conditional-mean level, with the anchor moved from one global constant (attempt C) to a process-intrinsic
+      point x0_p, keep the per-process diagram regressor''s level skill on the 43 new families AND stay correct when the same
+      process is sampled another way? Form per training process: log|M|^2 = c_p + b_p.(x - x0_p)/sx fitted on its events;
+      x0_p = RidgeCV (alphas 1e-3..1e3 by its own leave-one-out CV; standardized process + diagram descriptors, the regressor''s)
+      map of the training processes'' median x, cross-fitted by relabelling class (GroupKFold(5) by weak_key) on the training
+      processes and fitted on all of them for the held out: a function of the process alone, no statistic of the scored dataset;
+      sx = std over all training events (constant). The regressor''s network maps process -> (c_p, b_p); prediction per event
+      c^ + b^.(x - x0_p)/sx. Variants: D_s (x = log s_hat), D_sqE (+ q = Lmin - log s_hat, E); each also with slopes shrunk
+      fully to the training processes'' mean true slope of the same multiplicity (n_out) (_bcls). log P dropped (attempt C:
+      C_sqEP lost the level, 5.37).'
+    prior: 'Attempt C (dead end, FA-ccin2p3-444f056d, data/perevent_anchored.json @c00b40d98): global anchor; C_s level kept
+      0.248 (control regressor_ens 0.219, range 0.098-0.369) but subsets 0.42/0.28/0.44/0.96 vs regressor_ens 0.18/0.24/0.23/0.58;
+      with true (c,b) (_fit) subsets 0.0003-0.018: the form is sampling-robust, the predicted intercept at the far global
+      anchor carries the error (_trueb worse than both predicted: C_s 0.42, C_sqE 1.04). Dead ends A (propagator factor, new
+      6.3/3.1) and B (one per-event map, new 3.64/1.63 untuned, 4.75/2.64 tuned). Regressor: norm_explore3.json 0.0447 one
+      draw; results.tex l.8510-8514 ten ensembles median 0.087 range 0.016-0.19. Searched process anchor, intrinsic anchor,
+      reference point, leverage, class slope, shrink in docs/results.tex, plan.yaml, D566: none beyond attempt C (hybrid c_p
+      l.5820 and catalog_v4 kshot affine are other questions).'
+    measure: 'perevent_level.py --anchored --anchor process @7df6e5130 (job_perevent_level.sh PEL_ANCHORED=1 PEL_ANCHOR=process
+      PEL_MMAP=''99c164da4365de9d7c017b75/train55296_val10000_test10000 b39fc80c8b10edbe4b07f6a0/train55296_val10000_test10000'',
+      CPU job, CC; same events as attempt C: first 2000 train-role events per process of the memmap base caches). Per process
+      level error e_S = mean(pred - y over S)^2 / sigma_p^2 on S = all, s_lo, s_hi, q_hard, q_soft (attempt C''s subsets).
+      Ten 3-seed ensembles (seeds 3k..3k+2): median, min, max over ensembles of the new-set median; event bootstrap (30) on
+      ensemble 0. Candidates: shared, regressor (frozen), regressor_ens (control), oracle_const, D_s, D_sqE, D_s_bcls, D_sqE_bcls;
+      diagnostics _fit (true c,b at x0_p), _trueb (c predicted, slopes true), D_*_own (x0_p = the pool''s own median: the
+      anchor map''s error alone) and anchor_err (median |x0_p - own median|/sx on new and cross-fitted train). Output data/perevent_anchored_D.json,
+      figure perevent_anchored_fig.py D.'
+    check: 'Existing data: attempt C''s _fit (true c,b) subset errors 0.0003-0.018 against the constant''s 0.03-0.60 and _trueb''s
+      leverage error (C_s 0.42 with true slopes) show the anchor moves the measure: the same form with a different anchor
+      changes e on new by up to 25x (C_sqEP_trueb 10.3 vs C_sqEP 5.37). Code: synthetic end-to-end run (150 processes, scratch
+      test_attemptD.py): anchor map recovers the true process centre (median miss 0.028 sx on new), D_s_fit = 0 on all, D_s
+      keeps the level (0.012 vs regressor_ens 0.0085) and stays correct on s_lo/s_hi (0.013/0.014) where the constant moves
+      to 0.52/0.56; references (shared ~47, frozen regressor ~0.044 within 10%) asserted in the job before writing. Memmap
+      momenta float32 (as attempt C, matched comparison).'
+    fixed: Events, 1352/43/96 split (classes_default.json, heldout_twins.json), the regressor's network, descriptors, ensemble
+      seeds and folds (GroupKFold(5) by weak_key), subsets, bootstrap, sx; no training job, no new data.
+    control: 'regressor_ens: the same network on the pool means of the same events, ten ensembles (a constant per process);
+      beside it the frozen regressor, oracle_const, shared, and attempt C''s C_s/C_sqE (data/perevent_anchored.json, same
+      events).'
+    seeds: Ten 3-seed network ensembles (seeds 0-29) for every network candidate and the control; events fixed; event bootstrap
+      (30) on ensemble 0.
+    outcome: 'As attempt C''s passed design. Level kept: a D variant''s ten-ensemble median of the new-set median e_all <=
+      regressor_ens''s ten-ensemble max; partly kept up to 0.45; lost >= 0.45. Correct regardless of sampling: on every one
+      of s_lo, s_hi, q_hard, q_soft, the variant''s ensemble-median e_S within the level-kept bar (or e_S - e_all within 2
+      bootstrap sd), and below regressor_ens''s e_S by more than 2 x sqrt(sd_D^2 + sd_reg^2) where regressor_ens''s e_S exceeds
+      its e_all by more than 2 bootstrap sd (a subset where the constant does not move is reported as not testing the claim).
+      (Yes, both) report to Joaquin; next its training-run design (per-event level replacing the level file). (No) read the
+      diagnostics: D_*_own keeps it but D_* does not -> the anchor map is the error (next: a better anchor map); _trueb keeps
+      it, D_* not -> predicted slopes (next: _bcls result, else per-family slopes); _fit misses on subsets -> linear form
+      wrong at x0_p (next: nonlinear per-process form, e.g. quadratic in log s_hat).'
+    sources: 'level-kept bar <- measured: regressor_ens''s own ten-ensemble range, re-measured in the job (results.tex l.8510-8514:
+      0.016-0.19); 0.45 <- measured: content-only network''s new median 0.448 (norm_explore3.json B|nodiag|sampled); every
+      subset <- Joaquin''s words D566 ''this has to perform correctly in individual events regardless of that''; 2 bootstrap
+      sd <- measured noise (event bootstrap in the job)'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
