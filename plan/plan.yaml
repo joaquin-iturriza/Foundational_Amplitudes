@@ -34280,6 +34280,59 @@ entries:
       flat 353-1739 GeV number (5.83e-4 vs 1.90e-3): say so in the report. Non-blocking: assert in gen that all KIT bulk_test
       events pass the coded cut and that LHE weights are equal; first real job is the end-to-end run (CPU, cheap). Searched:
       sec:kit-mc, kit_mc, unweighting, second-stage, end-user, madevent, slide 11 in results.tex and the entry; D571-D575.'
+  - at: '2026-11-26T16:37:27+00:00'
+    question: 'Slide 11 of Bakar''s slides done exactly as written (D571 ''do 2, we run it'', D574 evaluations only, D575;
+      Joaquin asked whether our MC test is exactly what Bakar wants: it was not). For the packaged A2 models (fa_kit_surrogates_v10
+      = runs/kit/kit_A_ee_{uug_me2,uugg_me2,tt_virt_finite}_n100000_t1831_hpo_asym_cont): (1) tree, uug and uugg: with MadEvent
+      integrating and unweighting the SURROGATE |M_hat|^2 (grid adapted to it, events distributed as it), what are sigma_hat/sigma
+      - 1 (MadEvent''s own sigma_hat against the exact run''s sigma) and eps2 = <r>/r_max, r = |M|^2/|M_hat|^2 on those events,
+      with its r_max quantiles? (2) tt one loop: the bias of the integrated virtual sigma[V_hat]/sigma[V] - 1 over KIT''s
+      whole tt bulk window 353-1739 GeV (MadLoop exact), not only the 346-432 GeV threshold scan.'
+    prior: 'Searched results.tex sec:kit-mc, the entry''s findings, D571-D575. Earlier: (a) sec:kit-mc flat bulk_test reweighting:
+      bias -1.65e-3/-3.31e-3/+5.83e-4, eps2 0.886/0.562/0.967; (b) 2026-11-26 19:00 finding (tools/kit_mc_madgraph.py @7537eff46,
+      design PASS 15:06): MadEvent on the EXACT |M|^2, its events reweighted by u: bias E[u]-1 = -1.62e-3 (MC 5.2e-6) uug,
+      -1.35e-3 (1.2e-4) uugg; eps2 max/q0.9999/q0.999/q0.99 0.965/0.972/0.990/0.996 uug, 0.402/0.598/0.731/0.872 uugg; MadEvent
+      sigma 0.121861 pb uug, 0.0198228 +- 2.34e-5 pb uugg; tt only on the threshold scan 346-432 GeV (-29% at beta 1e-3, +6.4e-4
+      at beta 0.6). Its stated differences from slide 11 are what this design removes.'
+    measure: 'tools/kit_mc_madgraph.py @8e3d2dd36. (1) gen --surrogate RUN: same MadEvent setup as the exact run (MG5_aMC
+      3.x, sm, sqrt s 1 TeV, alpha_s 0.118 fixed, 1/alpha 132.507, KIT bulk cut s_ij/s>0.01 on every gluon pair in dummy_cuts,
+      iseed 11, 1e5 unweighted events, nhel 0 default); each P dir''s SMATRIX call (scalar DSIG and vector SMATRIX_MULTI,
+      vector_size 1024) is followed by KITSURR which multiplies MadEvent''s value by u = |M_hat|^2/|M|^2 from a serve process
+      (one per madevent process, two FIFOs): the integrand is alpha_c |M_hat|^2 with alpha_c MadEvent''s own multi-channel
+      weights (a partition of unity), so the VEGAS grid, sigma_hat and the unweighted events are those of |M_hat|^2. |M_hat|^2
+      = the run rebuilt once as kit_predict.predict (float64, 1 CPU thread, event frame), each batch re-read by the experiment''s
+      init_data; asserted equal to kit_predict.predict on 1000 bulk_test events (<1e-9). Exact |M|^2 per event by the standalone
+      (asserted vs KIT me2 <1e-6). Then predict --surr (batch kit_predict on the unweighted events) and metrics: bias = sigma_hat/sigma
+      - 1, MC error from both MadEvent quoted errors; eps2 = mean(r)/r_max at r_max = max and the 0.99/0.999/0.9999 quantiles
+      of r, sigma share above each cap E[max(r-r_q,0)]/E[r]. (2) kit_threshold_scan.py build --window bulk: sqrt s at 32 Gauss-Legendre
+      nodes over [353.1, 1738.7] GeV x 16 cos theta nodes, MadLoop exact V (checked vs KIT virt_finite on bulk_test and threshold
+      groups, tol 1e-8), surrogate by kit_predict; sigma[V](sqrt s) per node and int sigma[V] d sqrt s over the window (flat
+      sqrt s, KIT''s bulk measure): sigma[V_hat]/sigma[V]-1 per sqrt s and integrated. Figures: figure_exact (tree: bias per
+      process beside the reweighting estimate, eps2 vs 1-q; tt: bias vs sqrt s, threshold scan + bulk window).'
+    check: 'Local end-to-end run on the packaged uug model (package dir, 2000 events, 4 cores): compiles, KITSURR/serve round
+      trip works, server = kit_predict to 0.00, sigma_hat 0.12140 +- 0.00083 pb vs exact 0.121861 pb (moves with the surrogate
+      as expected from E[u]-1 = -1.62e-3 within its 0.7% error at 2000 events); 141k surrogate evaluations (2.7 ms each incl.
+      overhead). The measure moves with the surrogate: E[u]-1 differed across surrogates (-1.65e-3 vs -3.31e-3 flat; -1.62e-3/-1.35e-3
+      MadEvent), and the threshold scan''s sigma[V_hat]/sigma[V] differed across surrogates (kit_threshold_scan_asym.json).
+      selfcheck (surr_metrics: bias = c-1, eps2 = 1 for M_hat = M/c... ) passes.'
+    fixed: 'The three A2 models unchanged; KIT settings asserted from metadata; every MadEvent setting as the exact run''s
+      (cards, cut, iseed 11, 1e5 events); vector_size 1024 only batches the calls; surrogate float64 CPU 1 thread (the package''s
+      own gate); CPU jobs on CC htc via scripts/job_kit_mc_madgraph.sh (surr uug, surr uugg: 32 CPUs, 64G; tt_bulk: 8 CPUs).
+      Still differs from slide 11 (stated first in the report): MadEvent''s multi-channel weights alpha_c come from its exact
+      diagram amplitudes (a partition of unity: the integrand and hence sigma_hat and the event density are exactly |M_hat|^2;
+      only the variance depends on alpha_c); tt by Gauss-Legendre quadrature (exact for the exact V, 32x16 nodes) instead
+      of an MC; sigma_hat''s bias resolution is set by the two independent MadEvent errors (~1e-3), so the correlated estimate
+      E_exact[u]-1 is shown beside it.'
+    control: 'sigma: the existing exact MadEvent run (runs/kit/mc_madgraph/<proc>.h5 and its log, same settings and seed);
+      r: the exact |M|^2 of each event (standalone = KIT truth); beside, the reweighting estimates of 19:00; tt: MadLoop exact
+      V on the same nodes; the threshold-scan numbers for 346-432 GeV.'
+    seeds: No training; MadEvent iseed 11 (as the exact run).
+    outcome: 'Reported, no verdict bar from Joaquin or Bakar. Tree: sigma_hat/sigma-1 with its MC error; consistent with E_exact[u]-1
+      within errors -> the two estimates agree (the reweighting was equivalent); not -> the surrogate-driven grid changes
+      sigma_hat (reported as such). eps2 at each r_max quantile and its sigma share above cap: near the reweighting values
+      -> tails as seen before; lower at the maximum -> the |M_hat|^2-adapted sampling reaches tails the exact one under-sampled.
+      tt: bias per sqrt s and integrated over the window; |integrated bias| vs the flat-bulk 5.83e-4 estimate.'
+    sources: D571, D574, D575; slide 11 of analysis/kit_benchmark/source/hardps_benchmark_slides.pdf
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
