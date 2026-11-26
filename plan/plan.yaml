@@ -47607,6 +47607,94 @@ entries:
       match data/rerun_spread.json, prior covers the ladder Breit-Wigner A/B (results.tex l.14895-14935) and steps 15/16/22
       (searched target_propagators, Breit, propagator, resonan, pole, tbW, tbxwm, resonance_per_event in results.tex, the
       plan entry and site decisions).'
+  - at: '2026-11-26T23:39:27+00:00'
+    question: 'Step 26 (step 15''s yes branch; D564, Joaquin: ''despite the llm being so much worse at training and at relabels,
+      it seems to extrapolate better, we should understand why this is the case''): the pooled new-set gap to the LLM is carried
+      by the held-out g g > t b~ w- / g g > b t~ w+ pair (our searched best MSE of log|M|^2 36.8/35.7, bias -5.66/-5.58, LLM
+      2.2/2.5), whose error sits at the internal top''s pole (near-pole fifth mean d -7.65/-7.56 vs -5.16/-5.08 in the rest,
+      se 0.05) while the same network has the trained q q~ > t b W twins right (seen MSE <= 0.0069). Does putting the resonance''s
+      level into the target per event, the propagators'' Breit-Wigner factor (data.target_propagators: |M|^2 x prod_k ((s_k-M_k^2)^2+M_k^2
+      G_k^2)/M_k^4, divided out at evaluation), transfer the top resonance to the g g initial state, i.e. remove the near-pole
+      error and the pair''s gap?'
+    prior: 'Step 15 (plan llm_compare, 2026-11-27, data/c_best_factor_split.json): the pair''s error is at the top pole, V-shaped
+      binned d with floor -7.96 at the pole, -1.1 at the far ends; gg->ttX held out also near-pole lower (contrast -1.09 to
+      -1.39). Step 22 (FA-ccin2p3-1b480869, no off-shellness input): pair bias^2 43.8/42.1 vs 30.7/32.1, the input does not
+      drive the pair''s level. Step 16 level file: pair worse (44.4/40.6). docs/results.tex l.14895-14935 (ladder A/B, tp2/tp3
+      probes): the Breit-Wigner factor on 4 ee probes reaching the Z pole widened the target and bought nothing measurable
+      best-against-best, so tp3_ ran with it off (Joaquin''s call for that study); never tested on a multi-process catalogue
+      with held-out initial states, nor on the memmap path (asserted off until 1ca3514c0, step 26''s extension). Searched
+      docs/results.tex, plan llm_compare and site decisions --project FA for target_propagators, Breit, propagator, resonan,
+      pole, tbW, tbxwm: nothing else.'
+    measure: 'One arm: sweep/sweep_config_llmcmp_c_tprop.yaml (= sweep_config_llmcmp_c_latest.yaml with data.target_propagators
+      true, config defaults pdgs [23,24,6,25], MadGraph sm widths, straddle 0.005) at trial_1860''s HPs (--hp-idx 1860, lr
+      0.001603605, muon wd 0.02796892, L2 4.685537e-08, warmup 0.1908437, eta_min 4.115949e-09, EMA on 0.9831303), 60,840
+      steps + sigma stage, memmap (tp_<key> built by the CPU prebuilds, train and held-out recipes). Read as the control was:
+      tools/llm_score.py held-out (recipe catalog_daniel_heldout.yaml, parent_shared, 10,000 test events per process, factor
+      divided out: absolute log|M|^2) and seen (own recipe) -> data/split/c_tprop_heldout.json, data/c_tprop_seen.json; per-event
+      CSV (first 5000 per process) -> factor_split.py --pole-run on the arm''s own run dir (same offshell input and statistics
+      recipe) -> data/c_tprop_factor_split.json: per process of the pair MSE, bias, near-pole fifth vs rest mean d, contrast
+      and its se; held-out pooled RMSE, new-43 medians (level_file_read.py --tags c_best c_tprop), gg->ttX contrasts. Figure:
+      heldout_per_process.py (Suprio''s layout, one marker per arm: c_best and c_tprop) and factor_split.py --fig --panels
+      tbw for both runs. Launch path (D395, new: memmap with data.target_propagators): (0) CPU prebuilds on CC, scripts/job_mmap_prebuild.sh
+      with the config''s fixed_params, train and held-out recipe (base and feat_ caches exist; they add tp_<key>/logTP); GATE
+      before any GPU job: the held-out prebuild''s tp meta.json props must give dc_gg_tbxwm and dc_gg_btxwp >= 1 propagator
+      and the train one the q q~ > t b W twins >= 1 (read with site run cat); if the pair has no factor, nothing is submitted
+      and the arm is reported as unable to answer. (1) one smoke, scripts/job_config_smoke.sh sweep/sweep_config_llmcmp_c_tprop.yaml
+      50 (training, sigma stage, test, plots), --hdr=--mem=20G --hdr=--time=02:00:00; (2) on SMOKE_EXIT 0 job_llm_score.sh
+      RUN=<smoke dir> ONLY=heldout EVENTS=1: its CSV''s log_factor on the pair must differ from c_best''s on the same events
+      (the Breit-Wigner log, <= 0 near the pole) and factor_split.py must read it; (3) the run: sweep/trial_job.sh --sweep-config
+      sweep/sweep_config_llmcmp_c_tprop.yaml --detached --trial-idx 1860 --hp-idx 1860 --t-steps 60840 with trial_1860''s
+      HPs, --hdr=--mem=20G --hdr=--time=22:00:00 --hdr=--cpus-per-task=4 --hdr=--gpu-min-mem=32G. Wall-time target 16 h: trial_1860''s
+      own V100 rate 0.672 s/step x 60,840 = 11.4 h of steps (735.8 min with its validations) + its 2.39 h sigma stage = 14.7
+      h; on H100 0.27 s/step = 4.6 h + sigma ~1 h; limit 22 h. GPU-h: 14.7 + smoke ~0.5 + llm_score reads ~1 = ~16 (< 30).
+      Disk (CC /sps/lpnhe 16 GB free, df 2026-11-27): tp caches 1352 x 75,296 events x 8 B = 0.81 GB (train) + 139 x 75,296
+      x 8 B = 0.08 GB (held out), the run dir 1.4 GB (trial_1860''s du), the smoke ~0.3 GB, per-event CSV ~25 MB: ~2.6 GB,
+      fits with 13 GB to spare.'
+    check: 'Existing data (data/c_best_factor_split.json, the control''s own events): on the pair the binned mean of d is
+      a V with its floor -7.96 at the pole and -1.1 at the far ends, a depth of ~6.9 nats concentrated where the Breit-Wigner
+      factor is most negative (at s=M_t^2 its log is 2 log(G_t/M_t) = -9.48 with G_t=1.5083, M_t=172.5), so the error has
+      the factor''s location and its order of magnitude: the measure (near-pole contrast -2.49, se 0.047) moves if the network
+      places the resonance through the target. Code: tests/test_memmap_data.py --synthetic with data.target_propagators (and
+      with the physics factor) on, memmap identical to the in-memory path (8/20 synthetic processes carry a factor), in-memory
+      path bitwise unchanged by the refactor; repo-reviewer passed b80ebd251. Not yet checked: that the held-out pair''s top
+      propagator straddles its pole in its train pool (read from the held-out prebuild''s tp meta.json props before the run
+      is read; a pair without a factor makes the arm answer nothing about it and is reported as such). Run-to-run spread of
+      the contrast (factor_split.py --pole-run with trial_1860''s offshell statistics, --vars-from the c_best CC pair rows,
+      on each existing arm''s held-out events, pair only; scratchpad spread/*_fs.json): contrast tbxwm/btxwp c_best -2.49/-2.48,
+      c_control (part (c) setup, trial_1262''s HPs) -1.28/-1.13, c_nooffshell -1.54/-1.47, level_file -1.36/-1.48, b_h16 -0.87/-0.62,
+      b_h32 -1.32/-1.36, a_trial5 -0.66/-0.78, control -1.53/-1.43 (se 0.03-0.07): every run so far has the near-pole fifth
+      lower; the same setup at two HP sets differs by 1.21/1.34, the spread used below.'
+    fixed: 'Everything of part (c)''s searched best FA-ccin2p3-29ce8950 (llmcmp_c_qperp trial_1860): 1352 trained processes,
+      first 55,296 train events each, val/test 10,000, 60,840 steps of 24,576 events, the emission-scale target (target_physics_factor,
+      dim_only, orders, s0 1, dim_ref qperp), shared standardization, dimensionless inputs, off-shellness input, coupling
+      scalars, llm4lhc diagram encoder width 64, HETEROSC + sigma stage, MuonAdamW, WSD, width 8 heads x 8 blocks, seed 42,
+      trial_1860''s HPs; scoring tools and events as the control''s. The only change: data.target_propagators true.'
+    control: 'trial_1860 itself (FA-ccin2p3-29ce8950, same config but the flag, same seed, same HPs): its existing reads data/split/c_best_heldout.json,
+      data/c_best_seen.json, data/c_best_factor_split.json (pair MSE 36.79/35.73, near-pole contrast -2.49/-2.48 se 0.047/0.048,
+      held-out pooled RMSE 1.178, seen 0.0533, new-43 median MSE 0.641).'
+    seeds: 'One run, seed 42, as every arm of the entry; the noise of a retrain is the measured control/control_retrain spread
+      (data/rerun_spread.json: per-process MSE factor on the 43 new p10-p90 1.14-7.26, seen pooled ratio 1.11); the noise
+      of each fifth''s mean from its events (standard error).'
+    outcome: 'Yes (the resonance transfers through the target): on both processes of the pair MSE <= 5.07 / 4.92 (the control''s
+      36.79 / 35.73 over 7.26) and the near-pole contrast above -max(2 contrast_se, 0.19) (pole region no longer lower): report
+      to Joaquin with the figures; the gap was the g g resonance''s level and the factor is the lever; next the whole-catalogue
+      held-out and seen effect decides whether part (c)''s setup takes it (feature rule: then the same 8-trial DyHPO search
+      for the arm, best against best, its GPU-h to Joaquin, ~128 GPU-h > 100). Partly: the contrast rises above c_best''s
+      by more than the same-setup spread 1.34 (contrast > -1.15 / -1.14) but not to -max(2 se, 0.19), or it is gone while
+      the pair MSE stays above the bar: the factor moves the pole region but the pair''s level (bias) or part of the pole
+      stays wrong; reported with bias and contrast. No: contrast within 1.34 of c_best''s on both (<= -1.15 / -1.14) and MSE
+      above the bar: at trial_1860''s HPs the factor does not transfer the resonance; this is not a verdict on the feature
+      (CLAUDE.md feature rule): the next step is the same 8-trial DyHPO search over the template''s space for this arm, best
+      against part (c)''s best (~128 GPU-h at trial_1860''s 16 h each, above 100: to Joaquin with its cost), or the input
+      lever (data.resonance_per_event, its own memmap extension). In every branch the pair''s numbers, the held-out pooled
+      RMSE against 1.178 and the LLM''s 0.721, the seen pooled RMSE against 0.0533 (beyond 1.11x a side effect, reported),
+      the new-43 medians and the figures go to Joaquin.'
+    sources: '7.26 <- measured: the retrain spread''s p90 per-process MSE factor on the 43 new processes (data/rerun_spread.json,
+      control vs control_retrain); 0.19 <- measured: the trained twins'' largest seen MSE 0.0069 over a fifth of events, sqrt(0.0069/0.2)
+      (step 15''s passed design); 2 contrast_se <- measured: the two fifths'' standard errors from the events; 1.11x <- measured:
+      the retrain''s seen pooled RMSE ratio (data/rerun_spread.json); 1.34 <- measured: the pair''s contrast between the two
+      part (c) runs (trial_1860 vs trial_9000: 1.34 on btxwp, 1.21 on tbxwm, factor_split.py on existing events); 5.07/4.92
+      <- control MSE / 7.26'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
