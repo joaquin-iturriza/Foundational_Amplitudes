@@ -28341,6 +28341,9 @@ entries:
       a design and review
     29: 'Slide-10 metrics never reported: bias, 99th percentile, |M|^2-weighted relative error per bin and the azimuth harmonic
       h (computed by his evaluate.py, kit_result.json) into the slide-9-style summary for A2 (fine-tunes when they exist)'
+    30: 'Protocol A pretrained with the target held out for uug/uugg with A2: exists only for tt (and without A2); the fair
+      one-loop chain covers tt only, so uug/uugg pretrained-held-out A2 is NOT in any design; to design within the entry''s
+      approval'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -29865,6 +29868,11 @@ entries:
       if:
       - 'metrics present for every A2 run: summary drawn'
       - 'a run lacks them: rescore it (REREAD)'
+    30:
+      feeds: Bakar's protocol A (pretrained, family held out) for every KIT process
+      if:
+      - 'pretrained A2 beats scratch A2 on uug/uugg hard bins: report'
+      - 'not: report as level/loses'
   step_waits:
     '24': step 20's real fair-NLO parent run (tag kit_fairnlo_a2, not yet submitted)
     '20': FA-ccin2p3-3895a2a7 FA-ccin2p3-e0587622 FA-lxplus-abac4281
