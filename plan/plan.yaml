@@ -28531,7 +28531,7 @@ entries:
     agent: a753fb41b3f480c1d
     state: working
     since: '2026-11-26T02:44:45.162000+00:00'
-    state_at: '2026-11-26T02:44:45.162000+00:00'
+    state_at: '2026-11-26T03:10:27.665000+00:00'
     context: 183606
     context_at: '2026-11-26T03:10:39+00:00'
   findings:
