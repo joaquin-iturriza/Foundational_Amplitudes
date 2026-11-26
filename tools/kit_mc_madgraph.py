@@ -526,17 +526,7 @@ def cmd_figure(a):
     print("FIGURE", ps.save(fig, a.out))
 
 
-def cmd_figure_exact(a):
-    """Slide 11 as written: (tree) sigma_hat/sigma - 1 per process and eps2 against 1 - q on MadEvent's |M_hat|^2 events;
-    (tt) the integrated virtual's bias per sqrt s, threshold scan and bulk window."""
-    import plot_style as ps
-    ps.use()
-    d = {}
-    for j in a.json:
-        d.update(json.load(open(j)))
-    lab = {"ee_uug": r"$e^+e^-\to u\bar ug$", "ee_uugg": r"$e^+e^-\to u\bar ugg$"}
-    cols = {"ee_uug": ps.C.blue, "ee_uugg": ps.C.vermillion}
-    sur = sorted((k for k in d if k.endswith("/surrogate_sample")), key=lambda k: d[k]["process"])
+def _figure_tree(ps, d, sur, lab, cols, out):
     fig, (a1, a2, cell) = ps.figure(ncols=3)
     for i, k in enumerate(sur):
         e, ex = d[k], d[k.split("/")[0]]
@@ -552,7 +542,22 @@ def cmd_figure_exact(a):
     a1.set_ylabel(r"$\hat\sigma/\sigma-1$")
     a2.set_xscale("log"); a2.set_xlabel(r"$1-q$"); a2.set_ylabel(r"$\epsilon_2=\langle r\rangle/r_{\max}$")
     ps.legend_cell(cell, [a1, a2], fontsize=ps.LEGEND_MIN_PT)
-    print("FIGURE", ps.save(fig, a.out + "_tree"))
+    print("FIGURE", ps.save(fig, out + "_tree"))
+
+
+def cmd_figure_exact(a):
+    """Slide 11 as written: (tree) sigma_hat/sigma - 1 per process and eps2 against 1 - q on MadEvent's |M_hat|^2 events;
+    (tt) the integrated virtual's bias per sqrt s, threshold scan and bulk window."""
+    import plot_style as ps
+    ps.use()
+    d = {}
+    for j in a.json:
+        d.update(json.load(open(j)))
+    lab = {"ee_uug": r"$e^+e^-\to u\bar ug$", "ee_uugg": r"$e^+e^-\to u\bar ugg$"}
+    cols = {"ee_uug": ps.C.blue, "ee_uugg": ps.C.vermillion}
+    sur = sorted((k for k in d if k.endswith("/surrogate_sample")), key=lambda k: d[k]["process"])
+    if sur:
+        _figure_tree(ps, d, sur, lab, cols, a.out)
     if a.tt_bulk:
         fig, (b1, cell) = ps.figure(ncols=2)
         for path, mk, name in ((a.tt_scan, "s", "threshold scan"), (a.tt_bulk, "o", "bulk window")):
@@ -563,6 +568,7 @@ def cmd_figure_exact(a):
             y = np.asarray(sv["sigma_v"]) / np.asarray(t["sigma_v_exact"]) - 1
             b1.plot(t["sqrts"], y, mk + "-", ms=3, color=ps.C.green if mk == "o" else ps.C.orange, label=name)
         b1.axhline(0, color="k", lw=0.8)
+        b1.set_yscale("symlog", linthresh=1e-4)    # threshold -0.3 and bulk 1e-3 on one axis
         b1.set_xscale("log"); b1.set_xlabel(r"$\sqrt s$ [GeV]"); b1.set_ylabel(r"$\sigma[\hat V]/\sigma[V]-1$")
         ps.legend_cell(cell, [b1], fontsize=ps.LEGEND_MIN_PT)
         print("FIGURE", ps.save(fig, a.out + "_tt"))
@@ -582,7 +588,7 @@ def main():
     m = sub.add_parser("metrics"); m.add_argument("--dir", required=True); m.add_argument("--out", required=True)
     m.add_argument("--boot", type=int, default=1000)
     fg = sub.add_parser("figure"); fg.add_argument("json"); fg.add_argument("--out", required=True); fg.add_argument("--tt", help="the threshold scan's JSON (kit_threshold_scan collect)"); fg.add_argument("--tt-run")
-    fx = sub.add_parser("figure_exact"); fx.add_argument("json", nargs="+"); fx.add_argument("--out", required=True)
+    fx = sub.add_parser("figure_exact"); fx.add_argument("json", nargs="*"); fx.add_argument("--out", required=True)
     fx.add_argument("--tt-scan"); fx.add_argument("--tt-bulk"); fx.add_argument("--tt-run")
     sub.add_parser("selfcheck")
     a = ap.parse_args()
