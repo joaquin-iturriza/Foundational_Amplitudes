@@ -42413,12 +42413,10 @@ entries:
     - 21
     - 23
   owner:
-    agent: a9f2cdb0c287c4018
-    state: closed
-    since: '2026-11-26T18:21:45+00:00'
-    state_at: '2026-11-26T19:18:22.665000+00:00'
-    context: 230030
-    context_at: '2026-11-26T19:17:31+00:00'
+    agent: a85970e976cb8ac83
+    state: working
+    since: '2026-11-26T19:32:24+00:00'
+    state_at: '2026-11-26T19:32:24+00:00'
   step_why:
     15:
       feeds: 'D564: why the LLM extrapolates better than our LLoCa'
