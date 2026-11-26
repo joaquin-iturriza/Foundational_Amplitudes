@@ -41363,11 +41363,6 @@ entries:
       (per-family errors in Suprio''s layout already in figs/*heldout_per_process.png; candidate causes: his input encoding/pID
       embedding, his target standardisation on held-out, our shared affine statistics on new multiplicities, model capacity),
       design review, then the configurations that test it within the GPU budget'
-    16: '16: D564 level branch, the configuration: his setup (part (a) trial 5''s config and HPs, 8 heads, seed 42) with each
-      process''s target mean taken from the process-only level network with diagram descriptors (frozen level file, data-free)
-      instead of mu_N = a + bN; code (data.level_file in _resolve_amp_preprocessing and parent_target_standardization, unit
-      test, repo review), one ~50-step smoke (D395), the run, scoring by job_llm_score.sh, read against trial 5 and the post-hoc
-      substitution (level_source.py). Design recorded 2026-11-25, in review.'
     21: '22: D567/D564 matched test after step 21 (the gg->ttH split follows the sign of the internal-top off-shellness input):
       does our setup without the off-shellness input lose the split and the gg->tbW level error? Arm: part (c)''s control
       config and HPs (runs/llmcmp_c_qperp/trial_9000, FA-ccin2p3-d34535b0), identical flags except data.offshell_per_event=false
@@ -41603,13 +41598,6 @@ entries:
       if:
       - 'a cause found that a configuration of ours can test: design and run it (investigation scope, GPU budget)'
       - 'no candidate survives the checks on existing data: report what was ruled out with its evidence'
-    16:
-      feeds: 'D564: why the LLM extrapolates to new families better than our LLoCa (what sets a new family''s level)'
-      if:
-      - 'the network keeps the given level (new median MSE near the post-hoc 0.58, below trial 5 by >1.38x): the level is
-        set by the target''s per-process mean; the fix is a process-level level predictor in the target, carried to our setup'
-      - 'the network overrides it (new median within 1.38x of trial 5''s 1.144): the level is learned from the particles whatever
-        the target says; next, what in the inputs sets it (pID embedding vs property table)'
     21:
       feeds: 'D567/D564: whether the off-shellness input causes our setup''s new-family shape split and level errors'
       if:
@@ -42486,7 +42474,6 @@ entries:
     '13': FA-ccin2p3-623a3af6
     '14': FA-ccin2p3-f0b997a2
     '15': 'its branches'' readouts: step 16 (score FA-ccin2p3-2240c052) and list step 21 (run FA-ccin2p3-1b480869)'
-    '16': FA-ccin2p3-2240c052
     '21': FA-ccin2p3-1b480869
   handoff:
     state: 'Part (a) DONE, part (c) DONE. Step 19 DONE (untuned control retrain scored; bias/shape all-arms and shape_dists
