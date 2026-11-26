@@ -51612,3 +51612,5 @@ entries:
       if:
       - 'lxplus read: slide 6 gets the searched transformer, deck rebuilt'
       - 'lxplus still down: slide 6 stays without a transformer curve'
+  step_waits:
+    '2': lxplus reachable in site list (ssh master down)
