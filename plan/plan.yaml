@@ -29863,6 +29863,9 @@ entries:
       tested locally end to end on uug (300 MadEvent events, cut verified, sigma 0.1215 pb, check plumbing); design PASS.
       CC GPU queue ~7.6 h, htc CPU jobs pending on Resources; lxplus needs Joaquin''s 2FA (cluster_up lxplus); Jean Zay relay
       down.'
+  - at: '2026-11-26T15:20:41+00:00'
+    text: '2026-11-26 owner aca73c11d45c78e03 reached 310k context inside one turn (package + MC redo + figures + D575 designs):
+      the brief was too large; next briefs hand back each item as ready and hand off before 260k'
   step_why:
     20:
       feeds: 'D570: FT vs SCR-A2 vs V/B on the KIT hard bins'
