@@ -43320,6 +43320,11 @@ entries:
       lxplus down, CC first start ~8 h); factor_split --vars-from the baseline''s CC CSV runs/llmcmp_c_qperp/trial_1860/llm_events_heldout.csv
       (holds offshell_23/6/25/24, the file c_best_factor_split.json was read from; the join asserts true_logm2 row by row)
       and error_split follow on its end.'
+  - at: '2026-11-26T19:03:27+00:00'
+    text: '2026-11-26 step 22 (D566 attempt C): FA-ccin2p3-673f0bfa failed after 47 s at the pool read (log read whole: ValueError
+      in mmap_pools rows, amp slice of size 0): my reader bound the cache arrays late, so every pool read the last (held-out)
+      cache. Fixed @99f97a69f (arrays bound per cache; tested on two synthetic caches), rerun FA-ccin2p3-444f056d, same design
+      and command; figure script perevent_anchored_fig.py ready.'
   step_waits:
     '15': FA-ccin2p3-1b0cbd8a
     '21': FA-ccin2p3-1b0cbd8a
