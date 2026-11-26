@@ -1939,81 +1939,21 @@ class AmplitudeExperiment(BaseExperiment):
         _phys_on = bool(self.cfg.data.get("target_physics_factor", False))
         self._target_factor_on = _tp_on or _phys_on
         if _tp_on:
-            tp_pdgs = [int(x) for x in (self.cfg.data.get("target_propagator_pdgs", []) or [])]
-            widths = {int(k): float(v) for k, v in
-                      dict(self.cfg.data.get("target_propagator_widths", {}) or {}).items()}
-            # a pool generated with its own width (recipe physics.widths: catalog_v3's heavy-quark layer, the top width
-            # following m_t) takes that width in its Breit-Wigner, the configured one otherwise
-            _pool_widths = {sp["name"]: {abs(int(k)): float(v) for k, v in ((sp.get("physics") or {}).get("widths") or {}).items()}
-                            for sp in (getattr(self, "_recipe_specs", None) or [])}
-            # massless t-channel exchanges (data.target_propagator_tchannel): a massless
-            # propagator whose s_k is spacelike on the whole train pool is a t-channel
-            # exchange; |M|² goes like 1/|t| for a fermion and 1/t² for a boson, so the
-            # factor is (|t|/median|t|)^p with p = 1 or 2 (normalised to stay O(1)).
-            tch_on = bool(self.cfg.data.get("target_propagator_tchannel", False))
-            tch_max_final = int(self.cfg.data.get("target_propagator_tchannel_max_final", 99))
-            massless = [1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16, 21, 22] if tch_on else []
-            tp_masks = self._setup_offshell_masks(names, pdgs=tp_pdgs + massless)
+            tp = self._tp_settings()
+            tp_masks = self._setup_offshell_masks(names, pdgs=tp["pdgs"] + tp["massless"])
             n_ok, red_before, red_after, n_props, n_tch = 0, [], [], 0, 0
-            straddle = float(self.cfg.data.get("target_propagator_straddle", 0.005))
             n_cand = 0
             for proc_idx, name in enumerate(names):
                 sel = tp_masks[proc_idx] if tp_masks else None
-                cand = [(pdg, mrow, mm) for pdg, lst in (sel or {}).items() for mrow, mm in lst]
-                n_cand += len(cand)
-                # keep a massive propagator only if its pole is reached inside the pool: the
-                # train pool's s_k must straddle M² (a fraction of events on each side above
-                # `straddle`); a sub-system pole out of kinematic reach never straddles, and its
-                # factor would only add range. A massless one counts only as a t-channel
-                # exchange (s_k <= 0 on the whole pool); an s-channel massless propagator has
-                # no reachable pole.
-                props = []      # (pdg, mask, M², power, norm): massive -> BW, massless -> |t|^p
-                if cand and ("train", name) in store:
-                    pp = _phys(store[("train", name)])
-                    for pdg, mrow, mm in cand:
-                        q = np.einsum("s,nsc->nc", mrow, pp)
-                        s_prop = q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)
-                        if mm > 0:
-                            above = float(np.mean(s_prop > mm))
-                            if straddle < above < 1.0 - straddle:
-                                props.append((pdg, mrow, mm, 2.0, None))
-                        elif (tch_on and np.all(s_prop <= 1e-6 * np.abs(s_prop).max())
-                              and int(np.count_nonzero(mrow)) == 2 and mrow.min() < 0 < mrow.max()
-                              and pp.shape[1] - 2 <= tch_max_final):
-                            # the exchange between ONE initial and ONE final leg (the forward
-                            # peak); the other spacelike internal lines of a multi-leg process
-                            # are not poles the target reaches, and their factors only add range
-                            power = 1.0 if abs(int(pdg)) < 17 else 2.0
-                            # norm = (median |t|, floor): |t| is floored at the pool's 1e-3
-                            # quantile so the forward edge cannot put an outlier of tens of
-                            # units into the standardized target (one seed in three diverged
-                            # with a 1e-12 floor)
-                            at = np.abs(s_prop)
-                            pinned = self.cfg.data.get("target_propagator_tchannel_norm", None)
-                            assert pinned is None or len(names) == 1, \
-                                "data.target_propagator_tchannel_norm is one [median, floor] pair: single-process runs only"
-                            norm = ((float(pinned[0]), float(pinned[1])) if pinned is not None else
-                                    (float(np.median(at)) or 1.0, float(np.quantile(at, 1e-3)) or 1e-12))
-                            self._tch_norm = [float(norm[0]), float(norm[1])]
-                            LOGGER.info(f"t-channel factor {name}: median |t| {norm[0]:.6g}, floor {norm[1]:.6g}"
-                                        f"{' (pinned)' if pinned is not None else ''}")
-                            props.append((pdg, mrow, 0.0, power, norm))
-                            n_tch += 1
+                n_cand += sum(len(lst) for lst in (sel or {}).values())
+                props = (self._tp_props(name, sel, _phys(store[("train", name)]), tp, len(names))
+                         if ("train", name) in store else [])
+                n_tch += sum(1 for p_ in props if p_[2] == 0)
                 for role in roles:
                     if (role, name) not in store:
                         continue
                     rec = store[(role, name)]
-                    pp = _phys(rec)                                             # (N,P,4) GeV
-                    logF = np.zeros(pp.shape[0], dtype=np.float64)
-                    for pdg, mrow, mm, power, norm in props:
-                        q = np.einsum("s,nsc->nc", mrow, pp)                   # (N,4) physical
-                        s_prop = q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)
-                        if mm > 0:
-                            g = _pool_widths.get(name, {}).get(abs(int(pdg)), widths.get(abs(int(pdg)), 0.0))
-                            logF += np.log(((s_prop - mm) ** 2 + mm * g ** 2) / (mm ** 2))
-                        else:
-                            med, floor = norm
-                            logF += power * np.log(np.maximum(np.abs(s_prop), floor) / med)
+                    logF = self._tp_logF(name, props, _phys(rec), tp)
                     F = np.exp(logF).reshape(rec["raw_amp"].shape)
                     if role == "train" and props:
                         pos = rec["raw_amp"] > 0
@@ -2025,6 +1965,7 @@ class AmplitudeExperiment(BaseExperiment):
                     rec["raw_amp"] = rec["raw_amp"] * F
                 if props:
                     n_ok += 1; n_props += len(props)
+            tp_pdgs, widths = tp["pdgs"], tp["widths"]
             LOGGER.info(f"target_propagators ON: {n_ok}/{len(names)} processes carry a factor "
                         f"({n_props} of {n_cand} propagators reach their pole in the pool, of which "
                         f"{n_tch} massless t-channel; pdgs {tp_pdgs}, widths {widths}); median range of "
@@ -2556,6 +2497,73 @@ class AmplitudeExperiment(BaseExperiment):
                             f"parent's scale, the rest fitted here")
         self._offshell_stats = [mu.tolist(), sd.tolist()]
         return mu, sd
+
+    def _tp_settings(self):
+        """data.target_propagators' settings: the massive pdgs, their configured widths, each pool's own widths (recipe
+        physics.widths: catalog_v3's heavy-quark layer, the top width following m_t), the straddle fraction and the
+        massless t-channel switch (data.target_propagator_tchannel; its massless pdgs, max final multiplicity)"""
+        tch_on = bool(self.cfg.data.get("target_propagator_tchannel", False))
+        return {
+            "pdgs": [int(x) for x in (self.cfg.data.get("target_propagator_pdgs", []) or [])],
+            "widths": {int(k): float(v) for k, v in dict(self.cfg.data.get("target_propagator_widths", {}) or {}).items()},
+            "pool_widths": {sp["name"]: {abs(int(k)): float(v) for k, v in ((sp.get("physics") or {}).get("widths") or {}).items()}
+                            for sp in (getattr(self, "_recipe_specs", None) or [])},
+            "straddle": float(self.cfg.data.get("target_propagator_straddle", 0.005)),
+            "tch_on": tch_on,
+            "tch_max_final": int(self.cfg.data.get("target_propagator_tchannel_max_final", 99)),
+            "massless": [1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16, 21, 22] if tch_on else [],
+        }
+
+    def _tp_props(self, name, sel, pp, tp, n_names):
+        """The propagators of `name` (masks `sel` of _setup_offshell_masks) whose factor data.target_propagators puts in
+        the target, from its train momenta pp (N,P,4 GeV): a massive one only if its pole is reached inside the pool
+        (the train pool's s_k straddles M², a fraction of events on each side above `straddle`; a sub-system pole out of
+        kinematic reach never straddles, and its factor would only add range); a massless one only as a t-channel
+        exchange (s_k <= 0 on the whole pool; an s-channel massless propagator has no reachable pole).
+        Returns [(pdg, mask, M², power, norm)]: massive -> Breit-Wigner, massless -> |t|^p."""
+        props = []
+        for pdg, mrow, mm in [(pdg, mrow, mm) for pdg, lst in (sel or {}).items() for mrow, mm in lst]:
+            q = np.einsum("s,nsc->nc", mrow, pp)
+            s_prop = q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)
+            if mm > 0:
+                above = float(np.mean(s_prop > mm))
+                if tp["straddle"] < above < 1.0 - tp["straddle"]:
+                    props.append((pdg, mrow, mm, 2.0, None))
+            elif (tp["tch_on"] and np.all(s_prop <= 1e-6 * np.abs(s_prop).max())
+                  and int(np.count_nonzero(mrow)) == 2 and mrow.min() < 0 < mrow.max()
+                  and pp.shape[1] - 2 <= tp["tch_max_final"]):
+                # the exchange between ONE initial and ONE final leg (the forward peak); the other spacelike internal
+                # lines of a multi-leg process are not poles the target reaches, and their factors only add range
+                power = 1.0 if abs(int(pdg)) < 17 else 2.0
+                # norm = (median |t|, floor): |t| is floored at the pool's 1e-3 quantile so the forward edge cannot put
+                # an outlier of tens of units into the standardized target (one seed in three diverged with a 1e-12 floor)
+                at = np.abs(s_prop)
+                pinned = self.cfg.data.get("target_propagator_tchannel_norm", None)
+                assert pinned is None or n_names == 1, \
+                    "data.target_propagator_tchannel_norm is one [median, floor] pair: single-process runs only"
+                norm = ((float(pinned[0]), float(pinned[1])) if pinned is not None else
+                        (float(np.median(at)) or 1.0, float(np.quantile(at, 1e-3)) or 1e-12))
+                self._tch_norm = [float(norm[0]), float(norm[1])]
+                LOGGER.info(f"t-channel factor {name}: median |t| {norm[0]:.6g}, floor {norm[1]:.6g}"
+                            f"{' (pinned)' if pinned is not None else ''}")
+                props.append((pdg, mrow, 0.0, power, norm))
+        return props
+
+    def _tp_logF(self, name, props, pp, tp):
+        """log of data.target_propagators' per-event factor of `name` over its momenta pp (N,P,4 GeV): the sum over
+        `props` (_tp_props) of log(((s_k - M²)² + M²Γ²)/M⁴) (Γ the pool's own width where its recipe sets one) or
+        p log(max(|t|, floor)/median|t|)"""
+        logF = np.zeros(pp.shape[0], dtype=np.float64)
+        for pdg, mrow, mm, power, norm in props:
+            q = np.einsum("s,nsc->nc", mrow, pp)
+            s_prop = q[:, 0] ** 2 - (q[:, 1:] ** 2).sum(axis=1)
+            if mm > 0:
+                g = tp["pool_widths"].get(name, {}).get(abs(int(pdg)), tp["widths"].get(abs(int(pdg)), 0.0))
+                logF += np.log(((s_prop - mm) ** 2 + mm * g ** 2) / (mm ** 2))
+            else:
+                med, floor = norm
+                logF += power * np.log(np.maximum(np.abs(s_prop), floor) / med)
+        return logF
 
     def _physics_logF(self, name, mom_phys, alphas=None):
         """log of the factor data.target_physics_factor multiplies |M|^2 by, per event: (s0 / s_hat)^(4-N) / C_p (s_hat, a
