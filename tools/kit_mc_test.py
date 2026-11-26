@@ -23,7 +23,7 @@ Per run:
   *_q       every efficiency also with its maximum reduced to the weight above which a share 1 - q of sigma lies
   n_star    (std(w)/mean(w)/|bias|)^2: the event count at which the bias equals the MC error of sigma_exact
   pass      |bias| and its band below the MC error of sigma_exact on these events (the protocol's resolution)
-  regions   bias, share of sigma_exact and overweight share per bin of min s_ij/s over final pairs (RAMBO files) or
+  regions   bias, share of sigma_exact and overweight share per bin of min s_ij/s over the singular (gluon) pairs (RAMBO files) or
             of sqrt s in GeV (t t~); the t t~ sigma is sigma(sqrt s) integrated over the flat sqrt s window
 Counts exact |M|^2 evaluations only, not the surrogate's own cost.
 """
@@ -64,7 +64,9 @@ def weights(stem, target, run_dir):
         d = lambda a, b: 2 * (a[:, 0] * b[:, 0] - (a[:, 1:] * b[:, 1:]).sum(1))
         Q = mom[:, 0] + mom[:, 1]
         s = Q[:, 0] ** 2 - (Q[:, 1:] ** 2).sum(1)
-        reg = np.min([d(P[:, i], P[:, j]) for i in range(n) for j in range(i + 1, n)], axis=0) / s
+        g = [int(q["pdg"]) == 21 for q in kh.metadata(stem)["particles"]][2:]
+        # singular pairs only (a gluon in the pair): u u~ is not cut in the bulk, so it would drop events below 0.01
+        reg = np.min([d(P[:, i], P[:, j]) for i in range(n) for j in range(i + 1, n) if g[i] or g[j]], axis=0) / s
     return f * jac, fs * jac, float((f < 0).mean()), reg
 
 
@@ -146,6 +148,7 @@ def main():
         we, ws, neg, reg = weights(stem, target, rd)
         res[os.path.basename(rd.rstrip("/"))] = dict(mc(we, ws, a.boot, a.q), file=stem, target=target, neg_share=neg,
                                                      regions=regions(we, ws, reg, EDGES.get(stem, EDGES["rambo"]), a.q))
+        assert abs(sum(b["share"] for b in res[os.path.basename(rd.rstrip("/"))]["regions"]) - 1) < 1e-9, "regions miss events"
     if a.out:
         with open(a.out, "w") as fh:
             json.dump(res, fh, indent=1)
