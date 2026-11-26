@@ -34098,6 +34098,36 @@ entries:
       reported per family with exponents. Blow-up: a validation jump > 5x reruns once at half lr.'
     sources: 1/7 and 7 <- t t~ V same-HP rerun spread 0.78-6.96 (results.tex sec:datasaving, the passed step-20 design's bar);
       5x jump <- sec:ladder seeds' blow-ups against 1.5x seed noise; 100 GPU-h <- D575 names this work
+    fix_at: '2026-11-26T14:50:52+00:00'
+    fix: 'Part (i), protocol B against bulk-only continuation on the three A2 models, passes every check: matched control,
+      check data 0.15-6.5 decades (finding 2026-11-10T10:20), cost 5.4 GPU-h under D575. Part (ii), the held-out fine-tune
+      against scratch A2 for uug/uugg, fails two checks.
+
+      (1) Prior incomplete (check 5). The prior says the 12 fine-tunes from runs/kit/kit_pretrain_heldout exist but leaves
+      out what they found. Finding 2026-11-11T04:42 (lr_scale 1.0): uug deepest soft bin 2140 against scratch 14180 (0.82
+      decades lower); uugg 2450 against 9070. Finding 2026-11-11T06:37 (lr_scale 0.1): uug soft 36.7 (2.59 decades below scratch),
+      uugg soft 152 (1.78 decades below, exponent -2.14 in band); collinear unchanged at both lr. The tt fine-tune search
+      kit_hpo_tt_ft_r5 (finding 2026-11-14T02:45) chose lr_scale 2.49 with layer_decay 0.97. Fix: put these numbers in the
+      prior. Use the uug/uugg numbers as the check for (ii), because they are on the processes being tested; the tt numbers
+      are not.
+
+      (2) The fine-tune lr is not handled (checks 17 and 4). The design runs FT at KIT_LR_SCALE 1 only. Its NO branch reads
+      ''no transfer at this pretraining''. But the same comparison on uug/uugg already changed verdict along the fine-tune
+      lr: at lr_scale 1.0 the soft gain was small, at 0.1 it was 1.8-2.6 decades. So a LEVEL or LOSES at lr_scale 1 alone
+      cannot be read as no transfer. Fix, either way: (a) add an lr_scale 0.1 FT per process, as the earlier A_ft design''s
+      lr-axis check did (2 runs, about 1.3 GPU-h, still under D575''s 100 GPU-h); this serves Bakar''s question, which D575
+      approves. Or (b) state the feature-rule NO branch: if FT at lr_scale 1 does not beat SCR-A2, run the fine-tune search
+      used for kit_hpo_tt_ft_r5 (lr_scale [0.1,10], layer_decay [0.75,1], same trial layout) and compare best against best.
+      Write the chosen branch into the outcome.
+
+      (3) Ordering not stated (minor, check 19). The SCR-A2 arms read only the held-out parent''s config.yaml, which exists
+      once the parent starts. Say that they go out with the parent and do not wait for its end. Only FT waits for the parent''s
+      best weights.
+
+      Checks that hold: the 1/7 and 7 bars come from results.tex:9817 (t t~ V test rerun spread 0.78-6.96, D315 one seed).
+      The loss is HETEROSC. A2 with plain momenta matches the KIT A2 models. The recipe diff at 6a6ca8839 removes only ee_uug,
+      ee_uugg, ee_bbbarg and ee_bbbargg. The parent runs with memmap=false, so there is no shared cache. D575 covers all of
+      this work.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
