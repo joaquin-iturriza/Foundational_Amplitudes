@@ -47124,6 +47124,17 @@ entries:
       new median 0.448 (norm_explore3.json B|nodiag|sampled), the level without diagram information; every subset <- Joaquin''s
       words D566 ''this has to perform correctly in individual events regardless of that''; 2 bootstrap sd <- measured noise:
       the event bootstrap in the job (step 17''s shift_flat_sd 0.026-0.037)'
+    passed_at: '2026-11-26T18:48:18+00:00'
+    reviewer: 'Re-check of attempt C @a1220388f: ten 3-seed ensembles (seeds 3k..3k+2, as norm_explore4) for every network
+      candidate plus the matched control regressor_ens (same network refit on these events'' pool means, same ensembles) fix
+      the seed-noise gap (results.tex l.8510-8514: one draw 0.045, ten ensembles median 0.087, range 0.016-0.19); bar = control''s
+      measured range (sourced, lenient for a 10-ensemble median: report C and regressor_ens paired per ensemble beside it);
+      all four subsets now required with C''s own level kept on each and the beat-the-constant test only where the constant
+      moves beyond 2 bootstrap sd (D566 ''regardless of that''). Check 2: perevent_level_mlp.json shift_flat 0.176 (sd 0.037)
+      vs 0.084; norm_explore3.json 0.0447/0.0658/0.448 confirmed; caches 99c164da.../b39fc80c... present on CC, 16 GB free.
+      Check 5 searched: anchored, conditional mean, intercept, per-process slope, c_p, sampling-independent, per-event level,
+      window restriction (results.tex, plan.yaml, D566): hybrid c_p l.5820 and catalog_v4 kshot affine are other questions.
+      Float32 memmap momenta stated not checked; comparison matched on the same events.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
