@@ -28347,7 +28347,7 @@ entries:
     - FA-ccin2p3-f45f434a
     - FA-ccin2p3-f6b2ece9
     - FA-ccin2p3-fcad1510
-    commit: 4ee19749
+    commit: 0221530c5
     paths:
     - analysis/kit_benchmark/data/kit_curves_read.json
     - analysis/kit_benchmark/data/kit_fig_A.json
@@ -28356,6 +28356,7 @@ entries:
     - analysis/kit_benchmark/data/kit_hpo.json
     - analysis/kit_benchmark/data/kit_threshold_scan.json
     - analysis/kit_benchmark/data/kit_verdict_A_hpo_ftsearch.json
+    - analysis/kit_benchmark/fairnlo_arms.py
     - models/lloca.py
     - plot_style.py
     - recipes/transfer_finale_kit_fairnlo.yaml
