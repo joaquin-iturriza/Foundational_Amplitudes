@@ -33307,6 +33307,36 @@ entries:
     sources: '1/7 and 7 <- the test same-HP rerun spread 0.78-6.96 of t t~ V runs (measured, results.tex sec:datasaving, diag_readout.py
       @5555a0f0); 3 of 5 D <- D570 (''Then do those finetunes and compare with from scratch''): a majority over the five D
       of the protocol''s 100..1e4; 100 GPU-h <- D570 names this work (CLAUDE.md GPU budget)'
+    fix_at: '2026-11-26T02:20:57+00:00'
+    fix: '(10, pretraining target) The parent drops 47e14eae''s settled catalog target (its config.yaml on CC: data.target_physics_factor=true,
+      data.target_physics_orders=true, the adopted emission-scale + coupling-order target) for plain ln|M|^2 with one pooled
+      standardization over 27 pools of multiplicity 2->2 to 2->4. results.tex records exactly that plain shared target as
+      unit-dependent across multiplicities (''Why a dimensionless target'') and its one catalog pretraining blew up (D83,
+      non-finite gradients at step 8734, ~l.7977); A2 was established only on single processes, where the question does not
+      arise. Fix: either make the asymptotic factor work on the adopted target (code, then the smoke), or record the plain-target
+      choice as a plan ask to Joaquin with that evidence before the parent runs; in both cases state the blow-up risk and
+      what happens if the parent diverges (the 50-step smoke cannot show a step-8734 blow-up). (18, inherited settings) The
+      list of differences from 47e14eae is wrong: 47e14eae already has shared_standardization=true and input_soft_eps 0 /
+      input_pair_logs 0, so those are not changes. The real differences are the recipe, input_asym_factor, frames_gamma_max=4
+      (if not already there) and the two target flags. Fix: build the list from the parent''s Hydra --cfg job output against
+      47e14eae''s config.yaml. (11, only the asked axis moves) The V/B baseline runs on base trial 1262 while FT and SCR-A2
+      run on the parent''s config, so V/B differs from SCR-A2 in the target and the factor, as the question asks, but also
+      in every key where 1262 differs from the new parent (frames_gamma_max, internal_mass_pdgs, eval_subsample, standardization,
+      ...). Fix: run V/B on the same parent config with model.input_asym_factor=false and data.target_over_born=true, or list
+      each extra difference with its reason. (4, thresholds) ''BEATS at >= 3 of 5 D'' cites D570, but D570 gives no count.
+      Fix: either report the verdict per D (each D against the 1/7 and 7 bars, which have a source) or cite a source for the
+      across-D count. (5, prior, and the KIT horizon decision) The prior leaves out the existing fair-NLO catalog pretraining
+      built for this step, FA-ccin2p3-d0b132b6 plus its resume 03ea3719 (68224 steps, finished 2026-11-11, recipe catalog_v4_kit_pretrain_fair_nlo.yaml),
+      and D402, which held its D-scan. Name both and why they are not reused (the A2 configuration). It also leaves out D425
+      (''match the number of epochs'', 300 epochs as Bakar''s MLP, kit_benchmark), while T(D) = 5950/8500 steps at batch min(16384,
+      D/2) is about 3000-4250 epochs. State why the stage-2 horizons hold here (their HPs were searched at them), or which
+      decision decides it. (15, step rate) The arms'' rate of 0.1-0.37 s/step at float64 and batch min(16384, D/2) has no
+      source run. The KIT float64 runs at 1e5 ran 0.55-0.79 s/step (carry-over finding 2026-11-11T20:15), which at 8500 steps
+      is 1.3-1.9 h, over the 1 h target. Fix: name the run at a matching batch and dtype, or add the D=1e4 arm to the smoke
+      and read its rate before setting the arms'' --time. Passing: 0, 1 (FT vs SCR-A2 at each arm''s own stage-2 best, per
+      D570), 2, 3 (one seed per D315; 1/7 and 7 against the 0.78-6.96 test rerun spread), 6, 7, 8, 9 (HETEROSC in the parent
+      and arms), 12 (no HPO, per D570), 14 (/sps/lpnhe 17 GB free now, parent in memory ~1 GB plus 15 x 80 MB fits), 16, 17,
+      19.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
