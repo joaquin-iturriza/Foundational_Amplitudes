@@ -29655,6 +29655,16 @@ entries:
       -> 1/eff_x: uug 386 -> 1.13, uugg 520 -> 1.78, tt 4.1 -> 1.03. Region biases flat (uug -0.14..-0.20%; uugg -0.74% in
       s_min/s 0.01-0.02 carrying 65% of sigma, +0.36..+0.44% above; tt +0.051..+0.061% in every sqrt s bin). Figure pending
       (histogram rerun).'
+  - at: '2026-11-26T03:57:49+00:00'
+    text: '2026-11-26 ~05:00. Step 22: the 22 trials lost on CC 04:16-04:41 died of the full /sps/lpnhe (logs cut with no
+      traceback, one ''PytorchStreamWriter failed writing file data.pkl: file write failed'', one log never written, Slurm
+      signal 53); E9408-E9418, E9433-E9441 acked. Driver relaunched with --retry-failed (penalties removed), then on drive.py
+      @afa583cc3: a lost trial now holds the next wave (before, wave 2 = trials 6-10 of each search went out suggested from
+      wave 1''s six penalties only). 20 trials requeued on CC by site pick (5.9 GB free), divform trial 9 observed (val 4.33e-6).
+      Step 20: prebuild of transfer_finale_kit_fairnlo failed on lxplus (FA-lxplus-cdc7fee9: KeyError mg5_generate, KIT process
+      sent to the MG5 backend builder; fixed datagen.ensure_backend @bd560787d; plus 3 MG5 clean_template errors under 64
+      auto-workers on EOS, not fixed), refused on CC (FA-ccin2p3-ba10aeb9, 5.9 GB < 20 GB margin); rerun on lxplus FA-lxplus-a6f69040
+      @f6789adf1.'
   step_why:
     20:
       feeds: the KIT NLO statement in the draft
