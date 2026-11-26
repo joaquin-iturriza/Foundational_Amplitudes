@@ -29647,8 +29647,7 @@ entries:
       - 'FT below SCR-A2 and V/B per D past the design''s 1/7 bar: report the recipe as the fair-NLO answer to KIT'
       - 'FT not below them: report per D where it loses, with the parent''s curves'
   step_waits:
-    '20': critical_batch's uncommitted files (analysis/critical_batch/figs/{pretrain,zng4g}_update_bdl.pdf, data/ft_bcrit_ep50{,_raw}.json)
-      blocking site sync, sent to the main session 2026-11-26 (D568); then the D395 smoke (design PASS 2026-11-26T02:27)
+    '20': FA-ccin2p3-e95803a9 FA-ccin2p3-cecec366 FA-ccin2p3-9e3d7ae5
     '23': the design reviewer of the step-23 MC design (recorded 2026-11-26), then the same site-sync blocker as step 20
     '22': 'the main session''s narrowing of 2026-11-26 (step 22 stays as it is, not part of D570); note: its cost, 2 x ~9.6
       = 19.2 GPU-h, is under the 30 GPU-h confirm bar'
