@@ -43361,6 +43361,15 @@ entries:
       in mmap_pools rows, amp slice of size 0): my reader bound the cache arrays late, so every pool read the last (held-out)
       cache. Fixed @99f97a69f (arrays bound per cache; tested on two synthetic caches), rerun FA-ccin2p3-444f056d, same design
       and command; figure script perevent_anchored_fig.py ready.'
+  - at: '2026-11-26T19:46:43+00:00'
+    text: '2026-11-26 two MSE passes: data/<tag>_heldout.json and data/split/<tag>_heldout.json score the same checkpoint
+      on the same 10,000 test events per process (same run, recipe, eval_subsample); pooled RMSE equal to 1e-7 (a_trial5 1.0032835
+      vs 1.0032837, c_best 1.1782152 both), per-process MSE ratio 0.9998-1.0006 (a_trial5) and 0.989-1.014 (c_best), the large
+      ones only where MSE ~1e-6 (dc_ds_ds 4.6e-6, dc_sxsx_sxsx 1.7e-6: float32 inference noise; level_file''s two files identical).
+      Neither is wrong; the correct choice is one pass for every part: heldout_per_process.py PART mse reads data/split (the
+      pass carrying the bias) @a5ecf4790, so shape = MSE - bias^2 exactly; export_for_suprio.py reads the same (uncommitted,
+      with the repo-reviewer). llmcmp_final_{,bias_,shape_}heldout_per_process redrawn (MSE figure: one marker moved, a 13x14
+      px region). Attempt D design passed review (code @7df6e5130); its job waits on the CC rename answer (only CC up).'
   step_waits:
     '15': FA-ccin2p3-1b0cbd8a
     '21': FA-ccin2p3-1b0cbd8a
