@@ -144,7 +144,7 @@ def fig(path, xv, panels="ttx"):
         ax.text(0.03, 0.95, proc_label(meta[n]), transform=ax.transAxes, va="top", color="k")
         ax.set_xlabel(XLAB[xv])
         ax.set_ylabel(r"pred $-$ true of $\log|\mathcal{M}|^2$")
-    ps.legend(axes.ravel()[0], "upper left" if panels == "tbw" else "lower right")
+    ps.legend(axes.ravel()[0], "upper right" if panels == "tbw" else "lower right")
     base = os.path.splitext(os.path.basename(path))[0]
     ps.save(fig, os.path.join(HERE, "figs", (base if xv == "log_factor" else f"{base}_{xv}") + ("_tbw" if panels == "tbw" else "")))
 
