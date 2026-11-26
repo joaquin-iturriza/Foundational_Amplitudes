@@ -87,3 +87,26 @@ def test_review_prompt_by_file():
         plan.cmd_review(A(id="e1", agent="bad1"))
     agent(d, "inline1", plan.review_prompt(entry(plan)))      # the inline form still passes
     plan.cmd_review(A(id="e1", agent="inline1"))
+
+
+def two_open_asks(plan):
+    with plan.transaction() as (d, st):
+        e = plan.entry(d, "e1")
+        e["asks"] = [dict(ask="old q", at="2026-11-02T00:00:00+00:00", blocks_steps=[]),
+                     dict(ask="new q", at="2026-11-03T00:00:00+00:00", blocks_steps=[1])]
+        e.update(ask="new q", waiting_since="2026-11-03T00:00:00+00:00", status="running", blocks_steps=[1])
+
+
+def test_withdraw_at_names_one_ask():
+    d, plan = world()
+    two_open_asks(plan)
+    kw = dict(id="e1", decision="D7", why="x" * 200, set=None)
+    with pytest.raises(SystemExit):
+        plan.cmd_withdraw(A(at=None, **kw))
+    assert not any(x.get("withdrawn_at") for x in entry(plan)["asks"])
+    plan.cmd_withdraw(A(at="2026-11-02T00:00:00+00:00", **kw))
+    old, new = entry(plan)["asks"]
+    assert old["withdrawn_at"] and not new.get("withdrawn_at") and entry(plan)["ask"] == "new q"
+    plan.cmd_withdraw(A(at=None, **kw))               # one open now: no --at needed
+    plan.cmd_unwithdraw(A(id="e1", at="2026-11-03T00:00:00+00:00", why="mistake"))
+    assert entry(plan)["ask"] == "new q" and not entry(plan)["asks"][1].get("withdrawn_at")

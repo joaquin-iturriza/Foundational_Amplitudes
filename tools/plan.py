@@ -27,7 +27,7 @@ Both change only under an exclusive lock (plan/plan.yaml.lock), written through 
                                           and routed, its step prompt names the question and what waits on it (B);
                                           --holds-all makes the whole entry wait on the user (WHY: why nothing in
                                           it can move without the answer)
-  plan withdraw <id> --decision D --why W [--set title|question|next=V]   the open question is settled by a decision
+  plan withdraw <id> [--at TS] --decision D --why W [--set title|question|next=V]   the open question is settled by a decision
                                           already in force (asked although D settles it): recorded in the ask
                                           history with D, why and when, the question cleared, a waiting entry back
                                           to running
@@ -2901,16 +2901,27 @@ def cmd_withdraw(a):
         sys.exit("plan: not withdrawn: %s is no longer in force (site decisions --project %s)" % (a.decision, PROJECT))
     with transaction() as (d, st):
         e = entry(d, a.id)
-        if not open_question(e) and not (e.get("status") == "held" and e.get("ask")):   # a held entry's question too
-            sys.exit("plan: %s has no open question to withdraw" % a.id)
+        asks = e.get("asks") or []
+        opens = [x for x in asks if not x.get("answered_at")]
+        if getattr(a, "at", None):
+            rec = next((x for x in asks if x.get("at") == a.at and not x.get("answered_at")), None)
+            if rec is None:
+                sys.exit("plan: %s has no open ask at %s" % (a.id, a.at))
+        else:
+            if len(opens) > 1:
+                sys.exit("plan: %s has %d open asks (%s); name one with --at <ask timestamp>" % (
+                    a.id, len(opens), ", ".join(x.get("at") or "?" for x in opens)))
+            if not open_question(e) and not (e.get("status") == "held" and e.get("ask")):   # a held entry's too
+                sys.exit("plan: %s has no open question to withdraw" % a.id)
+            rec = next((x for x in reversed(asks) if x.get("ask") == e.get("ask") and not x.get("answered_at")), None)
+            if rec is None:
+                rec = {"ask": e["ask"], "at": e.get("waiting_since")}
+                e.setdefault("asks", []).append(rec)
         t = now().isoformat()
-        rec = next((x for x in reversed(e.get("asks") or []) if x.get("ask") == e.get("ask")
-                    and not x.get("answered_at")), None)
-        if rec is None:
-            rec = {"ask": e["ask"], "at": e.get("waiting_since")}
-            e.setdefault("asks", []).append(rec)
         # answered_at + decision: the re-ask guards (plan ask, the Stop check) treat it as settled from now on
         rec.update(answered_at=t, decision=a.decision, withdrawn_at=t, withdrawn_why=a.why)
+        if rec["ask"] != e.get("ask"):            # an older ask: the entry's current question stays
+            return print("plan: %s's ask of %s withdrawn, settled by %s" % (a.id, a.at, a.decision))
         if e.get("status") == "waiting_user":
             e["status"] = "running"
         for k in ("ask", "waiting_since", "checked_until", "searched", "blocks", "blocks_steps", "holds_all"):
@@ -2921,6 +2932,25 @@ def cmd_withdraw(a):
             e.pop("step_why", None)
     print("plan: %s's question withdrawn, settled by %s (%s); entry now %s" % (a.id, a.decision, a.why,
                                                                                e["status"]))
+
+
+def cmd_unwithdraw(a):
+    """Undo a wrong withdrawal: the ask recorded at --at is open again and is the entry's question."""
+    with transaction() as (d, st):
+        e = entry(d, a.id)
+        rec = next((x for x in e.get("asks") or [] if x.get("at") == a.at and x.get("withdrawn_at")), None)
+        if rec is None:
+            sys.exit("plan: %s has no withdrawn ask at %s" % (a.id, a.at))
+        if open_question(e):
+            sys.exit("plan: %s already has an open question" % a.id)
+        rec.setdefault("unwithdrawn", []).append({"at": now().isoformat(), "why": a.why, "was": rec["decision"]})
+        for k in ("answered_at", "decision", "withdrawn_at", "withdrawn_why"):
+            rec.pop(k, None)
+        e.update(ask=rec["ask"], waiting_since=rec["at"], searched=rec.get("searched"))
+        for k in ("blocks", "blocks_steps"):
+            if k in rec:
+                e[k] = rec[k]
+    print("plan: the ask of %s at %s is open again" % (a.id, a.at))
 
 
 def part_reask(old, new):
@@ -3620,7 +3650,10 @@ def main(argv=None):
         A("--ask-index", type=int, help="answer this older ask of the entry (index in asks) instead of the open one"),
         A("--set", action="append", metavar="FIELD=VALUE", help="title|question|next=VALUE to change with it "
           "(repeatable)"))
+    cmd("unwithdraw", cmd_unwithdraw, "reopen an ask withdrawn by mistake", ID,
+        A("--at", required=True, help="the ask's timestamp"), A("--why", required=True, help="why"))
     cmd("withdraw", cmd_withdraw, "withdraw the entry's open question: a decision already in force settles it", ID,
+        A("--at", help="the timestamp of the open ask to withdraw (required when several are open)"),
         A("--decision", required=True, help="the decision (D<n>) in force that settles the question"),
         A("--why", required=True, help="how that decision settles the question"),
         A("--set", action="append", metavar="FIELD=VALUE", help="title|question|next=VALUE to change with it "
