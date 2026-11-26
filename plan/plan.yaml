@@ -28616,6 +28616,19 @@ entries:
       was: D570
     answered_at: '2026-11-26T12:36:16.873000+00:00'
     decision: D572
+  - ask: 'Scope: protocol A pretrained with the target held out (Bakar''s ''most interesting test'', 9 Nov email) exists with
+      the asymptotic-factor (A2) model only for the tt one-loop virtual, through the fair one-loop run in progress; for e+e-
+      -> uug and uugg there is no pretrained, held-out result with A2 (only from scratch). Run it for uug and uugg too?'
+    at: '2026-11-26T14:20:22+00:00'
+    searched: 'D570 names the tt one-loop fair test only; D363 adopts the KIT benchmark broadly; D573 is the package; none
+      settles uug and uugg. Messages read: 2026-11-10T02:08 (the email with Bakar''s test, progress on the fair run: concerns
+      the test itself, not extending it to uug/uugg); 2026-11-14T04:31 (a pasted SciPost LaTeX template, no instruction on
+      scope); 2026-11-13T03:15 (item 3, Bakar''s fair one-loop protocol: about the loop attempts being the fair protocol,
+      not uug/uugg); 2026-10-22T21:18 (about generating events with more CPUs, unrelated); 2026-10-29T15:59 (catalog design,
+      predates the KIT test); 2026-11-06T04:28 (general review of earlier messages, does not name pretrained held-out A2 for
+      uug/uugg).'
+    blocks: nothing
+    blocks_steps: &id002 []
   owner:
     agent: aca73c11d45c78e03
     state: working
@@ -34371,6 +34384,18 @@ entries:
     units: null
     start: '2026-11-26T11:40:47+00:00'
     at: '2026-11-26T11:40:47+00:00'
+  ask: 'Scope: protocol A pretrained with the target held out (Bakar''s ''most interesting test'', 9 Nov email) exists with
+    the asymptotic-factor (A2) model only for the tt one-loop virtual, through the fair one-loop run in progress; for e+e-
+    -> uug and uugg there is no pretrained, held-out result with A2 (only from scratch). Run it for uug and uugg too?'
+  waiting_since: '2026-11-26T14:20:22+00:00'
+  searched: 'D570 names the tt one-loop fair test only; D363 adopts the KIT benchmark broadly; D573 is the package; none settles
+    uug and uugg. Messages read: 2026-11-10T02:08 (the email with Bakar''s test, progress on the fair run: concerns the test
+    itself, not extending it to uug/uugg); 2026-11-14T04:31 (a pasted SciPost LaTeX template, no instruction on scope); 2026-11-13T03:15
+    (item 3, Bakar''s fair one-loop protocol: about the loop attempts being the fair protocol, not uug/uugg); 2026-10-22T21:18
+    (about generating events with more CPUs, unrelated); 2026-10-29T15:59 (catalog design, predates the KIT test); 2026-11-06T04:28
+    (general review of earlier messages, does not name pretrained held-out A2 for uug/uugg).'
+  blocks: nothing
+  blocks_steps: *id002
 - id: ladder_figs
   title: 'draft figs 10 and 11: from-scratch line on top'
   question: Redraw rung_grid (the draft's figs 10 and 11) with the black from-scratch line on top and clearly visible (D362).
@@ -34951,7 +34976,7 @@ entries:
       (lxplus kinit), 2026-10-30T09:35 (generation), 2026-11-16T20:00 (writing skill): none says why lpnclaude03 refuses ssh
       or names another route'
     blocks: draft_rewrite step 4 (Fig. 14 right needs Jean Zay's 448-process data_stats.json) and every Jean Zay job
-    blocks_steps: &id002
+    blocks_steps: &id003
     - 4
   owner:
     agent: a9673ff5df07651dd
@@ -35719,7 +35744,7 @@ entries:
     2026-10-30T09:35 (generation), 2026-11-16T20:00 (writing skill): none says why lpnclaude03 refuses ssh or names another
     route'
   blocks: draft_rewrite step 4 (Fig. 14 right needs Jean Zay's 448-process data_stats.json) and every Jean Zay job
-  blocks_steps: *id002
+  blocks_steps: *id003
 - id: zng_uq_benchmark
   title: Our model on the Z + n gluon UQ datasets (Zenodo 16793011)
   question: 'How does our latest setup (emission-scale target, HETEROSC, mu-P LLoCa), from scratch and fine-tuned from a pretraining,
@@ -39324,7 +39349,7 @@ entries:
       (a pasted LaTeX template); 2026-11-10T02:08 (draft and slide uploads); 2026-10-26T17:18 (settings warnings relayed from
       another session); 2026-10-15T02:49 and 2026-10-06T00:17 (old transfer-study plan instructions, not this sentence)'
     blocks: nothing
-    blocks_steps: &id003 []
+    blocks_steps: &id004 []
   owner:
     agent: a275e674e217bc7c6
     state: stopped
@@ -41584,7 +41609,7 @@ entries:
     (a pasted LaTeX template); 2026-11-10T02:08 (draft and slide uploads); 2026-10-26T17:18 (settings warnings relayed from
     another session); 2026-10-15T02:49 and 2026-10-06T00:17 (old transfer-study plan instructions, not this sentence)'
   blocks: nothing
-  blocks_steps: *id003
+  blocks_steps: *id004
   writeup: ae083a6ab
   runs_override: the 14 listed sweeps were driven by sweep/drive.py with their state on the local machine (sweeps_local/<name>;
     'local' has no site registry); each summary.txt lists every trial finished, 0 failed, and every result is read in results.tex
@@ -41870,7 +41895,7 @@ entries:
       (share only words like level, gap, family, rerun, measured in other contexts: none says anything about seeds of this
       arm).'
     blocks: step 16's verdict only
-    blocks_steps: &id004
+    blocks_steps: &id005
     - 16
   owner:
     agent: a017802b37deeafec
@@ -46735,7 +46760,7 @@ entries:
     2026-11-10T02:08, 2026-11-13T01:18, 2026-11-16T20:00, 2026-11-17T11:15, 2026-11-25T13:11, 2026-09-28T15:30 (share only
     words like level, gap, family, rerun, measured in other contexts: none says anything about seeds of this arm).'
   blocks: step 16's verdict only
-  blocks_steps: *id004
+  blocks_steps: *id005
 - id: lab_llm_trial
   title: Lab LLMs in place of some subagents
   question: Can the lab's LLMs (deepseek-v4-flash, qwen3.8-27b via lpnllm) do some of our subagent work (mechanical steps,
@@ -47713,7 +47738,7 @@ entries:
       2026-11-14T04:31 (pasted SciPost template, text only) and 2026-10-02T11:24 (yes to a tf32 speed check, a precision question,
       not the batch) do not settle it.'
     blocks: nothing
-    blocks_steps: &id005 []
+    blocks_steps: &id006 []
   owner:
     agent: acb8c25b26df20051
     state: working
@@ -48953,7 +48978,7 @@ entries:
     writeup: 4b744779f
     why: two open questions to Joaquin
   blocks: nothing
-  blocks_steps: *id005
+  blocks_steps: *id006
 - id: cc_disk
   title: What uses disk on CC and what can be deleted
   question: 'What is using the disk on CC (checkout runs/sweeps, datasets, memmap caches, scratch, MG5 work dirs), against
@@ -49097,7 +49122,7 @@ entries:
       2026-11-10T02:08, 2026-11-11T02:02, 2026-11-11T02:09, 2026-10-04T19:25, 2026-10-31T03:39, 2026-11-12T00:33, 2026-10-05T04:33,
       2026-10-24T14:35, 2026-10-09T03:51, 2026-10-29T13:18 (other subjects: paper template, draft plan, local /tmp, cluster
       outage, a run readout, a submit log, hooks, physics, explanations, LLM use)'
-    blocks_steps: &id006
+    blocks_steps: &id007
     - 3
   owner:
     agent: a7580c28f015ad776
@@ -49663,7 +49688,7 @@ entries:
     2026-11-11T02:02, 2026-11-11T02:09, 2026-10-04T19:25, 2026-10-31T03:39, 2026-11-12T00:33, 2026-10-05T04:33, 2026-10-24T14:35,
     2026-10-09T03:51, 2026-10-29T13:18 (other subjects: paper template, draft plan, local /tmp, cluster outage, a run readout,
     a submit log, hooks, physics, explanations, LLM use)'
-  blocks_steps: *id006
+  blocks_steps: *id007
 - id: cc_login_jobs
   title: 'CC login node: recurring and long scripts moved to Slurm (CC support''s email)'
   question: 'Can every non-interactive script we run on CC''s login node (the supervisor''s maintain commands: disk_watch,
