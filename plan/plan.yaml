@@ -28561,7 +28561,7 @@ entries:
     - 20
   owner:
     agent: a8f9a3b8d28dab422
-    state: working
+    state: closed
     since: '2026-11-26T03:33:40.885000+00:00'
     state_at: '2026-11-26T08:43:55.616000+00:00'
     context: 227085
@@ -29727,39 +29727,39 @@ entries:
       pid 2843282)
     '24': step 20's real fair-NLO parent run (tag kit_fairnlo_a2, not yet submitted)
   handoff:
-    state: '2026-11-26 ~04:35 UTC. Step 23 (D571) DONE: MC test PASS on all three (bias below the exact sigma''s MC error:
-      uug -1.65e-3 vs 1.21e-2, uugg -3.31e-3 vs 1.12e-2, tt +5.83e-4 vs 1.90e-3; second-stage eff 0.886/0.562/0.967), results.tex
-      sec:kit-mc @d871ce55a, fig analysis/kit_benchmark/figs/mc_test/kit_mc_test.png, tool tools/kit_mc_test.py @cbb51408c.
-      Step 20 (D570): the CC smoke parent FA-ccin2p3-a0194ee9 failed at init_data (require_cache: recipe transfer_finale_kit_fairnlo
-      pools never prebuilt on CC); dependents cancelled, E9399-E9402 acked. CC /sps/lpnhe is 100% full (512G/512G, 0 free;
-      sweeps not writable, site pick AVOIDs CC): told to the main session. site pick now gives lxplus, so the chain moves
-      there, step by step (HTCondor has no afterok): prebuild FA-lxplus-cdc7fee9 (recipes/transfer_finale_kit_fairnlo.yaml
-      seed 42) running. When it ends: site pick FA --jobs 1, then the smoke parent on the picked site: site submit <site>
-      FA scripts/job_datasaving_parent.sh --item kit_benchmark --est-gpu-hours 1 --hdr=--time=01:00:00 -- finale recipe=recipes/transfer_finale_kit_fairnlo.yaml
-      flags=off lr=1.89e-3 iters=50 tag=kit_fairnlo_a2_smoke ++model.input_asym_factor=true ++model.net.frames_gamma_max=4
-      data.target_physics_factor=false data.target_physics_orders=false data.affine_multiplicity_std=true; when it ends cleanly:
-      the three arm smokes (python3 analysis/kit_benchmark/fairnlo_arms.py <site> runs/data_saving/dsave_parent_finale_kit_fairnlo_a2_smoke
-      01:00:00 --smoke, add --est-gpu-hours 1; run each with </dev/null, site submit eats a loop''s stdin) and the real parent
-      (same as smoke without iters, tag=kit_fairnlo_a2, --hdr=--time=14:00:00, --est-gpu-hours 14; target fairnlo_parent 10
-      h recorded); then SCR-A2 + V/B at all five D with limits 8500 x smoke s/step x 1.3 + 0.3 h, FT after the parent (step
-      24). The data must be on the site the chain runs on (all of a chain on one site). Step 22: on the main session''s go
-      (D570, NO branch of the 10:47 design) two 16-trial tt virtual searches run through sweep/drive.py (detached kit_hpo_tt_divform_rezero;
-      configs sweep/sweep_config_kit_hpo_ttvirt_thr_{divform,rezero}.yaml @057b40d47, targets 2 h each); read best against
-      hp0131 of kit_hpo_ttvirt_thr on val mu-MSE then the hard strata (job_kit_rescore.sh) when the driver ends.'
-    decisions: 'Joaquin''s: D570 (ladder recipe, extrapolating config, fine-tune vs scratch, no HPO), D571 (we run the MC
-      test), D428 (16 trials), D391 horizons. Main session''s: step 22 run now (ask withdrawn, D570). Mine (re-justify): MC
-      region variable over gluon pairs only (reviewer note); MC JSON written under runs/ on CC (an untracked file in analysis/
-      blocked sync); step 22 searches on tt only (both arms are clear NOs there; uug div-form and ReZero-collinear were inconclusive,
-      not searched: +9.6 GPU-h each if wanted); chain moved to lxplus because site pick AVOIDs full CC; plus the previous
-      owner''s choices (ladder+star finale recipe, A2 with affine_multiplicity_std, EW one-loop pools out, VB on the parent''s
-      config with the factor off).'
-    ruled_out: Catalog fair-NLO parent for step 20; HPO for step 20 (D570); running the chain on CC while /sps/lpnhe is full.
-    running: FA-lxplus-cdc7fee9 (prebuild, step 20/24 wait on it); drive.py kit_hpo_ttvirt_thr_divform + _rezero (detached,
-      step 22)
+    state: '2026-11-26 ~09:45 UTC. Step 20 (D570, fair one-loop protocol) on lxplus (its data exist only there; CC /sps/lpnhe
+      too full for the prebuild''s 20 GB margin). Prebuild FA-lxplus-637c9017 built all pools. Smoke parent FA-lxplus-fc131d66
+      (tag kit_fairnlo_a2_smoke2, recipe @b93c2e524) clean through every stage, ~1.9 s/step on A100. Arm smokes running: FA-lxplus-0c10620e
+      (FT), FA-lxplus-89c91852 (SCR-A2), FA-lxplus-3805efe5 (V/B), commands from python3 analysis/kit_benchmark/fairnlo_arms.py
+      lxplus runs/data_saving/dsave_parent_finale_kit_fairnlo_a2_smoke2 01:00:00 --smoke (+ --est-gpu-hours 1 --disk-gb 1),
+      code @c8d0386c1; step 20 waits on them. When they end cleanly: read each arm''s s/step (arm limits = 8500 x smoke s/step
+      x 1.3 + 0.3 h). The REAL PARENT is HELD on Joaquin''s open question (dropping uubar_ddbar_nlo: keep dropped, or replace
+      with a QCD one-loop 2->2 without sign change); on his answer: site pick FA --jobs 1 --only lxplus, then site submit
+      lxplus FA scripts/job_datasaving_parent.sh --item kit_benchmark --est-gpu-hours 14 --disk-gb <from smoke2 dir> --hdr=--time=14:00:00
+      -- finale recipe=recipes/transfer_finale_kit_fairnlo.yaml flags=off lr=1.89e-3 tag=kit_fairnlo_a2 ++model.input_asym_factor=true
+      ++model.net.frames_gamma_max=4 data.target_physics_factor=false data.target_physics_orders=false data.affine_multiplicity_std=true
+      (target fairnlo_parent 10 h recorded); then SCR-A2 + V/B at all five D, FT after the parent (step 24). Step 22: two
+      16-trial tt virtual searches (sweep_config_kit_hpo_ttvirt_thr_{divform,rezero}.yaml @057b40d47) via drive.py detached
+      (kit_hpo_tt_divform_rezero, log ~/.local/share/ccorch/detached/20261126-045117_kit_hpo_tt_divform_rezero.log); 22 trials
+      lost to CC''s full disk 04:16-04:41 were requeued (--retry-failed); read best vs hp0131 of kit_hpo_ttvirt_thr on val
+      mu-MSE then hard strata (job_kit_rescore.sh) when the driver ends.'
+    decisions: 'Joaquin''s: D570 (ladder recipe, extrapolating config A2, fine-tune vs scratch, no HPO), D571 (MC test, done),
+      D428 (16 trials), D391 horizons. Open to Joaquin: (1) uubar_ddbar_nlo dropped from the fair-NLO recipe (31.1% negative
+      one-loop values; A2''s input_asym_factor refuses a signedlog target) - holds the real parent; (2) step-22 wave 2 (trials
+      6-10 of each search) was suggested from wave 1''s penalties only (all lost): accept 11 random + 5 guided, or +5 guided
+      trials per search (~6 GPU-h, vs D428). Mine (re-justify): chain on lxplus (data only there; CC refused the prebuild
+      for disk); smoke tag kit_fairnlo_a2_smoke2 (old dir cannot be deleted by hand); requeued step-22 trials placed by site
+      pick (on CC); plus earlier owners'' choices (ladder+star finale recipe, A2 with affine_multiplicity_std, EW one-loop
+      pools out, VB on the parent''s config with the factor off, MC region variable over gluon pairs).'
+    ruled_out: Catalog fair-NLO parent for step 20; HPO for step 20 (D570); the chain on CC while /sps/lpnhe is near full;
+      uubar_ddbar_nlo with A2 (signedlog target refused).
+    running: FA-lxplus-0c10620e, FA-lxplus-89c91852, FA-lxplus-3805efe5 (step-20 arm smokes); drive.py kit_hpo_tt_divform_rezero
+      (step 22, detached)
     files: recipes/transfer_finale_kit_fairnlo.yaml, analysis/kit_benchmark/fairnlo_arms.py, scripts/job_datasaving_parent.sh,
-      scripts/job_kit.sh, tools/kit_mc_test.py, sweep/sweep_config_kit_hpo_ttvirt_thr_divform.yaml, sweep/sweep_config_kit_hpo_ttvirt_thr_rezero.yaml,
-      analysis/kit_benchmark/data/kit_mc_test.json
-    written: '2026-11-26T03:30:43+00:00'
+      scripts/job_kit.sh, prebuild_recipes.py (KIT pools read from file @ab0999175), datagen.py (KIT needs no backend @bd560787d),
+      sweep/drive.py (lost trial holds the next wave @afa583cc3), tests/test_kit_hardps.py, tests/test_drive_retry_failed.py,
+      sweep/sweep_config_kit_hpo_ttvirt_thr_divform.yaml, sweep/sweep_config_kit_hpo_ttvirt_thr_rezero.yaml
+    written: '2026-11-26T08:47:32+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
