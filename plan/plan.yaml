@@ -33907,6 +33907,18 @@ entries:
     sources: 1/7 and 7 <- the test same-HP rerun spread 0.78-6.96 of t t~ V runs (measured, results.tex sec:datasaving, diag_readout.py
       @5555a0f0); 5x validation jump <- the ladder seeds' blow-ups against 1.5x seed noise (results.tex sec:ladder); 100 GPU-h
       <- D570 names this work
+    passed_at: '2026-11-26T13:01:32+00:00'
+    reviewer: 'Re-check after FIX. (1) Disk: EOS user quota read by me (eos root://eosuser.cern.ch quota): 976.44 GB of 1.00
+      TB logical, 97.6%, ~24 GB free, against ~2.4 GB needed (parent ~1 GB, 15 arms x 80 MB, smokes); pools in memory, the
+      three restored pools'' train/val/test already on lxplus, no new cache. (2) Sign readout: tools/kit_sign_read.py @9fd82418d
+      reads only the sign column, process_id and names of sigma_stage/preds_val.npz (written under the sign head, experiment.py
+      ~3447-3450), selects pools whose truth has both signs, self-check present; it runs on the parent smoke before the real
+      parent. (3) The 47e14eae per-pool val comparison now leaves out the three signed pools (47e14eae has sign_head false,
+      signed-log target). Unchanged from the first read: the only changes against the 02:27 pass are the recipe @62bb84df6
+      and training.sign_head=true (D572). Check 2: A2 3.55 -> 0.010 deepest Coulomb; FT 1.58-6.23 vs scratch 0.82; sign head
+      0.45 vs 0.78. Check 3: 1/7 and 7 against rerun spread 0.78-6.96, one seed (D315). HETEROSC; <= 44 GPU-h under D570.
+      Searched: sign head, sign_head, het sign, sign row, abslog, signedlog in results.tex; plan kit_benchmark; decisions
+      D287, D570-D572.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
