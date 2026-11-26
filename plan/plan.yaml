@@ -29881,6 +29881,14 @@ entries:
       beta 1e-3, -0.252 at 0.012, -0.153 at 0.041, -0.049 at 0.076, +0.047 at 0.14, +1.7e-4 at 0.26, +6.4e-4 at 0.6; NLO ratio
       -0.291 at beta 1e-3: the packaged tt model''s coherent -0.152 decade offset in the deepest threshold bin (slide-10 bias)
       integrates to a ~29% low virtual at threshold. Figure analysis/kit_benchmark/figs/kit_mc_madgraph.png.'
+  - at: '2026-11-26T15:43:54+00:00'
+    text: '2026-11-26 ~19:30 @d9e647f6c. Package v8 (FA-ccin2p3-acb1d3a6) built and ran end to end but failed the 2e-6 gate
+      against the runs'' own (GPU) predictions.h5: max |delta log10| uug 2.6e-5, uugg 6.6e-5, tt bulk 3.2e-4 / threshold 4.85e-4
+      / Sudakov 5.5e-3. check --repo (FA-ccin2p3-297e9b10, the repository''s kit_predict on the original runs, 50 events/stratum):
+      the same deltas (tt threshold 4.85e-4, Sudakov 2.42e-3, uug 2.57e-5): not a package defect, the 1-thread CPU read of
+      the A2 models differs from the training job''s GPU predictions (the README''s ''reproduces exactly'' was false for them).
+      Fix d9e647f6c: examples'' expected from the repo predictor at 1 thread (gate: package = repository), GPU deltas reported
+      and stated in the README. v9 build FA-ccin2p3-6d36ce17.'
   step_why:
     20:
       feeds: 'D570: FT vs SCR-A2 vs V/B on the KIT hard bins'
