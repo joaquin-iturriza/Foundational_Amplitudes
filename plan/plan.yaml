@@ -29782,6 +29782,12 @@ entries:
       Design reviewed FIX (disk, sign readout tool, unlike per-pool comparison) then PASS 13:00; tools/kit_sign_read.py for
       the wrong-sign fraction. lxplus EOS quota 976/1000 GB used (~24 GB free; batch needs ~2.4 GB). Parent smoke FA-lxplus-f7c30433
       submitted; arm smokes, real parent and arms follow it.'
+  - at: '2026-11-26T13:45:33+00:00'
+    text: '2026-11-26 ~14:30. Signed-A2 parent smoke FA-lxplus-f7c30433 clean through every stage (0.58 s/it over 50 steps
+      incl. start-up; sign head on 3/29 pools). tools/kit_sign_read.py on its preds_val.npz: wrong sign after 50 steps uubar_ddbar_nlo
+      0.372 (31.1% negative), ee_mumu_ew_nlo 0.323 (66.2%), ee_uu_ew_nlo 0.180 (78.0%), 5000 val events each: untrained, the
+      readout works. Arm smokes (_smoke4) placed by site pick: FT FA-ccin2p3-3895a2a7 and SCR-A2 FA-ccin2p3-e0587622 (smoke
+      parent copied to CC by site copy, 32 MB), V/B FA-lxplus-abac4281.'
   step_why:
     20:
       feeds: whether the fair one-loop fine-tune with sign-changing pools in beats scratch A2 and the V/B baseline on the
