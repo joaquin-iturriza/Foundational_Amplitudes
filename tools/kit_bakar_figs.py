@@ -24,7 +24,7 @@ sys.path.insert(0, ROOT)
 
 T = "runs/kit/kit_A_{p}_n100000_t8000_{tag}"
 A2 = "runs/kit/kit_A_{p}_n100000_t1831_hpo_asym_cont"   # the asymptotic-factor (A2) models of sec:kit-mc, packaged for KIT (D573)
-A2L = "asymptotic factor"
+A2L = "transformer, asymptotic factor"   # the JSON key (kit_bakar_figs_a2.json); drawn as NAME[A2L]
 M = "runs/kit_mlp/kit_A_{p}_n100000_t14400_mlp{arm}_s{s}"
 # per process: (label, run dirs); MLP arms list their three seeds (medians over seeds)
 MODELS = {
@@ -35,7 +35,7 @@ MODELS = {
     "ee_tt_virt_finite": [("transformer", [T.format(p="ee_tt_virt_finite", tag="softpairthr")]),
                           ("no frames", [T.format(p="ee_tt_virt_finite", tag="softpairthr_noframes")]),
                           ("no frames, no off-shellness", [T.format(p="ee_tt_virt_finite", tag="softpairthr_noframesoff")])]}
-THR = "MLP, log + threshold"
+THR = r"MLP, log + $\log(s_{t\bar t}-4m_t^2)$"
 for _p, _m in MODELS.items():
     _m.insert(0, (A2L, [A2.format(p=_p)]))
     # the ladder's 'mlp' arm is his setup: log invariants, plus the threshold column on tt (kit_mlp_ladder.py)
@@ -172,7 +172,7 @@ def plot(path, figs):
     ax.plot(x, vb["truth"], "o", color="k", ms=3, label="MadLoop truth")
     for lab in present(vb):
         mk, c = style[lab]
-        ax.plot(x, seeds(vb, lab), mk, color=c, ms=3, label=lab)
+        ax.plot(x, seeds(vb, lab), mk, color=c, ms=3, label=NAME.get(lab, lab))
     ax.axvspan(0.2, 1.0, color=ps.C.grey, alpha=0.2, lw=0)
     ax.set_xscale("log"); ax.set_yscale("log")
     ax.set_xlabel(r"top velocity $\beta$"); ax.set_ylabel(r"$V/B$ (median per bin)")
@@ -189,7 +189,7 @@ def plot(path, figs):
         ax.plot(x, b[f]["truth"], "-", color="k", lw=2, label="MadGraph truth")
         for lab in present(b[f]):
             mk, c = style[lab]
-            ax.plot(x, seeds(b[f], lab), mk, color=c, ms=3, label=lab)
+            ax.plot(x, seeds(b[f], lab), mk, color=c, ms=3, label=NAME.get(lab, lab))
         ax.set_xscale("log"); ax.set_xlabel(xl); ax.set_ylabel(r"median $\log_{10}(|\mathcal{M}|^2/\mathrm{GeV}^{-2})$")
     leg(axs[0], axs)
     print("FIGURE", ps.save(fig, os.path.join(figs, "slide6_uug_limits")))
@@ -203,7 +203,7 @@ def plot(path, figs):
     a1.plot(ev["phi"], ev["truth"], "-", color="k", lw=2, label="MadGraph truth")
     for lab in [l for l in labs if l in ev and l not in DROP]:
         mk, c = style[lab]
-        a1.plot(ev["phi"], np.median(ev[lab], 0), mk, color=c, ms=2, label=lab)
+        a1.plot(ev["phi"], np.median(ev[lab], 0), mk, color=c, ms=2, label=NAME.get(lab, lab))
     a1.set_xticks([0, np.pi, 2 * np.pi], ["0", r"$\pi$", r"$2\pi$"])
     a1.set_xlabel(r"azimuth $\varphi$ of the $gg$ pair")
     a1.set_ylabel(r"$\log_{10}|\mathcal{M}|^2-$ mean over $\varphi$")
@@ -212,7 +212,7 @@ def plot(path, figs):
     a2.plot(y, [v["rms"]["truth"] for v in rows], "o-", color="k", label="MadGraph truth")
     for lab in [l for l in labs if l in rows[0]["rms"] and l not in DROP]:
         mk, c = style[lab]
-        a2.plot(y, [np.median(v["rms"][lab]) for v in rows], mk, color=c, label=lab)   # true values, no floor
+        a2.plot(y, [np.median(v["rms"][lab]) for v in rows], mk, color=c, label=NAME.get(lab, lab))   # true values, no floor
     a2.set_xscale("log"); a2.set_yscale("log")
     a2.set_xlabel(r"collinearity $y=s_{gg}/s$"); a2.set_ylabel(r"rms over events of $h$")
     leg(a2, [a1, a2])
@@ -232,7 +232,7 @@ def plot(path, figs):
             # by the bin's lower edge, numerically: a string sort put 1e-05 after 0.001 and the line ran back over itself
             st = sorted(((k, v) for k, v in rows.items() if k.startswith(f)), key=lambda kv: edges(kv[0])[0])
             xs = [np.sqrt(np.prod(edges(k))) for k, _ in st]
-            ax.plot(xs, [v for _, v in st], marker=mk[0], ls=dash, color=c, ms=3, label=lab + (", Bakar" if his else ""))
+            ax.plot(xs, [v for _, v in st], marker=mk[0], ls=dash, color=c, ms=3, label=NAME.get(lab, lab) + (", Bakar" if his else ""))
             if "bulk" in rows:
                 ax.axhline(rows["bulk"], color=c, ls=":", lw=1)
         ax.plot([], [], ls=":", color=ps.C.grey, lw=1, label="bulk (dotted, same colour)")
@@ -273,6 +273,7 @@ def metrics(res):
     return lm, {k.split("/")[0]: v["pred"] for k, v in res.get("slopes", {}).items()}
 
 
+NAME = {A2L: "asymptotic factor", THR: "MLP, log + threshold"}   # short legend entries for long keys
 DROP = ("no frames", "no frames, no off-shellness")   # pre-A2 ablations: not drawn beside A2
 
 
