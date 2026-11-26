@@ -42440,7 +42440,7 @@ entries:
       untouched
   owner:
     agent: a80f3c83112dd4b0b
-    state: working
+    state: closed
     since: '2026-11-26T22:35:04+00:00'
     state_at: '2026-11-26T22:35:04+00:00'
   step_why:
@@ -43432,32 +43432,31 @@ entries:
   step_waits:
     '25': FA-ccin2p3-d34fae85
   handoff:
-    state: 'Part (a), part (c), steps 16, 19, 21/22, 23 DONE. Step 22 (no off-shellness input, FA-ccin2p3-1b480869): gg->ttH
-      split gone (separation 3.57 vs 12.1, MSE-bias^2 0.681 vs 5.94) but d still depends on |off-shellness| on both pole sides
-      (eta2 0.565): design branch ''groups gone, pole dependence kept''; gg->tbW bias^2 43.8/42.1 vs 30.7/32.1 (pair no);
-      new-43 median MSE-bias^2 0.209 vs 0.135; seen pooled 0.129 vs 0.0533; the encoding question (Scope: ...) handed to the
-      main session to send and record (plan ask needs each flagged message named). Step 23: shape_dists with all three final
-      models, export_for_suprio.zip 871,452 bytes (export_for_suprio.py @cbd8eb718). MSE/bias/shape all from data/split (one
-      pass, heldout_per_process.py @a5ecf4790). D566: attempts A, B, C, D dead ends; D''s diagnosis: the D_sqE form with the
-      pool''s own median as anchor passes everything (0.182; subsets 0.19-0.22), with the ridge anchor map it is sampling-robust
-      but its level is only partly kept (0.383 vs bar 0.369): the anchor map is the error. Next: step 25 attempt E (better
-      anchor map: the regressor''s own network over many seeds, cross-fitted; or a reference phase-space median), design (perevent_level.py
-      --anchor gets a new mode, output perevent_anchored_E.json; fig perevent_anchored_fig.py with an E arm set), review,
-      CPU job on htc via job_perevent_level.sh (PEL_ANCHOR). Then step 15 (D564 investigation), which no longer waits.'
-    decisions: 'Joaquin''s: D522-D528, D536, D537, D553, D564, D566, D567, D576-D579, D584-D588. Mine (re-justify): earlier
-      (i)-(xli); (xxxix) CORRECTED: the baseline''s CC CSV had no offshell columns; baseline re-read on CC with them 2026-11-26
-      21:54 (interactive), the join used that; (xlii) one scoring pass (data/split) for MSE/bias/shape in every figure and
-      the export (the two passes differ only by float32 noise at MSE ~1e-6); (xliii) step 22 seen set scored (design measure
-      3) on CC interactive; (xliv) attempt D''s ridge anchor with RidgeCV leave-one-out alpha; (xlv) attempt D read on the
-      same events as C (memmap first 2000 train-role events).'
-    ruled_out: As before, plus D566 attempt D (ridge process anchor), dead end 2026-11-26
-    running: none of mine (the interactive scores and attempt D ended)
-    files: analysis/catalog_daniel/{perevent_level.py (--anchored --anchor global|process), perevent_anchored_fig.py [D],
-      data/perevent_anchored{,_D}.json}, analysis/catalog_daniel/figs/perevent_anchored_D.png, scripts/job_perevent_level.sh
-      (PEL_ANCHOR), analysis/llm_compare/{heldout_per_process.py, shape_dists.py, export_for_suprio.py, factor_split.py, data/c_nooffshell_factor_split.json,
-      data/step22_nooffshell_read.json, data/split/c_nooffshell_heldout.json}, figs/{shape_dists, step22_nooffshell_*_heldout_per_process,
-      c_nooffshell_factor_split_offshell_6}.png
-    written: '2026-11-26T22:23:28+00:00'
+    state: 'Step 25 (D566 attempt E) in flight: FA-ccin2p3-d34fae85 (htc CPU, 4 h limit, target 2 h; perevent_level.py --anchored
+      --anchor map @ad9f541, design passed 2026-11-26), writes analysis/catalog_daniel/data/perevent_anchored_E.json on CC
+      (PEL_JSON summary in its log; fetch the json via site run cat or the log line); read it against the passed outcome (E
+      map''s ten-ensemble new median <= regressor_ens max, subsets within bar or 2 sd, beat the constant where it moves),
+      figure perevent_anchored_fig.py E, caption, check_caption; on NO with D_sqE_own still passing, attempt F = the reference
+      phase-space anchor (plan step_why 25). First E job FA-ccin2p3-fb348771 cancelled by me (kin() log 0, fixed). Step 15
+      (D564) read DONE 2026-11-27 (finding recorded): the gg->tbW pair''s error sits at the internal top''s pole (near-pole
+      fifth mean d -7.65/-7.56 vs -5.16/-5.08, se 0.05; V-shaped binned curve, floor -7.96 at the pole, -1.1 at the far ends),
+      trained q q~ twins right (seen MSE <= 0.0069); figure figs/c_best_factor_split_offshell_6_tbw.png drawn, looked at,
+      caption passes check_caption; not yet sent to Joaquin by the main session. Step 15 dropped, continued as step 26 (resonance
+      level per event; blocked by memmap lacking data.target_propagators/resonance_per_event: data_mmap.py:871): next owner
+      starts it (worktree, extend data_mmap, tests, repo review, smoke, design, review, one ~15 GPU-h run).'
+    decisions: 'Joaquin''s: D522-D528, D536, D537, D553, D564, D566, D567, D576-D579, D584-D589. Mine (re-justify): earlier
+      (i)-(xlv); (xlvi) attempt E tests three anchor maps (network ten seeds, + kinematics, tree) in one job, ridge and own
+      median re-run as matched control and floor; (xlvii) kin() threshold floored at 10 GeV (catalog_v4''s edge for trees
+      without mass or cut leg); (xlviii) step 15''s control is the trained twins'' seen MSE bound (0.19 nats), not a per-event
+      seen re-read (the bound settles it, reviewer agreed); (xlix) the pole located at -mu/sd of the run''s own offshell_stats;
+      (l) data/c_best_factor_split.json now the CC re-read with poles (MSEs identical to the lxplus read).'
+    ruled_out: 'As before; D566 attempts A-D dead ends. Step 15: the pair''s error is not spread evenly over its events (eta2
+      0.81, contrast 53 se).'
+    running: FA-ccin2p3-d34fae85 (attempt E, CPU, htc)
+    files: analysis/catalog_daniel/{perevent_level.py (--anchor map, kin()), perevent_anchored_fig.py [D|E]}, scripts/job_perevent_level.sh
+      (PEL_ANCHOR=map), analysis/llm_compare/{factor_split.py (--pole-run, --panels tbw), data/c_best_factor_split.json},
+      analysis/llm_compare/figs/c_best_factor_split_offshell_6_tbw.png, scratchpad test_attemptE.py
+    written: '2026-11-26T23:03:37+00:00'
   designs:
   - at: '2026-11-22T04:13:14+00:00'
     question: 'Part (a), D525: in the conditions of Suprio''s LLM pID run (D524, D526, D527: our catalog_daniel regeneration
