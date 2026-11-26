@@ -189,11 +189,144 @@ def from_surrogate():
     print(json.dumps(res, indent=1))
 
 
+MMAP_ROLE = {}
+
+
+def mmap_pools(dirs):
+    """{process: f(k) -> its first k train-role events as pool rows (4P momenta, P PDG ids, |M|^2)} from memmap base
+    caches, which hold every pool's first events in pool order, momenta boosted to the incoming pair's frame (the
+    invariants used here do not change)"""
+    out = {}
+    for d in dirs:
+        m = json.load(open(os.path.join(d, "meta.json")))
+        mom, pdg, amp = (np.load(os.path.join(d, x + ".npy"), mmap_mode="r") for x in ("mom", "pdg", "amp"))
+        segs = {}
+        for sg in m["segs"]:  # the train role, else the first role the cache holds for the process
+            if sg["name"] not in segs or sg["role"] == "train":
+                segs[sg["name"]] = sg
+        for sg in segs.values():
+            MMAP_ROLE[sg["name"]] = sg["role"]
+            def rows(k, sg=sg):
+                k, P = min(k, sg["n"]), sg["P"]
+                mo = np.asarray(mom[sg["p0"]: sg["p0"] + k * P], np.float64).reshape(k, 4 * P)
+                pd = np.asarray(pdg[sg["p0"]: sg["p0"] + k * P], np.float64).reshape(k, P)
+                return np.column_stack([mo, pd, np.asarray(amp[sg["ev0"]: sg["ev0"] + k], np.float64)])
+            out[sg["name"]] = rows
+    return out
+
+
+# D566 attempt C: the regressor's descriptors and network, with a sampling-independent target. Per training process,
+# log|M|^2 = c_p + b_p . (x - x0) fitted on its events (x per event: the features below; x0 and the feature scales are
+# constants of the method, the medians and std over all training events, never a statistic of the dataset scored);
+# c_p, b_p are properties of the matrix element where the form holds (a conditional-mean fit does not move when the
+# events are drawn with another density over x), and the network maps (process, diagrams) -> (c_p, b_p). Prediction
+# per event: c^ + b^ . (x - x0).
+ANCH = {"C_s": ("L",), "C_sqE": ("L", "q", "E"), "C_sqEP": ("L", "q", "E", "logP")}
+SUBSETS = ("all", "s_lo", "s_hi", "q_hard", "q_soft")
+
+
+def subsets(d):
+    """the same process sampled another way, exactly: an unweighted pool restricted to a window is the pool of that
+    window. s_lo / s_hi: sqrt(s_hat) below / above the pool's median (another collider window); q_hard: the smallest
+    pair invariant over s_hat above its median (a harder cut); q_soft: its lowest fifth (the singular region)"""
+    L, q = d["L"], d["q"]
+    return {"all": np.ones(len(L), bool), "s_lo": L <= np.median(L), "s_hi": L > np.median(L),
+            "q_hard": q >= np.median(q), "q_soft": q <= np.percentile(q, 20)}
+
+
+def anchor_fit(X, y, lam=1e-3):
+    """(c, b) of y = c + b . X (X already anchored and scaled): ridge on b only, so a feature constant in the process
+    gets b = 0 and leaves c alone"""
+    xm, ym = X.mean(0), y.mean()
+    Z = X - xm
+    b = np.linalg.solve(Z.T @ Z + lam * len(y) * np.eye(X.shape[1]), Z.T @ (y - ym))
+    return np.concatenate([[ym - xm @ b], b])
+
+
+def anchored(D, tr, ho, new, rel, meta, grp, pfeat, lev, events, nboot=30):
+    rng = np.random.default_rng(0)
+    Xs = rng.normal(size=(500, 2)); assert np.allclose(anchor_fit(np.column_stack([Xs, np.ones(500)]),
+                                                                 1.5 + Xs @ [2.0, -1.0], 1e-9), [1.5, 2, -1, 0], atol=1e-6)
+    out = {"events": events, "mmap_roles": dict(sorted(MMAP_ROLE.items())), "n": {"train": len(tr), "new": len(new), "relabels": len(ho) - len(new)},
+           "features": {k: list(v) for k, v in ANCH.items()}}
+    pred = {"shared": {}, "regressor": {}, "oracle_const": {}}
+    My = np.mean([D[n]["y"].mean() for n in tr])
+    for n in D:
+        k = len(D[n]["y"])
+        pred["shared"][n] = np.full(k, My)
+        pred["regressor"][n] = np.full(k, lev[n])
+        pred["oracle_const"][n] = np.full(k, D[n]["y"].mean())   # the best any one number per pool can do on the pool
+    Xp_tr = np.array([pfeat(n, True) for n in tr]); Xp_ho = np.array([pfeat(n, True) for n in ho])
+    for tag, cols in ANCH.items():
+        allx = np.concatenate([np.column_stack([D[n][c] for c in cols]) for n in tr])
+        x0, sx = np.median(allx, 0), allx.std(0)
+        out.setdefault("anchor", {})[tag] = {"x0": x0.tolist(), "scale": sx.tolist()}
+        X = {n: (np.column_stack([D[n][c] for c in cols]) - x0) / sx for n in D}
+        T = {n: anchor_fit(X[n], D[n]["y"]) for n in D}
+        Ttr = np.array([T[n] for n in tr]); tm, ts = Ttr.mean(0), Ttr.std(0) + 1e-12
+        cf = np.zeros_like(Ttr)
+        for i, j in GroupKFold(5).split(Xp_tr, Ttr, grp):
+            sc = StandardScaler().fit(Xp_tr[i])
+            cf[j] = np.mean([mlp(r).fit(sc.transform(Xp_tr[i]), (Ttr[i] - tm) / ts).predict(sc.transform(Xp_tr[j]))
+                             for r in range(3)], 0).reshape(len(j), -1) * ts + tm
+        sc = StandardScaler().fit(Xp_tr)
+        hp = np.mean([mlp(r).fit(sc.transform(Xp_tr), (Ttr - tm) / ts).predict(sc.transform(Xp_ho))
+                      for r in range(3)], 0).reshape(len(ho), -1) * ts + tm
+        That = {**dict(zip(tr, cf)), **dict(zip(ho, hp))}
+        pred[tag] = {n: That[n][0] + X[n] @ That[n][1:] for n in D}
+        pred[tag + "_fit"] = {n: T[n][0] + X[n] @ T[n][1:] for n in D}                  # the form's own floor
+        pred[tag + "_trueb"] = {n: That[n][0] + X[n] @ T[n][1:] for n in D}             # level predicted, slopes true
+    cands = list(pred)
+    sub = {n: subsets(D[n]) for n in D}
+
+    def e_of(c, n, idx=None):
+        y, p = D[n]["y"], pred[c][n]
+        S = sub[n] if idx is None else subsets({"L": D[n]["L"][idx], "q": D[n]["q"][idx]})
+        if idx is not None:
+            y, p = y[idx], p[idx]
+        sd = D[n]["y"].std()
+        return {s: float((p[m] - y[m]).mean() ** 2 / sd ** 2) for s, m in S.items()}
+
+    R = {c: {n: e_of(c, n) for n in D} for c in cands}
+    for c in cands:
+        for n in D:
+            R[c][n]["spread"] = float((pred[c][n] - D[n]["y"]).std() / D[n]["y"].std())
+    rel_ho = [n for n in ho if n in rel]
+    summ = {c: {g: {s: float(np.median([R[c][n][s] for n in ns])) for s in SUBSETS + ("spread",)}
+                for g, ns in (("new", new), ("relabels", rel_ho), ("train_crossfit", tr))} for c in cands}
+    # event-bootstrap noise of the new-set medians (predictions fixed, events resampled, subsets redrawn)
+    bs = {c: {s: [] for s in SUBSETS} for c in cands}
+    for _ in range(nboot):
+        idx = {n: rng.integers(0, len(D[n]["y"]), len(D[n]["y"])) for n in new}
+        for c in cands:
+            ee = [e_of(c, n, idx[n]) for n in new]
+            for s in SUBSETS:
+                bs[c][s].append(np.median([x[s] for x in ee]))
+    for c in cands:
+        summ[c]["new"]["boot_sd"] = {s: float(np.std(bs[c][s])) for s in SUBSETS}
+    e_sh, e_rg = summ["shared"]["new"]["all"], summ["regressor"]["new"]["all"]
+    print(f"check: shared e median {e_sh:.3g} (2026-10-22: 47), regressor {e_rg:.3g} (level_source.py: 0.044)")
+    assert abs(e_sh / 47 - 1) < 0.10 and abs(e_rg / 0.044 - 1) < 0.10, (e_sh, e_rg)
+    fams = {}
+    for n in new:
+        fams.setdefault(meta[n]["test_group"], []).append(n)
+    out["summary"] = summ
+    out["families"] = {c: {g: {s: float(np.median([R[c][n][s] for n in ns])) for s in SUBSETS} | {"n": len(ns)}
+                           for g, ns in fams.items()} for c in cands}
+    out["per_process_new"] = {meta[n]["process"]: {c: R[c][n] for c in cands} for n in new}
+    json.dump(out, open(os.path.join(HERE, "data", "perevent_anchored.json"), "w"), indent=1)
+    for c in cands:
+        print(c, {g: {s: round(v, 4) for s, v in summ[c][g].items() if s != "boot_sd"} for g in ("new", "relabels")})
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--events", type=int, default=2000)
     ap.add_argument("--surrogate", action="store_true")
     ap.add_argument("--model", choices=("hgb", "mlp"), default="hgb")
+    ap.add_argument("--mmap", nargs="+", help="read each process's first train-role events from these memmap base "
+                    "caches (data_mmap: <key>/<depth> dirs) instead of $SCRATCH/amp_data_cache's pools")
+    ap.add_argument("--anchored", action="store_true", help="D566 attempt C, output data/perevent_anchored.json")
     ap.add_argument("--search", type=int, default=0, help="step 20: DyHPO GP trials on the content-signature "
                     "cross-fit (1 network seed per fit), then the best read as candidate B[_mlp]_tuned")
     a = ap.parse_args()
@@ -205,14 +338,20 @@ def main():
     lev = json.load(open(os.path.join(HERE, "data", "level_file_B_diag.json")))["levels"]
     cache = os.path.join(os.environ["SCRATCH"], "amp_data_cache")
     files = sorted(os.listdir(cache))
+    mm = mmap_pools(a.mmap) if a.mmap else {}
     D, missing = {}, []
     for split, f in (("train", "catalog_daniel_train"), ("heldout", "catalog_daniel_heldout")):
         for p in yaml.safe_load(open(os.path.join(ROOT, "recipes", f + ".yaml")))["processes"]:
             n = p["name"]
             g = [x for x in files if x.startswith(n + "_") and "_train_" in x and x.endswith("amplitudes.npy")]
-            if not g:
+            if a.mmap:
+                if n not in mm:
+                    missing.append(n); continue
+                x = mm[n](a.events)
+            elif not g:
                 missing.append(n); continue
-            x = np.asarray(np.load(os.path.join(cache, g[0]), mmap_mode="r")[: a.events], dtype=np.float64)
+            else:
+                x = np.asarray(np.load(os.path.join(cache, g[0]), mmap_mode="r")[: a.events], dtype=np.float64)
             y, L, Lmin, E, P, pdg = events(x)
             lp = log_prop(P, pdg, os.path.join(ROOT, "data", "diagrams", n + ".diagrams.json"))
             if lp is None or not np.isfinite(lp).all():
@@ -234,6 +373,8 @@ def main():
                   float(mi[int(np.argmax(l))]), float(max(mi))]
         return np.array(f, float)
 
+    if a.anchored:
+        return anchored(D, tr, ho, new, rel, meta, grp_p, pfeat, lev, a.events)
     global CANDS
     if a.model == "mlp":
         CANDS = CANDS[:-1] + ("B_mlp",)

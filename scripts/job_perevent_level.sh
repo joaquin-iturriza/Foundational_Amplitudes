@@ -12,6 +12,15 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
+# PEL_ANCHORED=1 (D566 attempt C): --anchored on the memmap base caches PEL_MMAP (<key>/<depth> under
+# $SCRATCH/amp_mmap_cache, space-separated), output perevent_anchored.json
+if [ -n "${PEL_ANCHORED:-}" ]; then
+  OMP_NUM_THREADS=4 python analysis/catalog_daniel/perevent_level.py --anchored --model mlp \
+    --mmap $(for k in $PEL_MMAP; do echo "$SCRATCH/amp_mmap_cache/$k"; done) && echo "PEL_JSON $(python -c \
+    "import json; d=json.load(open('analysis/catalog_daniel/data/perevent_anchored.json')); print(json.dumps(d['summary']))")" \
+    && echo "RUN_DONE"
+  exit $?
+fi
 # PEL_SEARCH=N (step 20): N DyHPO trials first, output perevent_level[_mlp]_search.json
 M=${PEL_MODEL:-hgb}; S=${PEL_SEARCH:-0}
 J=analysis/catalog_daniel/data/perevent_level$([ "$M" = mlp ] && echo _mlp)$([ "$S" -gt 0 ] && echo _search).json
