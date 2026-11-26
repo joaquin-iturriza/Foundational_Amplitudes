@@ -1,0 +1,96 @@
+%=========================================================================
+%  Foundational Amplitudes, reply to KIT: the hard phase-space benchmark (26 November 2026)
+%  Joaquin Iturriza Ramirez
+%  Compile (twice):  pdflatex -interaction=nonstopmode main.tex
+%=========================================================================
+\documentclass[aspectratio=169,10pt]{beamer}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+\usefonttheme{professionalfonts}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{xcolor}
+
+\graphicspath{{figs/}}
+
+\definecolor{navy}{RGB}{38,38,110}
+
+\setbeamercolor{frametitle}{fg=navy}
+\setbeamercolor{structure}{fg=navy}
+\setbeamertemplate{navigation symbols}{}
+
+\setbeamertemplate{frametitle}{%
+  \vskip0.6em\hbox{\hspace{0.2em}\usebeamerfont{frametitle}\insertframetitle}%
+  \vskip0.12em\hbox{\hspace{0.2em}\textcolor{navy}{\rule{0.965\paperwidth}{0.8pt}}}\vskip0.2em}
+
+\setbeamertemplate{footline}{%
+  \hfill\usebeamerfont{normal text}\color{gray}\scriptsize\insertframenumber\hspace{1em}\vspace{0.6em}}
+
+\setbeamerfont{frametitle}{size=\Large,series=\bfseries}
+
+% full slide size (weekly-deck skill); two side by side at 0.49\textwidth each
+\newcommand{\fig}[1]{\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{#1}}
+\newcommand{\figtop}[1]{\raisebox{-\height}{\includegraphics[width=0.49\textwidth,height=0.78\textheight,keepaspectratio]{#1}}}
+
+\title{Hard phase-space benchmark: first results}
+\author{Joaquin Iturriza Ramirez}
+\date{26 November 2026}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Coulomb threshold in the $t\bar t$ virtual}
+  \centering\fig{slide5_tt_coulomb.pdf}
+\end{frame}
+
+\begin{frame}{Soft and collinear limits in $e^+e^-\to u\bar ug$}
+  \centering\fig{slide6_uug_limits.pdf}
+\end{frame}
+
+\begin{frame}{Spin correlation in the $g\to gg$ collinear limit}
+  \centering\fig{slide7_uugg_azimuth.pdf}
+\end{frame}
+
+\begin{frame}{log-MSE per bin}
+  \centering\fig{slide8_logmse.pdf}
+\end{frame}
+
+\begin{frame}{Summary, deepest bins}
+  \vfill
+  \centering\small
+  \begin{tabular}{lcc}
+    log-MSE (fitted exponent) & ours & MLP, log invariants \\ \hline
+    $u\bar ug$ bulk & $2\times10^{-6}$ & $2.1\times10^{-5}$ \\
+    $u\bar ug$ soft $x\in[10^{-7},10^{-6}]$ & $0.015$ ($-2.01$) & $0.33$ ($-2.12$) \\
+    $u\bar ug$ collinear $y\in[10^{-7},10^{-6}]$ & $0.008$ ($-1.00$) & $0.11$ ($-0.93$) \\
+    $u\bar ugg$ bulk & $6.3\times10^{-5}$ & $1.9\times10^{-4}$ \\
+    $u\bar ugg$ soft & $0.19$ & $0.41$ \\
+    $u\bar ugg$ $q\to qg$ & $0.16$ & $0.08$ \\
+    $u\bar ugg$ $g\to gg$ & $0.042$ & $0.054$ \\
+    $t\bar t$ virtual bulk & $1.4\times10^{-7}$ & $7.6\times10^{-7}$ \\
+    $t\bar t$ virtual $\beta\in[10^{-4},10^{-3}]$ & $0.023$ ($-0.96$) & $2.4$ (log + threshold) \\
+    $t\bar t$ virtual $\sqrt s\in[15,50]$\,TeV & $0.077$ & $0.05$ \\
+  \end{tabular}
+  \vfill
+\end{frame}
+
+\begin{frame}{Monte Carlo test}
+  \centering\fig{kit_mc_madgraph.pdf}
+\end{frame}
+
+\begin{frame}{Open ends}
+  \begin{itemize}
+    \item Monte Carlo test with MadGraph sampling the surrogate, $t\bar t$ over the full $\sqrt s$ range
+    \item Fair one-loop protocol on $t\bar t$, fine-tuned against from scratch and $V/B$
+    \item Protocol B, and pretraining with $u\bar ug$, $u\bar ugg$ families held out
+    \item $g\to gg$ spin correlation not reproduced
+  \end{itemize}
+\end{frame}
+
+\end{document}
