@@ -40810,6 +40810,9 @@ entries:
       job_llm_score.sh EVENTS=1 ONLY=heldout; read factor_split.py on gg->ttX and gg->tbW, heldout_per_process.py all parts,
       error_split.py against the control. Prior: results.tex l.9373-9426 (off-shellness adopted, ~50x in-distribution), l.10855,
       kit_benchmark off arms (D418), none on held-out new families. Its design and design review first.'
+    22: 'Step 22 smoke readout check (design check 1): when FA-ccin2p3-0d721df0 ends, confirm runs/zz_smoke/zz_smoke_sweep_config_llmcmp_c_nooffshell_1795652245_12195/llm_events_heldout.csv
+      on CC is written (no offshell columns) and joins: factor_split.py --csv <it> --vars-from runs/llmcmp_c_qperp/trial_1860/lxplus_reread/llm_events_heldout.csv
+      as a CC CPU job (site run --job); a failure is fixed before the run FA-ccin2p3-1b480869 is scored'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -41034,6 +41037,11 @@ entries:
       - 'split gone and new-set shape/level better: the input''s sign misleads on new families; report, then the fix question
         (e.g. |o| only) to Joaquin'
       - 'split stays: the input is not the cause; report, next candidate the diagram encoder'
+    22:
+      feeds: 'D567/D564 step 22: that the no-off-shellness arm''s readout works before its run is read'
+      if:
+      - 'joins and prints eta2/AUC: readout ready for the run'
+      - 'fails: fix llm_score/factor_split, re-read the smoke'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
