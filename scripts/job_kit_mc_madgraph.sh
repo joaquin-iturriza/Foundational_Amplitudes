@@ -19,6 +19,9 @@ if [ "$1" = tt ]; then
     python tools/kit_threshold_scan.py predict --dir "$D" "$2" && \
     python tools/kit_threshold_scan.py collect --dir "$D" --out "$D/kit_threshold_scan_mcmg.json" && echo "RUN_DONE"; exit
 fi
+if [ "$1" = tt_bulk ] || [ "$1" = surr ]; then
+    export KIT_THREADS=1     # every surrogate read at 1 thread: the package's predictor and the served MadEvent integrand
+fi
 if [ "$1" = tt_bulk ]; then
     D=runs/kit/tt_bulk_window
     python tools/kit_threshold_scan.py build --window bulk --dir "$D" && \
@@ -29,6 +32,7 @@ if [ "$1" = surr ]; then
     P="$2"; D="$3"; N="$4"; RUN="$5"
     python tools/kit_mc_madgraph.py gen "$P" --dir "$D" --n "$N" --surrogate "$RUN" && \
     python tools/kit_mc_madgraph.py predict "$P" --dir "$D" "$RUN" --surr && \
+    python tools/kit_mc_madgraph.py predict "$P" --dir "$D" "$RUN" && \
     python tools/kit_mc_madgraph.py metrics --dir "$D" --out "$D/kit_mc_madgraph_${P}_surr.json" && echo "RUN_DONE"; exit
 fi
 P="$1"; D="$2"; N="$3"; RUN="$4"
