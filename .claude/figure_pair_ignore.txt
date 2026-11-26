@@ -30,3 +30,10 @@ talks/kit_nov2026/main.pdf
 analysis/llm_compare/suprio_llm_heldout_fig.png
 # Bakar's slide deck, a document not a figure
 analysis/kit_benchmark/source/hardps_benchmark_slides.pdf
+# KIT reply deck: copied slide figures and the compiled deck
+talks/kit_reply_nov2026/figs/kit_mc_madgraph.pdf
+talks/kit_reply_nov2026/figs/slide5_tt_coulomb.pdf
+talks/kit_reply_nov2026/figs/slide6_uug_limits.pdf
+talks/kit_reply_nov2026/figs/slide7_uugg_azimuth.pdf
+talks/kit_reply_nov2026/figs/slide8_logmse.pdf
+talks/kit_reply_nov2026/main.pdf
