@@ -42298,7 +42298,7 @@ entries:
     '14': FA-ccin2p3-f0b997a2
     '15': 'steps 16-18''s reads (FA-ccin2p3-89671610 level_file run, FA-lxplus-49899ef8 per-event network, FA-ccin2p3-996866f8
       log F re-read): the level-branch configurations are those three; the next one is designed from what they show'
-    '16': FA-ccin2p3-89671610
+    '16': 'FA-ccin2p3-89671610 FAILED: its RUN event (worker triage of the log, then this owner)'
     '21': FA-ccin2p3-1b480869
   handoff:
     state: 'Part (a) DONE, part (c) DONE. Step 20 DONE: D566 candidate (B) dead end (matched 8-trial searches: tuned tree
