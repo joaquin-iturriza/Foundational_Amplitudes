@@ -28561,13 +28561,12 @@ entries:
       2026-10-26T22:16, 2026-10-29T02:58, 2026-09-30T02:14 (share only generic words like qcd, factor, targets, sign, recipe:
       none concerns this pool).'
     blocks: the real fair-NLO parent run (step 20 after its smoke)
-    blocks_steps:
+    blocks_steps: &id002
     - 20
-    answered_at: '2026-11-26T12:30:08+00:00'
-    decision: D570
-    withdrawn_at: '2026-11-26T12:30:08+00:00'
-    withdrawn_why: the unguided-wave question concerns the step-22 searches, which D570 never asked for; they were run on
-      the main session's mistaken go, and are closed with no further trials
+    unwithdrawn:
+    - at: '2026-11-26T12:32:27+00:00'
+      why: 'withdrawn by mistake: D570 never asked about the u u~ -> d d~ pool; the intended withdrawal was the 04:11:20 ask'
+      was: D570
   owner:
     agent: a2a4b030ad0d119ce
     state: closed
@@ -34097,6 +34096,25 @@ entries:
     units: null
     start: '2026-11-26T11:40:47+00:00'
     at: '2026-11-26T11:40:47+00:00'
+  ask: 'Scope: the fair-NLO pretraining recipe (recipes/transfer_finale_kit_fairnlo.yaml) lost its QCD one-loop u u~ -> d
+    d~ pool (@b93c2e524): 31% of its events are negative and the A2 model (D570, model.input_asym_factor) refuses sign-changing
+    targets; 26 processes stay, 3 one-loop in bulk. Keep it dropped, or replace it by another QCD one-loop 2->2 pool without
+    sign change?'
+  waiting_since: '2026-11-26T08:33:53+00:00'
+  searched: 'D570 chose the recipe and the A2 config, not this pool. Read: 2026-10-26T02:03 (QCD-only one-loop pools are fine
+    if the difference is encodable, else drop them: about EW versus QCD pools, not a sign-changing pool, and it never named
+    a replacement); 2026-10-31T00:55 (asks whether the sign result comes from loops or from negative values, and about synthetic
+    replacement: a research question, not this recipe pool); 2026-10-30T23:09 (adding examples helps the changing-sign datasets
+    stays a result: not about dropping or replacing a pool); 2026-11-06T04:28 (sign head complaints: about the sign head,
+    not this pool); 2026-11-12T01:19 and 2026-11-12T13:59 (kit results and adding loop datasets to the pretraining as an idea:
+    no named pool); 2026-11-13T00:03 (be intentional with the pretraining datasets: general, names no pool); 2026-11-17T02:22
+    (bring back kit factor results: a request for figures); 2026-11-10T02:08 (kit plan with one loops in the pretraining:
+    before this pool was found sign-changing); 2026-11-14T04:31, 2026-11-15T17:28, 2026-10-04T10:57, 2026-10-05T02:23, 2026-10-06T00:17,
+    2026-10-08T19:02, 2026-10-09T00:15, 2026-10-14T16:48, 2026-10-15T13:07, 2026-10-15T13:14, 2026-10-22T21:18, 2026-10-26T22:16,
+    2026-10-29T02:58, 2026-09-30T02:14 (share only generic words like qcd, factor, targets, sign, recipe: none concerns this
+    pool).'
+  blocks: the real fair-NLO parent run (step 20 after its smoke)
+  blocks_steps: *id002
 - id: ladder_figs
   title: 'draft figs 10 and 11: from-scratch line on top'
   question: Redraw rung_grid (the draft's figs 10 and 11) with the black from-scratch line on top and clearly visible (D362).
@@ -34677,7 +34695,7 @@ entries:
       (lxplus kinit), 2026-10-30T09:35 (generation), 2026-11-16T20:00 (writing skill): none says why lpnclaude03 refuses ssh
       or names another route'
     blocks: draft_rewrite step 4 (Fig. 14 right needs Jean Zay's 448-process data_stats.json) and every Jean Zay job
-    blocks_steps: &id002
+    blocks_steps: &id003
     - 4
   owner:
     agent: a9673ff5df07651dd
@@ -35445,7 +35463,7 @@ entries:
     2026-10-30T09:35 (generation), 2026-11-16T20:00 (writing skill): none says why lpnclaude03 refuses ssh or names another
     route'
   blocks: draft_rewrite step 4 (Fig. 14 right needs Jean Zay's 448-process data_stats.json) and every Jean Zay job
-  blocks_steps: *id002
+  blocks_steps: *id003
 - id: zng_uq_benchmark
   title: Our model on the Z + n gluon UQ datasets (Zenodo 16793011)
   question: 'How does our latest setup (emission-scale target, HETEROSC, mu-P LLoCa), from scratch and fine-tuned from a pretraining,
@@ -39050,7 +39068,7 @@ entries:
       (a pasted LaTeX template); 2026-11-10T02:08 (draft and slide uploads); 2026-10-26T17:18 (settings warnings relayed from
       another session); 2026-10-15T02:49 and 2026-10-06T00:17 (old transfer-study plan instructions, not this sentence)'
     blocks: nothing
-    blocks_steps: &id003 []
+    blocks_steps: &id004 []
   owner:
     agent: a275e674e217bc7c6
     state: stopped
@@ -41310,7 +41328,7 @@ entries:
     (a pasted LaTeX template); 2026-11-10T02:08 (draft and slide uploads); 2026-10-26T17:18 (settings warnings relayed from
     another session); 2026-10-15T02:49 and 2026-10-06T00:17 (old transfer-study plan instructions, not this sentence)'
   blocks: nothing
-  blocks_steps: *id003
+  blocks_steps: *id004
   writeup: ae083a6ab
   runs_override: the 14 listed sweeps were driven by sweep/drive.py with their state on the local machine (sweeps_local/<name>;
     'local' has no site registry); each summary.txt lists every trial finished, 0 failed, and every result is read in results.tex
@@ -41596,7 +41614,7 @@ entries:
       (share only words like level, gap, family, rerun, measured in other contexts: none says anything about seeds of this
       arm).'
     blocks: step 16's verdict only
-    blocks_steps: &id004
+    blocks_steps: &id005
     - 16
   owner:
     agent: a017802b37deeafec
@@ -46461,7 +46479,7 @@ entries:
     2026-11-10T02:08, 2026-11-13T01:18, 2026-11-16T20:00, 2026-11-17T11:15, 2026-11-25T13:11, 2026-09-28T15:30 (share only
     words like level, gap, family, rerun, measured in other contexts: none says anything about seeds of this arm).'
   blocks: step 16's verdict only
-  blocks_steps: *id004
+  blocks_steps: *id005
 - id: lab_llm_trial
   title: Lab LLMs in place of some subagents
   question: Can the lab's LLMs (deepseek-v4-flash, qwen3.8-27b via lpnllm) do some of our subagent work (mechanical steps,
@@ -47439,7 +47457,7 @@ entries:
       2026-11-14T04:31 (pasted SciPost template, text only) and 2026-10-02T11:24 (yes to a tf32 speed check, a precision question,
       not the batch) do not settle it.'
     blocks: nothing
-    blocks_steps: &id005 []
+    blocks_steps: &id006 []
   owner:
     agent: acb8c25b26df20051
     state: working
@@ -48679,7 +48697,7 @@ entries:
     writeup: 4b744779f
     why: two open questions to Joaquin
   blocks: nothing
-  blocks_steps: *id005
+  blocks_steps: *id006
 - id: cc_disk
   title: What uses disk on CC and what can be deleted
   question: 'What is using the disk on CC (checkout runs/sweeps, datasets, memmap caches, scratch, MG5 work dirs), against
@@ -48823,7 +48841,7 @@ entries:
       2026-11-10T02:08, 2026-11-11T02:02, 2026-11-11T02:09, 2026-10-04T19:25, 2026-10-31T03:39, 2026-11-12T00:33, 2026-10-05T04:33,
       2026-10-24T14:35, 2026-10-09T03:51, 2026-10-29T13:18 (other subjects: paper template, draft plan, local /tmp, cluster
       outage, a run readout, a submit log, hooks, physics, explanations, LLM use)'
-    blocks_steps: &id006
+    blocks_steps: &id007
     - 3
   owner:
     agent: a7580c28f015ad776
@@ -49389,7 +49407,7 @@ entries:
     2026-11-11T02:02, 2026-11-11T02:09, 2026-10-04T19:25, 2026-10-31T03:39, 2026-11-12T00:33, 2026-10-05T04:33, 2026-10-24T14:35,
     2026-10-09T03:51, 2026-10-29T13:18 (other subjects: paper template, draft plan, local /tmp, cluster outage, a run readout,
     a submit log, hooks, physics, explanations, LLM use)'
-  blocks_steps: *id006
+  blocks_steps: *id007
 - id: cc_login_jobs
   title: 'CC login node: recurring and long scripts moved to Slurm (CC support''s email)'
   question: 'Can every non-interactive script we run on CC''s login node (the supervisor''s maintain commands: disk_watch,
