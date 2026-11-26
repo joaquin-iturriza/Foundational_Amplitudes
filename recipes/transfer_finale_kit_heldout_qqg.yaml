@@ -1,0 +1,30 @@
+# kit_benchmark, D575 (Bakar's protocol A, pretrained with the target family held out) for e+e- -> u u~ g and u u~ g g
+# with the asymptotic-factor (A2) model: recipes/transfer_finale_kit_fairnlo.yaml (the fair one-loop A2 parent's
+# recipe, D570/D572) minus the KIT ee_qqg and ee_qqgg families (recipes/gen_kit_pretrain.py: e+ e- with a q q~ pair
+# and one or two gluons, any flavour): ee_uug, ee_uugg, ee_bbbarg, ee_bbbargg out. Everything else as that recipe.
+processes:
+  - {name: ee_uu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_mumu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_numu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_bhabha, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_aa, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_ddbar, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uu_uu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_uubar, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_ddbar_nlo, sqrts: [25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: dd_dd, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_bbbar, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: uubar_ttbar, sqrts: [363, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_ZZ, sqrts: [192, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_ZH, sqrts: [227, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_Wg, sqrts: [85, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_Wgg, sqrts: [85, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_Wggg, sqrts: [85, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: ee_uu_nlo, sqrts: [25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: uubar_ZZ_nlo, sqrts: [192, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: ee_mumu_ew_nlo, sqrts: [500, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: ee_uu_ew_nlo, sqrts: [500, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: uubar_ttbar_nlo, sqrts: [363, 450], n_train: 50000, n_val: 5000, n_test: 5000}
+  - {name: udbar_enug, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: udbar_taunu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
+  - {name: kit_ee_tt__born__hard, sqrts: [346, 50000], n_train: 100000, n_val: 10000, n_test: 10000}
