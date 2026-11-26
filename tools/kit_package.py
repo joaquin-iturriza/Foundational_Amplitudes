@@ -37,7 +37,7 @@ EXTRA = ["keyed_aug.py", "multiplicity_extrap.py", "physics_scales.py",
          "tools/kit_package.py", "tools/nlo_conventions.py",
          # imported by the code above but outside publish_main's public paths (tests/test_kit_package_imports.py)
          "data_mmap.py", "dirlock.py", "diagram_graphs.py", "optim/__init__.py", "mix_compose.py", "optim/muon.py", "tools/nlo_virtual_pipeline.py",
-         "tools/pool_physics.py", "tools/synthetic_amplitudes.py", "scripts/cpu_env_requirements.txt",
+         "tools/pool_physics.py", "tools/synthetic_amplitudes.py", "scripts/cpu_env_requirements.txt", "noise_scale.py", "siteconf.py",
          "analysis/catalog_daniel/data/diagram_couplings.json"]   # read at init (data.target_physics_couplings)
 RUN_FILES = ["config.yaml", "data_stats.json", "particle_tokenizer.json", "base_shapes.bsh"]
 README = """FA surrogate models for the KIT hard phase-space benchmark (models.json lists them).
@@ -134,6 +134,9 @@ def cmd_build(a):
             os.makedirs(os.path.join(out, "data", "diagrams"), exist_ok=True)
             shutil.copy2(src, os.path.join(out, "data", "diagrams"))
         models.append({"run": name, "label": label, "file": stem, "target": target})
+    # siteconf (tools/rebuild_run.load_cfg) reads sites/sites.yaml: empty, the package is a "local" checkout
+    os.makedirs(os.path.join(out, "sites"), exist_ok=True)
+    open(os.path.join(out, "sites", "sites.yaml"), "w").write("{}\n")
     if a.standalone:
         _standalone(out, models)
     json.dump({"commit": commit, "models": models, "built_from": ROOT}, open(os.path.join(out, "models.json"), "w"), indent=1)
