@@ -46299,7 +46299,7 @@ entries:
     '3': 'the D551 replays'' write-up (detach wake_replay3, detach review_replay3): both reviewers already cover a3bcab715,
       ac845711e, ad9405eab and d75c664b9; plan done closes the entry, so it follows steps 5 and 6'
     '5': detach wake_replay4
-    '6': detach review_replay3
+    '6': detach review_replay4
   findings:
   - at: '2026-11-23T19:55:22+00:00'
     text: 'Local batch width cut from 6 parallel opencode streams to 2 (D531): 6 streams of opencode sessions (~350-400 MB
