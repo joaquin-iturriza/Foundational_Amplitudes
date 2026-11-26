@@ -28538,7 +28538,27 @@ entries:
       (agreeing the generation agent may check cut-short data; about token use and generation scope, not trial counts) do
       not settle it.
     blocks: nothing
-    blocks_steps: &id002 []
+    blocks_steps: []
+  - ask: 'Scope: the fair-NLO pretraining recipe (recipes/transfer_finale_kit_fairnlo.yaml) lost its QCD one-loop u u~ ->
+      d d~ pool (@b93c2e524): 31% of its events are negative and the A2 model (D570, model.input_asym_factor) refuses sign-changing
+      targets; 26 processes stay, 3 one-loop in bulk. Keep it dropped, or replace it by another QCD one-loop 2->2 pool without
+      sign change?'
+    at: '2026-11-26T08:33:53+00:00'
+    searched: 'D570 chose the recipe and the A2 config, not this pool. Read: 2026-10-26T02:03 (QCD-only one-loop pools are
+      fine if the difference is encodable, else drop them: about EW versus QCD pools, not a sign-changing pool, and it never
+      named a replacement); 2026-10-31T00:55 (asks whether the sign result comes from loops or from negative values, and about
+      synthetic replacement: a research question, not this recipe pool); 2026-10-30T23:09 (adding examples helps the changing-sign
+      datasets stays a result: not about dropping or replacing a pool); 2026-11-06T04:28 (sign head complaints: about the
+      sign head, not this pool); 2026-11-12T01:19 and 2026-11-12T13:59 (kit results and adding loop datasets to the pretraining
+      as an idea: no named pool); 2026-11-13T00:03 (be intentional with the pretraining datasets: general, names no pool);
+      2026-11-17T02:22 (bring back kit factor results: a request for figures); 2026-11-10T02:08 (kit plan with one loops in
+      the pretraining: before this pool was found sign-changing); 2026-11-14T04:31, 2026-11-15T17:28, 2026-10-04T10:57, 2026-10-05T02:23,
+      2026-10-06T00:17, 2026-10-08T19:02, 2026-10-09T00:15, 2026-10-14T16:48, 2026-10-15T13:07, 2026-10-15T13:14, 2026-10-22T21:18,
+      2026-10-26T22:16, 2026-10-29T02:58, 2026-09-30T02:14 (share only generic words like qcd, factor, targets, sign, recipe:
+      none concerns this pool).'
+    blocks: the real fair-NLO parent run (step 20 after its smoke)
+    blocks_steps: &id002
+    - 20
   owner:
     agent: a8f9a3b8d28dab422
     state: stopped
@@ -34018,16 +34038,24 @@ entries:
     units: null
     start: '2026-11-26T06:50:11+00:00'
     at: '2026-11-26T06:50:11+00:00'
-  ask: 'Scope: the two step-22 tt one-loop searches (div-form inputs, ReZero layers) lost their first random wave of 6 to
-    CC''s full disk and the old driver released wave 2 from failure penalties, so each has 11 effectively random trials and
-    5 guided against the design''s 6 and 10. A: accept 11 random + 5 guided. B: add 5 guided trials to each (about 6 GPU-h),
-    21 trials against the 16 of D428.'
-  waiting_since: '2026-11-26T04:11:20+00:00'
-  searched: site decisions --project FA (D428 sets 16 trials; none covers this shortfall). Joaquin's messages at 2026-11-14T04:31
-    (a pasted SciPost LaTeX template, mentions form/layers only as text; says nothing on these searches) and 2026-10-30T04:59
-    (agreeing the generation agent may check cut-short data; about token use and generation scope, not trial counts) do not
-    settle it.
-  blocks: nothing
+  ask: 'Scope: the fair-NLO pretraining recipe (recipes/transfer_finale_kit_fairnlo.yaml) lost its QCD one-loop u u~ -> d
+    d~ pool (@b93c2e524): 31% of its events are negative and the A2 model (D570, model.input_asym_factor) refuses sign-changing
+    targets; 26 processes stay, 3 one-loop in bulk. Keep it dropped, or replace it by another QCD one-loop 2->2 pool without
+    sign change?'
+  waiting_since: '2026-11-26T08:33:53+00:00'
+  searched: 'D570 chose the recipe and the A2 config, not this pool. Read: 2026-10-26T02:03 (QCD-only one-loop pools are fine
+    if the difference is encodable, else drop them: about EW versus QCD pools, not a sign-changing pool, and it never named
+    a replacement); 2026-10-31T00:55 (asks whether the sign result comes from loops or from negative values, and about synthetic
+    replacement: a research question, not this recipe pool); 2026-10-30T23:09 (adding examples helps the changing-sign datasets
+    stays a result: not about dropping or replacing a pool); 2026-11-06T04:28 (sign head complaints: about the sign head,
+    not this pool); 2026-11-12T01:19 and 2026-11-12T13:59 (kit results and adding loop datasets to the pretraining as an idea:
+    no named pool); 2026-11-13T00:03 (be intentional with the pretraining datasets: general, names no pool); 2026-11-17T02:22
+    (bring back kit factor results: a request for figures); 2026-11-10T02:08 (kit plan with one loops in the pretraining:
+    before this pool was found sign-changing); 2026-11-14T04:31, 2026-11-15T17:28, 2026-10-04T10:57, 2026-10-05T02:23, 2026-10-06T00:17,
+    2026-10-08T19:02, 2026-10-09T00:15, 2026-10-14T16:48, 2026-10-15T13:07, 2026-10-15T13:14, 2026-10-22T21:18, 2026-10-26T22:16,
+    2026-10-29T02:58, 2026-09-30T02:14 (share only generic words like qcd, factor, targets, sign, recipe: none concerns this
+    pool).'
+  blocks: the real fair-NLO parent run (step 20 after its smoke)
   blocks_steps: *id002
 - id: ladder_figs
   title: 'draft figs 10 and 11: from-scratch line on top'
