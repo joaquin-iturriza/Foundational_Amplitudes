@@ -62,6 +62,7 @@ on the sites (`~/work/CLAUDE.md`).
 - The main session talks to me and directs agents; it never does an entry's work itself: no code edits, analyses, tests or submissions, including fixes I ask for directly (small ones go to a `mechanical-worker`), and no method or design of its own: it passes on my words and the owner's reviewed design.
 - One agent owns each piece of work in progress and covers all of it: it is resumed on every event of that work, stopped while it waits on jobs, and closed near 300k tokens of context with a hand-off it writes on its entry.
 - A brief to an agent starts from `plan/step_prompt.txt`; what is added may narrow the task, never override its scope or capacity rules.
+- What we give someone outside (a package, a repo) holds only what its use opens, traced by running it, never our code tree or data wholesale, and no instructions they do not need.
 - Work I ask for on someone else's specification (an email, slides) carries that specification's text, saved in the checkout under a gitignored path (never pushed), in every brief and design of it; a design that says the source was not available stops there.
 - A design that departs from what I asked for, or from the specification I asked to follow, is fixed before it runs: the design reviewer fails it, and naming the departure in a report never makes it acceptable.
 - μP only: the maintained models are μP LLoCa (`model: lloca`, the default), μP L-GATr (`lgatr_mup`) and μP L-GATr slim (`lgatr_slim`); everything else is legacy, ignored unless I ask, never fixed or used in a solution.
