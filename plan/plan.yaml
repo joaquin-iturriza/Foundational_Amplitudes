@@ -51436,3 +51436,26 @@ entries:
     why: 'D561 (only where it helps): in the D392 finale setup x0=1e-5 leaves the rule inert; the soft gain needs x0=0.009
       with neutrinos exempt (only u d~ -> e nu g neutrinos lie below 0.009), eval-only, no GPU'
   writeup: ba26fb9d1
+- id: kit_reply_deck
+  title: 'KIT reply deck: one coherent figure style'
+  question: Every figure of talks/kit_reply_nov2026 drawn in one style
+  status: running
+  quotes:
+  - said_at: '2026-11-26T16:39:07.271000+00:00'
+    text: The figures have inconsistent styles, please make them coherent, this shouldn't even have to be said
+    decision: D582
+    covers:
+    - kit_reply_deck
+    - every figure of the KIT reply deck redrawn in one coherent style
+  decisions:
+  - D582
+  next: redraw the deck's figures in one style, rebuild the deck, hand back the PDF
+  done_when: null
+  notes_ref: null
+  match: kit_reply_deck_*
+  evidence:
+    runs: []
+    commit: null
+    paths: []
+  dead_ends: []
+  asks: []
