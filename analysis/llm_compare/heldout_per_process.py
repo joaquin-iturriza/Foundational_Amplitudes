@@ -44,15 +44,15 @@ TITLE = {"interp": "held-out: interpolation", "extrap": "held-out: extrapolation
 # One fixed name, colour and marker per arm, used in every figure (Joaquin 2026-11-25: the same run under two names and
 # changing arms made two figures look inconsistent). "his setup": his target z, AdamW at constant lr, his inputs (part
 # (a)/(b)); "our setup": the emission-scale target, our inputs, MuonAdamW, WSD (part (c)). Order = legend order.
-ARMS = {"a_trial5": ("his setup, 8 heads", ps.C.blue, "o"),
+ARMS = {"a_trial5": ("LLoCa, same setup as LLM", ps.C.blue, "o"),
         "control": ("his setup, 8 heads, untuned", ps.C.grey, "x"),
         "b_h16": ("his setup, 16 heads", ps.C.sky, "D"),
         "b_h32": ("his setup, 32 heads", ps.C.purple, "v"),
         "b_h64": ("his setup, 64 heads", ps.C.vermillion, "s"),
         "b_h120": ("his setup, 120 heads", ps.C.yellow, "P"),
-        "level_file": ("his setup, 8 heads, level from diagrams", "#17BECF", "d"),
+        "level_file": ("LLoCa, same setup as LLM + diagrams to remove bias", "#17BECF", "d"),
         "c_control": ("our setup, control", ps.C.green, "<"),
-        "c_best": ("our setup, searched", ps.C.orange, "^"),
+        "c_best": ("LLoCa + new preprocessing", ps.C.orange, "^"),
         # --part bias only (level_source.py): a small network's level error from the process alone, no events
         "lvl_feat": ("level from process", "#999999", "h"),
         "lvl_diag": ("level from process, diagrams", "#8c564b", "p")}
@@ -64,7 +64,7 @@ PART = {"mse": ("data", YLIM, r"MSE$(\log|\mathcal{M}|^2)$", "mse"),
         # --part shape (D567): the error with the level removed, MSE - bias^2 = scale + floor (same split files; his:
         # shape^2); the MSE figure's range
         "shape": (os.path.join("data", "split"), YLIM, r"MSE$-$bias$^2$ of $\log|\mathcal{M}|^2$", "shape")}
-LLM_LABEL = "pID emb. only (Suprio)"
+LLM_LABEL = "LLM with pIDs"
 LEVEL_ONLY = ("lvl_feat", "lvl_diag")   # no events, no shape
 
 
@@ -92,11 +92,15 @@ def main():
     for _, ours, _, _ in arms:
         assert set(ours) == {n for g in draft.values() for n in g}, "held-out sets differ"
     llm = {n: np.abs(v) for n, v in suprio.llm(llm_stat).items()}   # per seed; |level| for the bias
+    llm_mse = suprio.llm("mse")
     w0, h0 = ps.PLOT_W_IN, ps.PLOT_H_IN
     ps.PLOT_W_IN, ps.PLOT_H_IN = 7.5, 1.9      # his wide rows: room for one tick per process
     fig, axes = ps.figure(ncols=1, nrows=2)
     for ax, sp in zip(axes, ("interp", "extrap")):
-        names = sorted(draft[sp], key=lambda n: draft[sp][n][0])     # his order
+        # his class blocks in his order; inside a class, best to worst = median over seeds of the LLM's total MSE
+        # (the same order in every part)
+        gx = {g: min(draft[sp][n][0] for n in draft[sp] if meta[n]["test_group"] == g) for g, _ in GROUPS[sp]}
+        names = sorted(draft[sp], key=lambda n: (gx[meta[n]["test_group"]], np.median(llm_mse[n])))
         x = np.arange(len(names))
         for i, n in enumerate(names):
             if meta[n]["n_out"] == 2:
