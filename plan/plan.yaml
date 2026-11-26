@@ -47295,6 +47295,65 @@ entries:
       D ~2x the fits. Searched results.tex for ''intrinsic anchor'', ''process anchor'', ''x0_p'', ''anchored'', ''leverage'',
       ''own median'', ''class slope'', ''per-event level'', ''conditional mean''; plan dead ends A/B/C; site decisions for
       D566/anchor: nothing beyond attempt C and dead ends A, B (all in prior).'
+  - at: '2026-11-26T22:40:25+00:00'
+    question: 'D566 attempt E (step 25; Joaquin 2026-11-25: a per-process level ''depends on how that data was sampled ...
+      this has to perform correctly in individual events regardless of that. I believe there is a way to marry these two ideas''):
+      with attempt D''s + invariants form kept (log|M|^2 = c_p + b_p.(x - x0_p)/sx, x = log s_hat, q = Lmin - log s_hat, E;
+      sampling-robust in D), does a better process-intrinsic anchor map x0_p (process + diagram descriptors -> the training
+      processes'' median x) bring the level on the 43 new families within the regressor''s bar while staying correct on every
+      re-sampled subset? Three maps replace D''s RidgeCV: (net) the regressor''s own network mlp 2x64 (sklearn MLPRegressor,
+      alpha 1e-2, early stopping) on the same standardized descriptors, ten seeds averaged; (kin) the same network with three
+      kinematic descriptors of the final state added (log of (sum of final masses + 10 GeV per pT-cut massless visible leg)^2,
+      the number of such legs, the number of neutrinos: Daniel''s run card cuts pT > 10 GeV); (hgb) HistGradientBoostingRegressor
+      (sklearn defaults, random_state 0) per component on descriptors + kinematics. Each cross-fitted by GroupKFold(5) on
+      weak_key on the training processes and fitted on all of them for the held out: a function of the process alone, no statistic
+      of the scored pool.'
+    prior: 'Attempt D (dead end, FA-ccin2p3-df622fc5, data/perevent_anchored_D.json @4739d3cbf): ridge anchor, D_sqE new 0.383
+      (bar 0.369, partly kept), subsets 0.385/0.355/0.441/0.384 within 2 sd (sampling-robust); with the pool''s own median
+      as anchor D_sqE_own 0.182, subsets 0.211/0.217/0.195/0.202 (passes); D_sqE_trueb 0.276 (true slopes do not rescue the
+      mapped anchor); ridge anchor miss on new 0.158/0.464/0.211 sx (L, q, E), cross-fitted train 0.174/0.204/0.150: the map''s
+      miss, worst in q on the new, is the error. Attempt C (dead end): global anchor, subsets fail (0.42/0.28/0.44/0.96).
+      Dead ends A (propagator factor), B (one per-event map). Searched docs/results.tex and plan.yaml for ''anchor map'',
+      ''phase-space median'', ''reference median'', ''kinematic descriptor'', ''threshold feature'', and site decisions for
+      anchor/D566: nothing beyond attempts C, D (plan step_why 25 names the reference phase-space anchor as the next attempt
+      if E fails with the own median still passing).'
+    measure: 'perevent_level.py --anchored --anchor map @579d356ad --model mlp (job_perevent_level.sh PEL_ANCHORED=1 PEL_ANCHOR=map
+      PEL_MMAP=''99c164da4365de9d7c017b75/train55296_val10000_test10000 b39fc80c8b10edbe4b07f6a0/train55296_val10000_test10000'',
+      CPU job on CC, same events as attempts C and D: first 2000 train-role events per process of the memmap base caches).
+      Per process level error e_S = mean(pred - y over S)^2 / sigma_p^2 on S = all, s_lo, s_hi, q_hard, q_soft. Ten 3-seed
+      ensembles (seeds 3k..3k+2) of the c,b network: median, min, max over ensembles of the new-set median; event bootstrap
+      (30) on ensemble 0. Candidates: shared, regressor (frozen), regressor_ens (control), oracle_const, D_sqE (ridge, re-run),
+      E_sqE_net, E_sqE_kin, E_sqE_hgb, D_sqE_own (diagnostic); each with _fit and _trueb; anchor_err per map (median |x0_p
+      - own median|/sx, new and cross-fitted train). Output data/perevent_anchored_E.json, figure perevent_anchored_fig.py
+      E.'
+    check: 'Existing data (attempt D, same events): the measure moves with the anchor: D_sqE 0.383 with the ridge anchor (miss
+      0.16/0.46/0.21 sx on new) against 0.182 with the own median (miss 0) on the full pool, and the subsets follow (0.36-0.44
+      vs 0.19-0.22). Code: synthetic end-to-end run of the exact code path (scratchpad test_attemptE.py, 150 processes, anchor
+      nonlinear in the descriptors m = 6 + 0.8 f0 + 0.6 f3^2): net map halves the anchor miss in L on new (0.208 vs ridge
+      0.415), _fit = 0 on all subsets (form exact), all maps run, output written; references (shared ~47, frozen regressor
+      ~0.044 within 10%) asserted in the job before writing.'
+    fixed: Events, 1352/43/96 split (classes_default.json, heldout_twins.json), the c,b network and descriptors, the ensemble
+      seeds and folds (GroupKFold(5) by weak_key), subsets, bootstrap, sx; only the anchor map changes. No training job, no
+      new data.
+    control: 'regressor_ens: the same network on the pool means of the same events, ten ensembles (a constant per process);
+      D_sqE with the ridge anchor re-run in the same job (attempt D''s arm, matched seeds); D_sqE_own (own-median anchor)
+      as the floor of any anchor map; oracle_const and shared beside them.'
+    seeds: 'Ten 3-seed c,b network ensembles (seeds 0-29) for every candidate and the control; the anchor maps fixed once
+      per map (net, kin: seeds 0-9 averaged; hgb random_state 0); events fixed; event bootstrap (30) on ensemble 0.'
+    outcome: 'As attempt D''s passed design. Level kept: an E map''s ten-ensemble median of the new-set median e_all <= regressor_ens''s
+      ten-ensemble max; partly kept up to 0.45; lost >= 0.45. Correct regardless of sampling: on every one of s_lo, s_hi,
+      q_hard, q_soft, the variant''s ensemble-median e_S within the level-kept bar (or e_S - e_all within 2 bootstrap sd),
+      and below regressor_ens''s e_S by more than 2 x sqrt(sd_E^2 + sd_reg^2) where regressor_ens''s e_S exceeds its e_all
+      by more than 2 bootstrap sd (a subset where the constant does not move is reported as not testing the claim). (Yes,
+      any map, both) report to Joaquin with the figure; next its training-run design (per-event level replacing the level
+      file). (No) read anchor_err: a map with a smaller miss than ridge but still failing -> the miss left is the error; no
+      map beats ridge''s miss on new -> descriptors cannot extrapolate the new families'' medians; with D_sqE_own still passing,
+      next attempt F: the reference phase-space anchor (median x of the process under a fixed flat sampling with its cuts,
+      plan step_why 25).'
+    sources: 'level-kept bar <- measured: regressor_ens''s own ten-ensemble max, re-measured in the job (attempt D: 0.369);
+      0.45 <- measured: content-only network''s new median 0.448 (norm_explore3.json B|nodiag|sampled), as attempts C, D;
+      every subset <- Joaquin''s words D566 ''this has to perform correctly in individual events regardless of that''; 2 bootstrap
+      sd <- measured noise (event bootstrap in the job)'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
