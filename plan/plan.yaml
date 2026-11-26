@@ -28317,6 +28317,7 @@ entries:
     - FA-ccin2p3-1a14c791
     - FA-ccin2p3-2642b17b
     - FA-ccin2p3-2c922af4
+    - FA-ccin2p3-32df7421
     - FA-ccin2p3-366a4a98
     - FA-ccin2p3-3fa9854a
     - FA-ccin2p3-3fc1016a
@@ -28350,13 +28351,14 @@ entries:
     - FA-lxplus-35ac6ab5
     - FA-lxplus-9fc1e04e
     - FA-lxplus-da06f228
-    commit: a569fc3fd
+    commit: 10fa13d07
     paths:
     - analysis/kit_benchmark/data/kit_curves_read.json
     - analysis/kit_benchmark/data/kit_fig_A.json
     - analysis/kit_benchmark/data/kit_fig_A_gmax4_uug.json
     - analysis/kit_benchmark/data/kit_fig_Aft_thrloop.json
     - analysis/kit_benchmark/data/kit_hpo.json
+    - analysis/kit_benchmark/data/kit_hpo_tt_divform_rezero.json
     - analysis/kit_benchmark/data/kit_mc_test.json
     - analysis/kit_benchmark/data/kit_threshold_scan.json
     - analysis/kit_benchmark/data/kit_verdict_A_hpo_ftsearch.json
