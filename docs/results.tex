@@ -9340,7 +9340,7 @@ for the fine-tune, against $6.53$, $1.57$ and $1.98$ at $400$ epochs, so batch $
 arm. Per cell, the best at $50$ epochs over the best at $400$ is $1.17$ (Muon) and $1.02$ (fine-tune) at $2048$,
 within the $1.22$ spread, and $4.68$ for Adam, whose $244$ steps stay far above its $400$-epoch best (train over
 validation MSE $0.939$ at the end of its stable phase: no memorisation). At $128$, $50$ epochs is worse for Muon ($1.66$), at most $1.39$ for
-the fine-tune, whose best sits at the window's lower edge (below), so worse or equal, and better for Adam
+the fine-tune (a bound, below), so worse or equal, and better for Adam
 ($0.743$). The fine-tune's best at $128$ sits at the lower edge of its learning-rate
 window, a fraction $0.0220$ of its log width, so $0.0151$ is an upper bound on that cell; a lower value only raises its
 $r_{50}$. The trials' spread, the third-best over the best, is at most $1.30$ in every cell; in both Adam cells it
