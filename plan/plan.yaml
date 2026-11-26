@@ -43402,6 +43402,11 @@ entries:
       vs -6.03. Seen pooled RMSE: scoring on gpu_v100_interactive (started 21:47 CET, writes runs/llmcmp_c_nooffshell/trial_1860/llm_score_seen.json).
       Correction to my decision (xxxix): the baseline''s CC CSV had no offshell columns (only the lxplus re-read FA-lxplus-e3b67532
       had them); re-read on CC 2026-11-26 21:54 with them.'
+  - at: '2026-11-26T20:58:28+00:00'
+    text: '2026-11-26 step 22 seen: no-off-shellness arm seen pooled RMSE of log|M|^2 0.129 (runs/llmcmp_c_nooffshell/trial_1860/llm_score_seen.json
+      on CC, interactive score 21:56 CET, tools/llm_score.py) against c_best''s 0.0533 (data/c_best_seen.json): 2.4x worse
+      in distribution without the input (val_loss_no_reg -5.718 vs -6.03). Step 22 read complete; the encoding question goes
+      to Joaquin (design''s branch ''groups gone, pole dependence kept'').'
   step_waits:
     '15': FA-ccin2p3-1b0cbd8a
     '21': FA-ccin2p3-1b0cbd8a
