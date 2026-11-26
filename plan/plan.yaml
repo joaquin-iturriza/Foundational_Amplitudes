@@ -28345,9 +28345,12 @@ entries:
     - FA-ccin2p3-366a4a98
     - FA-ccin2p3-3fa9854a
     - FA-ccin2p3-3fc1016a
+    - FA-ccin2p3-44f737bc
     - FA-ccin2p3-4f3b24ef
+    - FA-ccin2p3-6eb41dd6
     - FA-ccin2p3-6f578ef2
     - FA-ccin2p3-761cb2d8
+    - FA-ccin2p3-76945fa6
     - FA-ccin2p3-7aff4018
     - FA-ccin2p3-7d74d518
     - FA-ccin2p3-84d3488e
@@ -28375,7 +28378,7 @@ entries:
     - FA-lxplus-35ac6ab5
     - FA-lxplus-9fc1e04e
     - FA-lxplus-da06f228
-    commit: 230758a32
+    commit: 7537eff46
     paths:
     - analysis/kit_benchmark/data/kit_curves_read.json
     - analysis/kit_benchmark/data/kit_fig_A.json
@@ -28410,6 +28413,7 @@ entries:
     - tools/kit_curves.py
     - tools/kit_figures.py
     - tools/kit_hardps.py
+    - tools/kit_mc_madgraph.py
     - tools/kit_mc_test.py
     - tools/kit_package.py
     - tools/kit_precision_check.py
