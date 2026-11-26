@@ -15820,8 +15820,6 @@ entries:
       so what remains is followed. Each part shown working by replaying the real cases through the real path.'
     31: 'Check the D534 part 3 routing on its first real cases: a broken search trial acked as folded with no wake, and the
       next lxplus ssh-master drop probed twice before ''down'''
-    34: 'Check the lxplus costing fix (step 29) on the first real lxplus submit: its submit file carries +MaxRuntime equal
-      to --hdr=--time=, and the site gate''s gpu_window charge equals that time x GPUs, not the flavour''s wall time'
     35: 'Refusal cost after the D558 fixes (133a1b102, 2026-11-25): python3 tools/token_share.py --refusals --since 2026-11-26T00:00
       --until 2026-12-03T00:00, per role and check against the 2026-11-09..23 window (13.7% of all tokens upper, 5.0% lower;
       main session 32.1%, owners 6.5%); per day, since the windows differ in length; add the after-window to par:refusal-cost'
@@ -16504,11 +16502,6 @@ entries:
       if:
       - 'works: note it on the entry'
       - 'fails: fix and replay'
-    34:
-      feeds: whether lxplus jobs are charged their own time limit against the 30 GPU-h budget
-      if:
-      - 'charged its own limit: report done'
-      - 'charged the flavour: fix condor_sub or the gate, replay on that submit file'
     35:
       feeds: 'D558: whether the fixes cut the tokens spent after refusals'
       if:
@@ -16527,7 +16520,6 @@ entries:
     '30': the main session resuming this owner for part (3) routing (single run failures folded into their batch's result;
       probe_site tries ssh before DOWN), 2026-11-24
     '31': '2026-11-26'
-    '34': 2026-11-26 (the first real lxplus submit; read its submit file and gpu_window charge)
     '35': '2026-12-03'
   owner:
     agent: ac4f3bf623a93600d
