@@ -42140,6 +42140,15 @@ entries:
       design review, then the configurations that test it within the GPU budget'
     25: 'attempt E (step 25): the D_sqE form with a better process-intrinsic anchor map, designed, reviewed and run as a CPU
       job on htc'
+    26: 'step 15''s yes branch (2026-11-27, data/c_best_factor_split.json): the g g > t b W pair''s error is the on-shell
+      top region (near-pole fifth mean d -7.65 vs -5.16 elsewhere, se 0.05), which the same network has right on the trained
+      q q~ twins. Test whether giving the resonance''s level per event transfers it to the g g initial state: part (c)''s
+      searched best (trial_1860 HPs, sweep_config_llmcmp_c_latest.yaml) with the internal propagators'' Breit-Wigner factor
+      in the target (data.target_propagators, the canonical target-side lever) or the resonance input (data.resonance_per_event),
+      one arm, against trial_1860 itself; ~15 GPU-h (13.5 h V100 + 1.8 h sigma stage, step 22''s measured rate). Blocker to
+      fix first: both flags are asserted off on the memmap path (data_mmap.py:871, its docstring l.34) and the 1352-process
+      catalogue needs memmap: extend data_mmap to carry the target-propagator factor (worktree, tests, repo review), smoke
+      (D395), then design and review.'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -42455,6 +42464,12 @@ entries:
         design (per-event level replacing the level file)'
       - 'E fails with the own-median anchor still passing: anchor maps are the bottleneck; try the reference phase-space anchor
         (median x of the process under a fixed flat sampling with its cuts)'
+    26:
+      feeds: 'D564: why the LLM extrapolates better than our LLoCa'
+      if:
+      - 'the resonance''s level given per event closes the gg->tbW gap: report to Joaquin with the held-out figure'
+      - 'it does not: the near-pole miss is not a missing level factor; read what else differs between the q q~ and g g resonant
+        regions'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
