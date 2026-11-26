@@ -33504,6 +33504,30 @@ entries:
       its value against the MC error of sigma_exact. Efficiencies reported as numbers with the gain eff_x/eff_exact (exact
       evaluations saved). No yes/no threshold beyond the band: KIT asked for the numbers, D571.'
     sources: '16-84% band <- a measured spread: the bootstrap over the 2e5 events of each process'
+    fix_at: '2026-11-26T02:39:14+00:00'
+    fix: 'Outcome (check 4): the stated yes/no is ''bias RESOLVED if its 16-84% bootstrap band excludes 0''. That band is
+      paired over the same 2e5 events, so it is tiny: per-event log10 error rms ~1.4e-3 (uug, bulk log10-MSE 1.98e-6) gives
+      a band ~1e-5, while the models'' existing per-event bulk biases (kit_fig_A_hpo_arms.json: uug -7.4e-4, uugg +1.47e-3,
+      tt virtual +2.5e-4 decades, i.e. about -0.17%, +0.34%, +0.06% in sigma) will exclude 0 every time. Any result confirms
+      ''resolved'', so it is not a decision. The entry''s own step 23 branch, and KIT''s question, is whether the bias is
+      within the MC''s statistical error. Fix: state per process YES (passes the event-generation test) if |bias|, with its
+      band, is below mc_err = std(w)/mean(w)/sqrt(N) of sigma_exact on the same N = 2e5 events (source: that measured MC noise),
+      and NO if it is above; say what each changes (YES: reported as passing; NO: reported with the region that drives it).
+      Also add N* = (std(w)/mean(w)/|bias|)^2, the sample size at which the bias equals the MC error, because a pass at 2e5
+      events can turn into a fail for a larger production. The efficiencies stay as reported numbers with no pass bar (no
+      source gives one); say so explicitly. The NO branch needs ''which phase-space region drives it'', and it reads the same
+      arrays, so it goes in the same job, not a second one (check 19): bias and overweight share per bin of min s_ij/s for
+      uug and uugg, and of sqrt s for tt. Not failures, to state in the report: the tt ''cross section'' is the integral of
+      sigma(sqrt s) over flat sqrt s in [353.1, 1738.7] GeV, not a fixed-energy sigma; report eff_exact and eff_surr also
+      at the same 0.999 quantile reduction as eff_x_q, so the gain eff_x/eff_exact compares like with like; the gain counts
+      exact evaluations only, not surrogate cost (arXiv:2301.13562 includes timing). Checked and fine: weights (README/generate.py/ps.py
+      on CC: flat massless RAMBO with a rejection cut, so w = f; tt sqrt s uniform with cos theta and phi flat, symmetric
+      beams, so w = f beta/s), two-stage definitions (eff_x = E_surr[x]/x_max = (sum w_e/sum w_s)/max x, eff_two = eff_surr*eff_x,
+      gain 1/eff_exact to 1/eff_x exact evaluations), self-check passes locally, the three predictions.h5 exist on CC (Nov
+      13; package v6 matches them), CC has 17 GB free for a JSON, and there is no prior MC or unweighting result on KIT (searched
+      results.tex, plan.yaml, decisions for unweight, cross section, Monte Carlo, 2301.13562, event generation). Bakar''s
+      2026-11-09 email (pasted by Joaquin 2026-11-10, in the session transcript) asks only for ''the cross-section bias and
+      unweighting efficiency'' in a Monte Carlo, so the scope matches.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
