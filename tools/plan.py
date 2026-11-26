@@ -1655,7 +1655,7 @@ def leave_problems(eid, t=None):
     sweeps = site_sweeps(want_of(st, [eid]), all_sites=False)
     held = blocked_steps(e)
     out = []
-    for k in step_keys(e):
+    for k in [k for k, _ in nexts(e)]:   # not step_keys: its [1] for an entry with no next step flagged an empty step
         w = (e.get("step_waits") or {}).get(str(k)) or (e.get("step_waits") or {}).get(k)
         if k in held or (w and not waited_runs_ended(w) and not wait_due(w, t)):
             continue
