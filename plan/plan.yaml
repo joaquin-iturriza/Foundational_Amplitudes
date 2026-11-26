@@ -34549,6 +34549,10 @@ entries:
       refused at the relay host lpnclaude03.in2p3.fr:22), down since 2026-11-20. Step 4 needs the 448-process bigrun runs''
       data_stats.json, which exist only there: no copy in the tier-0 mirror (~/.local/share/ccorch/artifacts/FA, searched
       for bigrun and data_stats.json) and none in the run registry on another site. Step 4 re-waits to 2026-11-26.'
+  - at: '2026-11-26T00:04:08+00:00'
+    text: '2026-11-26: Jean Zay still refuses ssh (site list UNREACHABLE; retry site run jeanzay FA -- hostname: connection
+      refused at lpnclaude03.in2p3.fr:22), down since 2026-11-20; the bigrun data_stats.json exist only there (searched 2026-11-25).
+      Step 4 re-waits to 2026-11-27.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
