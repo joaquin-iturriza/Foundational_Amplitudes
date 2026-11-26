@@ -42495,6 +42495,18 @@ entries:
       re-measured rerun spread (new 5.2x, relabels 2.5x): 3.70x and 2.1x are inside it, not resolved by one seed; the bias^2
       drop 7.0x is beyond it. Figures figs/step16_level_file_heldout_per_process.png (MSE) and figs/step16_level_file_bias_heldout_per_process.png
       (|bias|, with the level network).'
+  - at: '2026-11-26T11:14:04+00:00'
+    text: '2026-11-26 step 8 64-head smoke FA-ccin2p3-1cdc28b2 (code 38aca0e884, H100 NVL, save_last=false) hit its 2 h limit
+      (TIMEOUT) in the sigma stage, at iteration 139 of 250. Training stage passed: 101,020,481 parameters, 50 steps at ~2.5
+      s/step (45 steps in 113 s), peak GPU 37.6 GB (max_used 39.4 GB), val_loss_no_reg -0.389 at step 50, test stage done
+      in 0.48 h. The sigma stage made 25 full validation passes (heterosc_sigma_stage_validations default; 13.5M val events,
+      ~6 min each at 64 heads): 2.5 h, more than 2x the smoke''s 1 h target. Fix in the smoke only: scripts/job_config_smoke.sh
+      passes training.heterosc_sigma_stage_validations=2 (@2458c2084; every later smoke picks it up). The full runs keep the
+      default 25, which costs ~2.5 h of sigma stage at 64 heads (validation-bound, so more at 120): this goes into step 8''s
+      wall time. Not tested: the fix has not yet run on a GPU (the resubmitted smoke tests it). The timed-out smoke''s dir
+      was deleted (our debris, 2.6 GB). Resubmitted identically plus the fix: FA-ccin2p3-e0a1abe4 (--allow-unfit: no 64G/80G
+      GPU free now on CC or lxplus, 12 CC GPUs can hold it; --time 3 h, target 1.5 h, --disk-gb 4.5). CC /sps free disk read
+      by site submit: 19 GB (pick''s warning said 14 GB).'
   step_waits:
     '13': FA-ccin2p3-623a3af6
     '14': FA-ccin2p3-f0b997a2
