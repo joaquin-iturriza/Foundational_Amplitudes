@@ -33838,6 +33838,75 @@ entries:
       Everything else holds: the one change against the 02:27 pass is the recipe (+3 signed pools, D572) and training.sign_head=true;
       arms are unchanged and matched; HETEROSC; 1/7 and 7 sourced from the 0.78-6.96 rerun spread; the smoke re-runs every
       stage; cost <= 44 GPU-h under D570.'
+  - at: '2026-11-26T13:00:51+00:00'
+    question: 'Step 20 (D570, Bakar''s fair one-loop protocol) with D572 (''But of course we need to be able to handle sign
+      changes... what are you talking about?''): the passed step-20 design of 2026-11-26T02:27 (FT from the ladder+star A2
+      parent vs SCR-A2 vs from-scratch V/B with exact Born, on kit_ee_tt__virt_finite at D = 100, 316, 1e3, 3162, 1e4, scored
+      on the KIT hard bins and bulk) run on the recipe D570 adapted with every one-loop pool of the finale in: recipes/transfer_finale_kit_fairnlo.yaml
+      @62bb84df6 = recipes/transfer_finale.yaml''s 28 processes + the KIT t t~ Born (bulk + hard tree points); its 6 one-loop
+      pools all bulk (ee_uu_nlo, uubar_ZZ_nlo, uubar_ttbar_nlo, and the three sign-changing ones restored: uubar_ddbar_nlo
+      31% negative, ee_mumu_ew_nlo, ee_uu_ew_nlo 65-92%). The A2 model handles the sign changes by the existing sign head:
+      does the fine-tune beat scratch A2 and the V/B baseline on the hard bins? Feeds the KIT NLO statement (branches as the
+      02:27 design).'
+    prior: 'Searched docs/results.tex (signedlog, sign head, abslog, sign-changing), plan show kit_benchmark / catalog_coverage,
+      site decisions (D287, D570, D572). (1) The passed step-20 design (2026-11-26T02:27) dropped the EW one loops and later
+      (@b93c2e524) uubar_ddbar_nlo because model.input_asym_factor refused a signedlog target; D572 rejects that. (2) The
+      signed pools'' A/B (results.tex ''The signed pools'' A/B'', 2026-10-24, 48 sign-changing catalog_v3 one-loop pools):
+      the sign head (log|x| floored at its 1% train quantile = ''abslog'', plus a sign logit) against the shifted signed log:
+      magnitude error 0.45 vs 0.78 (median per pool), the same 1.3% wrong signs; held out 1.9 vs 4.7; the sign head is the
+      target the catalog_v3 runs use. (3) The sign head under HETEROSC (D287, models/lloca.py sign_channel): readout rows
+      [mu, sign, sigma], init bit-equal to the het model, the sign BCE only on the sign-changing pools (experiment._proc_signed),
+      validation = MSE on the log-magnitude. (4) Pair sign head, near-zero weighting and more signed pools (sign_head_search,
+      catalog_v3): no gain or blow-ups: not used. Difference here: A2''s factor (log|M|^2 = log A + g, A the universal singular
+      factors) now applied to log|V| of a sign-changing pool, its sign from the het sign row; code @62bb84df6 (readout [mu,
+      alpha, sign, sigma], abslog accepted with training.sign_head).'
+    measure: 'As the 02:27 design: every arm scored by tools/kit_predict.py (Bakar''s evaluate.py) at the end of its job:
+      log10-MSE of log10|V|, bias, p99, |M|^2-weighted error per hard_test stratum (Coulomb, Sudakov) and bulk_test, collected
+      by tools/kit_figures.py collect into analysis/kit_benchmark/data/kit_fig_fairnlo.json; per family and D the median over
+      strata of log10(arm/control log-MSE) (tools/kit_readout.py --vs), deepest-bin median signed error and fitted threshold
+      exponent (tools/kit_extrap_read.py, truth -1.02). Figure: log-MSE against D per family, three arms, log axes, and the
+      per-bin panel at D=1e4. Added for the sign: the parent''s val mu-MSE per pool beside 47e14eae''s on the 26 pools whose
+      target is log in both runs (the three sign-changing pools are left out of that comparison: 47e14eae trained them on
+      the signed log, sign_head false, this parent on log max(|x|,s), different target spaces); and the wrong-sign fraction
+      of each sign-changing pool from the parent''s sigma_stage/preds_val.npz `sign` column (written by experiment.py under
+      the sign head) by tools/kit_sign_read.py @9fd82418d (self-check passes; no magnitude read, so no standardization involved;
+      CPU, seconds), shown working on the parent smoke''s output before the real parent goes.'
+    check: 'The arms'' measure moved with A2 and with fine-tuning on existing runs (02:27 design: deepest tt Coulomb 3.55
+      -> 0.010 with A2; 11c fine-tunes 1.58-6.23 vs scratch 0.82 on high energy). The sign handling moved its own measure
+      on existing data: sign head vs signed log 0.45 vs 0.78 magnitude error on 48 pools (results.tex 2026-10-24). Code: tests/test_input_reps.py::test_asym_factor
+      @62bb84df6 (A2 + sign row: rows [mu, alpha, sign, sigma], output [mu, sign, sigma], mu and sigma bit-equal to the A2
+      het model without the row at one seed) passes, with tests/test_het_sign_head.py and test_sign_branch.py (run per file:
+      test_input_reps sets float64 globally at import). The KIT target kit_ee_tt__virt_finite is positive on every role (the
+      A2 KIT runs trained and scored it under ''log'', which refuses x<=0), so its target and the arms'' setup are unchanged;
+      the sign row there carries no loss (no signed pool).'
+    fixed: 'Everything of the 02:27 design (parent finale case, flags=off, lr 1.89e-3, 64000 steps, WSD 1/8, batch 16384,
+      float32, seed 42, HETEROSC + sigma stage, A2 flags model.input_asym_factor=true model.net.frames_gamma_max=4, data.target_physics_factor=false
+      data.target_physics_orders=false data.affine_multiplicity_std=true; arms'' HPs per D, horizons 5950/8500, cosine, float64,
+      scoring, tags) except: the recipe @62bb84df6 (three sign-changing one-loop pools back), and ++training.sign_head=true
+      on the parent (sign_loss_weight 1, sign_near_weight 1, defaults): a pool with a negative value in any role trains on
+      abslog:<s> = log max(|x|, s), s its 1% train quantile of |x|, plus the BCE of the het sign row; positive pools keep
+      log. The arms inherit the parent''s config (sign row, no signed pool). Site lxplus (data, earlier smokes and parent
+      prebuild there; CC /sps/lpnhe near full). Smoke first (D395, the setup changed): parent iters=50 tag=kit_fairnlo_a2s_smoke,
+      then FT, SCR-A2 and V/B 50 steps at D=1e4 from it through scoring (fairnlo_arms.py --smoke, tag _smoke4). Then the real
+      parent tag=kit_fairnlo_a2 (limit 14 h, target 10 h), SCR-A2 + V/B at all five D once the parent''s config exists, FT
+      at all five D after it ends. Cost as 02:27: <= 44 GPU-h, under D570''s 100. Disk on lxplus (EOS user quota, eos quota
+      read 2026-11-26 ~14:00: 976.44 GB of 1.00 TB logical used, ~24 GB free): parent ~1 GB at full size (smoke2 dir 31 MB
+      at 50 steps, plus checkpoints and sigma-stage preds), arms ~80 MB x 15 = 1.2 GB, smokes < 0.2 GB: ~2.4 GB, 10x margin;
+      pools load in memory (memmap false), the restored pools'' train/val/test files already on lxplus (amp_data_cache, datasets),
+      no new cache. Re-read free quota before each submission.'
+    control: 'As 02:27: FT against SCR-A2 at each D (same data, config, steps, seed, scoring; only the start differs); FT
+      and SCR-A2 against the protocol''s V/B baseline at each D. Beside: Bakar''s MLP at 1e5, package v6 A2 at 1e5, 47e14eae''s
+      per-pool val; for the sign, the signed pools'' A/B wrong-sign 1.3% (results.tex 2026-10-24) as reference.'
+    seeds: 'One seed (42) per run (D315); spread: same-HP rerun spread of t t~ V runs 0.78-6.96 on test (sec:datasaving).'
+    outcome: 'As 02:27, per family (bulk; Coulomb; Sudakov) and D, R = arm/control log-MSE (median over strata): BEATS if
+      R < 1/7, LOSES if R > 7, else LEVEL; branches (a) FT BEATS VB on a hard family -> strong positive there; (b) FT not
+      better than VB but BEATS SCR-A2 -> pretraining transfers within the factor model, baseline wins; (c) FT not better than
+      SCR-A2 -> inconclusive. Blow-up rules as 02:27 (parent rerun once at half lr 9.45e-4; FT at 1e3 rerun once at lr_scale
+      0.126). The wrong-sign fractions and the signed pools'' val are reported with no bar (none sourced): they say whether
+      the sign was learnt, not a verdict.'
+    sources: 1/7 and 7 <- the test same-HP rerun spread 0.78-6.96 of t t~ V runs (measured, results.tex sec:datasaving, diag_readout.py
+      @5555a0f0); 5x validation jump <- the ladder seeds' blow-ups against 1.5x seed noise (results.tex sec:ladder); 100 GPU-h
+      <- D570 names this work
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
