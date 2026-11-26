@@ -28,4 +28,5 @@ talks/progress_nov2026/figs/arms_zero_shot_axes_a.pdf
 talks/progress_nov2026/figs/arms_zero_shot_axes_b.pdf
 talks/kit_nov2026/main.pdf
 analysis/llm_compare/suprio_llm_heldout_fig.png
-analysis/kit_benchmark/source/hardps_benchmark_slides.pdf  # Bakar's slide deck, a document not a figure
+# Bakar's slide deck, a document not a figure
+analysis/kit_benchmark/source/hardps_benchmark_slides.pdf
