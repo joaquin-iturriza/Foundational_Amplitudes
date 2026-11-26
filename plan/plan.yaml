@@ -33337,6 +33337,114 @@ entries:
       D570), 2, 3 (one seed per D315; 1/7 and 7 against the 0.78-6.96 test rerun spread), 6, 7, 8, 9 (HETEROSC in the parent
       and arms), 12 (no HPO, per D570), 14 (/sps/lpnhe 17 GB free now, parent in memory ~1 GB plus 15 x 80 MB fits), 16, 17,
       19.'
+  - at: '2026-11-26T02:27:23+00:00'
+    question: 'Step 20 (D570, Bakar''s fair one-loop protocol): on the KIT e+e- -> t t~ one-loop virtual (kit_ee_tt__virt_finite),
+      at D = 100, 316, 1e3, 3162, 1e4 bulk target events, does a fine-tune from a ladder+star pretraining (recipes/transfer_finale_kit_fairnlo.yaml
+      @db384142: the 28-process finale minus its two sign-changing EW one-loop pools plus the KIT t t~ Born with its hard
+      tree points; 4 other one-loop pools, all bulk; no e+e- -> t t~ one loop, no hard one-loop point) trained in the KIT
+      model''s extrapolating configuration (A2: model.input_asym_factor, plain target and momenta, gamma<=4) beat (a) the
+      same model from scratch and (b) the protocol''s baseline, a from-scratch V/B with the exact Born, on the KIT hard bins
+      (Coulomb, Sudakov strata) and the bulk? Feeds: the KIT NLO statement of the draft (step 20 branches: beats the V/B baseline
+      on hard bins -> strong positive; not -> inconclusive, tree has no loop functions).'
+    prior: 'Searched docs/results.tex (sec:datasaving, sec:ladder star arms ~l.15950-16000, par:vob_june), plan show pretrain_data_saving
+      / virtual_over_born / zng_uq_benchmark / finetune_mechanism / critical_batch / kit_benchmark, site decisions D391, D402,
+      D433, D487, D493, D506, D539, D560, D570, D571. (1) Catalog parents (sec:datasaving, stage 2, treesin_r4, cosine, V/B,
+      8-trial searches per D): saving S on t t~ V 0.45 [0.26,0.58] on test, the fine-tune needs MORE data than scratch; physical-mass
+      tops added: within the same-HP rerun spread. So the catalog recipe (catalog_v4_kit_pretrain_fair_nlo.yaml, built earlier
+      for this step) is the one that does NOT fine-tune well on t t~ V: not used. (2) Ladder/star (old setup, sec:ladder):
+      the t t~ threshold arm (rung 1 + u u~ -> t t~ tree and one loop 363-450 GeV) on e+e- -> t t~ one loop near threshold
+      is 2-4x below rung 1 from D=1e3 up, rung 1 1.6-3.6x below scratch from 1e3 up, both 2.5-20x worse than scratch at D<=10^2.5;
+      the finale (all ladder + star) level with each star arm on its own probe. This is the recipe that fine-tuned relatively
+      well (D570: ''something probably from the ladder runs''). (3) zng_uq_benchmark: the finale retrained in the current
+      setup (FA-ccin2p3-47e14eae: WSD 1/8, lr 1.89e-3, 64000 steps, batch 16384, W in internal_mass_pdgs) STABLE, geometric-mean
+      val MSE 7.1e-6 over its 28 pools, 7.97 h on CC; no t t~ one-loop fine-tune from it. (4) KIT: A2 FIXED every family with
+      an exponent (uug soft/coll, tt Coulomb; package v6); 11c fine-tunes from catalog parents with tops added (not A2): deepest
+      Coulomb 6.76-9.06 vs scratch 7.48, high energy 1.58-6.23 vs 0.82. (5) V/B baseline: vob_tt_VB_atVhp1333 (catalog pool,
+      not KIT): V/B 3.9x below V on test; for KIT it must be refit on the KIT bulk at each D (finding 2026-11-10T08:58). (6)
+      The catalog fair one-loop pretraining built for this step (FA-ccin2p3-d0b132b6 + resume 03ea3719, runs/kit/kit_pretrain_fair_nlo,
+      recipes/catalog_v4_kit_pretrain_fair_nlo.yaml: every catalog_v4 tree + v4_epem_ttx + 10 one-loop pools, 68224 steps,
+      finished 2026-11-11) and its D-scan, held by D402 (''we clearly haven''t converged on something that does what we want,
+      so no''): not reused, because it is the catalog recipe family whose fine-tunes lost to scratch on t t~ V (S=0.45), not
+      the recipe that fine-tuned well that D570 asks for, and its emission-scale target is refused by the A2 factor. (7) D425
+      (''And okay, then we should match the number of epochs'', KIT search horizon 300 epochs at 1e5, as Bakar''s MLP): at
+      this scan''s batch D/2, 300 epochs is 600 steps at every D, below the measured val minimum of these targets (stage-2
+      calibration, D391: minima at ~1360-8500 steps); the D-scan keeps D391''s horizons, the rule Joaquin set for this kind
+      of scan (D356, D391: ''find when it gets to a minimum, then 10% more''), at which the stage-2 HPs were searched; stated
+      to Joaquin as a choice. (8) The recipe keeps u u~ -> t t~ at one loop (363-450 GeV, beta >= 0.30, bulk): it is outside
+      the held-out e+e- -> t t~ family (gen_kit_pretrain.family_of), one of the <= 10 other one-loop processes the protocol
+      allows, and the star-arm process that carried the old transfer; stated as a choice. Differences here: the ladder+star
+      recipe adapted to the protocol, the A2 configuration in parent, fine-tunes and scratch, KIT data and scoring, the D-scan
+      never run (D402 superseded by D570). No HPO (D570): HPs are the stage-2 searches'' bests for this target and D grid.'
+    measure: 'Each run scored by tools/kit_predict.py (Bakar''s evaluate.py) at the end of its job: log10-MSE of log10|V|
+      per hard_test stratum (Coulomb, Sudakov) and bulk_test; collected by tools/kit_figures.py collect into analysis/kit_benchmark/data/kit_fig_fairnlo.json;
+      per family and D the median over strata of log10(arm/control log-MSE) (tools/kit_readout.py --vs), deepest-bin median
+      signed error and the fitted threshold exponent (tools/kit_extrap_read.py, truth -1.02). Figure: log-MSE against D per
+      family (bulk, Coulomb deepest, Sudakov deepest), three arms, log axes; and the per-bin panel at D=1e4. Curves: tools/kit_curves.py
+      on each run''s val/train mu-MSE (separation, end_up). Parent: its val MSE per pool beside 47e14eae''s.'
+    check: 'On existing runs the measure separates arms of this kind: A2 vs plain from scratch moved the deepest tt Coulomb
+      bin 3.55 -> 0.010 log-MSE (step 18), 0.023 vs 7.5 at searched HPs (package v6 vs scratch); fine-tunes vs scratch on
+      tt V at fixed HPs moved val 0.19-1.92x (sec:datasaving tops/offown diagnostics); the 11c fine-tunes moved the high-energy
+      deepest bin 1.58-6.23 vs scratch 0.82. V/B vs V from scratch: 3.9x on test (vob). Code: model.input_asym_factor asserts
+      one target std (experiment.py:1282) and natural-log targets on every pool: 47e14eae already has data.shared_standardization=true
+      (one pooled std); the EW signed pools go out; the plain target is unit-dependent across multiplicities only by a level
+      offset (4-N) ln Lambda^2, linear in N (results.tex ''Why a dimensionless target'' ~l.18778), which data.affine_multiplicity_std=true
+      (mean a + b N, one sigma) absorbs while keeping one std; the D395 smoke below runs the whole path (parent with a KIT
+      pool in a recipe + A2, A_ft from it, scratch A2, V/B on KIT with the Born sidecar via kit_hardps.ensure_born and kit_predict''s
+      V/B branch) before the batch.'
+    fixed: 'Parent: site submit ccin2p3 FA scripts/job_datasaving_parent.sh -- finale recipe=recipes/transfer_finale_kit_fairnlo.yaml
+      flags=off lr=1.89e-3 tag=kit_fairnlo_a2 ++model.input_asym_factor=true ++model.net.frames_gamma_max=4 data.target_physics_factor=false
+      data.target_physics_orders=false data.affine_multiplicity_std=true (finale case). Settings against 47e14eae''s config.yaml
+      (runs/data_saving/dsave_parent_finale_zng_uq_w_lr1p89e-3_cc, read 2026-11-26): differ: data.processes_file transfer_finale.yaml
+      -> transfer_finale_kit_fairnlo.yaml; model.input_soft_eps 1e-8 -> 0 and model.input_pair_logs 7 -> 0 (flags=off: A2''s
+      plain momenta, as the KIT A2 models); data.target_physics_factor true -> false and data.target_physics_orders true ->
+      false (A2''s plain target); data.affine_multiplicity_std false -> true; model.input_asym_factor (absent/false) -> true;
+      model.net.frames_gamma_max (default) -> 4. Same: data.shared_standardization true, amp_trafos [log, standardization],
+      internal_mass_pdgs [23,6,25,24], eval_subsample 10000, WSD cooldown 0.125, lr 1.89e-3, 64000 steps, batch 16384, float32,
+      trial 1262 base for every other key, seed 42, HETEROSC + sigma stage; limit 14 h. If the parent blows up (non-finite
+      steps or a validation jump >= 5x not recovered, as D83''s plain shared run at step 8734) before its cooldown, it is
+      rerun once at half the lr (9.45e-4, the repair that stabilised 47e14eae''s own first retrain), stated; a blow-up inside
+      the cooldown keeps its best checkpoint. Arms on kit_ee_tt__virt_finite via scripts/job_kit.sh, float64, n_val 1e5 bulk
+      (bulk-only early stopping, mu_mse selection), test 2e5 bulk + every hard_test stratum, seed 42, training.scheduler=CosineAnnealingLR
+      (the HPs were searched under cosine), batch min(16384, D/2) (experiment.py cap), T(D) = 5950 at D=100, 8500 at 316..1e4
+      (stage-2 horizons, D391 rule). HPs per D = stage-2 search bests (sweeps_local/dsave_s2_{ft,scr}_ee_ttbar_nlo_d{4..8}_*/summary.txt).
+      FT (A_ft, KIT_PARENT=runs/data_saving/dsave_parent_finale_kit_fairnlo_a2, fine_tune.offshell_stats=own as the one-loop
+      fine-tunes since sec:datasaving, target_stats own): training.lr = stage-2 base lr (8.11e-3, 6.665e-3, 6.833e-3, 7.817e-3,
+      4.648e-3) with KIT_LR_SCALE = best lr_scale (0.1259, 0.1224, 7.412, 0.1637, 0.1090) and the best layer_decay, muon_weight_decay,
+      regularization_lambda, cosanneal_warmup_frac, cosanneal_eta_min, ema, ema_decay at D=100..1e4. SCR-A2 (A mode, same
+      KIT_PARENT so the config is the parent''s: same A2 flags and standardization, pretrained_path null): the stage-2 scratch
+      bests (lr 3.045e-3, 4.000e-3, 1.156e-2, 1.124e-2, 5.999e-3 with their wd, lambda, warmup, eta_min, ema). VB baseline
+      (A mode, the same KIT_PARENT config, model.input_asym_factor=false data.target_over_born=true: differs from SCR-A2 only
+      in the factor and the V/B target): the same scratch bests. Tags fairnlo_{ft,scra2,vb}_d<D>. Smoke (D395, first): parent
+      iters=50 tag=kit_fairnlo_a2_smoke; then FT, SCR-A2 and VB at 50 steps from it at D=1e4 (the largest batch, 5000: the
+      slowest arm), each through scoring; their logged s/step at float64 sets the arms'' wall need (8500 x rate) and limits
+      (need x 1.3 + scoring 0.3 h), recorded with plan target before the batch. Cost: parent ~8-10 h (47e14eae 7.97 h; A2
+      adds the factor''s per-event terms) = 10 GPU-h; 15 arm runs, upper bound from the float64 KIT runs at batch 16384 (0.55-0.79
+      s/step, finding 2026-11-11T20:15) x 8500 + 0.3 h scoring = <= 2.2 h each, <= 33 GPU-h (smaller batches are cheaper;
+      the smoke measures D=1e4); smokes 0.5: <= 44 GPU-h, under D570''s 100. Wall targets: parent 10 h, arms from the smoke''s
+      rate, one wave each (SCR-A2 and VB need only the parent''s config (the smoke parent''s, identical but for iterations
+      and run dir), so they go after the smoke; FT after the parent). Disk ~80 MB/run, parent ~1 GB, against CC free disk
+      read at submission.'
+    control: 'FT against SCR-A2 at each D: same data, model config (the parent''s), steps, batch, seed and scoring; only the
+      start differs (the pretraining''s effect); HPs are each arm''s own stage-2 best, as sec:datasaving compares best against
+      best. FT and SCR-A2 against VB at each D: the protocol''s baseline (Bakar: from-scratch V/B with exact Born) on the
+      same KIT bulk D, steps and scoring. References beside: Bakar''s MLP at 1e5 (kit_vs_mlp), package v6 A2 at 1e5, 47e14eae''s
+      per-pool val.'
+    seeds: 'One seed (42) per run (D315). Spread used: the same-HP rerun spread of t t~ V runs at these D, 0.46-4.84 on val,
+      0.78-6.96 on test (sec:datasaving offown diagnostics); the transformer rerun spread 1.1-30x (results.tex ~13232) quoted
+      beside.'
+    outcome: 'Per family (bulk; Coulomb; Sudakov) and D, R = arm/control log-MSE (median over the family''s strata). BEATS
+      if R < 1/7 (outside the test rerun spread 0.78-6.96), LOSES if R > 7, else LEVEL. Verdicts are reported per D (no count
+      across D). Branches, read per D and reported as the D range where each holds: (a) FT BEATS VB on a hard family -> strong
+      positive statement there (step 20 YES), with FT vs SCR-A2 saying whether the pretraining or the factor carries it. (b)
+      FT LEVEL/LOSES vs VB but BEATS SCR-A2 -> the pretraining transfers within the factor model, the baseline wins: reported
+      as such. (c) FT not better than SCR-A2 -> no transfer of one-loop structure from tree + 4 bulk one loops: inconclusive
+      (tree has no loop functions), reported. Bulk reported beside every hard verdict. A run that blows up is listed apart
+      with where; FT at D=1e3 (lr_scale 7.41, an outlier of the five bests) that blows up is rerun once at the median lr_scale
+      of the other four D (0.126), stated. Curve form (separation/end_up) beside every verdict.'
+    sources: '1/7 and 7 <- the test same-HP rerun spread 0.78-6.96 of t t~ V runs (measured, results.tex sec:datasaving, diag_readout.py
+      @5555a0f0); 5x validation jump <- a measured spread: the ladder seeds'' blow-ups, jumps of five-fold or more between
+      two validations against same-HP seed noise of 1.5x median (results.tex sec:ladder); 100 GPU-h <- D570 names this work
+      (CLAUDE.md GPU budget)'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
