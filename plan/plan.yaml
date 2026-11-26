@@ -41047,12 +41047,6 @@ entries:
       instead of mu_N = a + bN; code (data.level_file in _resolve_amp_preprocessing and parent_target_standardization, unit
       test, repo review), one ~50-step smoke (D395), the run, scoring by job_llm_score.sh, read against trial 5 and the post-hoc
       substitution (level_source.py). Design recorded 2026-11-25, in review.'
-    19: '19: D564/D567 repair: retrain the untuned his-setup control (part (a) matched control, lr 1e-3 constant, no warmup,
-      L2 0, EMA off, seed 42, 60,840 steps; its first run FA-lxplus-cb9273f1 lost models/ to the 11-24 prune, now blocked
-      by prune.py @b1aea28e0) on CC as trial_9000, identical flags; when it ends: compare its best val MSE of z to the first
-      run''s 6.79e-4, then job_llm_score.sh RUN=runs/llmcmp_a_adamw_const/trial_9000 EVENTS=1, copy the scores to data/ under
-      the untuned arm''s names, redraw heldout_per_process.py (all arms, --part shape) and shape_dists.py with the untuned
-      arm'
     21: '22: D567/D564 matched test after step 21 (the gg->ttH split follows the sign of the internal-top off-shellness input):
       does our setup without the off-shellness input lose the split and the gg->tbW level error? Arm: part (c)''s control
       config and HPs (runs/llmcmp_c_qperp/trial_9000, FA-ccin2p3-d34535b0), identical flags except data.offshell_per_event=false
@@ -41280,12 +41274,6 @@ entries:
         set by the target''s per-process mean; the fix is a process-level level predictor in the target, carried to our setup'
       - 'the network overrides it (new median within 1.38x of trial 5''s 1.144): the level is learned from the particles whatever
         the target says; next, what in the inputs sets it (pID embedding vs property table)'
-    19:
-      feeds: 'D567 (how well each model gets the shape) and D564 (why the LLM extrapolates better): whether tuning changes
-        the level-removed shape error in his setup'
-      if:
-      - 'best val within the seed spread of 6.79e-4: score it and add the untuned arm to the shape figures'
-      - 'best val far from 6.79e-4: report the retrain as not reproducing, read the curves before scoring'
     21:
       feeds: 'D567/D564: whether the off-shellness input causes our setup''s new-family shape split and level errors'
       if:
@@ -42121,7 +42109,6 @@ entries:
     '15': 'steps 16-18''s reads (FA-ccin2p3-89671610 level_file run, FA-lxplus-49899ef8 per-event network, FA-ccin2p3-996866f8
       log F re-read): the level-branch configurations are those three; the next one is designed from what they show'
     '16': FA-ccin2p3-89671610
-    '19': FA-lxplus-8516d84c
     '21': FA-ccin2p3-1b480869
     '22': FA-ccin2p3-0d721df0
   handoff:
