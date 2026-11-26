@@ -16519,7 +16519,7 @@ entries:
       be started by hand)
     '30': the main session resuming this owner for part (3) routing (single run failures folded into their batch's result;
       probe_site tries ssh before DOWN), 2026-11-24
-    '31': '2026-11-26'
+    '31': '2026-12-03'
     '35': '2026-12-03'
   owner:
     agent: ac4f3bf623a93600d
