@@ -28543,6 +28543,11 @@ entries:
       not settle it.
     blocks: nothing
     blocks_steps: []
+    answered_at: '2026-11-26T12:32:36+00:00'
+    decision: D570
+    withdrawn_at: '2026-11-26T12:32:36+00:00'
+    withdrawn_why: the unguided-wave question concerns the step-22 searches, which D570 never asked for; they ran on the main
+      session's mistaken go and are closed with no further trials
   - ask: 'Scope: the fair-NLO pretraining recipe (recipes/transfer_finale_kit_fairnlo.yaml) lost its QCD one-loop u u~ ->
       d d~ pool (@b93c2e524): 31% of its events are negative and the A2 model (D570, model.input_asym_factor) refuses sign-changing
       targets; 26 processes stay, 3 one-loop in bulk. Keep it dropped, or replace it by another QCD one-loop 2->2 pool without
