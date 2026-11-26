@@ -28316,9 +28316,8 @@ entries:
       (V/B smoke FA-lxplus-abac4281 clean): site pick, then SCR-A2 + V/B at all five D (fairnlo_arms.py <site> runs/data_saving/dsave_parent_finale_kit_fairnlo_a2
       <limit>, lines 2 and 3; SCR-A2 ~2.4 h, V/B ~0.95 h limits), parent config read from lxplus (site copy to CC if picked
       there)'
-    24: 'Step 20 fine-tunes: when the fair-NLO parent FA-ccin2p3-a3bc3374 (runs/data_saving/dsave_parent_finale_kit_fairnlo_a2,
-      10 h target) ends, submit FT at every D (fairnlo_arms.py with that parent, FT lines, limit from the arm smokes'' s/step),
-      then read FT vs SCR-A2 vs V/B per D on the hard bins (design PASS 2026-11-26T02:27)'
+    24: 'Fair one-loop FT at every D when the parent FA-lxplus-828d67d6 (runs/data_saving/dsave_parent_finale_kit_fairnlo_a2)
+      ends: fairnlo_arms.py FT lines, then read FT vs SCR-A2 vs V/B per D (design PASS 2026-11-26T02:27 / 13:00)'
     25: 'D573/D574 standalone KIT package v7 (A2 models of sec:kit-mc; predict.py writes log10_me2 / log10_abs_virt_finite
       + the value under the benchmark''s names; @1d050c7c37): build+check CPU job FA-ccin2p3-5c3fb7fa -> runs/kit_export/fa_kit_surrogates_v7.tar.gz;
       on PACKAGE_OK fetch the tarball (site fetch --what all), clean local venv per README on examples/*, copy to analysis/kit_benchmark/export/,
@@ -29849,11 +29848,11 @@ entries:
       - 'smokes clean: submit SCR-A2 + V/B at all D'
       - 'a smoke breaks: read log, fix inside the setup, resmoke'
     24:
-      feeds: 'D570: does fine-tuning from a pretraining recipe that works beat from scratch (SCR-A2, V/B with exact Born)
-        on ee->tt one-loop at 100-1e4 bulk points'
+      feeds: 'D570: does fine-tuning from the signed A2 pretraining beat SCR-A2 and V/B with exact Born on ee->tt one loop
+        at 100-1e4 points'
       if:
-      - 'FT below SCR-A2 and V/B per D past the design''s 1/7 bar: report the recipe as the fair-NLO answer to KIT'
-      - 'FT not below them: report per D where it loses, with the parent''s curves'
+      - 'FT below SCR-A2 and V/B past 1/7: the fair-NLO answer to KIT'
+      - 'not: per D where it loses, with the parent''s curves'
     25:
       feeds: 'D573/D574: KIT runs our surrogates in their own MC'
       if:
