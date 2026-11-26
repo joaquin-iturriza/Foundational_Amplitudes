@@ -47282,6 +47282,8 @@ entries:
     state: working
     since: '2026-11-26T05:11:47+00:00'
     state_at: '2026-11-26T05:11:47+00:00'
+    context: 41201
+    context_at: '2026-11-26T05:30:40+00:00'
   designs:
   - at: '2026-11-24T00:44:54+00:00'
     question: 'Step 1 of critical_batch (D532): what is the gradient noise scale B_simple = tr(Sigma)/|G|^2 (McCandlish et
