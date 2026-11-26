@@ -9271,7 +9271,7 @@ hyperparameters, read at $b=2048$, $4096$ and $8192$, the full step raises the l
 $13$ windows (Fig.~\ref{fig:cbs_update}, top): it overshoots by the same amount at every $b$. $5$ windows hold a
 read above $100$ times their median and are set apart; the one fitted $B_{\rm dL}$, $201$, is among them. In the
 other windows $B_A$ lies between $27.9$ and $111$, and in the windows holding the run's own crossings of the scan's
-three loss targets $B_q$ is $102$, $112$ and $137$, below a third of $B_{\rm crit}$ at each: the design's NO.
+three loss targets $B_q$ is $102$, $112$ and $137$, below a third of $B_{\rm crit}$ at each: the design's outcome for no.
 % src: python3 analysis/critical_batch/dl_read.py analysis/critical_batch/data/pretrain_update_noise_scale.json pretrain_update_bdl --ref 2500 6690 --ref-label "scan's critical batch, range" @ada4a16c8
 % claim: n_dL_nonpositive=12
 % claim: n_windows=13
