@@ -23,6 +23,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 
 T = "runs/kit/kit_A_{p}_n100000_t8000_{tag}"
+A2 = "runs/kit/kit_A_{p}_n100000_t1831_hpo_asym_cont"   # the asymptotic-factor (A2) models of sec:kit-mc, packaged for KIT (D573)
+A2L = "transformer, asymptotic factor"
 M = "runs/kit_mlp/kit_A_{p}_n100000_t14400_mlp{arm}_s{s}"
 # per process: (label, run dirs); MLP arms list their three seeds (medians over seeds)
 MODELS = {
@@ -35,6 +37,7 @@ MODELS = {
                           ("no frames, no off-shellness", [T.format(p="ee_tt_virt_finite", tag="softpairthr_noframesoff")])]}
 THR = r"MLP, log + $\log(s_{t\bar t}-4m_t^2)$"
 for _p, _m in MODELS.items():
+    _m.insert(0, (A2L, [A2.format(p=_p)]))
     # the ladder's 'mlp' arm is his setup: log invariants, plus the threshold column on tt (kit_mlp_ladder.py)
     _m += [(THR if _p.startswith("ee_tt") else "MLP, log invariants", [M.format(p=_p, arm="mlp", s=s) for s in range(3)]),
            ("MLP, raw invariants", [M.format(p=_p, arm="raw", s=s) for s in range(3)])]
@@ -154,8 +157,8 @@ def plot(path, figs):
     ps.use()
     os.makedirs(figs, exist_ok=True)
     d = json.load(open(path))
-    labs = ["transformer", "no frames", "no frames, no off-shellness", "MLP, log invariants", "MLP, raw invariants"]
-    style = dict(zip(labs, [("o-", ps.C.vermillion), ("v-", ps.C.purple), ("D-", ps.C.orange),
+    labs = [A2L, "transformer", "no frames", "no frames, no off-shellness", "MLP, log invariants", "MLP, raw invariants"]
+    style = dict(zip(labs, [("*-", ps.C.vermillion), ("o-", ps.C.purple), ("v-", ps.C.orange), ("D-", ps.C.yellow),
                             ("o-", ps.C.blue), ("s-", ps.C.green)]))
     style[THR] = ("^-", ps.C.sky)
     labs = labs + [THR]
@@ -289,7 +292,43 @@ def summary(d):
                          **{st: lm(st) for st in sts}, **{f"exp_{st.rsplit('_', 2)[0]}": ex(st.rsplit('_', 2)[0]) for st in sts}})
             lines.append(f"| {proc} | {lab} | {lm('bulk'):.2g} | " + "; ".join(cells) + " |")
     d["summary"] = rows
-    return "\n".join(lines)
+    return "\n".join(lines) + "\n\n" + extra_summary(d, deep)
+
+
+EXTRA = (("bias", "bias"), ("p99_abs", "p99 |dlog10|"), ("me2_weighted_rel_err", "|M|^2-weighted rel. err."))
+
+
+def extra_summary(d, deep):
+    """evaluate.py's other metrics (kit_result.json), median over seeds: bias = mean(pred - truth) in log10, p99_abs =
+    99th percentile of |pred - truth| in log10, me2_weighted_rel_err = sum |M|^2_true |pred/true - 1| / sum |M|^2_true,
+    on bulk and the deepest bins; uugg azimuth: rms over events of h = 2<log10|M|^2 cos 2phi>_phi, truth and
+    prediction, and the rms of their difference, per y"""
+    def full(r):
+        return {("bulk" if k.startswith("bulk_test") else k.split("/")[1]): v
+                for k, v in r.get("strata", r).items() if isinstance(v, dict) and "/" in k}
+    rows, lines = [], ["| process | model | bin | " + " | ".join(l for _, l in EXTRA) + " |", "|---|---|---|---|---|---|"]
+    for proc, sts in deep.items():
+        e = d[proc]
+        for lab, rs in [(lab, rs) for lab, rs in e["result"].items()] + [(lab + " [his]", [r]) for lab, r in e["base"].items()]:
+            fs = [full(r) for r in rs]
+            for st in ["bulk"] + sts:
+                v = {k: float(np.median([f[st][k] for f in fs if st in f and k in f[st]])) for k, _ in EXTRA
+                     if any(st in f and k in f[st] for f in fs)}
+                if v:
+                    rows.append({"process": proc, "model": lab, "bin": st, **v})
+                    lines.append(f"| {proc} | {lab} | {st} | " + " | ".join(f"{v[k]:.3g}" if k in v else "-" for k, _ in EXTRA) + " |")
+    hl = ["", "| model | y | h rms truth | h rms pred | rms(h pred - h truth) |", "|---|---|---|---|---|"]
+    e = d["ee_uugg_me2"]
+    for lab, rs in [(lab, rs) for lab, rs in e["result"].items()] + [(lab + " [his]", [r]) for lab, r in e["base"].items()]:
+        fs = [full(r) for r in rs]
+        for st in sorted({k for f in fs for k in f if k.startswith("azimuth")}, key=lambda k: float(k.rsplit("_", 1)[-1])):
+            v = {k: float(np.median([f[st][k] for f in fs if k in f.get(st, {})])) for k in
+                 ("cos2phi_rms_truth", "cos2phi_rms_pred", "cos2phi_rms_error") if any(k in f.get(st, {}) for f in fs)}
+            if len(v) == 3:
+                rows.append({"process": "ee_uugg_me2", "model": lab, "bin": st, **v})
+                hl.append(f"| {lab} | {st.rsplit('_', 1)[-1]} | {v['cos2phi_rms_truth']:.3g} | {v['cos2phi_rms_pred']:.3g} | {v['cos2phi_rms_error']:.3g} |")
+    d["summary_extra"] = rows
+    return "\n".join(lines + hl)
 
 
 def main():   # dup-ok: argparse collect/plot boilerplate, every kit tool has it

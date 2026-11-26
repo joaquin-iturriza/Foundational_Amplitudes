@@ -160,7 +160,8 @@ ap = argparse.ArgumentParser(); ap.add_argument("process"); ap.add_argument("inp
 ap.add_argument("--splits", nargs="*", default=None); a = ap.parse_args()
 os.environ["KIT_HARDPS_DIR"] = os.path.join(HERE, "kit_data")      # the models' own training events, shipped here
 for k in ("DATA_DIR", "SCRATCH"):
-    os.environ.setdefault(k, tempfile.mkdtemp(prefix="fa_kit_"))
+    if k not in os.environ:
+        os.environ[k] = tempfile.mkdtemp(prefix="fa_kit_")
 os.environ.setdefault("KIT_THREADS", "1")   # CPU results reproduce ours exactly at 1 thread (README)
 meta = json.load(open(os.path.join(HERE, "models.json")))
 (m,) = [x for x in meta["models"] if x["file"] == a.process] or sys.exit(f"process: one of {[x['file'] for x in meta['models']]}")
@@ -181,6 +182,8 @@ with h5py.File(path, "r") as p, h5py.File(a.out, "w") as o:
             o[f"{sp}/{st}/{k}"] = y    # the benchmark's own name: log10_me2, or log10_abs_virt_finite for ee_tt
             o[f"{sp}/{st}/{m['target']}"] = np.power(10.0, y)   # and the value, signed (every model here predicts > 0)
     o.attrs["model"] = m["run"]
+import shutil
+shutil.rmtree(tmp, ignore_errors=True)
 print(f"wrote {a.out}")
 """
 
