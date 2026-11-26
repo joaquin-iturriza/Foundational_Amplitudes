@@ -28339,6 +28339,8 @@ entries:
       the A2 models beside his MLP'
     28: Protocol B (continue from A with hard_train) on the A2 models (run so far only on the 11-10 scratch model); needs
       a design and review
+    29: 'Slide-10 metrics never reported: bias, 99th percentile, |M|^2-weighted relative error per bin and the azimuth harmonic
+      h (computed by his evaluate.py, kit_result.json) into the slide-9-style summary for A2 (fine-tunes when they exist)'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -29858,6 +29860,11 @@ entries:
       if:
       - 'B improves the hard bins over A2''s A: report the gain per family'
       - 'no gain: A2 already extrapolates, reported'
+    29:
+      feeds: Bakar's slide-10 metrics reported
+      if:
+      - 'metrics present for every A2 run: summary drawn'
+      - 'a run lacks them: rescore it (REREAD)'
   step_waits:
     '24': step 20's real fair-NLO parent run (tag kit_fairnlo_a2, not yet submitted)
     '20': FA-ccin2p3-3895a2a7 FA-ccin2p3-e0587622 FA-lxplus-abac4281
