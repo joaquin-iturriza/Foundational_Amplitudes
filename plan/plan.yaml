@@ -29718,6 +29718,14 @@ entries:
       kit_hpo_tt_divform_rezero had stalled since ~05:35 (site submit now refuses without --disk-gb; 776 failed submits; divform
       10/16 observed + 1 retry, rezero 9/16 + 2 retries); drive.py --disk-gb @86115d2d5 (trial peak ~40 MB: runs/kit_hpo_ttvirt_thr_*
       on CC 643/665 MB over ~17 dirs), driver relaunched with --disk-gb 0.1 (log ~/.local/share/ccorch/detached/20261126-103246_kit_hpo_tt_divform_rezero.log).'
+  - at: '2026-11-26T09:51:08+00:00'
+    text: '2026-11-26 ~10:50 @a569fc3fd. Step 20 smokes: SCR-A2 FA-lxplus-9fc1e04e and V/B FA-lxplus-35ac6ab5 clean through
+      every stage (training, sigma fit, kit_predict scoring of bulk and all hard strata) on V100S; 50-step mean s/iter incl.
+      start-up: SCR-A2 0.68, V/B 0.21 (arm limits by the hand-off rule 8500 x s/step x 1.3 + 0.3 h: SCR-A2 ~2.4 h, V/B ~0.95
+      h, at D=1e4; s/step from a 50-step mean overstates the plain rate). FT smoke FA-lxplus-2149304f broke at the head map
+      (target_stats=own needed one parent mean; the A2 parent has mu_N per multiplicity): fixed (mu_N at the run''s own N),
+      resubmitted FA-lxplus-da06f228 (_smoke3); step 20 waits on it. drive.py prebuild now passes --disk-gb (--prebuild-disk-gb,
+      default 20).'
   step_why:
     20:
       feeds: the KIT NLO statement in the draft
