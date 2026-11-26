@@ -175,6 +175,8 @@ def ensure_backend(process):
     if mg.is_synthetic(process):
         mg.register_synthetic(process)
         return None
+    if mg.is_kit(process):   # a KIT pool is cut from its HDF5 file (build_dataset): no generator to compile
+        return None
     if is_virt(process):
         return ensure_virt_backend(process)
     # A coupling-only scan shares its base's compiled standalone (see
