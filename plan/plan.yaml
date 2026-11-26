@@ -43405,6 +43405,14 @@ entries:
       on CC, interactive score 21:56 CET, tools/llm_score.py) against c_best''s 0.0533 (data/c_best_seen.json): 2.4x worse
       in distribution without the input (val_loss_no_reg -5.718 vs -6.03). Step 22 read complete; the encoding question goes
       to Joaquin (design''s branch ''groups gone, pole dependence kept'').'
+  - at: '2026-11-26T22:59:24+00:00'
+    text: '2026-11-26 step 25 (D566 attempt E): design passed (anchor maps: regressor''s network ten seeds, + final-state
+      kinematics, boosted tree; ridge and own median beside; perevent_level.py --anchor map). First job FA-ccin2p3-fb348771
+      cancelled after ~5 min by me: kin()''s log((sum m + 10 n_cut)^2) was log 0 for final states with neither a mass nor
+      a cut leg (RuntimeWarning in its log, the anchor features would be -inf); 10 GeV floor @ad9f541 (all 1491 processes
+      finite: range 4.61-12.31), synthetic test re-run clean; rerun FA-ccin2p3-d34fae85 (htc, 4 h limit, target 2 h). Step
+      15 (D564) design passed after one FIX (pole placed at -mu/sd of the run''s offshell_stats, near-pole fifth contrast
+      with its standard error; factor_split.py --pole-run @3e748b197); its CPU read ccj_3c502367feac (job 64942400) on CC.'
   step_waits:
     '25': FA-ccin2p3-d34fae85
   handoff:
