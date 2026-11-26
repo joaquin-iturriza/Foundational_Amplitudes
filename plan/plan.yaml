@@ -42439,10 +42439,10 @@ entries:
     withdrawn_why: his 'Do whatever needs to be done' settles it; the sync block was fixed in our repo (61c2b9698), CC's file
       untouched
   owner:
-    agent: a80f3c83112dd4b0b
-    state: closed
-    since: '2026-11-26T22:35:04+00:00'
-    state_at: '2026-11-26T22:35:04+00:00'
+    agent: a3442332bd5ff4a7c
+    state: working
+    since: '2026-11-26T23:15:16+00:00'
+    state_at: '2026-11-26T23:15:16+00:00'
   step_why:
     25:
       feeds: 'D566: a per-event level from the process and its diagrams that keeps the level on new families and is correct
