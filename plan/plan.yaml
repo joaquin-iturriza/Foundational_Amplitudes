@@ -41913,6 +41913,12 @@ entries:
     answers_after: '2026-11-24T16:59:07+00:00'
     covers:
     - llm_compare
+  - said_at: '2026-11-26T15:25:50.183000+00:00'
+    text: it's clear that widening is not doing much, so I wouldn't spend the compute.
+    decision: D576
+    answers_after: '2026-11-26T15:07:36+00:00'
+    covers:
+    - llm_compare
   decisions:
   - D525
   - D527
@@ -41920,12 +41926,8 @@ entries:
   - D537
   - D553
   - D554
+  - D576
   next:
-    8: 'Part (b) from our setup (D537 ''We then also widen the best HPs for our setup''): once part (c)''s search ends (step
-      5 names its best trial), the same muP width scale-up (num_heads 16, 32, 64, 120 toward 359.6M) at part (c)''s best HPs
-      in its config (sweep/sweep_config_llmcmp_c_latest.yaml), its own design (reusing part (b)''s smoke rates where the setup''s
-      cost matches), smokes, then the runs; its GPU-h estimate to Joaquin if above 100 (D536). Does not hold part (b) from
-      part (a).'
     13: 'Part (b) readout, 64 heads (FA-ccin2p3-623a3af6; D553 "show the results as they come"): when it ends, save its "Val
       loss (combined)" lines to analysis/llm_compare/data/b_val_h64.txt (runs/llmcmp_b_width/trial_0064/out_0.log), score
       it REREAD=FA-ccin2p3-623a3af6 with scripts/job_llm_score.sh on its site, copy llm_score_{seen,heldout}.json to data/b_h64_{seen,heldout}.json;
@@ -42029,6 +42031,13 @@ entries:
       regressor's 0.047; the search's objective fell while the new-set error rose (does not track the new families); flat
       shift not below the regressor's by 2x noise
     at: '2026-11-25T23:10:40+00:00'
+  - tried: 'Part (b) from our setup (D537 ''We then also widen the best HPs for our setup''): once part (c)''s search ends
+      (step 5 names its best trial), the same muP width scale-up (num_heads 16, 32, 64, 120 toward 359.6M) at part (c)''s
+      best HPs in its config (sweep/sweep_config_llmcmp_c_latest.yaml), its own design (reusing part (b)''s smoke rates where
+      the setup''s cost matches), smokes, then the runs; its GPU-h estimate to Joaquin if above 100 (D536). Does not hold
+      part (b) from part (a).'
+    why: 'step 8 dropped by D576: the user answered no to the question that blocked it'
+    at: '2026-11-26T15:26:09+00:00'
   asks:
   - ask: 'Scope: the data of the LLM run is not within our reach, so the comparison runs either on Suprio''s own files or
       on another pool. His training data (processes/<name>/data_running_alpha.npy, with |M|^2 and the running alpha_s) is
@@ -42154,8 +42163,10 @@ entries:
       part (a)''s search, not step 8''s widths. 2026-11-14T04:31: the paper draft''s LaTeX source he pasted, no budget call.
       2026-11-16T20:00: the writing-style skill message, about prose, not GPU budget.'
     blocks: step 8 only
-    blocks_steps: &id004
+    blocks_steps:
     - 8
+    answered_at: '2026-11-26T15:25:50.183000+00:00'
+    decision: D576
   owner:
     agent: a017802b37deeafec
     state: closed
@@ -42164,11 +42175,6 @@ entries:
     context: 209652
     context_at: '2026-11-26T11:35:05+00:00'
   step_why:
-    8:
-      feeds: 'part (b) for our setup: does width close the held-out gap in the latest setup'
-      if:
-      - 'part (c) best known: design and launch'
-      - 'part (c) search still running: wait for DRIVE_DONE'
     13:
       feeds: 'D522/D537 part (b): whether muP width toward the LLM''s 359.6M parameters closes the held-out gap at part (a)''s
         best HPs'
@@ -47009,15 +47015,6 @@ entries:
       diverges shouldn't wake you and it's owning agent up.
     said_at: '2026-11-24T10:33:58.174000+00:00'
     at: '2026-11-24T11:23:35+00:00'
-  ask: 'GPU budget: ~180 GPU-h for the four width runs of our setup (16/32/64/120 heads at part (c)''s best HPs, D537 ''We
-    then also widen the best HPs for our setup''; 64 heads measured by its smoke at ~46 GPU-h, 120 heads ~99), above the 100
-    GPU-h line of D536. Go?'
-  waiting_since: '2026-11-26T15:07:36+00:00'
-  searched: 'D536 sets the 100 GPU-h line; D537 asks for the widening without a cost; part (a)''s budget answer covered part
-    (a)''s search, not step 8''s widths. 2026-11-14T04:31: the paper draft''s LaTeX source he pasted, no budget call. 2026-11-16T20:00:
-    the writing-style skill message, about prose, not GPU budget.'
-  blocks: step 8 only
-  blocks_steps: *id004
 - id: lab_llm_trial
   title: Lab LLMs in place of some subagents
   question: Can the lab's LLMs (deepseek-v4-flash, qwen3.8-27b via lpnllm) do some of our subagent work (mechanical steps,
@@ -47995,7 +47992,7 @@ entries:
       2026-11-14T04:31 (pasted SciPost template, text only) and 2026-10-02T11:24 (yes to a tf32 speed check, a precision question,
       not the batch) do not settle it.'
     blocks: nothing
-    blocks_steps: &id005 []
+    blocks_steps: &id004 []
   owner:
     agent: acb8c25b26df20051
     state: working
@@ -49235,7 +49232,7 @@ entries:
     writeup: 4b744779f
     why: two open questions to Joaquin
   blocks: nothing
-  blocks_steps: *id005
+  blocks_steps: *id004
 - id: cc_disk
   title: What uses disk on CC and what can be deleted
   question: 'What is using the disk on CC (checkout runs/sweeps, datasets, memmap caches, scratch, MG5 work dirs), against
@@ -49379,7 +49376,7 @@ entries:
       2026-11-10T02:08, 2026-11-11T02:02, 2026-11-11T02:09, 2026-10-04T19:25, 2026-10-31T03:39, 2026-11-12T00:33, 2026-10-05T04:33,
       2026-10-24T14:35, 2026-10-09T03:51, 2026-10-29T13:18 (other subjects: paper template, draft plan, local /tmp, cluster
       outage, a run readout, a submit log, hooks, physics, explanations, LLM use)'
-    blocks_steps: &id006
+    blocks_steps: &id005
     - 3
   owner:
     agent: a7580c28f015ad776
@@ -49945,7 +49942,7 @@ entries:
     2026-11-11T02:02, 2026-11-11T02:09, 2026-10-04T19:25, 2026-10-31T03:39, 2026-11-12T00:33, 2026-10-05T04:33, 2026-10-24T14:35,
     2026-10-09T03:51, 2026-10-29T13:18 (other subjects: paper template, draft plan, local /tmp, cluster outage, a run readout,
     a submit log, hooks, physics, explanations, LLM use)'
-  blocks_steps: *id006
+  blocks_steps: *id005
 - id: cc_login_jobs
   title: 'CC login node: recurring and long scripts moved to Slurm (CC support''s email)'
   question: 'Can every non-interactive script we run on CC''s login node (the supervisor''s maintain commands: disk_watch,
