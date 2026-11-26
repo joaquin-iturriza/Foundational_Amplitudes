@@ -29866,6 +29866,14 @@ entries:
   - at: '2026-11-26T15:20:41+00:00'
     text: '2026-11-26 owner aca73c11d45c78e03 reached 310k context inside one turn (package + MC redo + figures + D575 designs):
       the brief was too large; next briefs hand back each item as ready and hand off before 260k'
+  - at: '2026-11-26T15:31:31+00:00'
+    text: '2026-11-26 ~18:30 @96c9ea7bb. Package v7 build FA-ccin2p3-5c3fb7fa failed in check: rebuild_run asserted mom_div
+      0.28381 vs the run''s 0.28376 (ee_uug): the standalone kit_data file is a new HDF5, so kit_hardps.recipe''s kit_file_sha256
+      changed the train pool''s identity, hence its keyed augmentation and mom_div. Fix 80dbb06ac: the package''s kit_data
+      file carries source_sha256 and file_sha256 returns it. Rebuild FA-ccin2p3-1b18c76c. Slide-11 MC: reviewer''s asserts
+      added dd2b2fd1b (bulk_test and MadEvent events pass the coded cut; LHE weights equal); jobs FA-ccin2p3-6eb41dd6 (uug),
+      76945fa6 (uugg), 44f737bc (tt). Slides 5-8 redrawn at 96c9ea7bb (slide 7/8 legends had covered curves), looked at, captions
+      check_caption OK.'
   step_why:
     20:
       feeds: 'D570: FT vs SCR-A2 vs V/B on the KIT hard bins'
