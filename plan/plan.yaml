@@ -42159,6 +42159,11 @@ entries:
       names/colours/markers), families as before; level_file''s per-event CSV from REREAD FA-ccin2p3-2461cbe0 (job_llm_score.sh
       ONLY=heldout EVENTS=1), rows checked against a_trial5''s true_logm2; LLM per-event predictions do not exist here (only
       per-process summaries in data/suprio_cond), said in the caption'
+    24: 'Attempt D: the same, with a process-intrinsic anchor x0_p (a fixed function of the process alone, e.g. a ridge fit
+      of the training processes'' median x on the regressor''s descriptors; no statistic of the scored dataset), so c_p is
+      the level at the process''s own typical point (little leverage) and b_p carries the sampling dependence; slopes optionally
+      shrunk toward the multiplicity-class mean; variants C_s and C_sqE (log P dropped: lost the level); same ten ensembles,
+      control, subsets and bars as attempt C''s passed design'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -42436,6 +42441,12 @@ entries:
       if:
       - 'CSV rows match: draw, look once, hand back png+pdf with caption'
       - 'rows do not match: find why (event selection of llm_score) before drawing'
+    24:
+      feeds: 'D566: a per-event, sampling-independent level from process and diagram information that keeps the level gain
+        on new families'
+      if:
+      - 'D keeps the level and is correct on all four subsets: report, then its training-run design'
+      - 'D fails: read _fit/_trueb again; next a nonlinear per-process form or a network target taken against c^+b^.x'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
