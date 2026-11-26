@@ -2482,10 +2482,15 @@ class AmplitudeExperiment(BaseExperiment):
                                             "levels": {k: float(v) for k, v in lv.items()}}
                         LOGGER.info(f"level_file: per-process means from {lp}, sigma = {sd:.4f}; median |own mean - "
                                     f"level| over the train processes {float(np.median(np.abs(mu_p - lev))):.3f}")
-                    if bool(self.cfg.data.get("affine_multiplicity_std", False)):
+                    N_p = [int(npart_of(nm)) for nm in names]
+                    if bool(self.cfg.data.get("affine_multiplicity_std", False)) and len(set(N_p)) < 2:
+                        # one multiplicity (a single-process run of an A2 config, e.g. a fine-tune with its own
+                        # target stats): mu_N at the only N is the pooled mean, so the shared standardization above is it
+                        LOGGER.info(f"affine_multiplicity_std: one multiplicity N = {N_p[0]}, the shared "
+                                    f"standardization is the fit (no slope to record)")
+                    elif bool(self.cfg.data.get("affine_multiplicity_std", False)):
                         # the draft's multiplicity preprocessing (Sec. "Extrapolating to more legs"):
                         # mu_N = a + b N over the particle count N, one shared sigma (multiplicity_extrap)
-                        N_p = [int(npart_of(nm)) for nm in names]
                         a, b, sd = fit_affine_multiplicity(n, N_p, mu_p, sd_p)
                         prepd_means = [a + b * k for k in N_p]
                         prepd_stds = [sd] * len(names)
