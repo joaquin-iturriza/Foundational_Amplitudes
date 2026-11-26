@@ -28630,7 +28630,7 @@ entries:
     withdrawn_why: 'D574: no more trainings for today''s reply; a pretrained held-out uug/uugg run is training'
   owner:
     agent: aca73c11d45c78e03
-    state: working
+    state: closed
     since: '2026-11-26T14:19:39+00:00'
     state_at: '2026-11-26T14:39:52.193000+00:00'
     context: 194585
@@ -29916,40 +29916,34 @@ entries:
     '31': FA-ccin2p3-58bc2125
     '30': FA-ccin2p3-42ae3468
   handoff:
-    state: '2026-11-26 ~15:00 UTC. Step 20 (D570 + D572 signed A2, design PASS 13:00): parent smoke FA-lxplus-f7c30433 clean
-      (0.58 s/it over 50 steps incl. start-up; kit_sign_read wrong sign after 50 steps 0.37/0.32/0.18 on uubar_ddbar_nlo/ee_mumu_ew_nlo/ee_uu_ew_nlo:
-      untrained, readout works). Arm smokes (_smoke4) in flight: FT FA-ccin2p3-3895a2a7, SCR-A2 FA-ccin2p3-e0587622 (smoke
-      parent copied to CC, 32 MB), V/B FA-lxplus-abac4281; step 20 waits on them. On clean ends: site pick FA --jobs 1 and
-      the REAL PARENT: site submit <picked> FA scripts/job_datasaving_parent.sh --item kit_benchmark --est-gpu-hours 14 --disk-gb
-      1.5 --hdr=--time=14:00:00 -- finale recipe=recipes/transfer_finale_kit_fairnlo.yaml flags=off lr=1.89e-3 tag=kit_fairnlo_a2
-      ++model.input_asym_factor=true ++model.net.frames_gamma_max=4 data.target_physics_factor=false data.target_physics_orders=false
-      data.affine_multiplicity_std=true ++training.sign_head=true (plan target --batch fairnlo_parent --wall 10 --jobs 1;
-      data on lxplus; if picked to CC, site copy the pools/KIT data first); then SCR-A2 + V/B at all five D (fairnlo_arms.py
-      <site> runs/data_saving/dsave_parent_finale_kit_fairnlo_a2 <limit>, SCR-A2 lines 2 and V/B lines 3; limits from the
-      _smoke4 rates by 8500 x s/step x 1.3 + 0.3 h), FT at all D after the parent ends (step 24). Read: kit_sign_read on the
-      parent, per-pool val vs 47e14eae on the 26 log pools only. Step 25 (D573 export): tools/kit_package.py build --standalone
-      written, UNCOMMITTED (repo-reviewer pillar overdue blocked the commit; reviewer launched); next: commit, a design for
-      the CPU build+check job (plan design, reviewer), site submit ccin2p3 FA scripts/job_kit_package.sh (add --standalone
-      to its build line) with the three runs runs/kit/kit_A_ee_{uug_me2,uugg_me2,tt_virt_finite}_n100000_t1831_hpo_asym_cont
-      into e.g. runs/kit_export/fa_kit_surrogates_v7, then site fetch <run> --what all --dir runs/kit_export (I implemented
-      --what all in ~/.local/bin/site, backup site.bak-20261126-fetchall, UNTESTED), then a clean local venv (README''s CPU
-      install) running predict.py on examples/* against *.expected.txt; tarball to analysis/kit_benchmark/export/ (add to
-      .gitignore). Untested points of the standalone code: kit_predict with a no-truth input (placeholder path), relocate
-      from predict.py, rebuild with n_val 10.'
-    decisions: 'Joaquin''s: D570 (fair one-loop protocol, ladder recipe, A2, FT vs scratch, no HPO), D572 (sign changes must
-      be handled: the three sign-changing one-loop pools back in), D573 (give KIT the checkpoint and an easy way to run it),
-      D315 (one seed), D391 horizons. Mine (re-justify): sign handling = the existing sign head (abslog + het sign row) with
-      A2 on log|V|, readout [mu, alpha, sign, sigma] (results.tex 2026-10-24 A/B: sign head 0.45 vs signed log 0.78); arms
-      inherit sign_head=true from the parent (inert on the positive KIT tt virtual); arm smokes split CC/lxplus by site pick
-      with the smoke parent site-copied; standalone package ships the models'' 1e5 training events (rebuild asserts stats
-      from them) rather than a frozen-stats code path; site fetch --what all as the route home for the tarball.'
-    ruled_out: Dropping sign-changing pools (D572); signedlog target for A2 (sign head chosen, results.tex A/B); div-form
-      and ReZero for the tt virtual (step 22).
-    running: FA-ccin2p3-3895a2a7, FA-ccin2p3-e0587622, FA-lxplus-abac4281 (arm smokes); repo-reviewer pillar agent
-    files: models/lloca.py, experiment.py (_post_instantiate_model), tests/test_input_reps.py, recipes/transfer_finale_kit_fairnlo.yaml,
-      analysis/kit_benchmark/fairnlo_arms.py (_smoke4), tools/kit_sign_read.py, tools/kit_package.py (uncommitted --standalone),
-      scripts/job_kit_package.sh, ~/.local/bin/site (fetch --what all)
-    written: '2026-11-26T14:02:32+00:00'
+    state: '2026-11-26 ~17:15. ORDER (coordinator): package, then slide-11 MC test, then slide 5-9 figures, D575 runs alongside.
+      (1) PACKAGE (D573/D574): code committed and reviewed (9032d1238, d5e9f0b87, 45a1e906b; predict.py writes log10_me2 /
+      log10_abs_virt_finite + value under KIT names); build+check CPU job FA-ccin2p3-5c3fb7fa (runs/kit_export/fa_kit_surrogates_v7)
+      PENDING on htc Resources since 15:25; on its end: site fetch --what all (untested), clean local venv per README on examples/*,
+      tarball to analysis/kit_benchmark/export/, hand Joaquin path+size. Possible issue: if the tt A2 model is V/B the example
+      files (momenta only) are refused. (2) SLIDE-11 MC TEST: design PASS; tools/kit_mc_madgraph.py @ece0b1c76 tested locally
+      end to end on uug; NOT SUBMITTED: next step has the exact commands; add the reviewer''s two asserts first. (3) FIGURES:
+      drawn @a01085ff8 in analysis/kit_benchmark/figs/bakar_a2 (redraw once at the committed code so the producer hash matches,
+      look at each at low res, captions with check_caption.py); summary numbers in finding 17:15. (4) D575: fair one-loop
+      real parent FA-lxplus-828d67d6 running (lxplus, 14 h limit); arm smokes FT FA-ccin2p3-3895a2a7 / SCR-A2 FA-ccin2p3-e0587622
+      pending on CC; then SCR-A2+V/B at all D (step 20), FT after parent (24). D575 design PASS (B + held-out): smokes FA-ccin2p3-58bc2125
+      (B tt A2) and FA-ccin2p3-42ae3468 (held-out qqg parent, recipe transfer_finale_kit_heldout_qqg.yaml) pending on CC (~7.6
+      h queue); steps 31 and 30. Sites: CC only up; lxplus needs Joaquin''s 2FA (cluster_up lxplus); Jean Zay relay down.'
+    decisions: 'Joaquin''s: D573 package, D574 answer today from existing models, D575 all of Bakar''s requests run (fair
+      chain, protocol B on A2, held-out A2 for uug/uugg), D570, D572, D315 one seed. Mine (re-justify): package ships empty
+      sites/sites.yaml (no cluster paths to KIT); predict.py writes the value too (sign included) beside log10; held-out parent
+      = fair A2 recipe minus ee_uug/uugg/bbbarg/bbbargg (a non-A2 checkpoint cannot start an A2 model); FT at lr_scale 1 and
+      0.1 (reviewer FIX); B = 3000-step continuation as the 11-10 B; MC test reweights MadEvent''s exact-|M|^2 sample by u
+      instead of a MadEvent run on the surrogate (stated as a difference from slide 11), tt via the threshold scan quadrature
+      (covers 346-432 GeV only); figures drop the pre-A2 no-frames ablations.'
+    ruled_out: Fine-tuning A2 from the non-A2 kit_pretrain_heldout parent (readout row and standardization differ); flat-bulk
+      reweighting as the slide-11 test (the gap Joaquin named).
+    running: FA-ccin2p3-5c3fb7fa (package CPU), FA-lxplus-828d67d6 (fair parent), FA-ccin2p3-3895a2a7, FA-ccin2p3-e0587622
+      (arm smokes), FA-ccin2p3-58bc2125 (B smoke), FA-ccin2p3-42ae3468 (held-out parent smoke)
+    files: tools/kit_package.py, tools/kit_predict.py, scripts/job_kit_package.sh, tools/kit_mc_madgraph.py, scripts/job_kit_mc_madgraph.sh,
+      tools/kit_bakar_figs.py, recipes/transfer_finale_kit_heldout_qqg.yaml, analysis/kit_benchmark/data/kit_bakar_figs_a2.json,
+      analysis/kit_benchmark/figs/bakar_a2/
+    written: '2026-11-26T15:08:54+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
