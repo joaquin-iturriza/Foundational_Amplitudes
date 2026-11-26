@@ -28335,6 +28335,8 @@ entries:
       the standalone package (uncommitted diff, scratchpad kit_export_uncommitted.diff) must write log10|M|^2 under their
       target names (log10_me2; one loop log10_abs_virt_finite with its sign), not me2; reuse kit_package.py @817d0d0c4 machinery
       (1-thread pinning, check subset); package the sec:kit-mc A2 models'
+    27: 'Bakar slides 5-9 his-layout figures (tools/kit_bakar_figs.py, drawn 11-12 with the pre-A2 transformer): redraw with
+      the A2 models beside his MLP'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -29844,6 +29846,11 @@ entries:
       if:
       - 'the package check reproduces our log10 to float64 rounding: hand Joaquin the tarball'
       - 'it does not: locate the stage and fix'
+    27:
+      feeds: showing Joaquin Bakar's asks done his way (slides 10, 13)
+      if:
+      - 'A2 ahead of the MLP on the hard bins: the figures carry it'
+      - 'behind on some: the figures show where'
   step_waits:
     '24': step 20's real fair-NLO parent run (tag kit_fairnlo_a2, not yet submitted)
     '20': FA-ccin2p3-3895a2a7 FA-ccin2p3-e0587622 FA-lxplus-abac4281
