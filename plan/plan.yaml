@@ -28311,11 +28311,11 @@ entries:
   - D572
   - D573
   next:
-    20: 'Step 20 (D570, D572 signed A2, design PASS 2026-11-26 13:00): parent smoke FA-lxplus-f7c30433 (dsave_parent_finale_kit_fairnlo_a2s_smoke,
-      recipe @62bb84df6 with the 3 sign-changing one-loop pools, ++training.sign_head=true); on its clean end read tools/kit_sign_read.py
-      on its preds_val.npz and submit the three arm smokes (fairnlo_arms.py lxplus runs/data_saving/dsave_parent_finale_kit_fairnlo_a2s_smoke
-      01:00:00 --smoke, tags _smoke4); on their clean end the real parent (tag kit_fairnlo_a2, same args, --hdr=--time=14:00:00,
-      target 10 h) and SCR-A2 + V/B at all five D'
+    20: 'Fair one-loop (D570, D572, D575): real parent FA-lxplus-828d67d6 submitted (runs/data_saving/dsave_parent_finale_kit_fairnlo_a2,
+      lxplus, limit 14 h, target 10 h). On the clean end of the arm smokes FT FA-ccin2p3-3895a2a7 and SCR-A2 FA-ccin2p3-e0587622
+      (V/B smoke FA-lxplus-abac4281 clean): site pick, then SCR-A2 + V/B at all five D (fairnlo_arms.py <site> runs/data_saving/dsave_parent_finale_kit_fairnlo_a2
+      <limit>, lines 2 and 3; SCR-A2 ~2.4 h, V/B ~0.95 h limits), parent config read from lxplus (site copy to CC if picked
+      there)'
     24: 'Step 20 fine-tunes: when the fair-NLO parent FA-ccin2p3-a3bc3374 (runs/data_saving/dsave_parent_finale_kit_fairnlo_a2,
       10 h target) ends, submit FT at every D (fairnlo_arms.py with that parent, FT lines, limit from the arm smokes'' s/step),
       then read FT vs SCR-A2 vs V/B per D on the hard bins (design PASS 2026-11-26T02:27)'
@@ -29844,11 +29844,10 @@ entries:
       Protocol B dropped (D574: needs training); fair one-loop real parent and arms held under D574.'
   step_why:
     20:
-      feeds: whether the fair one-loop fine-tune with sign-changing pools in beats scratch A2 and the V/B baseline on the
-        KIT hard bins (D570, D572)
+      feeds: 'D570: FT vs SCR-A2 vs V/B on the KIT hard bins'
       if:
-      - 'smokes clean through every stage: submit the real parent and SCR-A2 + V/B at all D'
-      - 'a smoke breaks: read its log, fix inside the setup, resmoke'
+      - 'smokes clean: submit SCR-A2 + V/B at all D'
+      - 'a smoke breaks: read log, fix inside the setup, resmoke'
     24:
       feeds: 'D570: does fine-tuning from a pretraining recipe that works beat from scratch (SCR-A2, V/B with exact Born)
         on ee->tt one-loop at 100-1e4 bulk points'
