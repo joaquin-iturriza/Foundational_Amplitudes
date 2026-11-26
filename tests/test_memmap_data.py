@@ -357,6 +357,13 @@ def section2_end_to_end(sweep_config, n_procs, out):
     # smaller caps: a prefix of the same cache (train_subsample / eval_subsample are not in its key)
     small = ["++data.train_subsample=1000", "++data.eval_subsample=200", "seed=42"]
     A1 = _build(sweep_config, n_procs, os.path.join(out, "off_small"), small)
+    if any(o.endswith("data.target_propagators=true") for o in SET):
+        # the target_propagators factor is keyed by the train caps (which propagators straddle their pole is read on
+        # the run's train selection): smaller caps prebuild their own tp_<key> beside the same base
+        try:
+            _build(sweep_config, n_procs, os.path.join(out, "prebuild_small"), on + small + ["++data.memmap_prebuild=true"])
+        except SystemExit as e:
+            assert e.code in (0, None), e.code
     B1 = _build(sweep_config, n_procs, os.path.join(out, "on_small"), on + small)
     assert B1["mmap_dir"] == snaps[42][1]["mmap_dir"], "smaller caps must read a prefix of the same cache"
     _compare(A1, B1, "smaller caps: in memory vs memmap")

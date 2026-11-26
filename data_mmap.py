@@ -10,6 +10,9 @@ blind review of 2026-11-02). Two levels under $SCRATCH/amp_mmap_cache (data.memm
   <key>/<depth>/feat_<fk>/  the frame-independent per-event inputs a configuration derives from them: the target
                             factor's log (data.target_physics_factor) and the raw off-shellness columns
                             (offshell_per_event), keyed by what they are computed from.
+  <key>/<depth>/tp_<tk>/    the log of data.target_propagators' per-event factor (logTP), keyed by its masks, widths,
+                            straddle and the run's train caps (which propagators straddle their pole is read on the
+                            run's train selection, as in memory).
 
 <key> is the hash of the pools' content identities (keyed_aug.pool_identity: recipe_id, size, the bytes at both
 ends; never the path or mtime), the layout (roles, process order, particle_order) and MMAP_VERSION. <depth> is the
@@ -31,8 +34,8 @@ on the cache's filesystem) named by host, job and pid, and appears by one rename
 staging dir. A run checks the canaries on open (array sizes and the bytes at both ends of every array, and the first
 and last |M|^2 of every pool segment against the pool file itself) and touches last_used, which the pruning reads.
 
-Not on this path (asserted): data.target_propagators, training.sign_head, data.resonance_per_event,
-data.phase_space_on_pool, data.target_physics_hybrid.
+Not on this path (asserted): training.sign_head, data.resonance_per_event, data.phase_space_on_pool,
+data.target_physics_hybrid, data.target_propagator_tchannel.
 """
 import socket
 import hashlib
@@ -809,6 +812,48 @@ def _build_features(exp, c, d, meta, fd, fkey_doc, want_offshell):
             "by": _job_tag()}
 
 
+TP_FORMAT = 1                  # the format of tp_<tk>/logTP.npy (_build_tp); bump with any change to what it writes
+
+
+def tp_key_doc(exp, names, masks, need):
+    """What data.target_propagators' factor is computed from (besides the base arrays): the masks (pdg, signed leg
+    mask, M²), the widths, the straddle fraction and the train events the straddle is read on"""
+    tp = exp._tp_settings()
+    return _jsonable({
+        "format": TP_FORMAT,
+        "widths": tp["widths"],
+        "pool_widths": [tp["pool_widths"].get(n, {}) for n in names],
+        "straddle": tp["straddle"],
+        "train_need": [int(need[("train", n)]) for n in names],
+        "masks": [None if m is None else {str(p): [[_key_floats(list(mrow)), _key_floats([mm])[0]] for mrow, mm in lst]
+                                          for p, lst in sorted(m.items())} for m in (masks or [None] * len(names))],
+    })
+
+
+def _build_tp(exp, c, d, meta, td, tkd, masks, need):
+    """Write log F of data.target_propagators for every stored event into td (logTP): the propagators straddling their
+    pole on the run's train selection (experiment._tp_props), their Breit-Wigner factor per event (_tp_logF)"""
+    names = c["names"]
+    tp = exp._tp_settings()
+    mom = _open(d, "mom")
+    seg_of = {(s["role"], s["name"]): s for s in meta["segs"]}
+    logTP = _alloc(os.path.join(td, "logTP.npy"), np.float64, (meta["N"],))
+    props = {}
+    for i, n in enumerate(names):
+        s, k = seg_of[("train", n)], need[("train", n)]
+        pp = np.asarray(mom[s["p0"]:s["p0"] + k * s["P"]]).reshape(k, s["P"], 4).astype(np.float64)
+        props[n] = exp._tp_props(n, masks[i] if masks else None, pp, tp, len(names))
+    for sg in meta["segs"]:
+        for i in range(0, sg["n"], BUILD_CHUNK):
+            k = min(sg["n"], i + BUILD_CHUNK) - i
+            p0 = sg["p0"] + i * sg["P"]
+            pp = np.asarray(mom[p0:p0 + k * sg["P"]]).reshape(k, sg["P"], 4).astype(np.float64)
+            logTP[sg["ev0"] + i:sg["ev0"] + i + k] = exp._tp_logF(sg["name"], props[sg["name"]], pp, tp)
+    logTP.flush()
+    return {"key_doc": tkd, "canary": _canary(td, ["logTP"]), "props": {n: len(v) for n, v in props.items()},
+            "built": time.strftime("%Y-%m-%dT%H:%M:%S"), "by": _job_tag()}
+
+
 def _ordered_map(fn, items, workers=None, ahead=2):
     """fn over items, yielded in order, computed by `workers` threads at most workers * ahead items ahead"""
     from collections import deque
@@ -868,14 +913,18 @@ def init_data_recipes_mmap(exp, c):
     assert not c["stats_on_pool"], "data.memmap: data.phase_space_on_pool is not implemented on the memmap path"
     assert not bool(cfg.data.get("target_physics_hybrid", False)), \
         "data.memmap: data.target_physics_hybrid (a per-process constant from its events) is implemented on the in-memory path only"
-    for k in ("target_propagators", "resonance_per_event"):
-        assert not bool(cfg.data.get(k, False)), f"data.memmap: data.{k} is not implemented on the memmap path"
+    assert not bool(cfg.data.get("resonance_per_event", False)), \
+        "data.memmap: data.resonance_per_event is not implemented on the memmap path"
+    tp_on = bool(cfg.data.get("target_propagators", False))
+    # shortcut: the massless t-channel factor fits its |t| norm per run (exp._tch_norm); add it to tp_key_doc when needed
+    assert not (tp_on and bool(cfg.data.get("target_propagator_tchannel", False))), \
+        "data.memmap: data.target_propagator_tchannel is implemented on the in-memory path only"
     assert not bool(cfg.training.get("sign_head", False)), "data.memmap: training.sign_head is not implemented"
     phys_on = bool(cfg.data.get("target_physics_factor", False))
     orders_on = bool(cfg.data.get("target_physics_orders", False))
     assert phys_on or not orders_on, \
         "data.target_physics_orders acts through the target factor: set data.target_physics_factor=true"
-    exp._target_factor_on = phys_on
+    exp._target_factor_on = phys_on or tp_on
     exp._sign_head = False
     want_offshell = (exp._offshell_per_event and exp._use_internal_mass_scalars and bool(exp._internal_mass_pdgs))
     prebuild = bool(cfg.data.get("memmap_prebuild", False))
@@ -924,6 +973,16 @@ def init_data_recipes_mmap(exp, c):
                                    f"off-shellness ({fdir}); build them with a CPU prebuild job first: {rebuild}")
             nb = meta["N"] * (8 + 4 * len(exp._internal_mass_pdgs))
             _locked_build(fdir, nb, root, lambda st: _build_features(exp, c, d, meta, st, fkd, want_offshell))
+    tdir = None
+    if tp_on:
+        masks = exp._setup_offshell_masks(names, pdgs=exp._tp_settings()["pdgs"])
+        tkd = tp_key_doc(exp, names, masks, need)
+        tdir = os.path.join(d, "tp_" + _hash(tkd))
+        if not os.path.exists(os.path.join(tdir, "meta.json")):
+            if not prebuild:
+                raise RuntimeError(f"data.memmap: the cache {d} has no target_propagators factor for this run "
+                                   f"({tdir}); build it with a CPU prebuild job first: {rebuild}")
+            _locked_build(tdir, meta["N"] * 8, root, lambda st: _build_tp(exp, c, d, meta, st, tkd, masks, need))
     if prebuild:
         if c["mom_div"] is None and cfg.get("seed", None) is not None:
             # the GPU run's momentum scale for the seed this prebuild was given (so the run does not hold its GPU
@@ -932,7 +991,7 @@ def init_data_recipes_mmap(exp, c):
         LOGGER.info(f"data.memmap_prebuild: the cache {d} is ready{f' (derived inputs {fdir})' if fdir else ''}; "
                     f"exiting before the model")
         sys.exit(0)
-    _open_run(exp, c, d, meta, fdir, need, want_offshell)
+    _open_run(exp, c, d, meta, fdir, need, want_offshell, tdir)
 
 
 def _keep_touching(d):
@@ -991,7 +1050,7 @@ def mom_stats(d, meta, names, need, seed, dimless):
     return out
 
 
-def _open_run(exp, c, d, meta, fdir, need, want_offshell):
+def _open_run(exp, c, d, meta, fdir, need, want_offshell, tdir=None):
     """Point the experiment at the cache for this run: the selection, the tokens, the statistics (its own, or
     frozen), the per-event arrays in the role's shuffled order, and the batch source."""
     from particle_ids import global_encode, species_pdgs
@@ -1005,6 +1064,9 @@ def _open_run(exp, c, d, meta, fdir, need, want_offshell):
         fmeta = json.load(open(os.path.join(fdir, "meta.json")))
         now = _canary(fdir, list(fmeta["canary"]))
         assert now == fmeta["canary"], f"memmap cache {fdir}: derived inputs differ from what the build wrote"
+    if tdir is not None:
+        tmeta = json.load(open(os.path.join(tdir, "meta.json")))
+        assert _canary(tdir, ["logTP"]) == tmeta["canary"], f"memmap cache {tdir}: logTP differs from what the build wrote"
     _touch(d)
     phys_on = bool(cfg.data.get("target_physics_factor", False))
     dimless = bool(cfg.data.get("dimensionless_inputs", False))
@@ -1012,6 +1074,8 @@ def _open_run(exp, c, d, meta, fdir, need, want_offshell):
     pidx = {n: i for i, n in enumerate(names)}
     mom, pdg, amp, rs = (_open(d, n) for n in ("mom", "pdg", "amp", "rs"))
     logF = _open(fdir, "logF") if phys_on else None
+    logTP = _open(tdir, "logTP") if tdir is not None else None
+    fac_on = phys_on or logTP is not None
 
     # ---- tokens: the registrations the in-memory path makes as it loads (each pool's distinct ids, ascending, in
     #      load order), then one table per process over every id of the cache ----
@@ -1075,14 +1139,22 @@ def _open_run(exp, c, d, meta, fdir, need, want_offshell):
         for n in names:
             s, k = seg_of[(r, n)], need[(r, n)]
             a = np.asarray(amp[s["ev0"]:s["ev0"] + k], dtype=np.float64).reshape(-1, 1)
-            if phys_on:
-                F = np.exp(np.asarray(logF[s["ev0"]:s["ev0"] + k])).reshape(a.shape)
+            if fac_on:
+                lf = np.zeros(k)
+                if phys_on:
+                    lf += np.asarray(logF[s["ev0"]:s["ev0"] + k])
+                if logTP is not None:
+                    lf += np.asarray(logTP[s["ev0"]:s["ev0"] + k])
+                F = np.exp(lf).reshape(a.shape)
                 fac[(r, n)] = F
                 a = a * F
             raw[(r, n)] = a
-    if phys_on:
+    if logTP is not None:
+        LOGGER.info(f"target_propagators ON (memmap): {sum(1 for v in tmeta['props'].values() if v)}/{len(names)} "
+                    f"processes carry a factor ({sum(tmeta['props'].values())} propagators reach their pole)")
+    if fac_on:
         lf = np.concatenate([np.log(fac[("train", n)]).reshape(-1) for n in names])
-        LOGGER.info(f"target_physics_factor ON (memmap): {len(names)} processes, mean log F over the train events "
+        LOGGER.info(f"{'target_physics_factor' if phys_on else 'target factor'} ON (memmap): {len(names)} processes, mean log F over the train events "
                     f"{lf.mean():.3g}, 5-95% {np.percentile(lf, 5):.3g} to {np.percentile(lf, 95):.3g}")
         del lf
     amp_min = min(float(np.min(v)) for v in raw.values() if v.size)
@@ -1109,7 +1181,7 @@ def _open_run(exp, c, d, meta, fdir, need, want_offshell):
             aa.append(ap)
             rr.append(s["ev0"] + np.arange(k, dtype=np.int64))
             pp_.append(np.full(k, i, dtype=np.int32))
-            if phys_on:
+            if fac_on:
                 ff.append(fac.pop((r, n)).reshape(-1))
         perm = rng.permutation(sum(len(x) for x in rr))
         exp._role_perm[r] = perm
@@ -1117,12 +1189,12 @@ def _open_run(exp, c, d, meta, fdir, need, want_offshell):
         ev_rows.append(np.concatenate(rr)[perm])
         amps.append(np.concatenate(aa, axis=0)[perm].astype(np.float32))
         pids.append(np.concatenate(pp_)[perm])
-        if phys_on:
+        if fac_on:
             facs.append(np.concatenate(ff)[perm])
     ev_rows = np.concatenate(ev_rows)
     exp.all_amplitudes = np.concatenate(amps, axis=0)
     exp.all_process_ids = np.concatenate(pids)
-    exp.all_amp_factor = np.concatenate(facs) if phys_on else None
+    exp.all_amp_factor = np.concatenate(facs) if fac_on else None
     del amps, pids, facs
 
     # ---- order features; the off-shellness columns' statistics over every role (as in memory) ----
