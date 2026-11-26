@@ -100,7 +100,16 @@ def mc(we, ws, boot, q, seed=0):
             "eff_exact": float(we.mean() / we.max()), "eff_surr": float(ws.mean() / ws.max()),
             "eff_x": float(ex / x.max()), "eff_x_q": float(min(ex / xq, 1.0)), "x_q": float(xq), "overweight_share": over,
             "eff_two": float(ws.mean() / ws.max() * ex / x.max()),
-            "eff_two_q": float(min(ws.mean() / qmax(ws, ws, q), 1.0) * min(ex / xq, 1.0))}
+            "eff_two_q": float(min(ws.mean() / qmax(ws, ws, q), 1.0) * min(ex / xq, 1.0)),
+            "hist_log10x": _hist(np.log10(x), ws)}
+
+
+def _hist(lx, ws, nb=60):
+    """Events and their share of sigma_surr (the measure the second stage samples) in bins of log10 x."""
+    e = np.linspace(lx.min(), lx.max(), nb + 1)
+    c, _ = np.histogram(lx, e)
+    m, _ = np.histogram(lx, e, weights=ws)
+    return {"edges": e.tolist(), "events": c.tolist(), "share_surr": (m / ws.sum()).tolist()}
 
 
 def regions(we, ws, reg, edges, q):
@@ -136,7 +145,11 @@ def main():
     ap.add_argument("--q", type=float, default=0.999)
     ap.add_argument("--out", default=None)
     ap.add_argument("--selfcheck", action="store_true")
+    ap.add_argument("--plot", default=None, help="draw the figure from this JSON (with --fig <base>) and stop")
+    ap.add_argument("--fig", default="analysis/kit_benchmark/figs/mc_test/kit_mc_test")
     a = ap.parse_args()
+    if a.plot:
+        return plot(json.load(open(a.plot)), a.fig)
     _selfcheck()
     if a.selfcheck:
         print("SELFCHECK OK")
@@ -153,6 +166,44 @@ def main():
         with open(a.out, "w") as fh:
             json.dump(res, fh, indent=1)
     print("KITMC " + json.dumps(res))
+
+
+PROC = {"ee_uug": r"$e^+e^-\to u\bar u g$", "ee_uugg": r"$e^+e^-\to u\bar u gg$", "ee_tt": r"$e^+e^-\to t\bar t$, one loop"}
+ORDER = ["ee_uug", "ee_uugg", "ee_tt"]
+
+
+def plot(res, base):
+    """Per process the distribution of x = w_exact / w_surr under the surrogate measure, its largest value and its
+    0.999 quantile; fourth panel: the unweighting efficiencies per process."""
+    import plot_style as ps
+    rs = {r["file"]: r for r in res.values()}
+    fig, axs = ps.figure(2, 2)
+    cells = [axs[0][0], axs[0][1], axs[1][0]]
+    for ax, f in zip(cells, ORDER):
+        r, h = rs[f], rs[f]["hist_log10x"]
+        e = np.array(h["edges"])
+        dens = np.array(h["share_surr"]) / np.diff(e)
+        ax.stairs(np.where(dens > 0, dens, np.nan), e, color=ps.C.blue, label="surrogate-weighted events")
+        ax.axvline(e[-1], color=ps.C.vermillion, ls="--", label="largest $x$")
+        ax.axvline(np.log10(r["x_q"]), color=ps.C.green, ls=":", label="0.999 quantile of $x$")
+        ax.set_yscale("log")
+        ax.set_xlabel(r"$\log_{10} x$, $x = w_{\rm exact}/w_{\rm surr}$")
+        ax.set_ylabel(r"$d\sigma_{\rm surr}/\sigma_{\rm surr}\,/\,d\log_{10}x$")
+        ps.process_label(ax, PROC[f])
+    ps.legend(cells[0], "upper left")
+    ax = axs[1][1]
+    k = np.arange(len(ORDER))
+    for key, lab, col, mk in [("eff_exact", "exact $|\\mathcal{M}|^2$", "k", "o"),
+                              ("eff_surr", "surrogate, first stage", ps.C.blue, "s"),
+                              ("eff_x", "second stage", ps.C.vermillion, "^"),
+                              ("eff_two", "surrogate, both stages", ps.C.green, "D")]:
+        ax.plot(k, [rs[f][key] for f in ORDER], ls="none", marker=mk, color=col, label=lab)
+    ax.set_xticks(k, [r"$u\bar u g$", r"$u\bar u gg$", r"$t\bar t$"])
+    ax.set_xlim(-0.5, len(ORDER) - 0.5)
+    ax.set_yscale("log")
+    ax.set_ylabel("unweighting efficiency")
+    ps.legend(ax, "upper left")
+    ps.save(fig, base)
 
 
 if __name__ == "__main__":
