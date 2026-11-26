@@ -28351,7 +28351,7 @@ entries:
     - FA-lxplus-35ac6ab5
     - FA-lxplus-9fc1e04e
     - FA-lxplus-da06f228
-    commit: 10fa13d07
+    commit: 230758a32
     paths:
     - analysis/kit_benchmark/data/kit_curves_read.json
     - analysis/kit_benchmark/data/kit_fig_A.json
@@ -28362,6 +28362,7 @@ entries:
     - analysis/kit_benchmark/data/kit_mc_test.json
     - analysis/kit_benchmark/data/kit_threshold_scan.json
     - analysis/kit_benchmark/data/kit_verdict_A_hpo_ftsearch.json
+    - analysis/kit_benchmark/data/kit_verdict_A_hpo_searched.json
     - analysis/kit_benchmark/fairnlo_arms.py
     - datagen.py
     - models/lloca.py
