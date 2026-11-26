@@ -48293,6 +48293,14 @@ entries:
       lab_wake_trial data in ~/.local/share/fa_labllm/wake_trial (outside the checkout). The stash pattern itself is unguarded
       (any agent''s untracked outputs being written by a detached job are exposed); routed to the coordinator for a hook.
       Also: 6 concurrent calls (my widening from the design''s 2) gave 219 timeouts at 600 s; relaunched at 3 with 1200 s.'
+  - at: '2026-11-26T20:35:51+00:00'
+    text: '2026-11-26T20:34: D551 replay coverage after wake_replay4 (19 h against a 7 h target) and 20 h of review_replay4:
+      wakes answered Qwen 66/100, DeepSeek 67/100; review rounds Qwen 110/318, DeepSeek 15/318. The unanswered calls fail
+      even after 10 bounded retries: 429 Too Many Requests, 500 and 1200 s timeouts. A probe at 20:33 UTC got 500 from both
+      models: LiteLLM cannot reach the Qwen vLLM host (qwen_vllm-qwen38-27b:8002, connect failed), and the DeepSeek backend
+      (lpns245:8001) ''Can not write request body''. So the lab server''s backends are down, not throttling our pattern. Resume
+      passes keep going at the design''s 2 calls (wake_replay5, review_replay4); not read on a subset (that would cut the
+      design''s 100 wakes / 159 rounds).'
   handoff:
     state: 'Token-share answer done: par:labllm3 + fig:labllm3 committed ad9405eab (src tools/token_share.py @7ddc8128c, verify_claims
       0 problems): over 2026-11-09..23, 4953M tokens ($2028), owners 55.8%, main 29.3%, reviewers 5.3% (10.0% of $); routed
