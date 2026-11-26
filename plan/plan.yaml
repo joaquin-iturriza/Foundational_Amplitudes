@@ -29941,7 +29941,7 @@ entries:
     '20': 'next owner: event E9622 (arm smokes done), then site pick + SCR-A2 and V/B arms'
     '29': FA-ccin2p3-58bc2125 FA-ccin2p3-42ae3468
     '31': FA-ccin2p3-58bc2125
-    '30': FA-ccin2p3-42ae3468
+    '30': 'next owner: event E9620 (FA-ccin2p3-42ae3468 failed, log to read)'
     '32': FA-ccin2p3-aacf91cc FA-ccin2p3-706a0f6f
   handoff:
     state: '2026-11-27 @bcee3530a. Slide-11 MC test done exactly as specified (D571/D574/D575; design PASS 2026-11-26 16:45).
