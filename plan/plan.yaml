@@ -42138,14 +42138,6 @@ entries:
       (per-family errors in Suprio''s layout already in figs/*heldout_per_process.png; candidate causes: his input encoding/pID
       embedding, his target standardisation on held-out, our shared affine statistics on new multiplicities, model capacity),
       design review, then the configurations that test it within the GPU budget'
-    21: '22: D567/D564 matched test after step 21 (the gg->ttH split follows the sign of the internal-top off-shellness input):
-      does our setup without the off-shellness input lose the split and the gg->tbW level error? Arm: part (c)''s control
-      config and HPs (runs/llmcmp_c_qperp/trial_9000, FA-ccin2p3-d34535b0), identical flags except data.offshell_per_event=false
-      (offshell_zero is not equivalent for a fresh run: check which flag the kit_benchmark off arms used, D418), seed 42,
-      60,840 steps; time per step from d34535b0''s own log; one smoke if the flag changes the launch path (D395); score by
-      job_llm_score.sh EVENTS=1 ONLY=heldout; read factor_split.py on gg->ttX and gg->tbW, heldout_per_process.py all parts,
-      error_split.py against the control. Prior: results.tex l.9373-9426 (off-shellness adopted, ~50x in-distribution), l.10855,
-      kit_benchmark off arms (D418), none on held-out new families. Its design and design review first.'
     24: 'Attempt D: the same, with a process-intrinsic anchor x0_p (a fixed function of the process alone, e.g. a ridge fit
       of the training processes'' median x on the regressor''s descriptors; no statistic of the scored dataset), so c_p is
       the level at the process''s own typical point (little leverage) and b_p carries the sampling dependence; slopes optionally
@@ -42445,12 +42437,6 @@ entries:
       if:
       - 'a cause found that a configuration of ours can test: design and run it (investigation scope, GPU budget)'
       - 'no candidate survives the checks on existing data: report what was ruled out with its evidence'
-    21:
-      feeds: 'D567/D564: whether the off-shellness input causes our setup''s new-family shape split and level errors'
-      if:
-      - 'split gone and new-set shape/level better: the input''s sign misleads on new families; report, then the fix question
-        (e.g. |o| only) to Joaquin'
-      - 'split stays: the input is not the cause; report, next candidate the diagram encoder'
     24:
       feeds: 'D566: a per-event, sampling-independent level from process and diagram information that keeps the level gain
         on new families'
@@ -43409,7 +43395,6 @@ entries:
       to Joaquin (design''s branch ''groups gone, pole dependence kept'').'
   step_waits:
     '15': FA-ccin2p3-1b0cbd8a
-    '21': FA-ccin2p3-1b0cbd8a
     '24': FA-ccin2p3-df622fc5
   handoff:
     state: 'Part (a), part (c), steps 16, 19 DONE (as before). Step 21/22 no-off-shellness arm FA-ccin2p3-1b480869 trained
