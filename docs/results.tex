@@ -9343,7 +9343,7 @@ within the $1.22$ spread, and $4.68$ for Adam, whose $244$ steps leave it far fr
 MSE $0.939$ at the end of its stable phase). At $128$, $50$ epochs is worse for Muon ($1.66$) and the fine-tune
 ($1.39$) and better for Adam ($0.743$). The fine-tune's best at $128$ sits at the lower edge of its learning-rate
 window, a fraction $0.0220$ of its log width, so $0.0151$ is an upper bound on that cell; a lower value only raises its
-$r_{50}$. The trials' spread, the third-best over the best, stays below $1.30$ in every cell. So the batch-$128$ gain
+$r_{50}$. The trials' spread, the third-best over the best, is at most $1.30$ in every cell. So the batch-$128$ gain
 on $10^4$ repeated events does not come from training too long: at $50$ epochs, where batch $2048$ no longer
 memorises (train over validation between $0.237$ and $0.939$ at $2048$), it still ends several times above batch $128$ for both
 optimizers from scratch.
