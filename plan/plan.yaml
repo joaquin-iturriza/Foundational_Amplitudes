@@ -29697,7 +29697,7 @@ entries:
     '20': FA-lxplus-637c9017
     '22': drive.py searches kit_hpo_ttvirt_thr_divform and kit_hpo_ttvirt_thr_rezero (detached kit_hpo_tt_divform_rezero,
       pid 2843282)
-    '24': FA-lxplus-91319d3e (prebuild; step 20's smoke parent, arm smokes and real parent follow it, FT after the real parent)
+    '24': FA-lxplus-637c9017 (prebuild; step 20's smoke parent, arm smokes and real parent follow it, FT after the real parent)
   handoff:
     state: '2026-11-26 ~04:35 UTC. Step 23 (D571) DONE: MC test PASS on all three (bias below the exact sigma''s MC error:
       uug -1.65e-3 vs 1.21e-2, uugg -3.31e-3 vs 1.12e-2, tt +5.83e-4 vs 1.90e-3; second-stage eff 0.886/0.562/0.967), results.tex
