@@ -47222,6 +47222,25 @@ entries:
       0.016-0.19); 0.45 <- measured: content-only network''s new median 0.448 (norm_explore3.json B|nodiag|sampled); every
       subset <- Joaquin''s words D566 ''this has to perform correctly in individual events regardless of that''; 2 bootstrap
       sd <- measured noise (event bootstrap in the job)'
+    passed_at: '2026-11-26T19:45:18+00:00'
+    reviewer: 'Attempt D (process-intrinsic anchor) checked against attempt C''s passed design and data/perevent_anchored.json
+      @c00b40d98, code @7df6e5130 (anchored(mode=process), anchor_map RidgeCV cross-fit by weak_key, bcls, _own diagnostic,
+      PEL_ANCHOR in job_perevent_level.sh). One change vs attempt C: the anchor (global median -> ridge map of training medians
+      on descriptors); events, split, network, seeds, subsets, bootstrap, bars identical; C_sqEP dropped and _bcls/_own added,
+      both stated. Check 2: attempt C''s numbers confirmed (C_s new 0.248 vs regressor_ens 0.219, max 0.369; C_s_fit subsets
+      0.0019/0.0019/0.007/0.018 vs oracle_const 0.027/0.027/0.203/0.602; C_s_trueb 0.42), the leverage error the anchor targets;
+      the synthetic run scratchpad tD/data/perevent_anchored_D.json written by the exact code path shows the measure moving
+      with the anchor (s_lo/s_hi: regressor_ens 0.52/0.56 vs D_s 0.013/0.014; anchor miss 0.028 sx). The check field''s sentence
+      ''different anchor changes e by 25x (C_sqEP_trueb 10.3 vs C_sqEP 5.37)'' is wrong (those differ in slopes, not anchor;
+      ratio 1.9x): do not carry it into results.tex. Note on real data s_lo/s_hi barely move the constant (0.027), so q_hard/q_soft
+      carry the test; the outcome already reports non-moving subsets as not testing. Check 3: ten 3-seed ensembles, control
+      range 0.098-0.369, 30-sample event bootstrap (C: sd 0.0004-0.05), as the sibling attempt. Check 4: bars sourced (control''s
+      own ten-ensemble max, 0.448 content-only network in norm_explore3.json, D566 words for every subset, measured bootstrap).
+      Check 8: x0_p is a function of descriptors only, y enters only _fit/_trueb diagnostics; _own labelled a diagnostic.
+      No training, loss, HPO, lr or generation (checks 9,10,12,13,17 n/a); CPU job, attempt C ran 16 min at the same 3 h limit,
+      D ~2x the fits. Searched results.tex for ''intrinsic anchor'', ''process anchor'', ''x0_p'', ''anchored'', ''leverage'',
+      ''own median'', ''class slope'', ''per-event level'', ''conditional mean''; plan dead ends A/B/C; site decisions for
+      D566/anchor: nothing beyond attempt C and dead ends A, B (all in prior).'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
