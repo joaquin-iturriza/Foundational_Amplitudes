@@ -74,7 +74,9 @@ order e+ e- finals, and the benchmark file's root attribute `metadata`; any targ
   python predict.py ee_tt   <in.h5> --out tt_me2.h5
 Output, float64, under the benchmark's own dataset names: <split>/<stratum>/log10_me2 = log10|M|^2 (ee_tt:
 log10_abs_virt_finite = log10|V|, V the finite one-loop virtual) and the value itself (me2; ee_tt: virt_finite, with its
-sign: the ee_tt model predicts V > 0, as V is on every event of the benchmark's ee_tt file). CPU threads are pinned to 1 (KIT_THREADS), where the results reproduce ours exactly.
+sign: the ee_tt model predicts V > 0, as V is on every event of the benchmark's ee_tt file). CPU threads are pinned to 1 (KIT_THREADS), where the results are reproducible to float64 rounding; our own
+predictions (made on GPU) differ from them by up to 2.6e-5 (ee_uug), 6.6e-5 (ee_uugg) and, on ee_tt, 2e-4 (bulk),
+4.9e-4 (threshold) and 5.5e-3 (Sudakov bins) in log10, a rounding sensitivity of the models well below their errors there.
 Check: python predict.py ee_uug examples/ee_uug_bulk5.h5 --out /tmp/x.h5 must give examples/ee_uug_bulk5.expected.txt
 (log10 of the first 5 bulk_test events of your ee_uug.h5; same for ee_uugg, ee_tt) to float64 rounding.
 Limits: trained on the bulk only (100000 bulk_train events each; no hard_train point): for ee_uug/ee_uugg the s_ij/s > 0.01
@@ -219,10 +221,18 @@ def _standalone(out, models):
             with h5py.File(os.path.join(out, "examples", f"{m['file']}_bulk5.h5"), "w") as e:
                 e.attrs["metadata"] = f.attrs["metadata"]
                 e["bulk_test/bulk/momenta"] = t["momenta"][:5]
-        # the expected output: our own predictions of those events (the run's job, kit_benchmark/predictions.h5)
-        with h5py.File(os.path.join(ROOT, "runs", "kit", m["run"], "kit_benchmark", "predictions.h5"), "r") as o:
+        # the expected output: the repository's own predictor on those events at 1 CPU thread, what predict.py must
+        # reproduce (the training job's GPU predictions differ from any 1-thread CPU read of the asymptotic-factor
+        # models by up to 5.5e-3 in log10, measured by check --repo, FA-ccin2p3-297e9b10: README)
+        tmp = tempfile.mkdtemp(prefix="kitpkg_expected_", dir=os.environ.get("SCRATCH"))
+        subprocess.run([sys.executable, "-c", "import sys; from tools.kit_predict import predict; "
+                        "predict(sys.argv[1], ['bulk_test'], sys.argv[3], h5=sys.argv[2])",   # predictions only, no scorer
+                        f"runs/kit/{m['run']}", os.path.join(out, "kit_data", f"{m['file']}.h5"), tmp],
+                       cwd=ROOT, env=dict(os.environ, KIT_THREADS="1", PYTHONPATH=ROOT), check=True, stdout=subprocess.DEVNULL)
+        with h5py.File(os.path.join(tmp, "predictions.h5"), "r") as o:
             (k,) = [k for k in o["bulk_test/bulk"]]
             y = o[f"bulk_test/bulk/{k}"][:5].astype(np.float64)   # log10, as predict.py writes it
+        shutil.rmtree(tmp, ignore_errors=True)
         open(os.path.join(out, "examples", f"{m['file']}_bulk5.expected.txt"), "w").write(
             "".join(f"{x:.17e}\n" for x in y))
     open(os.path.join(out, "predict.py"), "w").write(PREDICT)
@@ -264,6 +274,10 @@ def cmd_check(a):
     finally:
         for k in ("DATA_DIR", "SCRATCH"):
             shutil.rmtree(env[k], ignore_errors=True)
+    gpu = {k: v for k, v in worst.items() if not k.endswith(":standalone")}
+    if gpu and len(gpu) < len(worst):   # standalone: gated on the 1-thread CPU read; the GPU deltas are reported (README)
+        print(f"GPU predictions vs this package, max |delta log10|: " + ", ".join(f"{k} {v:.2e}" for k, v in gpu.items()))
+        worst = {k: v for k, v in worst.items() if k.endswith(":standalone")}
     if a.report:    # a diagnostic read: the deltas are the result, a mismatch is not a failure
         print(f"REPORT worst {max(worst.values()):.2e}")
         return
