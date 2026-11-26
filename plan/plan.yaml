@@ -48153,7 +48153,7 @@ entries:
       steps 5 and 6
     '5': detach wake_replay5
     '6': detach review_replay4
-    '7': repo-reviewer a301e680efb448582 (holds the lock) passing the backlog with worktrees/wt-labwake's diff
+    '7': repo-reviewer a301e680efb448582 re-check of labwake 089b53ffb (Retry-After cap, its nit)
   findings:
   - at: '2026-11-23T19:55:22+00:00'
     text: 'Local batch width cut from 6 parallel opencode streams to 2 (D531): 6 streams of opencode sessions (~350-400 MB
