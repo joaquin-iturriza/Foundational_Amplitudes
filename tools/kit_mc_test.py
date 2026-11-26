@@ -147,7 +147,12 @@ def main():
     ap.add_argument("--selfcheck", action="store_true")
     ap.add_argument("--plot", default=None, help="draw the figure from this JSON (with --fig <base>) and stop")
     ap.add_argument("--fig", default="analysis/kit_benchmark/figs/mc_test/kit_mc_test")
+    ap.add_argument("--summary", default=None, help="print this JSON's scalars per process (the claims' source) and stop")
     a = ap.parse_args()
+    if a.summary:
+        res = json.load(open(a.summary))
+        print(json.dumps({r["file"]: {k: v for k, v in r.items() if isinstance(v, (int, float))} for r in res.values()}))
+        return
     if a.plot:
         return plot(json.load(open(a.plot)), a.fig)
     _selfcheck()
