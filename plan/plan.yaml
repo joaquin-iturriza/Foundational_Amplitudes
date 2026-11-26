@@ -28509,7 +28509,7 @@ entries:
     agent: afcf66cbd5366b5c2
     state: closed
     since: '2026-11-26T02:04:32.890000+00:00'
-    state_at: '2026-11-26T02:40:10+00:00'
+    state_at: '2026-11-26T02:42:02+00:00'
     context: 223429
     context_at: '2026-11-26T02:18:58+00:00'
   findings:
