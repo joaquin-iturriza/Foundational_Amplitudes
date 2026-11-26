@@ -20,6 +20,12 @@ Per run:
             also with x_max at the q-quantile of x under the surrogate measure and the share of sigma_exact in
             events above it (overweights, the bias that cut leaves)
   eff_two   eff_surr * eff_x: exact evaluations needed per unweighted event fall from 1/eff_exact to 1/eff_x
+  *_q       every efficiency also with its maximum reduced to the weight above which a share 1 - q of sigma lies
+  n_star    (std(w)/mean(w)/|bias|)^2: the event count at which the bias equals the MC error of sigma_exact
+  pass      |bias| and its band below the MC error of sigma_exact on these events (the protocol's resolution)
+  regions   bias, share of sigma_exact and overweight share per bin of min s_ij/s over final pairs (RAMBO files) or
+            of sqrt s in GeV (t t~); the t t~ sigma is sigma(sqrt s) integrated over the flat sqrt s window
+Counts exact |M|^2 evaluations only, not the surrogate's own cost.
 """
 import argparse
 import json
@@ -50,9 +56,26 @@ def weights(stem, target, run_dir):
         pt = mom[:, 2]
         beta = np.sqrt((pt[:, 1:] ** 2).sum(1)) / pt[:, 0]   # CM frame: |p_t| / E_t
         jac = beta / s
+        reg = np.sqrt(s)
     else:
         jac = np.ones_like(f)
-    return f * jac, fs * jac, float((f < 0).mean())
+        P = mom[:, 2:]
+        n = P.shape[1]
+        d = lambda a, b: 2 * (a[:, 0] * b[:, 0] - (a[:, 1:] * b[:, 1:]).sum(1))
+        Q = mom[:, 0] + mom[:, 1]
+        s = Q[:, 0] ** 2 - (Q[:, 1:] ** 2).sum(1)
+        reg = np.min([d(P[:, i], P[:, j]) for i in range(n) for j in range(i + 1, n)], axis=0) / s
+    return f * jac, fs * jac, float((f < 0).mean()), reg
+
+
+EDGES = {"ee_tt": [353.0, 500.0, 700.0, 1000.0, 1400.0, 1739.0], "rambo": [0.01, 0.02, 0.05, 0.1, 0.2, 1.0]}
+
+
+def qmax(w, m, q):
+    """The value of w above which a share 1 - q of sum(m) lies (m: the measure the events are weighted by)."""
+    o = np.argsort(w)
+    cw = np.cumsum(m[o]) / m.sum()
+    return w[o][min(np.searchsorted(cw, q), len(w) - 1)]
 
 
 def mc(we, ws, boot, q, seed=0):
@@ -64,17 +87,32 @@ def mc(we, ws, boot, q, seed=0):
         i = rng.integers(0, n, n)
         bb[b] = ws[i].sum() / we[i].sum() - 1
     x = we / ws
-    # q-quantile of x under the surrogate measure (events weighted by w_surr)
-    o = np.argsort(x)
-    cw = np.cumsum(ws[o]) / ws.sum()
-    xq = x[o][min(np.searchsorted(cw, q), n - 1)]
+    xq = qmax(x, ws, q)            # q-quantile of x under the surrogate measure (events weighted by w_surr)
     ex = we.sum() / ws.sum()
+    err = float(we.std() / we.mean() / np.sqrt(n))
     over = float(we[x > xq].sum() - (ws[x > xq] * xq).sum()) / we.sum()
     return {"n": n, "bias": float(bias), "bias_lo": float(np.quantile(bb, 0.16)), "bias_hi": float(np.quantile(bb, 0.84)),
-            "mc_err": float(we.std() / we.mean() / np.sqrt(n)),
+            "mc_err": err, "n_star": float((err * np.sqrt(n) / abs(bias)) ** 2) if bias else float("inf"),
+            "pass": bool(max(abs(bias), abs(np.quantile(bb, 0.16)), abs(np.quantile(bb, 0.84))) < err),
+            "eff_exact_q": float(min(we.mean() / qmax(we, we, q), 1.0)), "eff_surr_q": float(min(ws.mean() / qmax(ws, ws, q), 1.0)),
             "eff_exact": float(we.mean() / we.max()), "eff_surr": float(ws.mean() / ws.max()),
             "eff_x": float(ex / x.max()), "eff_x_q": float(min(ex / xq, 1.0)), "x_q": float(xq), "overweight_share": over,
-            "eff_two": float(ws.mean() / ws.max() * ex / x.max())}
+            "eff_two": float(ws.mean() / ws.max() * ex / x.max()),
+            "eff_two_q": float(min(ws.mean() / qmax(ws, ws, q), 1.0) * min(ex / xq, 1.0))}
+
+
+def regions(we, ws, reg, edges, q):
+    x = we / ws
+    xq = qmax(x, ws, q)
+    out = []
+    for lo, hi in zip(edges[:-1], edges[1:]):
+        k = (reg >= lo) & (reg < hi)
+        if not k.any():
+            continue
+        out.append({"lo": lo, "hi": hi, "n": int(k.sum()), "bias": float(ws[k].sum() / we[k].sum() - 1),
+                    "share": float(we[k].sum() / we.sum()),
+                    "overweight_share": float((we[k & (x > xq)] - ws[k & (x > xq)] * xq).sum() / we.sum())})
+    return out
 
 
 def _selfcheck():
@@ -83,7 +121,10 @@ def _selfcheck():
     r = mc(we, we.copy(), 50, 0.999)
     assert abs(r["bias"]) < 1e-12 and abs(r["eff_x"] - 1) < 1e-12 and r["overweight_share"] == 0
     r = mc(we, 2 * we, 50, 0.999)
-    assert abs(r["bias"] - 1) < 1e-12 and abs(r["eff_x"] - 1) < 1e-12
+    assert abs(r["bias"] - 1) < 1e-12 and abs(r["eff_x"] - 1) < 1e-12 and not r["pass"]
+    reg = rng.uniform(0.01, 1, len(we))
+    rr = regions(we, 2 * we, reg, EDGES["rambo"], 0.999)
+    assert abs(sum(b["share"] for b in rr) - 1) < 1e-9 and all(abs(b["bias"] - 1) < 1e-12 for b in rr)
 
 
 def main():
@@ -102,8 +143,9 @@ def main():
     for r in a.runs:
         rd = r if os.path.isabs(r) else os.path.join(ROOT, r)
         stem, target, _ = kh.parse(run_target(rd))
-        we, ws, neg = weights(stem, target, rd)
-        res[os.path.basename(rd.rstrip("/"))] = dict(mc(we, ws, a.boot, a.q), file=stem, target=target, neg_share=neg)
+        we, ws, neg, reg = weights(stem, target, rd)
+        res[os.path.basename(rd.rstrip("/"))] = dict(mc(we, ws, a.boot, a.q), file=stem, target=target, neg_share=neg,
+                                                     regions=regions(we, ws, reg, EDGES.get(stem, EDGES["rambo"]), a.q))
     if a.out:
         with open(a.out, "w") as fh:
             json.dump(res, fh, indent=1)
