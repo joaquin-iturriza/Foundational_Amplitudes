@@ -29877,6 +29877,7 @@ entries:
     '24': step 20's real fair-NLO parent run (tag kit_fairnlo_a2, not yet submitted)
     '20': FA-ccin2p3-3895a2a7 FA-ccin2p3-e0587622 FA-lxplus-abac4281
     '25': the repo-reviewer pillar run (blocks the commit of tools/kit_package.py --standalone, uncommitted in trunk)
+    '26': a new owner (the previous closed at its context limit, 2026-11-26 ~15:30); after step 25/26's package
   handoff:
     state: '2026-11-26 ~15:00 UTC. Step 20 (D570 + D572 signed A2, design PASS 13:00): parent smoke FA-lxplus-f7c30433 clean
       (0.58 s/it over 50 steps incl. start-up; kit_sign_read wrong sign after 50 steps 0.37/0.32/0.18 on uubar_ddbar_nlo/ee_mumu_ew_nlo/ee_uu_ew_nlo:
