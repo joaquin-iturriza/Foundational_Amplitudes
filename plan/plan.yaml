@@ -42297,6 +42297,18 @@ entries:
       Figures redrawn with the untuned arm, beside *_before_untuned.{png,pdf}: figs/all_arms_bias_heldout_per_process.png,
       figs/all_arms_shape_heldout_per_process.png, figs/shape_dists.png (two representative processes changed by the median-spread
       rule: multi-H bbx_ahh -> uux_zhh, gg->Wqq'' gg_csxwm -> gg_udxwm).'
+  - at: '2026-11-26T03:40:29+00:00'
+    text: '2026-11-26 ~04:19 CC /sps filled (0 GB free), read at 04:3x: step 8''s 120-head smoke FA-ccin2p3-caf1170e (slurm
+      64872564, started ~04:00, H100) wrote 16 GB into runs/zz_smoke/zz_smoke_sweep_config_llmcmp_c_width_64872564. In that
+      window: step 16''s level-file run FA-ccin2p3-89671610 (slurm 64862460) exited 1 with no message at 04:19:26 after 8.5
+      h (~41k of 60,840 steps, validation still falling, best 6.28e-4; only model_run0_best.pt of 03:45 kept, no resume; worker
+      triage: no cause in log or sacct, DeepSeek did not answer), at the time its next validation would write the best model;
+      the 64-head smoke FA-ccin2p3-1969f226 died silently while writing its val predictions (~04:16); 4 kit_hpo jobs of another
+      entry failed 0:53 at 04:20. Cause read as the full disk (consistent timing and write points; not proven by an error
+      line). Freed: our read smoke debris zz_smoke_..._c_width_64872562 (failed 64-head smoke, 4.6 GB), _64847535 and _64847537
+      (16/32-head smokes, passed 11-25, 2.2 GB): 5.5 GB free. Repair of step 16 (identical flags, new run dir trial_7002 so
+      the partial trial_7001 stays): site submit refused (1 GB need + 5 GB margin > 5.5 GB); it goes once caf1170e ends and
+      its smoke dir (16 GB, debris once its SMOKE_EXIT is read) is deleted. The 64-head smoke is resubmitted then too.'
   step_waits:
     '8': FA-ccin2p3-1969f226 FA-ccin2p3-caf1170e
     '13': FA-ccin2p3-623a3af6
