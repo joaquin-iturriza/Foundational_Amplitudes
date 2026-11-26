@@ -47137,11 +47137,6 @@ entries:
   decisions:
   - D532
   next:
-    5: 'D563 write-up: par:cbs_horizon in docs/results.tex after par:cbs_update, with fig ft_ep50 (ft_bcrit.py ep50 at ae99a4010,
-      data 98cf81a0c; caption in the 2026-11-26 hand-back, check_caption OK) and % src / % claim lines (src: python3 analysis/critical_batch/ft_bcrit.py
-      ep50 @<commit>; keys cells.<arm>|<b>.val_best, arms.<arm>.r50/r400, cells.*.E50_over_E400, cells.Fn|128.lr_pos): r50
-      4.60/9.86/1.45 > 1.22 for Muon/Adam/Fn, the batch-128 gain persists at 50 epochs (not the horizon); Fn 128 reported
-      as a bound (lower lr edge)'
     6: 'Close: once par:cbs_update (e05fc9e32) and par:cbs_horizon pass the notes-editor, plan done critical_batch --writeup
       <commits> (par:cbs_scan 145d14839, par:cbs_update e05fc9e32, par:cbs_horizon)'
   done_when: null
@@ -48144,11 +48139,6 @@ entries:
       (decisions); plus the first-read data files above, which the prior names but does not carry through to the predicted
       B_dL.'
   step_why:
-    5:
-      feeds: 'D563: is the batch-128 gain at 400 epochs a horizon effect'
-      if:
-      - 'written and claims verified: run the notes-editor on par:cbs_update + par:cbs_horizon (backlog 158/200 + this)'
-      - 'Joaquin answers the Fn 128 edge question with a run: design it (window 3x down, 16 trials), design-review, submit'
     6:
       feeds: the entry's close
       if:
