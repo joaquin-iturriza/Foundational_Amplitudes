@@ -34248,6 +34248,18 @@ entries:
       eps2 near 1 at the 0.999 quantile -> exact second stage costs little; eps2 at the maximum far below that -> tails set
       it, quoted with the sigma share above the cap. tt: bias per sqrt s, read at threshold (beta < 0.1) and above.'
     sources: D571, D574, D575
+    passed_at: '2026-11-26T15:06:33+00:00'
+    reviewer: 'Slide-11 MadGraph MC test (D571 we run it, D574 no training, D575): read slide 11 (pdf p11) and the KIT email;
+      tools/kit_mc_madgraph.py @ece0b1c76 implements it correctly: events from MadEvent distributed as exact |M|^2 inside
+      s_ij/s>0.01 on every gluon-holding pair (dummy_cuts loop checked: uug (u,g),(ub,g); uugg adds (g,g), not (u,ub)), sigma_hat/sigma-1
+      = E[u]-1 exact identity, eps2 = (1/E[u])/r_max with u-weighted r quantiles = the |M_hat|^2-sample values in expectation
+      (stated deviation, sound); exact |M|^2 asserted against KIT me2 at 1e-6, alpha_s asserted from LHE. Check 2: same u-ratio
+      measure moved on the same three packaged models (kit_mc_test.json: bias -1.65e-3/-3.31e-3/5.83e-4, eps2 0.886/0.562/0.967).
+      Check 3: no training; MC error std(u)/sqrt(1e5) plus bootstrap reported beside each bias, no verdict bar (no threshold
+      without source). tt: exact quadrature per sqrt s on the threshold scan (346-432 GeV), the bulk above relies on the earlier
+      flat 353-1739 GeV number (5.83e-4 vs 1.90e-3): say so in the report. Non-blocking: assert in gen that all KIT bulk_test
+      events pass the coded cut and that LHE weights are equal; first real job is the end-to-end run (CPU, cheap). Searched:
+      sec:kit-mc, kit_mc, unweighting, second-stage, end-user, madevent, slide 11 in results.tex and the entry; D571-D575.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
