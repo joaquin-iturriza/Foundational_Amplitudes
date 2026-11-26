@@ -112,7 +112,7 @@ def stats(t, q, X, full, pole=None):
             "groups": {"lo_share": float((~hi).mean()), "lo_mean_d": float(c[0]), "hi_mean_d": float(c[1]),
                        "separation": float((c[1] - c[0]) / within)},
             "vars": {k: against(d, x, hi, full) for k, x in X.items()}} | (
-        {"pole": {k: pole_split(d, X[k], v, hi) for k, v in pole.items() if k in X and X[k].std() > 0}} if pole else {})
+        {"pole": {k: pole_split(d, X[k], v, hi) for k, v in pole.items() if k in X and X[k].std() > 1e-12}} if pole else {})
 
 
 XLAB = {"log_factor": r"$\log F$", "offshell_23": r"off-shellness input, internal $Z$",
@@ -144,7 +144,7 @@ def fig(path, xv, panels="ttx"):
         ax.text(0.03, 0.95, proc_label(meta[n]), transform=ax.transAxes, va="top", color="k")
         ax.set_xlabel(XLAB[xv])
         ax.set_ylabel(r"pred $-$ true of $\log|\mathcal{M}|^2$")
-    ps.legend(axes.ravel()[0], "lower right")
+    ps.legend(axes.ravel()[0], "upper center" if panels == "tbw" else "lower right")
     base = os.path.splitext(os.path.basename(path))[0]
     ps.save(fig, os.path.join(HERE, "figs", (base if xv == "log_factor" else f"{base}_{xv}") + ("_tbw" if panels == "tbw" else "")))
 
