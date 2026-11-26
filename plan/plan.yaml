@@ -28308,6 +28308,9 @@ entries:
       v6 on CC, the three asymptotic-factor models), measure the cross-section bias and the unweighting efficiency against
       the exact |M|^2 on the KIT processes; define the MC (phase-space sampler, events, unweighting against max weight) in
       a reviewed design first'
+    24: 'Step 20 fine-tunes: when the fair-NLO parent FA-ccin2p3-a3bc3374 (runs/data_saving/dsave_parent_finale_kit_fairnlo_a2,
+      10 h target) ends, submit FT at every D (fairnlo_arms.py with that parent, FT lines, limit from the arm smokes'' s/step),
+      then read FT vs SCR-A2 vs V/B per D on the hard bins (design PASS 2026-11-26T02:27)'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -29637,6 +29640,12 @@ entries:
         event-generation test'
       - 'bias beyond the MC error or efficiency far below: report with numbers per process and which phase-space region drives
         it'
+    24:
+      feeds: 'D570: does fine-tuning from a pretraining recipe that works beat from scratch (SCR-A2, V/B with exact Born)
+        on ee->tt one-loop at 100-1e4 bulk points'
+      if:
+      - 'FT below SCR-A2 and V/B per D past the design''s 1/7 bar: report the recipe as the fair-NLO answer to KIT'
+      - 'FT not below them: report per D where it loses, with the parent''s curves'
   step_waits:
     '20': critical_batch's uncommitted files (analysis/critical_batch/figs/{pretrain,zng4g}_update_bdl.pdf, data/ft_bcrit_ep50{,_raw}.json)
       blocking site sync, sent to the main session 2026-11-26 (D568); then the D395 smoke (design PASS 2026-11-26T02:27)
