@@ -48999,6 +48999,7 @@ entries:
       the caches is unread; nothing deleted, no duplicate key (the three keys hold different pool sets).'
   step_waits:
     '2': the next owner of cc_disk (hand-off written 2026-11-25; the closing owner reached its context limit)
+    '3': ccj_4f7a6e6248e3 ccj_a92263be3b0c ccj_d7c7455d61ad (detached reader scr_read, pid 2914609)
   targets:
   - batch: disk_inventory
     wall_h: 1.0
