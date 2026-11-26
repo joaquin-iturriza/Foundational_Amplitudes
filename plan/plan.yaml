@@ -16523,7 +16523,7 @@ entries:
     '35': '2026-12-03'
   owner:
     agent: ac4f3bf623a93600d
-    state: working
+    state: closed
     since: '2026-11-25T13:18:03+00:00'
     state_at: '2026-11-26T00:03:22.263000+00:00'
     context: 268062
@@ -18015,31 +18015,23 @@ entries:
       - left for the next owner to read. Part (b) has no real case yet: the only lxplus ssh failure since 11-24 was a connection
       reset during a maintain prune (E9213), not a down probe.'
   handoff:
-    state: 'D558 step done 2026-11-25: refusal cost per role and check (tools/token_share.py --refusals @e1b708a35; write-up
-      74b362473 par:refusal-cost, fig:refusal-cost, analysis/agent_redesign/figs/refusal_cost.png, data refusal_cost.json
-      1a84e9d31): 1000 refusals over 2026-11-09..23 followed by 677.6M tokens (13.7%; lower 5.0%), main session 32.1% of its
-      tokens, owners 6.5%. Misfires fixed in 133a1b102 (commit block named paths/other repos, sleep_guard short sleeps, question
-      matcher short restated asks, brief_guard names COLD READ); context guard repeats already fixed by ee7afdfb7. Step 35
-      = re-measure the week 2026-11-26..12-03 (date wait 2026-12-03; a non-default window writes dated files, fedde5371).
-      Step 36 = D562 audit of the wording-judging hooks, ready for the fresh owner: start from refusal_cost.json (per check:
-      n, repeats, dropped, examples) and the verdict counts in the tool''s last JSON line. Other steps (11, 12, 14, 17, 28,
-      30, 31, 34) as in the previous hand-off: waited or held.'
-    decisions: 'Joaquin''s: D558 (measure refusal cost per role), D562 (audit wording-judging hooks). Mine: (1) a refusal''s
-      cost is the messages until the same action succeeds, else until the first all-passing message (a dropped refusal charged
-      to turn end overstated sleep_guard 10x); each message to the newest open refusal (no double count). Reason: D558 says
-      ''until the refused action succeeds or is dropped''. (2) six of the top ten judged right from code plus case samples
-      and the agent''s response (SendMessage/plan bookkeeping followed); not every case hand-read. (3) sleep limit 5 s for
-      a single foreground sleep (the refused short ones were 0-5 s; loops and longer sleeps still refused). (4) md_guard refusing
-      a scratchpad .tex counted right: its header guards the scratchpad on purpose. (5) question matcher fixed in code rather
-      than asking the main to quote asks verbatim, since CLAUDE.md wants questions rewritten by the main session.'
-    ruled_out: Asking for verbatim quotes of plan asks (conflicts with the rewrite rule); counting a dropped refusal to the
-      end of its turn.
+    state: '2026-11-26: D562 audit done (step 36: removed open-ask matcher 8da026b88, reply check at Stop 8e53d6eb0, brief_guard
+      cut check 2022ad363; fixed send_check axes a675aee7a; kept the rest, see finding 2026-11-25). Owner misbooking fixed:
+      plan owner refuses an agent launched for another entry (caba98687). Step 34 done (lxplus gate charges own --time, 10
+      real submits). Step 31: part (a) fold routing confirmed live; part (b) lxplus ssh-master drop probe has no real case
+      yet, date wait 2026-12-03. Step 35 date wait 2026-12-03. Other steps (11, 12, 14, 17, 28, 30) waited or held as before.'
+    decisions: 'Joaquin''s: D562 (audit wording-judging hooks), D558. Mine: (1) a check is removed when its hand-read misfires
+      exceed its catches, or a tool already enforces its rule at source (reason: D562''s own criterion); (2) ask_matches functions
+      kept for token_share.py''s replay of par:refusal-cost; (3) legend-definition misfires (collective definitions) left
+      unfixed because a looser match passes real catches; (4) the axes check still refuses ''Top panel: sigma in pb'' and
+      ''along the run'' (no axis named).'
+    ruled_out: Exempting a PDF without a sibling png (an existing test refuses a lone figure PDF); loosening legend matching
+      to token presence.
     running: none
-    files: tools/token_share.py (refusal_scan, refusal_verdicts, figure_refusals) analysis/agent_redesign/refusal_cost.json
-      analysis/agent_redesign/figs/refusal_cost.png .claude/hooks/review_backlog.sh .claude/hooks/brief_guard.py ~/.claude/hooks/sleep_guard.sh
-      (backup .bak-20261125-d558) tools/plan.py (ask_matches) tests/test_plan_ask_short.py tests/data_plan_ask_short.json
-      tests/test_review_backlog_paths.py tests/test_sleep_guard_short.py docs/results.tex par:refusal-cost
-    written: '2026-11-25T13:14:07+00:00'
+    files: tools/plan.py (cmd_owner) .claude/hooks/plan_check.py .claude/hooks/stop_conditions.py .claude/hooks/brief_guard.py
+      .claude/hooks/send_check.py tests/test_redesign_d.py tests/test_setup_scenarios.py tests/test_send_check_axes.py tests/test_mechanical_brief.py
+      tests/test_hooks_real.py; scratchpad audit/ (hand-read cases)
+    written: '2026-11-26T00:06:45+00:00'
   ask: 'GPU budget: the site''s budget gate charges a new job its full time limit (it cannot know the real run time), so a
     batch with generous limits is held even when its expected use fits (part (b): 275 GPU-h of limits for ~196 expected).
     Should the gate charge the GPU-h each submission declares (--est-gpu-hours) instead, with the supervisor''s 2x-target
