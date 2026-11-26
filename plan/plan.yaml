@@ -34183,6 +34183,16 @@ entries:
       reruns once at half lr.'
     sources: 1/7 and 7 <- t t~ V same-HP rerun spread 0.78-6.96 (results.tex sec:datasaving, the passed step-20 design's bar);
       5x jump <- sec:ladder seeds' blow-ups against 1.5x seed noise; 100 GPU-h <- D575 names this work
+    passed_at: '2026-11-26T14:52:45+00:00'
+    reviewer: 'Re-check after FIX: all three reasons addressed. Prior now has the uug/uugg held-out fine-tunes (2140 vs 14180
+      at lr_scale 1; 2.59/1.78 decades soft at 0.1; collinear unchanged) and kit_hpo_tt_ft_r5 (lr_scale 2.49). The check uses
+      them (0.57-2.59 decades, findings 2026-11-11T04:42/06:37), and B moved 0.15-6.5 decades (2026-11-10T10:20). FT runs
+      at lr_scale 1 and 0.1; the no branch is the kit_hpo_tt_ft_r5 search best against best before any no-transfer statement.
+      SCR-A2 goes out once the parent config exists. Matched controls: B_bulk, and SCR-A2 at the same base and HPs. One seed
+      per D315; bars 1/7 and 7 from the t t~ V rerun spread 0.78-6.96 (results.tex:9817), wide enough to cover best-of-two
+      lr. Recipe diff @6a6ca8839 removes only ee_uug/uugg/bbbarg/bbbargg. HETEROSC, A2 with plain momenta as in the KIT A2
+      models, memmap off, <=25 GPU-h under D575. Searched: kit_pretrain_heldout, A_ft, heldout, lr_scale, asym_cont, flags=off,
+      6.96 in results.tex, plan.yaml, D570-D575.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
