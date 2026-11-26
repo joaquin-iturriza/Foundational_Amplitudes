@@ -43375,6 +43375,16 @@ entries:
       slurm 64936424 (trial_7002 level-file, REREAD FA-ccin2p3-0ca1d68d; log runs/llmcmp_level_file/trial_7002/interactive_score.log)
       and 64936425 (trial_1860 no-off-shell; log runs/llmcmp_c_nooffshell/trial_1860/interactive_score.log), ONLY=heldout
       EVENTS=1. Pending twins cancelled: 64930520 (FA-ccin2p3-2461cbe0, trial_7002) and 64927465 (FA-ccin2p3-1b0cbd8a, trial_1860).'
+  - at: '2026-11-26T20:54:13+00:00'
+    text: '2026-11-26 step 23 done: level-file events (interactive re-read of FA-ccin2p3-0ca1d68d trial_7002 on gpu_v100_interactive,
+      fetched via FA-ccin2p3-2461cbe0''s window) to data/events/level_file_heldout_events.csv (untracked as the others): 139
+      processes x 5000 rows, true_logm2 equal to a_trial5''s row by row within the CSV''s 1e-4 rounding; its held-out pooled
+      RMSE 0.96858 (data/split pass 0.96858, per-process MSE within 0.2%). figs/shape_dists.{png,pdf} redrawn with all three
+      final models (export_for_suprio.py @cbd8eb718); the median-spread pick over three models changed three panels (multi-H
+      bbx_ahh -> gbx_bxhh, ZZZ ccx_zzz -> ssx_zzz, ttX gg_ttxa -> gg_ttxz); previous two-model version kept as figs/shape_dists_before_diagrams.{png,pdf};
+      export_for_suprio.zip 871,452 bytes, README lists all three models. Level-removed shape MSE-bias^2 (same setup / + diagrams
+      / new preprocessing): gbx_bxhh 0.58/0.19/0.57, bbx_htamtap 0.85/0.18/0.057, scx_wpwmwm 0.48/0.28/0.50, ssx_zzz 0.081/0.018/0.13,
+      gg_csxwm 0.071/0.078/0.006, gg_ttxz 0.34/0.37/1.07.'
   step_waits:
     '15': FA-ccin2p3-1b0cbd8a
     '21': FA-ccin2p3-1b0cbd8a
