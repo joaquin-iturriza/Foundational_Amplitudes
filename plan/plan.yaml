@@ -48633,9 +48633,9 @@ entries:
     - 3
   owner:
     agent: a7580c28f015ad776
-    state: working
+    state: stopped
     since: '2026-11-26T03:33:13+00:00'
-    state_at: '2026-11-26T04:04:02.211000+00:00'
+    state_at: '2026-11-26T04:06:55.852000+00:00'
     context: 125677
     context_at: '2026-11-26T04:04:20+00:00'
   designs:
