@@ -43350,6 +43350,7 @@ entries:
     '15': FA-ccin2p3-1b0cbd8a
     '21': FA-ccin2p3-1b0cbd8a
     '23': FA-ccin2p3-2461cbe0
+    '24': the design reviewer's verdict on attempt D's design (recorded 2026-11-26T19:42)
   handoff:
     state: 'Part (a), part (c), steps 16, 19 DONE (as before). Step 21/22 no-off-shellness arm FA-ccin2p3-1b480869 trained
       clean (V100, 60,840 steps 13.45 h + sigma 1.78 h; best val_loss_no_reg -5.718 at validation 20/20 vs baseline trial_1860
