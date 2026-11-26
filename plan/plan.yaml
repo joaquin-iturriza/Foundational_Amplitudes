@@ -47581,6 +47581,32 @@ entries:
       control vs control_retrain); 0.19 <- measured: the trained twins'' largest seen MSE 0.0069 over a fifth of events, sqrt(0.0069/0.2)
       (step 15''s passed design); 2 contrast_se <- measured: the two fifths'' standard errors from the events; 1.11x <- measured:
       the retrain''s seen pooled RMSE ratio (data/rerun_spread.json)'
+    fix_at: '2026-11-26T23:35:12+00:00'
+    fix: 'Check 2 (measure moves) and 3 (spread): the check shows where the control''s error sits (V floor -7.96, near-pole
+      contrast -2.49, se 0.047; data/c_best_factor_split.json confirmed) but no run where the near-pole contrast moved, and
+      its run-to-run spread is unmeasured: the 0.19 floor is a bound from the twins'' seen MSE and 2 se is event noise only,
+      so a Partly or No read on the contrast cannot be told from a retrain. Fix with existing data, a CPU job: factor_split.py
+      --pole-run on the per-event CSVs already in analysis/llm_compare/data/events (c_control, c_nooffshell, b_h16, b_h32,
+      a_trial5, control) for the pair''s near-pole contrast in each run; that shows how far the contrast moves between runs
+      that do not touch the target and sets the contrast bar as max(2 se, 0.19, that spread), with the runs named in sources.
+      Also make the design''s ''not yet checked'' a gate: read the held-out prebuild''s tp meta props (and the train prebuild''s
+      for the q q~ > t b W twins) before the GPU run is submitted; if the pair''s top propagator carries no factor, the run
+      is not submitted (the run waits on the prebuilds anyway, so this costs nothing). Check 1/17 (feature rule): the arm
+      runs at trial_1860''s HPs with a target that changes the loss landscape; the No branch (and the Yes branch''s ''whether
+      part (c)''s setup takes it'') must say that a NO at the control''s HPs is not a verdict: next is the same 8-trial DyHPO
+      search for the target-propagator arm, best against part (c)''s best (CLAUDE.md feature rule), with its GPU-h to Joaquin
+      if above budget; or state why this diagnostic needs no search. Check 14 (disk): not stated. CC /sps/lpnhe has 16 GB
+      free now (512 G, 97% used, read 2026-11-27); state the size of the two tp_<key> caches (train 1352 x 75,296 events,
+      held-out), the run''s outputs and the per-event CSVs, where the caches live, and that they fit with margin. Check 15
+      and the launch-path smoke: the design text names no smoke and no wall-time target; add the one ~50-step smoke on the
+      new path (memmap with tp on from both prebuilds, sigma stage, then tools/llm_score.py held-out with --events-out on
+      the smoke run, showing a non-zero log_factor column for the pair and factor_split.py reading it) so the readout is shown
+      written by this exact config, and the target from trial_1860''s own 0.672 s/step (V100; its H100 rate too) with the
+      --time limit. Passed: one change only (diff of sweep_config_llmcmp_c_tprop.yaml against _c_latest: sweep_name and data.target_propagators),
+      HETEROSC + sigma stage as decided, the same test events and scoring as the control, outcome thresholds 7.26 and 1.11
+      match data/rerun_spread.json, prior covers the ladder Breit-Wigner A/B (results.tex l.14895-14935) and steps 15/16/22
+      (searched target_propagators, Breit, propagator, resonan, pole, tbW, tbxwm, resonance_per_event in results.tex, the
+      plan entry and site decisions).'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
