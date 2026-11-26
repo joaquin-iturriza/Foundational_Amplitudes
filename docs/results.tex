@@ -9328,6 +9328,65 @@ update $b$, each clean window coloured by its training step; the black line is n
 % allow: 4g 10^4 200 100 because they are the process multiplicity, the training size, the window and the exploding-read threshold, settings
 % allow: 4 2 because they are constants of the quadratic model, a formula
 
+\paragraph{Batch $128$ against $2048$ at $50$ epochs (D563, 2026-11-26).}\label{par:cbs_horizon} The question: the
+$Z+4g$ searches of par.~\ref{par:cbs_regimes} train $400$ epochs, long enough for batch $2048$ to memorise its
+$10^4$ training events; is the gain of batch $128$ an effect of that horizon? We retune the three arms of
+Fig.~\ref{fig:cbs_regimes}, Muon and Adam from scratch and the fine-tune from the parent without the two input
+settings, by one search per arm and batch at $50$ epochs ($244$ steps at $2048$, $3906$ at $128$), everything else as
+the $400$-epoch searches, with the learning-rate window moved by the measured optimum's dependence on the step count.
+The design fixes the reading before the data: the gain is the horizon if the best validation MSE$(\log|\mathcal M|^2)$
+at $2048$ over that at $128$, $r_{50}$, is at most $1.22$, the largest best-to-third-best spread of the $400$-epoch
+searches. It is not the horizon (Fig.~\ref{fig:cbs_horizon}): $r_{50}$ is $4.60$ for Muon, $9.86$ for Adam and $1.45$
+for the fine-tune, against $6.53$, $1.57$ and $1.98$ at $400$ epochs, so batch $128$ wins at both horizons in every
+arm. Per cell, the best at $50$ epochs over the best at $400$ is $1.17$ (Muon) and $1.02$ (fine-tune) at $2048$,
+within the $1.22$ spread, and $4.68$ for Adam, whose $244$ steps leave it far from converged (train over validation
+MSE $0.939$ at the end of its stable phase). At $128$, $50$ epochs is worse for Muon ($1.66$) and the fine-tune
+($1.39$) and better for Adam ($0.743$). The fine-tune's best at $128$ sits at the lower edge of its learning-rate
+window, a fraction $0.0220$ of its log width, so $0.0151$ is an upper bound on that cell; a lower value only raises its
+$r_{50}$. The trials' spread, the third-best over the best, stays below $1.30$ in every cell. So the batch-$128$ gain
+on $10^4$ repeated events does not come from training too long: at $50$ epochs, where batch $2048$ no longer
+memorises (train over validation between $0.237$ and $0.939$ at $2048$), it still ends several times above batch $128$ for both
+optimizers from scratch.
+% src: python3 analysis/critical_batch/ft_bcrit.py ep50 @ae99a4010
+% claim: arms.muon.r50=4.60
+% claim: arms.adam.r50=9.86
+% claim: arms.Fn.r50=1.45
+% claim: arms.muon.r400=6.53
+% claim: arms.adam.r400=1.57
+% claim: arms.Fn.r400=1.98
+% claim: cells.muon|2048.E50_over_E400=1.17
+% claim: cells.Fn|2048.E50_over_E400=1.02
+% claim: cells.adam|2048.E50_over_E400=4.68
+% claim: cells.adam|2048.train_over_val_stable_end=0.939
+% claim: cells.muon|128.E50_over_E400=1.66
+% claim: cells.Fn|128.E50_over_E400=1.39
+% claim: cells.adam|128.E50_over_E400=0.743
+% claim: cells.Fn|128.lr_pos=0.0220
+% claim: cells.Fn|128.val_best=0.0151
+% claim: cells.adam|128.third_over_best=1.30
+% claim: cells.Fn|2048.train_over_val_stable_end=0.237
+% allow: 128 2048 because they are batch sizes, settings
+% allow: 4g 10^4 400 50 because they are the process multiplicity, the training size and the two horizons, settings
+% allow: 244 3906 because they are the 50-epoch step counts, settings
+% allow: 1.22 because it is the design's threshold, a measured spread fixed before the data (D563 design 2026-11-25)
+% allow: 2 because it is the exponent of |M|^2 and the count of input settings
+
+\begin{figure}[h]
+\centering
+\includegraphics{../analysis/critical_batch/figs/ft_ep50.pdf}
+\caption{$q\bar q\to Z+4g$ at $10^4$ training events, retuned at $50$ epochs beside the $400$-epoch searches, seed
+$42$. Top left, top right, bottom left: validation MSE$(\log|\mathcal M|^2)$ against epochs over the training events,
+the best trial of each search, for Muon from scratch, Adam from scratch with plateau decay (a curve ends where the run
+stopped early) and the fine-tune from the parent without the two input settings. Bottom right: the best validation
+MSE$(\log|\mathcal M|^2)$ of each search against the arm. Batch $2048$ in blue, $128$ in orange; solid lines and
+filled circles $400$ epochs, dashed lines and open circles $50$ epochs.}
+\label{fig:cbs_horizon}
+\end{figure}
+% allow: 4g 10^4 50 400 because they are the process multiplicity, the training size and the horizons, settings
+% allow: 42 because it is the seed, a setting
+% allow: 2048 128 because they are batch sizes, settings
+% allow: 2 because it is the exponent of |M|^2 and the count of input settings
+
 % ==========================================================================
 \section{Physical feature levers: what the momenta cannot encode}\label{sec:levers}
 % ==========================================================================
