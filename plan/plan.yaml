@@ -42241,6 +42241,21 @@ entries:
       predicted c at the global anchor carries a leverage error that predicted slopes partly cancel (the anchor sits far from
       many processes'' events).'
     at: '2026-11-26T19:20:49+00:00'
+  - tried: 'D566 attempt D (step 24): anchored conditional-mean level c_p + b_p.(x - x0_p)/sx with a process-intrinsic anchor
+      x0_p = RidgeCV map of descriptors -> training processes'' median x (cross-fitted), variants D_s, D_sqE, class-mean slopes
+      (_bcls); perevent_level.py --anchored --anchor process @7df6e5130, FA-ccin2p3-df622fc5, data/perevent_anchored_D.json
+      @4739d3cbf, figs/perevent_anchored_D.png; ten 3-seed ensembles, control regressor_ens'
+    why: 'On the 43 new, ten-ensemble median of the new-set median level error (min-max), bar = regressor_ens max 0.369: regressor_ens
+      0.219 (0.098-0.369); D_s 0.381 (partly), D_s_bcls 0.240 (kept), D_sqE 0.383 (partly), D_sqE_bcls 0.345 (kept). Subsets
+      s_lo/s_hi/q_hard/q_soft: D_s_bcls 0.586/0.307/0.506/0.697 and D_sqE_bcls 0.473/0.291/0.467/0.518 leave the bar with
+      e_S - e_all beyond 2 bootstrap sd (fail); D_sqE 0.385/0.355/0.441/0.384 stays within 2 sd of its own 0.383 on all four
+      and beats the constant on the only subset where the constant moves (q_soft: 0.384 vs 0.581, diff 0.197 > 2 sd 0.18),
+      so it is sampling-robust but its level is only partly kept (0.383 vs bar 0.369). The anchor map is the error: with the
+      pool''s own median as anchor (diagnostic) D_sqE_own 0.182 (0.069-0.309) all and 0.211/0.217/0.195/0.202 on the subsets
+      (all within the bar; q_soft beats the constant by 0.38), D_s_own 0.217; the ridge anchor misses the own median by 0.165
+      sx in log s_hat and 0.464 sx in q on the new (anchor_err). True slopes do not help (D_s_trueb 0.379); class slopes break
+      the subsets. The form (_fit) is exact: subsets 0.0003-0.018.'
+    at: '2026-11-26T22:22:32+00:00'
   asks:
   - ask: 'Scope: the data of the LLM run is not within our reach, so the comparison runs either on Suprio''s own files or
       on another pool. His training data (processes/<name>/data_running_alpha.npy, with |M|^2 and the running alpha_s) is
