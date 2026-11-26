@@ -29675,7 +29675,7 @@ entries:
     '20': FA-lxplus-cdc7fee9
     '22': drive.py searches kit_hpo_ttvirt_thr_divform and kit_hpo_ttvirt_thr_rezero (detached kit_hpo_tt_divform_rezero,
       pid 2843282)
-    '24': FA-ccin2p3-a3bc3374
+    '24': FA-lxplus-cdc7fee9
   handoff:
     state: '2026-11-26 ~03:40 UTC. Step 20 (D570): design PASS 2026-11-26T02:27, nothing submitted. Every site sync/submit
       is refused by critical_batch''s uncommitted files (analysis/critical_batch/figs/{pretrain,zng4g}_update_bdl.pdf, data/ft_bcrit_ep50{,_raw}.json);
