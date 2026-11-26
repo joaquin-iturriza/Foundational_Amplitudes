@@ -13386,6 +13386,55 @@ $\log\beta^2$ input. Off the scale, value printed: a value beyond the axis, draw
 \label{fig:kit-deepest}
 \end{figure}
 
+\subsection{The singular-limit benchmark: Monte Carlo test of the surrogates (2026-11-26)}\label{sec:kit-mc}
+The question (D571, run by us rather than by the benchmark's authors): is a cross section computed with the
+asymptotic-factor surrogates as accurate as one computed with the exact $|\mathcal M|^2$, and how much does the
+surrogate save in event unweighting? Each process's flat bulk test sample ($2\times10^5$ events; $e^+e^-\to u\bar ug$
+and $u\bar ugg$ flat in phase space at $\sqrt s=1$\,TeV with $s_{ij}/s>0.01$, the one-loop $e^+e^-\to t\bar t$ flat in
+$\sqrt s$ over 353 to 1739\,GeV) gives each event the cross-section weight $w=f$, or $w=f\beta/s$ for $t\bar t$, with $f$
+the exact or the predicted $|\mathcal M|^2$. The surrogate's cross-section bias $\sigma_{\rm surr}/\sigma_{\rm
+exact}-1$ is $-1.65\times10^{-3}$ on $u\bar ug$, $-3.31\times10^{-3}$ on $u\bar ugg$ and $5.83\times10^{-4}$ on
+$t\bar t$, against a Monte Carlo error of $\sigma_{\rm exact}$ on the same events of $1.21\times10^{-2}$,
+$1.12\times10^{-2}$ and $1.90\times10^{-3}$: the design's pass branch on all three, the bias and its bootstrap band
+stay below the statistical error up to $1.08\times10^{7}$, $2.29\times10^{6}$ and $2.11\times10^{6}$ events. The bias
+is flat across the phase space except on $u\bar ugg$, where the bin closest to the cut carries most of it. In a
+two-stage unweighting (arXiv:2301.13562), surrogate-unweighted events are accepted with probability $x/x_{\max}$,
+$x=w_{\rm exact}/w_{\rm surr}$, which makes the sample exact; its efficiency is $0.886$, $0.562$ and $0.967$, against a
+one-stage efficiency with the exact $|\mathcal M|^2$ of $2.59\times10^{-3}$, $1.92\times10^{-3}$ and $0.246$, so the
+exact amplitude is evaluated about once per unweighted event instead of hundreds of times for the QCD processes
+(Fig.~\ref{fig:kit-mc}). The surrogate's own evaluation cost is not counted.
+% src: python3 tools/kit_mc_test.py --summary analysis/kit_benchmark/data/kit_mc_test.json @cbb51408c
+% claim: ee_uug.n=2e5
+% claim: ee_uug.bias=-1.65e-3
+% claim: ee_uugg.bias=-3.31e-3
+% claim: ee_tt.bias=5.83e-4
+% claim: ee_uug.mc_err=1.21e-2
+% claim: ee_uugg.mc_err=1.12e-2
+% claim: ee_tt.mc_err=1.90e-3
+% claim: ee_uug.n_star=1.08e7
+% claim: ee_uugg.n_star=2.29e6
+% claim: ee_tt.n_star=2.11e6
+% claim: ee_uug.eff_x=0.886
+% claim: ee_uugg.eff_x=0.562
+% claim: ee_tt.eff_x=0.967
+% claim: ee_uug.eff_exact=2.59e-3
+% claim: ee_uugg.eff_exact=1.92e-3
+% claim: ee_tt.eff_exact=0.246
+% allow: 1 0.01 353 1739 because they are the benchmark's energy and phase-space cut
+% allow: 2301.13562 2 because they are an arXiv number and the square of |M|
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/kit_benchmark/figs/mc_test/kit_mc_test.pdf}
+\caption{Monte Carlo test of the asymptotic-factor surrogates on each process's flat bulk test events. Three panels:
+the distribution of $x=w_{\rm exact}/w_{\rm surr}$ weighted by the surrogate's cross section, its largest value and
+the value below which 99.9\% of that cross section lies. Lower right: unweighting efficiency (mean over maximum
+weight) with the exact $|\mathcal M|^2$, with the surrogate, of the second stage that accepts surrogate-unweighted
+events with probability $x/x_{\max}$, and of both stages together.}
+% allow: 99.9 2 because they are the quantile the design fixed and the square of |M|
+\label{fig:kit-mc}
+\end{figure}
+
 \subsection{Hand-off: open items}\label{sec:div-open}
 Genuinely-unfinished / future work for this line (the completed findings are the subsection above):
 \begin{itemize}
