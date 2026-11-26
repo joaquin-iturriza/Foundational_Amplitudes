@@ -43280,6 +43280,16 @@ entries:
       (our/his rate ratio 1.00 at 64 heads) 90 h + validations ~4 h + sigma ~5 h = ~99 GPU-h. With 16/32 heads at the design''s
       pre-smoke 12/22 GPU-h: step 8 in all ~180 GPU-h, above 100: goes to Joaquin (D536) before the full runs. Smoke dir deleted
       (debris, 1.4 GB).'
+  - at: '2026-11-26T18:29:12+00:00'
+    text: '2026-11-26 step 21/22 (D567/D564): no-off-shellness arm FA-ccin2p3-1b480869 (runs/llmcmp_c_nooffshell/trial_1860,
+      sweep_config_llmcmp_c_nooffshell.yaml @fa499b8c0, code 3f82666c53, trial_1860''s HPs, seed 42) ended clean on a V100-PCIE-32GB:
+      60,840 steps in 13.45 h + sigma stage 1.78 h, peak GPU 14.6 GB; opened base cache 99c164da (train). Best val_loss_no_reg
+      (HETEROSC NLL, before the sigma fit) -5.718 at validation 20 of 20 (curve -1.74 -> -4.11 at validation 16, then -4.58/-5.19/-5.72
+      in the WSD cool-down; no spike), against the baseline trial_1860''s -6.03: 0.31 nats worse in distribution without the
+      input. Scoring FA-ccin2p3-1b0cbd8a (job_llm_score.sh EVENTS=1, seen + held out, REREAD=FA-ccin2p3-1b480869, CC; pick:
+      lxplus down, CC first start ~8 h); factor_split --vars-from the baseline''s CC CSV runs/llmcmp_c_qperp/trial_1860/llm_events_heldout.csv
+      (holds offshell_23/6/25/24, the file c_best_factor_split.json was read from; the join asserts true_logm2 row by row)
+      and error_split follow on its end.'
   step_waits:
     '15': FA-ccin2p3-1b0cbd8a
     '21': FA-ccin2p3-1b0cbd8a
