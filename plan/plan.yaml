@@ -28327,6 +28327,8 @@ entries:
     31: 'Protocol B on the three A2 models (D575, design PASS ~16:40): smoke FA-ccin2p3-58bc2125 (B, tt A2, 50 steps); on
       its clean end site pick + 6 runs job_kit.sh B and B_bulk 3000 steps with --env KIT_FROM=runs/kit/kit_A_ee_{uug_me2,uugg_me2,tt_virt_finite}_n100000_t1831_hpo_asym_cont,
       tags a2B (limit 1:30), then B vs B_bulk per family'
+    32: 'Slide 11 exact (design PASS 16:45): read FA-ccin2p3-aacf91cc (uug), 706a0f6f (uugg: MadEvent on the A2 surrogate)
+      and 12d32b55 (tt virtual over the bulk window 353-1739 GeV); figure_exact; hand to Joaquin'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -29919,6 +29921,12 @@ entries:
       if:
       - 'B beats B_bulk on a family: report the gain'
       - 'level: A2 already extrapolates from bulk there'
+    32:
+      feeds: 'D571/D575: Bakar''s slide-11 end-user test of the packaged A2 surrogates, done as he specified'
+      if:
+      - 'sigma_hat/sigma within 3 MC errors of E_exact[u] (wiring sound): report slide-11 numbers, eps2 quantiles, tt integrated
+        bias to Joaquin'
+      - 'beyond 3 errors: KITSURR path fault, fix and rerun before any number goes out'
   step_waits:
     '24': FA-lxplus-828d67d6
     '20': FA-ccin2p3-3895a2a7 FA-ccin2p3-e0587622
