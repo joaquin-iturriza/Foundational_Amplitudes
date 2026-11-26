@@ -35,14 +35,71 @@
 \newcommand{\fig}[1]{\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{#1}}
 \newcommand{\figtop}[1]{\raisebox{-\height}{\includegraphics[width=0.49\textwidth,height=0.78\textheight,keepaspectratio]{#1}}}
 
-\title{Hard phase-space benchmark: first results}
-\author{Joaquin Iturriza Ramirez}
-\date{26 November 2026}
-
 \begin{document}
+\begin{frame}{Extrapolation into the limits}
+  \centering\fig{kitvm_median_nofactor_ee_uug_me2.pdf}
+\end{frame}
 
-\begin{frame}
-  \titlepage
+\begin{frame}{Extrapolation into the limits}
+  \centering\fig{kitvm_median_nofactor_ee_tt_virt_finite.pdf}
+\end{frame}
+
+\begin{frame}{Log invariants extrapolate almost by chance}
+  \vfill
+  \[ |\mathcal{M}|^2 \propto y^{-1}\ \ (\text{collinear}),\qquad |\mathcal{M}|^2 \propto x^{-2}\ \ (\text{soft})
+     \quad\Longrightarrow\quad \log|\mathcal{M}|^2 \ \text{linear in}\ \log y,\ \log x \]
+  \vspace{1em}
+  \begin{itemize}
+    \item The MLP reads $\log s_{ij}$ through leaky ReLUs. A ReLU MLP trained by gradient descent becomes linear in its inputs far from the data (Xu et al., ICLR 2021, arXiv:2009.11848), and linear in $\log s_{ij}$ is a power law in $s_{ij}$
+    \item Our transformer's LayerNorm, softmax and GELU saturate instead, so it goes flat
+    \item In the $u\bar u g$ soft and collinear limits the power law already shows in the training data (slope $-1.99$ and $-1.10$ at its edge), so the MLP continues it with the right slope: $-1.98$ (truth $-2$) and $-0.95$ (truth $-1$)
+    \item At the $t\bar t$ threshold the training data reach only $\beta>0.2$, where the slope is $-0.59$; the MLP continues that slope, $-0.56$, short of the $1/\beta$ rise ($-1$), even with $\log(s_{t\bar t}-4m_t^2)$ as an input
+  \end{itemize}
+  \vfill
+\end{frame}
+
+\begin{frame}{Asymptotic factor}
+  \vfill
+  \[ \log|\mathcal{M}|^2 = \log\Big(\sum_t e^{\,c_t(x)}\,D_t(x) + e^{\,r(x)}\Big) \]
+  \vspace{1em}
+  \begin{itemize}
+    \item $D_t$ the known singular structures: Catani Seymour dipoles $\frac{s}{s_{ij}}V_{ij,k}$, Coulomb $1/\beta$, Sudakov $\log^2(s/m_t^2)$
+    \item The transformer learns the coefficients $c_t$ and a bounded remainder $r$, not the divergence: in a limit one $D_t$ dominates and its form is exact
+    \item Ma\^{\i}tre and Truong's factorisation-aware emulator (arXiv:2107.06625), Catani Seymour dipoles times learned coefficients; hadron-collider multijets in arXiv:2301.13562, one loop in arXiv:2302.04005
+  \end{itemize}
+  \vfill
+\end{frame}
+
+\begin{frame}{Extrapolation into the limits}
+  \centering\fig{kitvm_median_ee_uug_me2.pdf}
+\end{frame}
+
+\begin{frame}{Extrapolation into the limits}
+  \centering\fig{kitvm_median_ee_tt_virt_finite.pdf}
+\end{frame}
+
+\begin{frame}{Asymptotic factor fixes the singular limits}
+  \centering\fig{kitvm_mse_ee_uug_me2.pdf}
+\end{frame}
+
+\begin{frame}{Asymptotic factor fixes the singular limits}
+  \centering\fig{kitvm_mse_ee_uugg_me2.pdf}
+\end{frame}
+
+\begin{frame}{Top pairs at one loop}
+  \centering\fig{kitvm_mse_ee_tt_virt_finite.pdf}
+\end{frame}
+
+\begin{frame}{Deepest bins}
+  \centering\fig{kitvm_dist_ee_uug_me2.pdf}
+\end{frame}
+
+\begin{frame}{Bulk is not worse}
+  \centering\fig{kitvm_bulk.pdf}
+\end{frame}
+
+\begin{frame}{Other attempts}
+  \centering\fig{kit_deepest_attempts.pdf}
 \end{frame}
 
 \begin{frame}{Coulomb threshold in the $t\bar t$ virtual}
@@ -78,19 +135,6 @@
     $t\bar t$ virtual $\sqrt s\in[15,50]$\,TeV & $0.077$ & $0.05$ \\
   \end{tabular}
   \vfill
-\end{frame}
-
-\begin{frame}{Monte Carlo test}
-  \centering\fig{kit_mc_madgraph.pdf}
-\end{frame}
-
-\begin{frame}{Open ends}
-  \begin{itemize}
-    \item Monte Carlo test with MadGraph sampling the surrogate, $t\bar t$ over the full $\sqrt s$ range
-    \item Fair one-loop protocol on $t\bar t$, fine-tuned against from scratch and $V/B$
-    \item Protocol B, and pretraining with $u\bar ug$, $u\bar ugg$ families held out
-    \item $g\to gg$ spin correlation not reproduced
-  \end{itemize}
 \end{frame}
 
 \end{document}
