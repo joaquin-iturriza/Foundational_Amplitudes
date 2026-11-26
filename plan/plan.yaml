@@ -48393,6 +48393,16 @@ entries:
       queued, lxplus 0/259 slots fit 32G/4cpu, Jean Zay down (connection backoff): nowhere to move the queued trials, so the
       overrun (>2x) is queue-bound; the driver keeps placing through site pick as sites free up. Collection: ft_bcrit.py ep50
       --collect runs a CC CPU job (site_python); rerun the same call once no new trial lands to read it.'
+  - at: '2026-11-26T03:49:57+00:00'
+    text: '2026-11-26 D563 final read (ft_bcrit.py ep50 at ae99a4010, data 98cf81a0c; 105 trials at design counts, one lost
+      Muon b128 trial recollected): best val MSE(log|M|^2) at 50 against 400 epochs, batch 2048 / 128: Muon 0.0676 vs 0.0580
+      / 0.0147 vs 0.00888; Adam 0.235 vs 0.0503 / 0.0238 vs 0.0321; Fn 0.0219 vs 0.0214 / 0.0151 vs 0.0108. r50 = 4.60 (Muon),
+      9.86 (Adam), 1.45 (Fn) against r400 6.53/1.57/1.98: all > 1.22 -> the batch-128 gain persists at 50 epochs for every
+      arm (not a horizon effect). E50/E400: Muon 1.17 equal (2048), 1.66 worse (128); Adam 4.68 worse (2048), 0.74 better
+      (128); Fn 1.02 equal (2048), 1.39 worse (128). Spread third/best 1.02-1.30 (Adam 2048 1.23, Adam 128 1.30). lr edge:
+      Fn 128''s best at 2% of its log lr window [7.67e-3, 6.90e-2] (lower edge): a bound, its best may lie below; question
+      to Joaquin. Train/val at stable end 0.24-0.26 except Muon 128 0.63, Adam 2048 0.94. Figure figs/ft_ep50.png, caption
+      check OK.'
   handoff:
     state: 'D560 part B settled NO on existing data (finding 16:40, dead end of the step-size rerun after design FIX by a4f3d7192edf30268):
       B_simple 55.5, first-order B_A 28-111 (Z+4g 6-51), optimal-step B_q 48-137 (one window 1082; Z+4g 3-196) against B_crit
