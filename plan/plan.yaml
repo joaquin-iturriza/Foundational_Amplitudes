@@ -28565,9 +28565,9 @@ entries:
     - 20
   owner:
     agent: a2a4b030ad0d119ce
-    state: stopped
+    state: working
     since: '2026-11-26T09:22:39.035000+00:00'
-    state_at: '2026-11-26T09:51:58.336000+00:00'
+    state_at: '2026-11-26T11:07:33.551000+00:00'
     context: 157609
     context_at: '2026-11-26T10:02:40+00:00'
   findings:
@@ -41588,9 +41588,9 @@ entries:
     - 16
   owner:
     agent: a017802b37deeafec
-    state: stopped
+    state: working
     since: '2026-11-26T08:13:59.747000+00:00'
-    state_at: '2026-11-26T08:49:02.400000+00:00'
+    state_at: '2026-11-26T11:07:34.701000+00:00'
     context: 190924
     context_at: '2026-11-26T09:22:34+00:00'
   step_why:
