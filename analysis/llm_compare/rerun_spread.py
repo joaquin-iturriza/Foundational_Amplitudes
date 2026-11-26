@@ -2,7 +2,7 @@
 Two runs of one config and seed (his setup, his optimizer settings: first run FA-lxplus-cb9273f1 -> data/control_*,
 retrain FA-ccin2p3-0165aa58 -> data/control_retrain_*), per set (seen 1352, relabels 96, new 43 of suprio.split()):
 the ratio of their median per-process MSE of log|M|^2, of their pooled RMSE, and the median and 10-90% range of the
-per-process |log ratio| as a factor. The margin for a single-seed median is the larger of the two runs' median ratios.
+per-process |log ratio| as a factor. The margin for a single-seed median is the ratio of the two runs' medians.
     python analysis/llm_compare/rerun_spread.py [--a control --b control_retrain]
 Output: data/rerun_spread.json, and its JSON on the last line.
 """
