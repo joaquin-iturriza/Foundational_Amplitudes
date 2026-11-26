@@ -28508,6 +28508,23 @@ entries:
     - 22
     answered_at: '2026-11-18T23:35:53.600000+00:00'
     decision: D493
+  - ask: 'Scope: two extra 16-trial searches, for alternatives to a model that already works. The KIT asymptotic-factor model
+      (A2) already gets the right limit exponent on every hard family (uug soft and collinear, uugg, tt Coulomb threshold).
+      Two alternatives tested earlier came out mixed: dividing the target by the singular form (uug inconclusive, tt threshold
+      unchanged) and ReZero residual scaling (uug soft limit better, tt high-energy tail blows up). A proper 16-trial search
+      for each (as the KIT searches, D428) costs about 9.6 GPU-h each, 19.2 GPU-h total. Do you want those two searches run,
+      or do we keep A2 and drop the alternatives?'
+    at: '2026-11-26T02:56:31+00:00'
+    searched: 'site decisions --all (D428; D493 superseded; D570; D571); plan show kit_benchmark steps 14/19/22 and the 10:47
+      design''s NO branches; Joaquin''s messages 2026-11-13T00:03 (fine-tune transfer figures), 2026-11-12T03:19 (fine-tune
+      vs scratch investigation), 2026-11-12T13:59 (D415, compare with Bakar''s MLP), 2026-11-16T20:00 (writing style skill),
+      2026-11-17T02:22 (bring back the factor results), 2026-11-10T09:22 (Bakar''s raw-input MLP on uug), 2026-11-11T02:09
+      (clusters back), 2026-11-13T04:16 and 04:18 (draft wording), 2026-11-14T04:31 (the draft''s LaTeX), 2026-11-17T04:27
+      (slide wording), 2026-11-10T02:08 (the KIT request, D363), D435-D436 (asymptotic factors approved): none is a call on
+      these two searches; 2026-10-05T21:17, 2026-10-06T00:17, 2026-10-08T02:48, 2026-10-08T19:02, 2026-10-09T00:15, 2026-10-14T16:48,
+      2026-10-22T21:18, 2026-10-27T02:14, 2026-11-01T16:09, 2026-11-06T04:28 predate the KIT entry (opened 2026-11-10)'
+    blocks_steps: &id002
+    - 22
   owner:
     agent: a753fb41b3f480c1d
     state: working
@@ -33939,6 +33956,22 @@ entries:
     units: null
     start: '2026-11-26T02:50:36+00:00'
     at: '2026-11-26T02:50:36+00:00'
+  ask: 'Scope: two extra 16-trial searches, for alternatives to a model that already works. The KIT asymptotic-factor model
+    (A2) already gets the right limit exponent on every hard family (uug soft and collinear, uugg, tt Coulomb threshold).
+    Two alternatives tested earlier came out mixed: dividing the target by the singular form (uug inconclusive, tt threshold
+    unchanged) and ReZero residual scaling (uug soft limit better, tt high-energy tail blows up). A proper 16-trial search
+    for each (as the KIT searches, D428) costs about 9.6 GPU-h each, 19.2 GPU-h total. Do you want those two searches run,
+    or do we keep A2 and drop the alternatives?'
+  waiting_since: '2026-11-26T02:56:31+00:00'
+  searched: 'site decisions --all (D428; D493 superseded; D570; D571); plan show kit_benchmark steps 14/19/22 and the 10:47
+    design''s NO branches; Joaquin''s messages 2026-11-13T00:03 (fine-tune transfer figures), 2026-11-12T03:19 (fine-tune
+    vs scratch investigation), 2026-11-12T13:59 (D415, compare with Bakar''s MLP), 2026-11-16T20:00 (writing style skill),
+    2026-11-17T02:22 (bring back the factor results), 2026-11-10T09:22 (Bakar''s raw-input MLP on uug), 2026-11-11T02:09 (clusters
+    back), 2026-11-13T04:16 and 04:18 (draft wording), 2026-11-14T04:31 (the draft''s LaTeX), 2026-11-17T04:27 (slide wording),
+    2026-11-10T02:08 (the KIT request, D363), D435-D436 (asymptotic factors approved): none is a call on these two searches;
+    2026-10-05T21:17, 2026-10-06T00:17, 2026-10-08T02:48, 2026-10-08T19:02, 2026-10-09T00:15, 2026-10-14T16:48, 2026-10-22T21:18,
+    2026-10-27T02:14, 2026-11-01T16:09, 2026-11-06T04:28 predate the KIT entry (opened 2026-11-10)'
+  blocks_steps: *id002
 - id: ladder_figs
   title: 'draft figs 10 and 11: from-scratch line on top'
   question: Redraw rung_grid (the draft's figs 10 and 11) with the black from-scratch line on top and clearly visible (D362).
@@ -38857,7 +38890,7 @@ entries:
       (a pasted LaTeX template); 2026-11-10T02:08 (draft and slide uploads); 2026-10-26T17:18 (settings warnings relayed from
       another session); 2026-10-15T02:49 and 2026-10-06T00:17 (old transfer-study plan instructions, not this sentence)'
     blocks: nothing
-    blocks_steps: &id002 []
+    blocks_steps: &id003 []
   owner:
     agent: a275e674e217bc7c6
     state: stopped
@@ -41117,7 +41150,7 @@ entries:
     (a pasted LaTeX template); 2026-11-10T02:08 (draft and slide uploads); 2026-10-26T17:18 (settings warnings relayed from
     another session); 2026-10-15T02:49 and 2026-10-06T00:17 (old transfer-study plan instructions, not this sentence)'
   blocks: nothing
-  blocks_steps: *id002
+  blocks_steps: *id003
   writeup: ae083a6ab
   runs_override: the 14 listed sweeps were driven by sweep/drive.py with their state on the local machine (sweeps_local/<name>;
     'local' has no site registry); each summary.txt lists every trial finished, 0 failed, and every result is read in results.tex
@@ -47135,7 +47168,7 @@ entries:
       2026-10-06T00:17 (old transfer plan); 2026-10-05T21:17 (a pin on an old plot); 2026-10-02T11:24 (tf32 speed, not the
       batch); 2026-10-06T16:02 (a forwarded colleague message)
     blocks: nothing
-    blocks_steps: &id003 []
+    blocks_steps: &id004 []
   owner:
     agent: a7b288b537965af86
     state: stopped
@@ -48374,7 +48407,7 @@ entries:
     2026-10-06T00:17 (old transfer plan); 2026-10-05T21:17 (a pin on an old plot); 2026-10-02T11:24 (tf32 speed, not the batch);
     2026-10-06T16:02 (a forwarded colleague message)
   blocks: nothing
-  blocks_steps: *id003
+  blocks_steps: *id004
 - id: cc_disk
   title: What uses disk on CC and what can be deleted
   question: 'What is using the disk on CC (checkout runs/sweeps, datasets, memmap caches, scratch, MG5 work dirs), against
