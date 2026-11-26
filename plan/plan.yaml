@@ -48158,7 +48158,8 @@ entries:
       steps 5 and 6
     '5': detach wake_replay5
     '6': detach review_replay4
-    '7': repo-reviewer a301e680efb448582 re-check of labwake 089b53ffb (Retry-After cap, its nit)
+    '7': the next repo-reviewer pass on trunk (a301e680efb448582 passed labwake 089b53ffb on its branch, but the merge guard
+      needs it inside trunk's passed backlog, watermark 5d7d59aa19)
   findings:
   - at: '2026-11-23T19:55:22+00:00'
     text: 'Local batch width cut from 6 parallel opencode streams to 2 (D531): 6 streams of opencode sessions (~350-400 MB
