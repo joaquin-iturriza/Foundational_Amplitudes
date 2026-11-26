@@ -43431,7 +43431,7 @@ entries:
       own design.'
   step_waits:
     '25': FA-ccin2p3-d34fae85
-    '26': '2026-11-27'
+    '26': FA-ccin2p3-6fa10d57 FA-ccin2p3-a1f973ec
   handoff:
     state: 'Step 25 (D566 attempt E) in flight: FA-ccin2p3-d34fae85 (htc CPU, 4 h limit, target 2 h; perevent_level.py --anchored
       --anchor map @ad9f541, design passed 2026-11-26), writes analysis/catalog_daniel/data/perevent_anchored_E.json on CC
