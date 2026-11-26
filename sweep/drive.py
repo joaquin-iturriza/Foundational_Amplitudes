@@ -325,7 +325,7 @@ class Sweep:
             log("[dry-run] would submit prebuild of %s on %s" % (self.spec, s)); return False
         cpus = 8 if s == "lxplus" else 32
         out = site("submit", s, PROJECT, PREBUILD, "--no-sync", "--allow-stale", "--item", a.item, "--note", "prebuild %s" % self.name,
-                   "--hdr=--cpus-per-task=%d" % cpus, "--hdr=--time=04:00:00",
+                   "--hdr=--cpus-per-task=%d" % cpus, "--hdr=--time=04:00:00", "--disk-gb", str(a.prebuild_disk_gb),
                    "--", self.spec, "--seed", str(self.seed), timeout=300)
         m = re.search(r"\brun\s+(\S+)", out)
         if not m:
@@ -656,6 +656,10 @@ def main():
     ap.add_argument("--sites", nargs="*")
     ap.add_argument("--item", required=True, help="the work item these trials belong to (`site items FA`)")
     ap.add_argument("--allow-jeanzay", action="store_true")
+    # shortcut: one declared size for every recipe (the prebuild itself stops cleanly at its disk floor, DISK_LOW);
+    # size it from the recipe's pools when a prebuild is refused for a need it does not have
+    ap.add_argument("--prebuild-disk-gb", type=float, default=20.0,
+                    help="a prebuild's declared disk need in GB, passed to site submit (default 20)")
     ap.add_argument("--disk-gb", type=float, required=True, help="one trial's peak disk in GB (site submit refuses without it; "
                     "from an earlier trial of the same setup, e.g. du of runs/<sweep>/trial_* on its site)")
     ap.add_argument("--poll", type=int, default=60)

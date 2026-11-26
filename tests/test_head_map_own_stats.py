@@ -88,3 +88,27 @@ if __name__ == "__main__":
     test_step0_is_parent_zero_shot()
     test_no_map_when_parent_predicts_another_quantity()
     print("ok")
+
+
+def test_affine_parent_maps_at_the_targets_multiplicity():
+    """A data.affine_multiplicity_std parent (one mean per particle count, mu_N = a + b N): the map uses mu_N at this
+    run's process's N (kit_benchmark step 20, E9497)."""
+    torch.manual_seed(0)
+    parent = _Toy()
+    a, b, n = -34.3, 7.95, 4                  # parent means -18.4 / -10.5 / -2.5 at N = 2 / 3 / 4 (the fair-NLO parent)
+    with tempfile.TemporaryDirectory() as tmp:
+        os.makedirs(os.path.join(tmp, "models"))
+        json.dump({"prepd_mean": [a + b * k for k in (2, 3, 4)], "prepd_std": [SP] * 3, "shared_standardization": True,
+                   "affine_multiplicity": {"a": a, "b": b, "sigma": SP}}, open(os.path.join(tmp, "data_stats.json"), "w"))
+        OmegaConf.save(OmegaConf.create({"training": {"loss": "HETEROSC"}}), os.path.join(tmp, "config.yaml"))
+        p = os.path.join(tmp, "models", "m.pt.gz")
+        with gzip.open(p, "wb") as f:
+            torch.save({"model": parent.state_dict()}, f)
+        s = _Stub()
+        s._amp_npart = {"kit_ee_tt__virt_finite": n}
+        s._load_pretrained_weights(p)
+    h = torch.randn(64, 5, 6)
+    with torch.no_grad():
+        mu_p, _ = parent(h)
+        mu_o, _ = s.model(h)
+    torch.testing.assert_close(MO + SO * mu_o, (a + b * n) + SP * mu_p, rtol=0, atol=1e-5)

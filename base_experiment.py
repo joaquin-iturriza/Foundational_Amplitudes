@@ -1641,6 +1641,13 @@ class BaseExperiment:
                         f"its readout is loaded unchanged")
             return
         pm, psd = np.unique(np.round(pst["prepd_mean"], 12)), np.unique(np.round(pst["prepd_std"], 12))
+        if (pst.get("affine_multiplicity") or pst.get("level_file")) and getattr(self, "_amp_npart", None):
+            # a multiplicity-affine (or level-file) parent has one mean per particle count: its function for this
+            # run's process is the one at that process's own mean (mu_N = a + b N, or its level)
+            from multiplicity_extrap import parent_target_standardization
+            nm = list(self._amp_npart)
+            m, sd, _ = parent_target_standardization(pst, [self._amp_npart[k] for k in nm], names=nm)
+            pm, psd = np.unique(np.round(m, 12)), np.unique(np.round(sd, 12))
         om, osd = (np.unique(np.round(np.ravel(np.asarray(x, dtype=float)), 12)) for x in (self.prepd_mean, self.prepd_std))
         assert len(pm) == len(psd) == len(om) == len(osd) == 1, (
             f"target_stats=own head map needs one target standardization on each side: parent {pm}, {psd}; run {om}, {osd}")
