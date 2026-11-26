@@ -569,7 +569,7 @@ def cmd_figure_exact(a):
             b1.plot(t["sqrts"], y, mk + "-", ms=3, color=ps.C.green if mk == "o" else ps.C.orange, label=name)
         b1.axhline(0, color="k", lw=0.8)
         b1.set_yscale("symlog", linthresh=1e-4)    # threshold -0.3 and bulk 1e-3 on one axis
-        b1.set_xscale("log"); b1.set_xlabel(r"$\sqrt s$ [GeV]"); b1.set_ylabel(r"$\sigma[\hat V]/\sigma[V]-1$")
+        b1.set_xscale("log"); b1.set_xlabel(r"$\sqrt{s}$ [GeV]"); b1.set_ylabel(r"$\sigma[\hat V]/\sigma[V]-1$")
         ps.legend_cell(cell, [b1], fontsize=ps.LEGEND_MIN_PT)
         print("FIGURE", ps.save(fig, a.out + "_tt"))
 
