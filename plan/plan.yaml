@@ -43281,7 +43281,7 @@ entries:
       pre-smoke 12/22 GPU-h: step 8 in all ~180 GPU-h, above 100: goes to Joaquin (D536) before the full runs. Smoke dir deleted
       (debris, 1.4 GB).'
   step_waits:
-    '15': list step 21's run FA-ccin2p3-1b480869 (step 16 read 2026-11-26)
+    '15': FA-ccin2p3-1b0cbd8a
     '21': FA-ccin2p3-1b0cbd8a
   handoff:
     state: 'Part (a) DONE, part (c) DONE, step 19 DONE, step 16 DONE (read 2026-11-26: level-file arm new-family median MSE
