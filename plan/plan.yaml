@@ -29938,7 +29938,7 @@ entries:
       - 'beyond 3 errors: KITSURR path fault, fix and rerun before any number goes out'
   step_waits:
     '24': FA-lxplus-828d67d6
-    '20': FA-ccin2p3-3895a2a7 FA-ccin2p3-e0587622
+    '20': 'next owner: event E9622 (arm smokes done), then site pick + SCR-A2 and V/B arms'
     '29': FA-ccin2p3-58bc2125 FA-ccin2p3-42ae3468
     '31': FA-ccin2p3-58bc2125
     '30': FA-ccin2p3-42ae3468
