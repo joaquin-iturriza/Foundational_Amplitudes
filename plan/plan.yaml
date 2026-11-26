@@ -42071,7 +42071,7 @@ entries:
     - 16
   owner:
     agent: a017802b37deeafec
-    state: working
+    state: closed
     since: '2026-11-26T08:13:59.747000+00:00'
     state_at: '2026-11-26T14:42:59.729000+00:00'
     context: 209652
@@ -43004,36 +43004,30 @@ entries:
     '15': list step 21's run FA-ccin2p3-1b480869 (step 16 read 2026-11-26)
     '21': FA-ccin2p3-1b480869
   handoff:
-    state: 'Part (a) DONE, part (c) DONE. Step 19 DONE (untuned control retrain scored; bias/shape all-arms and shape_dists
-      redrawn beside *_before_untuned; data @77f6a8741; retrain vs first run held-out per-process MSE median 1.89x: same-setup
-      rerun spread ~1.8x on held out, wider than the 1.38x margin of steps 13/14/16, not yet re-based). Step 21 (list; the
-      no-off-shellness arm, design passed): run FA-ccin2p3-1b480869 RUNNING on CC (V100-PCIE, ~12.2 h training + sigma, target
-      16 h); readout chain checked on its smoke (factor_split --vars-from exit 0, 139 processes); on its end: job_llm_score.sh
-      RUN=runs/llmcmp_c_nooffshell/trial_1860 ONLY=heldout EVENTS=1 on CC, factor_split.py --csv <its CSV> --vars-from runs/llmcmp_c_qperp/trial_1860/lxplus_reread/llm_events_heldout.csv
-      (CC CPU job; CC''s own trial_1860 CSV has only log F), error_split.py, heldout_per_process.py with the arm beside c_best,
-      read against the design''s outcome. Step 16: first run FA-ccin2p3-89671610 killed with CC /sps full at 04:19 (8.5 h,
-      ~41k steps); rerun FA-ccin2p3-0ca1d68d (identical flags, runs/llmcmp_level_file/trial_7002; trial_7001 partial kept),
-      target 14 h; then score and read per the step. Step 8: both smokes lost to the full disk (64-head FA-ccin2p3-1969f226
-      failed, 120-head FA-ccin2p3-caf1170e cancelled on the coordinator''s order; their zz_smoke dirs deleted). NOT resubmitted:
-      site pick (--gpu-min-mem 80G --mem 64G) allots both to CC; CC has ~18 GB free; the 11-24 disk plan (120 heads 27 GB
-      peak, 64 heads 7.8 GB: CC only when free > peak + 10 GB, else lxplus EOS) rules CC out for 120 and leaves 64 at the
-      edge; EOS free not read (eos quota via site run failed; ~23 GB at 11-25). Next owner: read EOS quota, then submit each
-      smoke where its peak fits with --disk-gb <peak> (never without it), resolving pick vs disk (a disk-aware pick is the
-      gap). Why the 11-24 plan did not stop the CC submission: the 64/120-head smokes (2026-11-25 ~22:54) were sent with --allow-unfit
-      and no --disk-gb, so site submit printed ''batch needs ?'' and checked nothing; the plan was written for the full runs
-      and the smokes save the same checkpoints. Open question on step 15''s text stands; paragraph unchanged.'
-    decisions: 'Joaquin''s: D522-D528, D536, D537, D553, D564, D566, D567. Mine (re-justify): earlier hand-offs'' (i)-(xxviii);
-      (xxix) step 19 score on lxplus from a copy (pick), first run''s data/control_*.json kept for the MSE figure, retrain
-      under control_retrain_* and split/control_heldout.json; (xxx) step 22 run on CC by pick, arm caches prebuilt on CC (same
-      keys); (xxxi) step 16 rerun in a new dir trial_7002, a repair keeping the setup; (xxxii) deleted own read smoke debris
-      on CC (c_width 64872562/64847535/64847537/64872564) to free the full disk'
+    state: 'Part (a) DONE, part (c) DONE, step 19 DONE, step 16 DONE (read 2026-11-26: level-file arm new-family median MSE
+      0.309 vs trial 5 1.144, post-hoc 0.577, LLM 0.940; bias^2 0.122 vs given 0.096: kept by the design''s 1.38x, MSE drop
+      3.70x not resolved by the re-measured 5.2x rerun spread; gg->tbW worse; data @77079efe5, figs/step16_level_file{,_bias}_heldout_per_process.png).
+      Single-seed margin re-based: rerun_spread.py @e7fbadada, ratio of medians seen 1.07 / relabels 2.53 / new 5.20 (finding
+      2026-11-26 08:25); steps 13/14 texts still say 1.38: read them with both. Step 8: 64-head smoke passed (FA-ccin2p3-e0a1abe4:
+      2.43 s/step H100, peak 39.4 GB, sigma stage 0.66 h with 2 validations); job_config_smoke.sh now runs the sigma stage
+      with 2 validations (@2458c2084); full width runs ~12/22/46/99 GPU-h at 16/32/64/120 heads, ~180 in all, above D536''s
+      100: waiting on Joaquin''s go (the plan ask was refused as matching part (a)''s answered budget ask; the main session
+      records the question). 120-head smoke not run: no disk (needs ~17.7 GB transient with save_last=false; CC 19 GB, EOS
+      23.8 GB) and no 80G GPU on lxplus. DISK RISK: part (b) 120-head run FA-ccin2p3-f0b997a2 on CC needs ~15 GB more at its
+      end (~11-29) with ~19 GB free. Open ask: second seed (seed 43) of trial 5 and the level-file arm. Step 21 (no-off-shellness
+      arm FA-ccin2p3-1b480869) and steps 13/14 running; step 15 waits on step 21.'
+    decisions: 'Joaquin''s: D522-D528, D536, D537, D553, D564, D566, D567. Mine (re-justify): earlier hand-offs'' (i)-(xxxii);
+      (xxxiii) margin for set medians = ratio of the two reruns'' medians (not the per-process 1.89x); (xxxiv) step 8 smokes
+      and runs with training.save_last=false (best kept, run_trial deletes the last anyway; disk); (xxxv) smoke sigma stage
+      2 validations (smoke only, full runs keep 25); (xxxvi) step 16 scored with EVENTS=1 on CC; (xxxvii) deleted our smoke
+      debris zz_smoke_..._c_width_64884115 and _64893197 on CC after reading'
     ruled_out: As before.
-    running: FA-ccin2p3-1b480869 (step 21 run), FA-ccin2p3-0ca1d68d (step 16 rerun), FA-ccin2p3-623a3af6 (step 13, 64 heads),
-      FA-ccin2p3-f0b997a2 (step 14, 120 heads)
-    files: analysis/llm_compare/{heldout_per_process.py, shape_dists.py, error_split.py, factor_split.py}, analysis/llm_compare/data/{split/control_heldout.json,
-      control_retrain_*.json, a_val_control_retrain.txt, events/control_heldout_events.csv}, analysis/llm_compare/figs/{all_arms_bias,all_arms_shape}_heldout_per_process{,_before_untuned}.png,
-      figs/shape_dists{,_before_untuned}.png, sweep/sweep_config_llmcmp_c_nooffshell.yaml, sweep/sweep_config_llmcmp_level_file.yaml
-    written: '2026-11-26T03:53:27+00:00'
+    running: FA-ccin2p3-1b480869 (step 21 run), FA-ccin2p3-623a3af6 (step 13, 64 heads), FA-ccin2p3-f0b997a2 (step 14, 120
+      heads)
+    files: analysis/llm_compare/{rerun_spread.py, level_file_read.py, heldout_per_process.py (arm level_file)}, analysis/llm_compare/data/{rerun_spread.json,
+      step16_level_file_read.json, step16_level_vs_a5.json, level_file_{seen,heldout}.json, split/level_file_heldout.json,
+      level_val_trial_7002.txt}, analysis/llm_compare/figs/step16_level_file{,_bias}_heldout_per_process.png, scripts/job_config_smoke.sh
+    written: '2026-11-26T14:58:58+00:00'
   designs:
   - at: '2026-11-22T04:13:14+00:00'
     question: 'Part (a), D525: in the conditions of Suprio''s LLM pID run (D524, D526, D527: our catalog_daniel regeneration
