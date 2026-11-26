@@ -48151,6 +48151,8 @@ entries:
       full) -> wait on the cc_disk owner''s freeing, then one resubmission'
     '1': steps 2 and 4
     '2': the notes-editor review of par:cbs_update (e05fc9e32), batched with the D563 write-up
+    '6': 'mechanical-worker aeb067b0c19e9f5c4: plan check --before fix (done_when for finished write-up), then plan done --writeup
+      4dc553829'
   targets:
   - batch: noise_smoke
     wall_h: 0.4
