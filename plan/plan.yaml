@@ -28350,13 +28350,14 @@ entries:
     - FA-ccin2p3-f45f434a
     - FA-ccin2p3-f6b2ece9
     - FA-ccin2p3-fcad1510
-    commit: 0221530c5
+    commit: 6bedf8e71
     paths:
     - analysis/kit_benchmark/data/kit_curves_read.json
     - analysis/kit_benchmark/data/kit_fig_A.json
     - analysis/kit_benchmark/data/kit_fig_A_gmax4_uug.json
     - analysis/kit_benchmark/data/kit_fig_Aft_thrloop.json
     - analysis/kit_benchmark/data/kit_hpo.json
+    - analysis/kit_benchmark/data/kit_mc_test.json
     - analysis/kit_benchmark/data/kit_threshold_scan.json
     - analysis/kit_benchmark/data/kit_verdict_A_hpo_ftsearch.json
     - analysis/kit_benchmark/fairnlo_arms.py
