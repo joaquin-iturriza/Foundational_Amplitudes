@@ -43324,7 +43324,7 @@ entries:
     '15': FA-ccin2p3-1b0cbd8a
     '21': FA-ccin2p3-1b0cbd8a
     '23': FA-ccin2p3-2461cbe0
-    '22': FA-ccin2p3-673f0bfa
+    '22': FA-ccin2p3-444f056d
   handoff:
     state: 'Part (a) DONE, part (c) DONE, step 19 DONE, step 16 DONE (read 2026-11-26: level-file arm new-family median MSE
       0.309 vs trial 5 1.144, post-hoc 0.577, LLM 0.940; bias^2 0.122 vs given 0.096: kept by the design''s 1.38x, MSE drop
