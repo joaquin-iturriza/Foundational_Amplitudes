@@ -42131,13 +42131,6 @@ entries:
   - D576
   - D578
   next:
-    15: 'D564 (''So despite the llm being so much worse at training and at relabels, it seems to extrapolate better, we should
-      understand why this is the case''): find why Suprio''s LLM extrapolates to the 43 new-family held-out processes better
-      than our LLoCa (pooled RMSE new 1.193 vs ours 1.756-1.767 at 8 and 16 heads) while ours wins seen (0.103-0.117 vs 0.321)
-      and relabels (0.192-0.241 vs 0.341). An investigation: search docs/results.tex/plan/decisions for prior work, then design
-      (per-family errors in Suprio''s layout already in figs/*heldout_per_process.png; candidate causes: his input encoding/pID
-      embedding, his target standardisation on held-out, our shared affine statistics on new multiplicities, model capacity),
-      design review, then the configurations that test it within the GPU budget'
     25: 'attempt E (step 25): the D_sqE form with a better process-intrinsic anchor map, designed, reviewed and run as a CPU
       job on htc'
     26: 'step 15''s yes branch (2026-11-27, data/c_best_factor_split.json): the g g > t b W pair''s error is the on-shell
@@ -42451,11 +42444,6 @@ entries:
     since: '2026-11-26T22:35:04+00:00'
     state_at: '2026-11-26T22:35:04+00:00'
   step_why:
-    15:
-      feeds: 'D564: why the LLM extrapolates better than our LLoCa'
-      if:
-      - 'a cause found that a configuration of ours can test: design and run it (investigation scope, GPU budget)'
-      - 'no candidate survives the checks on existing data: report what was ruled out with its evidence'
     25:
       feeds: 'D566: a per-event level from the process and its diagrams that keeps the level on new families and is correct
         regardless of sampling'
