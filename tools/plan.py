@@ -56,7 +56,7 @@ Both change only under an exclusive lock (plan/plan.yaml.lock), written through 
                                           it settles and what each result leads to (with --next N: replace step N only)
                                           | add-next <id> "<step>" --feeds ... --if ... --if ... | drop-next <id> <N>
   plan sweeps [--fresh]                   every recorded sweep's state on its site, and the unrecorded ones recorded
-  plan evidence <id> [--run R] [--commit C] [--path P] | dead-end <id> --tried T --why W
+  plan evidence <id> [--run R] [--commit C] [--path P] | dead-end <id> --tried T --why W (--next "<next attempt>" --feeds .. --if .. --if .. | --asked)
   plan next [--prompts]                   deterministic: what can move now, with each step agent's exact prompt
   plan done <id> --writeup C [--override-runs WHY]
   plan view [--write]
@@ -3384,8 +3384,20 @@ def print_nexts(eid):
 
 
 def cmd_dead_end(a):
+    """A dead end ends one attempt, never the work asked for: it carries the next attempt or an open ask."""
+    if bool(a.next) == bool(a.asked):
+        sys.exit("plan: a dead end ends one attempt, never the work asked for (CLAUDE.md): give --next with the next "
+                 "attempt, or ask Joaquin (plan ask) and pass --asked")
+    if a.next:
+        steps_with_why(a.next, getattr(a, "seq", None))     # refuse before anything is written
     with transaction() as (d, st):
-        entry(d, a.id).setdefault("dead_ends", []).append({"tried": a.tried, "why": a.why, "at": now().isoformat()})
+        e = entry(d, a.id)
+        if a.asked and not any(not x.get("answered_at") for x in e.get("asks") or []):
+            sys.exit("plan: --asked needs an open ask on %s (plan ask), none is unanswered" % a.id)
+        e.setdefault("dead_ends", []).append({"tried": a.tried, "why": a.why, "at": now().isoformat()})
+    if a.next:
+        a.text = a.next
+        cmd_add_next(a)
 
 
 def cmd_next(a):
@@ -3765,7 +3777,10 @@ def main(argv=None):
         A("--mechanical", metavar="STEP", help="instead: a mechanical-worker's brief for this one step "
           "(plan/mechanical_prompt.txt, D213)"))
     cmd("dead-end", cmd_dead_end, "record something tried that did not work", ID,
-        A("--tried", required=True, help="what was tried"), A("--why", required=True, help="why it failed"))
+        A("--tried", required=True, help="what was tried"), A("--why", required=True, help="why it failed"),
+        A("--next", help="the next attempt, added as a next step (with its --feeds and --if, as add-next)"),
+        A("--asked", action="store_true", help="instead of --next: an open plan ask to Joaquin carries the work on"),
+        *WHY_ARGS)
     cmd("continuous", cmd_continuous, "mark the entry continuous, with the user's words asking for it", ID,
         A("--quote", required=True, help="the user's words"))
     cmd("next", cmd_next, "what can move now (exit 1 while a listed step is not launched)",
