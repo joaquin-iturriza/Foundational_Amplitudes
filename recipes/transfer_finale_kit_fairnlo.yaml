@@ -1,8 +1,9 @@
 # kit_benchmark step 20 (D570): Bakar's fair one-loop protocol on the ladder + star-arm pretraining.
 # recipes/transfer_finale.yaml (28 processes) adapted: the target's tree in (the KIT e+e- -> t t~ Born, bulk plus the
 # hard tree points: protocol allows hard tree points), the two electroweak one-loop pools out (ee_mumu_ew_nlo,
-# ee_uu_ew_nlo change sign on 65-92% of events: a signedlog target, which model.input_asym_factor refuses), leaving 4
-# one-loop pools, all bulk (<= 10). No e+e- -> t t~ one loop, no KIT one-loop or hard one-loop points.
+# ee_uu_ew_nlo change sign on 65-92% of events: a signedlog target, which model.input_asym_factor refuses), and the QCD
+# one-loop uubar_ddbar_nlo out for the same reason (31% of its val events negative; smoke FA-lxplus-0caa53bf refused at
+# init), leaving 3 one-loop pools, all bulk (<= 10). No e+e- -> t t~ one loop, no KIT one-loop or hard one-loop points.
 processes:
   - {name: ee_uu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
   - {name: ee_mumu, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
@@ -21,7 +22,6 @@ processes:
   - {name: udbar_Wgg, sqrts: [85, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
   - {name: udbar_Wggg, sqrts: [85, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
   - {name: ee_uu_nlo, sqrts: [25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
-  - {name: uubar_ddbar_nlo, sqrts: [25, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
   - {name: uubar_ZZ_nlo, sqrts: [192, 1000], n_train: 50000, n_val: 5000, n_test: 5000}
   - {name: ee_uug, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
   - {name: ee_uugg, sqrts: [25, 1000], n_train: 100000, n_val: 10000, n_test: 10000}
