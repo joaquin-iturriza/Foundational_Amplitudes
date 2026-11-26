@@ -48439,6 +48439,10 @@ entries:
     2: 'Write the cc_disk result into docs/results.tex (what used CC''s /sps/lpnhe and what was freed: D550 debris 5.85 GiB,
       frees 8.1 GiB, D556 fine-tune models 15.0 GiB; every cache kept with its reader), % src: lines to the job logs and analysis/storage
       tools at their commits; then plan done cc_disk --writeup <commit>'
+    3: 'E9422 (2026-11-26 04:29, /sps/lpnhe 100%, 446 MB free): find what grew since 2026-11-25 (SCRATCH top entries ccj_4f7a6e6248e3,
+      checkout runs/sweeps of the last 2 days ccj_a92263be3b0c), delete our cheap-to-rebuild debris among it (D550 kinds;
+      memmap only with no running job and no open-entry recipe reading it), read the prune pass ccj_d7c7455d61ad (prune_site.sh
+      ccin2p3, D19), report freed GB by category, ack E9422'
   done_when: null
   notes_ref: null
   match: cc_disk_*,zz_probe_*
@@ -49045,6 +49049,11 @@ entries:
       if:
       - 'written and the notes-editor passes: plan done'
       - 'the notes-editor blocks: fix its items, then plan done'
+    3:
+      feeds: whether CC can run jobs again (60 GB floor)
+      if:
+      - 'debris plus prune reach the 60 GB floor: report and ack'
+      - 'they fall short: list what holds the space by owner and entry, ask Joaquin for the costly part'
 - id: cc_login_jobs
   title: 'CC login node: recurring and long scripts moved to Slurm (CC support''s email)'
   question: 'Can every non-interactive script we run on CC''s login node (the supervisor''s maintain commands: disk_watch,
