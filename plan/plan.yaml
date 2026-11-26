@@ -47139,7 +47139,8 @@ entries:
   next:
     6: 'Close: once par:cbs_update (e05fc9e32) and par:cbs_horizon pass the notes-editor, plan done critical_batch --writeup
       <commits> (par:cbs_scan 145d14839, par:cbs_update e05fc9e32, par:cbs_horizon)'
-  done_when: null
+  done_when: for l in sec:noisescale par:cbs_scan par:cbs_regimes par:cbs_update par:cbs_horizon; do grep -q "label{$l}" docs/results.tex
+    || exit 1; done && test -s analysis/critical_batch/data/ft_bcrit_ep50.json && test -s analysis/critical_batch/figs/ft_ep50.pdf
   notes_ref: sec:noisescale
   match: zz_cbs_*,cbs_*
   evidence:
@@ -48485,6 +48486,7 @@ entries:
     2026-11-22T02:55, 2026-10-06T00:17 (other studies'' results, plots and plans, matched on common words)'
   blocks: nothing
   blocks_steps: *id004
+  checked_before: 8fb4916cb900b337b6aa8434704ad8126953100a
 - id: cc_disk
   title: What uses disk on CC and what can be deleted
   question: 'What is using the disk on CC (checkout runs/sweeps, datasets, memmap caches, scratch, MG5 work dirs), against
