@@ -37,9 +37,10 @@ EOF
 # unique per submission: on HTCondor there is no SLURM_JOB_ID and the PID repeats (2026-10-08: two runs both "85")
 RUN=zz_smoke_$(basename "$CFG" .yaml)_${SLURM_JOB_ID:-$(date +%s)_$RANDOM}
 echo "SMOKE $CFG steps=$STEPS run=$RUN"
-# validate_frac=0: a config's validate_frac (a fraction of the run) would override validate_every_n_steps
+# validate_frac=0: a config's validate_frac (a fraction of the run) would override validate_every_n_steps.
+# sigma stage: 2 validations, not 25 (each is a full validation pass: 25 took 2.5 h at 64 heads, FA-ccin2p3-1cdc28b2)
 python run.py $OVR training.iterations=$STEPS training.validate_frac=0 training.validate_every_n_steps=100 \
-  evaluation.train_subsample=2000 use_mlflow=false run_name=$RUN exp_name=zz_smoke \
+  training.heterosc_sigma_stage_validations=2 evaluation.train_subsample=2000 use_mlflow=false run_name=$RUN exp_name=zz_smoke \
   run_dir="$PROJECT_DIR/runs/zz_smoke/$RUN" "$@"   # explicit: a base_config's run_dir is the parent run's own
 RC=$?
 echo "SMOKE_EXIT $RC"
