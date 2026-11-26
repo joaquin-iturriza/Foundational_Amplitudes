@@ -1103,7 +1103,12 @@ def refund(inp):
     cmd = (inp.get("tool_input") or {}).get("command", "") or ""
     # only a command that is one `site` step in all (one submission, nothing chained): in a chain the failing `site:`
     # line may belong to another step while an earlier submission went through, and its unit must stay spent
-    if len(re.findall(r"(?:^|[;&|(]|\$\()\s*site\s+\S", cmd, re.M)) != 1 or len(named_submissions(cmd)) != 1:
+    steps = list(re.finditer(r"(?:^|[;&|(]|\$\()\s*site\s+(\S+)", cmd, re.M))
+    if len(named_submissions(cmd)) != 1 or not steps:
+        return 0
+    # one `site` step, or `site sync ... && site submit ...`: a `&&` chain whose last step is the submission stops at
+    # the first refusal, so the submission never ran (2026-11-26: sync refused over uncommitted changes kept the slot)
+    if len(steps) > 1 and not (steps[-1].group(1) == "submit" and not re.search(r"[;|\n]|\|\|", cmd.strip())):
         return 0
     msg = "%s %s" % (inp.get("error", ""), json.dumps(inp.get("tool_response", "")))
     if not re.search(r"(^|\\n|\s)site: ", msg):
