@@ -29673,8 +29673,8 @@ entries:
       - 'FT not below them: report per D where it loses, with the parent''s curves'
   step_waits:
     '20': FA-ccin2p3-e95803a9 FA-ccin2p3-cecec366 FA-ccin2p3-9e3d7ae5
-    '22': 'the main session''s narrowing of 2026-11-26 (step 22 stays as it is, not part of D570); note: its cost, 2 x ~9.6
-      = 19.2 GPU-h, is under the 30 GPU-h confirm bar'
+    '22': drive.py searches kit_hpo_ttvirt_thr_divform and kit_hpo_ttvirt_thr_rezero (detached kit_hpo_tt_divform_rezero,
+      pid 2843282)
     '24': FA-ccin2p3-a3bc3374
   handoff:
     state: '2026-11-26 ~03:40 UTC. Step 20 (D570): design PASS 2026-11-26T02:27, nothing submitted. Every site sync/submit
