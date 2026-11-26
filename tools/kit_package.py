@@ -206,6 +206,7 @@ def _standalone(out, models):
         yaml.safe_dump(rec, open(rec_p, "w"))
         with h5py.File(kh.h5_path(m["file"]), "r") as f, h5py.File(os.path.join(out, "kit_data", f"{m['file']}.h5"), "w") as g:
             g.attrs["metadata"] = f.attrs["metadata"]
+            g.attrs["source_sha256"] = kh.file_sha256(kh.h5_path(m["file"]))   # same pool identity as the run's own
             b = f["bulk_train/bulk"]
             N = b["momenta"].shape[0]
             assert n + N_VAL_STANDALONE <= N

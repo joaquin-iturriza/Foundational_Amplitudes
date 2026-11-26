@@ -123,6 +123,10 @@ def file_sha256(path):
     """sha256 of a benchmark file, cached beside it in <file>.sha256 keyed on its size and mtime (hashed once per site
     and release: a corrected release of the same size gets a new identity)"""
     import hashlib
+    import h5py
+    with h5py.File(path, "r") as f:   # a standalone package's cut of a benchmark file stands for the source's pools
+        if "source_sha256" in f.attrs:  # (the pool identity keys the augmentation, hence the run's mom_div)
+            return str(f.attrs["source_sha256"])
     st = os.stat(path)
     key = f"{st.st_size} {st.st_mtime_ns}"
     side = path + ".sha256"
