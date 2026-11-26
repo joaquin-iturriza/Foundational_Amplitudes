@@ -42907,6 +42907,18 @@ entries:
       was deleted (our debris, 2.6 GB). Resubmitted identically plus the fix: FA-ccin2p3-e0a1abe4 (--allow-unfit: no 64G/80G
       GPU free now on CC or lxplus, 12 CC GPUs can hold it; --time 3 h, target 1.5 h, --disk-gb 4.5). CC /sps free disk read
       by site submit: 19 GB (pick''s warning said 14 GB).'
+  - at: '2026-11-26T14:51:24+00:00'
+    text: '2026-11-26 step 8 64-head smoke FA-ccin2p3-e0a1abe4 (code a16efecd05, H100 NVL, save_last=false, sigma stage 2
+      validations @2458c2084): SMOKE_EXIT 0. 101,020,481 parameters; training 2.43 s/step (iterations 1-45: 106.9 s / 44),
+      peak GPU 37.6 GB (max_used 39.4 GB: 80G floor), test stage and plots 0.61 h; sigma stage 250 steps + 2 validations 0.66
+      h, max_used 9.7 GB; one full validation pass ~5.8 min at 64 heads. The smoke-script fix is tested on this case (sigma
+      stage ended in 0.66 h instead of timing out); not tested at 120 heads. Our setup''s 64-head rate equals his setup''s
+      (part (b) smoke 2.42 s/step). Full 64-head run estimate: 60,840 x 2.43 s = 41.1 h + 20 validations x 5.8 min = 1.9 h
+      + sigma stage (25 validations) ~2.5 h + test ~0.4 h = ~46 GPU-h (job limit x1.3 = 60 h). 120 heads (no smoke yet: no
+      disk for its ~17.7 GB transient on CC 19 GB or EOS 23.8 GB, and no 80G GPU free on lxplus): by part (b)''s 5.33 s/step
+      (our/his rate ratio 1.00 at 64 heads) 90 h + validations ~4 h + sigma ~5 h = ~99 GPU-h. With 16/32 heads at the design''s
+      pre-smoke 12/22 GPU-h: step 8 in all ~180 GPU-h, above 100: goes to Joaquin (D536) before the full runs. Smoke dir deleted
+      (debris, 1.4 GB).'
   step_waits:
     '13': FA-ccin2p3-623a3af6
     '14': FA-ccin2p3-f0b997a2
