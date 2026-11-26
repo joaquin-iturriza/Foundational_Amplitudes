@@ -22,6 +22,9 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 TTX = ("dc_gg_ttxh", "dc_gg_ttxa", "dc_gg_ttxz", "dc_gg_gttx")
+# step 15 (D564): the pair carrying the pooled new-set gap (gg -> W qq' family) and their trained q q~ initial-state
+# twins (same final state, the internal top's pole reachable), histogrammed like the gg -> t t~ X processes
+TBW = ("dc_gg_tbxwm", "dc_gg_btxwp", "dc_uux_tbxwm", "dc_uux_btxwp")
 D_EDGES = np.linspace(-10, 10, 81)
 
 
@@ -97,7 +100,7 @@ XLAB = {"log_factor": r"$\log F$", "offshell_23": r"off-shellness input, interna
         "offshell_24": r"off-shellness input, internal $W$"}
 
 
-def fig(path, xv):
+def fig(path, xv, panels="ttx"):
     sys.path.insert(0, ROOT)
     import plot_style as ps
     from matplotlib.colors import LogNorm
@@ -107,7 +110,7 @@ def fig(path, xv):
             json.load(open(os.path.join(ROOT, "analysis", "catalog_daniel", "classes_default.json")))["processes"]}
     o = json.load(open(path))
     fig, axes = ps.figure(ncols=2, nrows=2)
-    for ax, n in zip(axes.ravel(), TTX):
+    for ax, n in zip(axes.ravel(), TBW if panels == "tbw" else TTX):
         v = o["processes"][n]["vars"][xv]
         h = v["hist2d"]
         im = ax.pcolormesh(h["x_edges"], h["d_edges"], np.ma.masked_equal(np.array(h["counts"]), 0), cmap="viridis",
@@ -121,7 +124,7 @@ def fig(path, xv):
         ax.set_ylabel(r"pred $-$ true of $\log|\mathcal{M}|^2$")
     ps.legend(axes.ravel()[0], "lower right")
     base = os.path.splitext(os.path.basename(path))[0]
-    ps.save(fig, os.path.join(HERE, "figs", base if xv == "log_factor" else f"{base}_{xv}"))
+    ps.save(fig, os.path.join(HERE, "figs", (base if xv == "log_factor" else f"{base}_{xv}") + ("_tbw" if panels == "tbw" else "")))
 
 
 def main():
@@ -130,20 +133,21 @@ def main():
     ap.add_argument("--out", default=None)
     ap.add_argument("--fig", default=None, help="draw the figure from this JSON")
     ap.add_argument("--x", default="log_factor", help="the figure's per-event variable")
+    ap.add_argument("--panels", choices=("ttx", "tbw"), default="ttx", help="the figure's four processes")
     ap.add_argument("--vars-from", default=None, help="another run's events CSV giving the variables this one lacks")
     a = ap.parse_args()
     if a.fig:
-        return fig(a.fig, a.x)
+        return fig(a.fig, a.x, a.panels)
     ev = read(a.csv)
     if a.vars_from:
         ev = join_vars(ev, read(a.vars_from))
-    out = {"csv": a.csv, "vars_from": a.vars_from, "processes": {n: stats(t, q, X, n in TTX) for n, (t, q, X) in ev.items()}}
+    out = {"csv": a.csv, "vars_from": a.vars_from, "processes": {n: stats(t, q, X, n in TTX + TBW) for n, (t, q, X) in ev.items()}}
     out["all"] = {}
     for k in next(iter(ev.values()))[2]:
         vs = [p["vars"][k] for p in out["processes"].values() if p["vars"][k]]
         out["all"][k] = {"n_processes": len(vs), "median_abs_spearman": float(np.median([abs(v["spearman"]) for v in vs])),
                          "median_eta2": float(np.median([v["eta2"] for v in vs]))} if vs else None
-    for n in TTX:
+    for n in [m for m in TTX + TBW if m in out["processes"]]:
         p = out["processes"][n]
         print(n, p["mse"], p["bias"], p["groups"], {k: v and {j: round(w, 3) for j, w in v.items() if isinstance(w, float)}
                                                      for k, v in p["vars"].items()}, file=sys.stderr)
