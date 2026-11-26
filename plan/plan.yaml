@@ -42375,12 +42375,10 @@ entries:
     answered_at: '2026-11-26T16:03:24.964000+00:00'
     decision: D578
   owner:
-    agent: a017802b37deeafec
-    state: closed
-    since: '2026-11-26T08:13:59.747000+00:00'
-    state_at: '2026-11-26T14:42:59.729000+00:00'
-    context: 209652
-    context_at: '2026-11-26T11:35:05+00:00'
+    agent: a9f2cdb0c287c4018
+    state: working
+    since: '2026-11-26T18:21:45+00:00'
+    state_at: '2026-11-26T18:21:45+00:00'
   step_why:
     15:
       feeds: 'D564: why the LLM extrapolates better than our LLoCa'
