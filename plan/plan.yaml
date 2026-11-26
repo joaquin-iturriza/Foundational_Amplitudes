@@ -43380,6 +43380,11 @@ entries:
       pass carrying the bias) @a5ecf4790, so shape = MSE - bias^2 exactly; export_for_suprio.py reads the same (uncommitted,
       with the repo-reviewer). llmcmp_final_{,bias_,shape_}heldout_per_process redrawn (MSE figure: one marker moved, a 13x14
       px region). Attempt D design passed review (code @7df6e5130); its job waits on the CC rename answer (only CC up).'
+  - at: '2026-11-26T20:35:39+00:00'
+    text: 'Interactive scores (not in the site registry), launched with scripts/submit_interactive.sh (b5e07a3a7) on gpu_v100_interactive:
+      slurm 64936424 (trial_7002 level-file, REREAD FA-ccin2p3-0ca1d68d; log runs/llmcmp_level_file/trial_7002/interactive_score.log)
+      and 64936425 (trial_1860 no-off-shell; log runs/llmcmp_c_nooffshell/trial_1860/interactive_score.log), ONLY=heldout
+      EVENTS=1. Pending twins cancelled: 64930520 (FA-ccin2p3-2461cbe0, trial_7002) and 64927465 (FA-ccin2p3-1b0cbd8a, trial_1860).'
   step_waits:
     '15': FA-ccin2p3-1b0cbd8a
     '21': FA-ccin2p3-1b0cbd8a
