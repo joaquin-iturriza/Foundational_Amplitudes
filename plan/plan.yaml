@@ -47122,7 +47122,7 @@ entries:
   question: What is the critical batch size of our canonical setup, measured from the gradient noise scale B_simple = tr(Sigma)/|G|^2
     (McCandlish et al. 2018, arXiv:1812.06162) along training, and does it predict where larger batches stop paying off in
     measured runs?
-  status: running
+  status: done
   quotes:
   - said_at: '2026-11-24T00:34:29.435000+00:00'
     text: In parallel, I remember trying to implement something about a critical batchsize, related to the gradient's noise
@@ -48485,6 +48485,7 @@ entries:
   blocks: nothing
   blocks_steps: *id004
   checked_before: 8fb4916cb900b337b6aa8434704ad8126953100a
+  writeup: 4b744779f
 - id: cc_disk
   title: What uses disk on CC and what can be deleted
   question: 'What is using the disk on CC (checkout runs/sweeps, datasets, memmap caches, scratch, MG5 work dirs), against
