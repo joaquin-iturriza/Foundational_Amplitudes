@@ -14,10 +14,7 @@ source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 RUN=${1:-$RUN}; HELD=${2:-${HELD:-recipes/catalog_daniel_heldout.yaml}}   # args, or --env RUN=/HELD= (site submit passes no args)
 SEEN=$(python -c "import sys; sys.path.insert(0, 'tools'); from rebuild_run import load_cfg; print(load_cfg('$RUN').data.processes_file)") || exit 1
-# ONLY=seen with EVENTS=1 (step 15): the seen set alone, its per-event CSV $RUN/llm_events_seen.csv
-[ "${ONLY:-}" = heldout ] || python tools/llm_score.py --run "$RUN" --out "$RUN/llm_score_seen.json" \
-  ${EVENTS:+--events-out "$RUN/llm_events_seen.csv"} "$SEEN" || exit 1
-[ "${ONLY:-}" = seen ] && { echo "RUN_DONE"; exit 0; }
+[ "${ONLY:-}" = heldout ] || python tools/llm_score.py --run "$RUN" --out "$RUN/llm_score_seen.json" "$SEEN" || exit 1
 # EVENTS=1 (D567): also the per-event true and predicted log|M|^2 of the held-out processes, $RUN/llm_events_heldout.csv
 python tools/llm_score.py --run "$RUN" --out "$RUN/llm_score_heldout.json" ${EVENTS:+--events-out "$RUN/llm_events_heldout.csv"} "$HELD" || exit 1
 echo "RUN_DONE"
