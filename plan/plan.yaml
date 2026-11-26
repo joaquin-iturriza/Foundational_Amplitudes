@@ -47158,9 +47158,7 @@ entries:
     - its validation against batch-size runs
   decisions:
   - D532
-  next:
-    6: 'Close: once par:cbs_update (e05fc9e32) and par:cbs_horizon pass the notes-editor, plan done critical_batch --writeup
-      <commits> (par:cbs_scan 145d14839, par:cbs_update e05fc9e32, par:cbs_horizon)'
+  next: null
   done_when: for l in sec:noisescale par:cbs_scan par:cbs_regimes par:cbs_update par:cbs_horizon; do grep -q "label{$l}" docs/results.tex
     || exit 1; done && test -s analysis/critical_batch/data/ft_bcrit_ep50.json && test -s analysis/critical_batch/figs/ft_ep50.pdf
   notes_ref: par:cbs_horizon
@@ -48184,12 +48182,6 @@ entries:
       42 as the runs repeated). Terms searched: overshoot, step size, update, noise scale (results.tex); D532, D536, D560
       (decisions); plus the first-read data files above, which the prior names but does not carry through to the predicted
       B_dL.'
-  step_why:
-    6:
-      feeds: the entry's close
-      if:
-      - 'notes-editor passes: plan done'
-      - 'notes-editor blocks: fix and continue the same reviewer'
   step_waits:
     '4': 'the detached ep50_collect2 (pid 2901036) ending: COLLECTED -> ft_bcrit.py ep50 read and figure; FAILED (CC /sps
       full) -> wait on the cc_disk owner''s freeing, then one resubmission'
