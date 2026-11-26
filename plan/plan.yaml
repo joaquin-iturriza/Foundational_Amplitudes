@@ -28349,7 +28349,7 @@ entries:
     - FA-lxplus-2149304f
     - FA-lxplus-35ac6ab5
     - FA-lxplus-9fc1e04e
-    commit: 86115d2d5
+    commit: faee980b9
     paths:
     - analysis/kit_benchmark/data/kit_curves_read.json
     - analysis/kit_benchmark/data/kit_fig_A.json
