@@ -1,0 +1,110 @@
+{
+ "kit_A_ee_tt_virt_finite_n100000_t1831_hpo_softpairthr_divform_searched vs kit_A_ee_tt_virt_finite_n100000_t1831_hpo_softpairthr": {
+  "bulk_decades": 0.47919943839183476,
+  "families": {
+   "sudakov_sqrts": {
+    "stratum": "sudakov_sqrts_15000_50000",
+    "logmse": 0.33961178293005373,
+    "logmse_ref": 0.8191791270149045,
+    "bias": -0.4930327227998281,
+    "bias_ref": -0.8287655959542812,
+    "exp": null,
+    "exp_ref": null,
+    "exp_truth": null,
+    "verdict": "inconclusive"
+   },
+   "threshold_beta": {
+    "stratum": "threshold_beta_0.0001_0.001",
+    "logmse": 7.682541785237546,
+    "logmse_ref": 7.4796685323596295,
+    "bias": -2.7548835053265526,
+    "bias_ref": -2.718712848950035,
+    "exp": -0.013363225883980876,
+    "exp_ref": -1.7136301381258284e-05,
+    "exp_truth": -1.0157556001743897,
+    "verdict": "STAYED"
+   }
+  }
+ },
+ "kit_A_ee_tt_virt_finite_n100000_t1831_hpo_softpairthr_rezero_searched vs kit_A_ee_tt_virt_finite_n100000_t1831_hpo_softpairthr": {
+  "bulk_decades": -0.013611170055469685,
+  "families": {
+   "sudakov_sqrts": {
+    "stratum": "sudakov_sqrts_15000_50000",
+    "logmse": 0.4068344380514785,
+    "logmse_ref": 0.8191791270149045,
+    "bias": 0.5959893398543359,
+    "bias_ref": -0.8287655959542812,
+    "exp": null,
+    "exp_ref": null,
+    "exp_truth": null,
+    "verdict": "inconclusive"
+   },
+   "threshold_beta": {
+    "stratum": "threshold_beta_0.0001_0.001",
+    "logmse": 3.538053027013145,
+    "logmse_ref": 7.4796685323596295,
+    "bias": -1.8766070391577094,
+    "bias_ref": -2.718712848950035,
+    "exp": -0.3110382000587183,
+    "exp_ref": -1.7136301381258284e-05,
+    "exp_truth": -1.0157556001743897,
+    "verdict": "inconclusive"
+   }
+  }
+ },
+ "kit_A_ee_tt_virt_finite_n100000_t1831_hpo_softpairthr_divform vs kit_A_ee_tt_virt_finite_n100000_t1831_hpo_softpairthr": {
+  "bulk_decades": 0.17432887602674993,
+  "families": {
+   "sudakov_sqrts": {
+    "stratum": "sudakov_sqrts_15000_50000",
+    "logmse": 0.961884822430807,
+    "logmse_ref": 0.8191791270149045,
+    "bias": -0.5397446099428436,
+    "bias_ref": -0.8287655959542812,
+    "exp": null,
+    "exp_ref": null,
+    "exp_truth": null,
+    "verdict": "STAYED"
+   },
+   "threshold_beta": {
+    "stratum": "threshold_beta_0.0001_0.001",
+    "logmse": 8.517440876150857,
+    "logmse_ref": 7.4796685323596295,
+    "bias": -2.906210783397194,
+    "bias_ref": -2.718712848950035,
+    "exp": 0.05773347251660469,
+    "exp_ref": -1.7136301381258284e-05,
+    "exp_truth": -1.0157556001743897,
+    "verdict": "STAYED"
+   }
+  }
+ },
+ "kit_A_ee_tt_virt_finite_n100000_t1831_hpo_softpairthr_rezero vs kit_A_ee_tt_virt_finite_n100000_t1831_hpo_softpairthr": {
+  "bulk_decades": 1.0427308660132513,
+  "families": {
+   "sudakov_sqrts": {
+    "stratum": "sudakov_sqrts_15000_50000",
+    "logmse": 3139911.8735319753,
+    "logmse_ref": 0.8191791270149045,
+    "bias": 0.1545197516101297,
+    "bias_ref": -0.8287655959542812,
+    "exp": null,
+    "exp_ref": null,
+    "exp_truth": null,
+    "verdict": "inconclusive"
+   },
+   "threshold_beta": {
+    "stratum": "threshold_beta_0.0001_0.001",
+    "logmse": 3.415001612504659,
+    "logmse_ref": 7.4796685323596295,
+    "bias": -1.8362833393338671,
+    "bias_ref": -2.718712848950035,
+    "exp": -0.34055977494385964,
+    "exp_ref": -1.7136301381258284e-05,
+    "exp_truth": -1.0157556001743897,
+    "verdict": "inconclusive"
+   }
+  }
+ }
+}

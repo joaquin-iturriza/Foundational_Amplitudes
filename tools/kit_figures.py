@@ -14,7 +14,7 @@ the truth clipped to its bulk_train [0.5%, 99.5%] range (tools/kit_target_slope.
 the training range and flat at its edge outside it (zero in a bin whose truth stays inside the range); and the same
 binned truth median. Prints one line 'KITFIG <json>'.
 
-plot: one panel set per process and figure kind (ps.panels, one panel per family):
+plot: one file per process and figure kind, one panel per family and the legend in a spare cell:
   kit_mse_<file>_<target>_{a,b,...}     log10-MSE per stratum against the median singular_var, one curve per arm,
                                         Bakar's reference MLP (slide 9) at its deepest bin, the reference line
   kit_median_<file>_<target>_{a,b,...}  median log10|M|^2 per bin, truth and each arm
@@ -206,6 +206,9 @@ INPUT_ARMS = {"pairlogs": r"$\log s_{ij}$", "softrescale": "soft", "locallogs": 
               "asym_cont_sud1": r"factor+log, $\gamma\leq4$",
               "softpair_plain_divform": "div-form", "softpair_plain_rezero": "plain, ReZero",
               "softpairthr_divform": r"div-form, $\log\beta^2$", "softpairthr_rezero": r"ReZero, $\log\beta^2$",
+              # step 22: each arm at its own 16-trial search's chosen HPs (best against best)
+              "softpairthr_divform_searched": r"div-form searched, $\log\beta^2$",
+              "softpairthr_rezero_searched": r"ReZero searched, $\log\beta^2$",
               "ftr5own": "FT", "ftr5thrown": "FT+LO", "ftr5thrbetaown": r"FT+LO+$\beta$",
               "ftr5thrloopown": "FT+1L", "ftr5thrloopbetaown": r"FT+1L+$\beta$"}
 
@@ -215,6 +218,7 @@ SHORT = {"softpair_plain": "scratch", "softpair": "scratch", "softpairthr": r"sc
          "asym_cont": "factor", "asym_cont_sud1": "factor+log",
          "softpair_plain_divform": "div-form", "softpairthr_divform": "div-form",
          "softpair_plain_rezero": "ReZero", "softpairthr_rezero": "ReZero",
+         "softpairthr_divform_searched": "div-form searched", "softpairthr_rezero_searched": "ReZero searched",
          "ftr5own": "FT", "ftr5own_search": "FT searched", "ftr5thrown": "FT+LO", "ftr5thrbetaown": r"FT+LO+$\beta$",
          "ftr5thrloopown": "FT+1L", "ftr5thrloopbetaown": r"FT+1L+$\beta$"}
 
@@ -232,6 +236,19 @@ def arm_label(r, with_n=True, short=False):
     n = (r"$10^5$" if r["n"] == 100000 else r"$9\times10^5$") if with_n else ""
     parts = [how if not inputs.startswith("FT") else "", n, inputs or ("scratch" if not how else ""), r"lr$\times0.1$" if lr else ""]
     return ", ".join(p for p in parts if p)
+
+
+def _grid(ps, n):
+    """One figure for n family panels plus a spare cell for the legend (one file, legend inside; fa-figures):
+    (fig, panel axes, legend cell)."""
+    cells = n + 1
+    nc = 1 if cells == 3 else min(cells, 2)   # three columns run past the printable width, 2x2 would leave a hole
+    nr = -(-cells // nc)
+    fig, axs = ps.figure(ncols=nc, nrows=nr)
+    axs = list(np.ravel(axs))
+    for a in axs[cells:]:
+        a.set_axis_off()
+    return fig, axs[:n], axs[n]
 
 
 def plot(path, outdir, prefix="", split_offshell=False, short=False):
@@ -267,39 +284,31 @@ def plot(path, outdir, prefix="", split_offshell=False, short=False):
                     arms[i] = (lab, next(free), r)
         base = f"{stem}_{target}" + ("_nooffshell" if off else "")
         # (1) log10-MSE per stratum
-        figs = ps.panels(len(fams))
-        for (fig, ax), fam in zip(figs, fams):
+        fig, axs, cell = _grid(ps, len(fams))
+        for ax, fam in zip(axs, fams):
             for lab, c, r in arms:
                 pts = sorted((v["x"], v["logmse"]) for k, v in r["strata"].items()
                              if k.startswith("hard_test/") and family(k.split("/")[1]) == fam)
                 ax.plot(*zip(*pts), "o", ls=ls.get(id(r), "-"), color=c, label=lab)
             fl = sorted((v["x"], v["mse"]) for st, v in tr["floor"].items() if family(st) == fam)
             if any(m > 0 for _, m in fl):   # zero in every bin (truth inside the training range): not drawn, no entry
-                ax.plot(*zip(*fl), "--", color=ps.C.grey, label="clip")
+                ax.plot(*zip(*fl), "--", color=ps.C.grey, label="truth clipped to its bulk range")
             ref = MLP.get((stem, target, fam))
             if ref:
                 x = np.sqrt(ref[0] * ref[1])
-                ax.plot([x], [ref[2]], "*", color="k", label="MLP log")
-                ax.plot([x], [ref[3]], "x", color="k", label="MLP raw")
+                ax.plot([x], [ref[2]], "*", color="k", label="KIT MLP, log inputs")
+                ax.plot([x], [ref[3]], "x", color="k", label="KIT MLP, raw inputs")
             ax.set_xscale("log")
             ax.xaxis.set_minor_formatter(NullFormatter())
             ax.set_yscale("log")
             ax.set_xlabel(XLAB.get(fam, fam.replace("_", " ")))
-            ax.set_ylabel(r"log-MSE of $\log_{10}|\mathcal{M}|^2$")
+            ax.set_ylabel(r"MSE$(\log_{10}|\mathcal{M}|^2)$")
             ps.process_label(ax, PROC.get((stem, target), stem))
-        # each panel file carries its own legend (any file may be shown alone; Joaquin 2026-11-12: 'The figure has no
-        # legend'), listing what that panel draws (the reference line is absent where it is zero); inside the axes up
-        # to 4 arms, else a strip above the panel on the same canvas (more entries fit in no 2.4 x 1.92 in box)
-        for fig, ax in figs:
-            if len(ax.get_legend_handles_labels()[0]) > 3:     # entries, not arms: truth and the KIT markers count
-                ps.shared_legend(fig, ax, ncol=2)
-            else:
-                ps.legend(ax, "upper left")
-                ps.make_room(ax)
-        written += ps.save_panels(figs, os.path.join(outdir, f"kit_mse_{prefix}{base}"))
+        ps.legend_cell(cell, axs, fontsize=ps.LEGEND_MIN_PT)
+        written.append(ps.save(fig, os.path.join(outdir, f"kit_mse_{prefix}{base}")))
         # (2) median predicted vs truth log10|M|^2
-        figs = ps.panels(len(fams))
-        for (fig, ax), fam in zip(figs, fams):
+        fig, axs, cell = _grid(ps, len(fams))
+        for ax, fam in zip(axs, fams):
             tm = tr["median"].get(fam, [])
             if tm:
                 ax.plot(*zip(*tm), "-", color="k", label="truth")
@@ -312,14 +321,8 @@ def plot(path, outdir, prefix="", split_offshell=False, short=False):
             ax.set_xlabel(XLAB.get(fam, fam.replace("_", " ")))
             ax.set_ylabel(r"median $\log_{10}|\mathcal{M}|^2$")
             ps.process_label(ax, PROC.get((stem, target), stem))
-        h0 = figs[0][1].get_legend_handles_labels()[0]
-        for fig, ax in figs:
-            if len(h0) > 3:
-                ps.shared_legend(fig, figs[0][1], ncol=2)
-            else:
-                ps.legend(ax, "upper left", handles=h0)
-                ps.make_room(ax)
-        written += ps.save_panels(figs, os.path.join(outdir, f"kit_median_{prefix}{base}"))
+        ps.legend_cell(cell, axs, fontsize=ps.LEGEND_MIN_PT)
+        written.append(ps.save(fig, os.path.join(outdir, f"kit_median_{prefix}{base}")))
     for w in written:
         print(w)
 
