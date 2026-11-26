@@ -10,6 +10,7 @@ Per process, from d = pred - true of log|M|^2 over the CSV's events (first 5000 
     bins of x; auc = P(x of a hi event > x of a lo event) (0.5: x carries nothing about the group; 0 or 1: x decides
     it); for the gg -> t t~ X processes also the 2D histogram of d against x (counts) and the binned mean of d.
     python analysis/llm_compare/factor_split.py --csv <run>/llm_events_heldout.csv [--out data/<tag>_factor_split.json]
+        [--pole-run <run>]   (each gg -> t t~ X / t b W process: d near the internal pole against the rest)
     python analysis/llm_compare/factor_split.py --fig data/<tag>_factor_split.json [--x offshell_6]   (figure, locally)
   --vars-from <other run>/llm_events_heldout.csv: the variables this CSV lacks (offshell_<pdg> of a run without the
     off-shellness input) taken from another run's CSV row by row, the same test events checked on true_logm2.
@@ -22,9 +23,27 @@ import numpy as np
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
 TTX = ("dc_gg_ttxh", "dc_gg_ttxa", "dc_gg_ttxz", "dc_gg_gttx")
-# step 15 (D564): the pair carrying the pooled new-set gap (gg -> W qq' family) and their trained q q~ initial-state
-# twins (same final state, the internal top's pole reachable), histogrammed like the gg -> t t~ X processes
-TBW = ("dc_gg_tbxwm", "dc_gg_btxwp", "dc_uux_tbxwm", "dc_uux_btxwp")
+# step 15 (D564): the pair carrying the pooled new-set gap (gg -> W qq' family), histogrammed like gg -> t t~ X
+TBW = ("dc_gg_tbxwm", "dc_gg_btxwp")
+
+
+def poles(run):
+    """{offshell_<pdg>: the standardized input at s_prop = M^2}: the input is (sign(o) log1p|o| - mu) / sd (data_mmap,
+    experiment._resolve_offshell_stats), so the pole sits at -mu / sd, read from the run's own data_stats.json"""
+    import yaml
+    mu, sd = json.load(open(os.path.join(run, "data_stats.json")))["offshell_stats"]
+    pdgs = yaml.safe_load(open(os.path.join(run, "config.yaml")))["data"]["internal_mass_pdgs"]
+    return {f"offshell_{g}": -m / v for g, m, v in zip(pdgs, mu, sd)}
+
+
+def pole_split(d, x, x_pole, hi):
+    """the fifth of events closest to the pole against the rest: mean d in each, their difference, its noise (the two
+    means' standard errors in quadrature), and the share of the low 2-means group in each"""
+    near = np.abs(x - x_pole) <= np.quantile(np.abs(x - x_pole), 0.2)
+    se = np.sqrt(d[near].var() / near.sum() + d[~near].var() / (~near).sum())
+    return {"x_pole": float(x_pole), "mean_d_near": float(d[near].mean()), "mean_d_far": float(d[~near].mean()),
+            "contrast": float(d[near].mean() - d[~near].mean()), "contrast_se": float(se),
+            "lo_share_near": float((~hi[near]).mean()), "lo_share_far": float((~hi[~near]).mean())}
 D_EDGES = np.linspace(-10, 10, 81)
 
 
@@ -85,14 +104,15 @@ def against(d, x, hi, full):
     return r
 
 
-def stats(t, q, X, full):
+def stats(t, q, X, full, pole=None):
     d = q - t
     hi, c = two_means(d)
     within = np.sqrt((((d[hi] - c[1]) ** 2).sum() + ((d[~hi] - c[0]) ** 2).sum()) / d.size)
     return {"n": int(d.size), "mse": float((d ** 2).mean()), "bias": float(d.mean()), "sd_d": float(d.std()),
             "groups": {"lo_share": float((~hi).mean()), "lo_mean_d": float(c[0]), "hi_mean_d": float(c[1]),
                        "separation": float((c[1] - c[0]) / within)},
-            "vars": {k: against(d, x, hi, full) for k, x in X.items()}}
+            "vars": {k: against(d, x, hi, full) for k, x in X.items()}} | (
+        {"pole": {k: pole_split(d, X[k], v, hi) for k, v in pole.items() if k in X and X[k].std() > 0}} if pole else {})
 
 
 XLAB = {"log_factor": r"$\log F$", "offshell_23": r"off-shellness input, internal $Z$",
@@ -109,7 +129,7 @@ def fig(path, xv, panels="ttx"):
     meta = {"dc_" + p["folder"]: p["process"] for p in
             json.load(open(os.path.join(ROOT, "analysis", "catalog_daniel", "classes_default.json")))["processes"]}
     o = json.load(open(path))
-    fig, axes = ps.figure(ncols=2, nrows=2)
+    fig, axes = ps.figure(ncols=2, nrows=1 if panels == "tbw" else 2)
     for ax, n in zip(axes.ravel(), TBW if panels == "tbw" else TTX):
         v = o["processes"][n]["vars"][xv]
         h = v["hist2d"]
@@ -119,6 +139,8 @@ def fig(path, xv, panels="ttx"):
         bb = v["binned"]
         ax.plot(bb["x_mid"], bb["mean_d"], "o-", color=ps.C.vermillion, ms=2, lw=0.8, label="mean in bins")
         ax.axhline(0, color="0.5", lw=0.5)
+        if "pole" in o["processes"][n] and xv in o["processes"][n]["pole"]:
+            ax.axvline(o["processes"][n]["pole"][xv]["x_pole"], color="k", ls=":", lw=0.8, label="pole")
         ax.text(0.03, 0.95, proc_label(meta[n]), transform=ax.transAxes, va="top", color="k")
         ax.set_xlabel(XLAB[xv])
         ax.set_ylabel(r"pred $-$ true of $\log|\mathcal{M}|^2$")
@@ -133,6 +155,8 @@ def main():
     ap.add_argument("--out", default=None)
     ap.add_argument("--fig", default=None, help="draw the figure from this JSON")
     ap.add_argument("--x", default="log_factor", help="the figure's per-event variable")
+    ap.add_argument("--pole-run", default=None, help="the scored run's dir: its off-shellness statistics place each "
+                    "pole on the input axis, and the gg -> t b W pair gets the near-pole fifth against the rest")
     ap.add_argument("--panels", choices=("ttx", "tbw"), default="ttx", help="the figure's four processes")
     ap.add_argument("--vars-from", default=None, help="another run's events CSV giving the variables this one lacks")
     a = ap.parse_args()
@@ -141,7 +165,9 @@ def main():
     ev = read(a.csv)
     if a.vars_from:
         ev = join_vars(ev, read(a.vars_from))
-    out = {"csv": a.csv, "vars_from": a.vars_from, "processes": {n: stats(t, q, X, n in TTX + TBW) for n, (t, q, X) in ev.items()}}
+    pl = poles(a.pole_run) if a.pole_run else None
+    out = {"csv": a.csv, "vars_from": a.vars_from, "poles": pl,
+           "processes": {n: stats(t, q, X, n in TTX + TBW, pl if n in TTX + TBW else None) for n, (t, q, X) in ev.items()}}
     out["all"] = {}
     for k in next(iter(ev.values()))[2]:
         vs = [p["vars"][k] for p in out["processes"].values() if p["vars"][k]]
