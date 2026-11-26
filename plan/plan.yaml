@@ -43413,6 +43413,19 @@ entries:
       finite: range 4.61-12.31), synthetic test re-run clean; rerun FA-ccin2p3-d34fae85 (htc, 4 h limit, target 2 h). Step
       15 (D564) design passed after one FIX (pole placed at -mu/sd of the run''s offshell_stats, near-pole fifth contrast
       with its standard error; factor_split.py --pole-run @3e748b197); its CPU read ccj_3c502367feac (job 64942400) on CC.'
+  - at: '2026-11-26T23:01:38+00:00'
+    text: '2026-11-27 step 15 (D564) read, passed design (factor_split.py --pole-run @3e748b197 on CC, ccj job 64942400, REREAD
+      of FA-ccin2p3-29ce8950''s held-out per-event CSV; data/c_best_factor_split.json @HEAD; figs/c_best_factor_split_offshell_6_tbw.png).
+      Top pole on the input axis -mu/sd = -0.018. g g > t b~ w- / g g > b t~ w+: mean d = pred - true of log|M|^2 in the fifth
+      of events nearest the pole -7.65/-7.56 against -5.16/-5.08 in the rest: contrast -2.49/-2.48, standard error 0.047/0.048
+      (53x), beyond the trained q q~ twins'' bound 0.19 (seen MSE 0.0011-0.0069); the low 2-means group is 99%/99% of the
+      near fifth against 65%/66% of the rest. Binned mean of d (20 equal-count bins of the input, t b~ w-): -1.08 at -2.68,
+      -5.66 at -1.89, -7.89 at -0.20, -7.96 at 1.36, -6.04 at 1.97, -1.13 at 2.58: a V with its floor at the pole, e^-8 ~
+      1/2800 under the truth there. Design branch YES: the gap carried by this pair is the resonant (on-shell top) region
+      of a g g initial state, which the same network gets right for q q~ > t b W (trained). Same read on g g > t t~ X (held
+      out): contrast -1.09 (ttH), -1.25 (ttA), -1.39 (ttZ), -0.22 (g t t~), all near-pole lower. MSEs reproduce the lxplus
+      read exactly (36.79/35.73). Next (design branch): a configuration testing the transfer of the resonance''s level, its
+      own design.'
   step_waits:
     '25': FA-ccin2p3-d34fae85
   handoff:
