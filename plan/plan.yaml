@@ -34004,6 +34004,12 @@ entries:
     units: null
     start: '2026-11-26T03:12:25+00:00'
     at: '2026-11-26T03:12:25+00:00'
+  - batch: fairnlo_smoke_parent
+    wall_h: 0.3
+    jobs: 1
+    units: null
+    start: '2026-11-26T06:50:11+00:00'
+    at: '2026-11-26T06:50:11+00:00'
   ask: 'Scope: the two step-22 tt one-loop searches (div-form inputs, ReZero layers) lost their first random wave of 6 to
     CC''s full disk and the old driver released wave 2 from failure penalties, so each has 11 effectively random trials and
     5 guided against the design''s 6 and 10. A: accept 11 random + 5 guided. B: add 5 guided trials to each (about 6 GPU-h),
