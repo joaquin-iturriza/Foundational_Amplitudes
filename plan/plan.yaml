@@ -42146,14 +42146,6 @@ entries:
       job_llm_score.sh EVENTS=1 ONLY=heldout; read factor_split.py on gg->ttX and gg->tbW, heldout_per_process.py all parts,
       error_split.py against the control. Prior: results.tex l.9373-9426 (off-shellness adopted, ~50x in-distribution), l.10855,
       kit_benchmark off arms (D418), none on held-out new families. Its design and design review first.'
-    22: 'D566 resumed (Joaquin 2026-11-25 ''I believe there is a way to marry these two ideas''; dead ends A and B ended two
-      attempts, not the work): attempt after attempt of a per-event, sampling-independent use of process and diagram information
-      that keeps the per-process diagram regressor''s level skill on the 43 new families (median level error 0.047). Attempt
-      C: the regressor''s descriptors and network with a sampling-independent target, the per-process conditional-mean form
-      log|M|^2 = c_p + b_p.(x - x0) over per-event invariants (log s_hat, Lmin - log s_hat, soft sum E, optionally the diagrams''
-      log P), x0 a constant of the method; prediction per event c^ + b^.(x - x0); judged on the full pools and on the same
-      processes re-sampled exactly by window/cut restriction (s_hat below/above median, harder Lmin cut, singular fifth) against
-      the regressor''s constant level. CPU job on CC from the memmap base caches (perevent_level.py --anchored).'
     23: 'Joaquin 2026-11-26 ''can you also redo the plots that show the true vs predicted distributions with the bias removed?'':
       shape_dists.py redrawn with the final arm set of heldout_per_process.py @2fc2f1076 (a_trial5, level_file, c_best; same
       names/colours/markers), families as before; level_file''s per-event CSV from REREAD FA-ccin2p3-2461cbe0 (job_llm_score.sh
@@ -42426,16 +42418,6 @@ entries:
       - 'split gone and new-set shape/level better: the input''s sign misleads on new families; report, then the fix question
         (e.g. |o| only) to Joaquin'
       - 'split stays: the input is not the cause; report, next candidate the diagram encoder'
-    22:
-      feeds: 'D566: a per-event, sampling-independent level from process and diagram information that keeps the level gain
-        on new families'
-      if:
-      - 'C keeps the level (new median <= 0.094) and beats the constant on the re-sampled subsets beyond 2 bootstrap sd: report
-        it to Joaquin with numbers; next: carry it into a training run (the per-event c^+b^.x as the level the network''s
-        target is taken against, in place of the level file), its own design'
-      - 'C loses the level or does not beat the constant on the subsets: read why from its own diagnostics (_fit floor, _trueb:
-        slope vs level), record the attempt, design the next (nonlinear per-event form, anchored network target, or a different
-        anchor) and go on'
     23:
       feeds: 'Joaquin''s request 2026-11-26: bias-removed true vs predicted distributions with the final arm set'
       if:
@@ -43355,7 +43337,6 @@ entries:
     '15': FA-ccin2p3-1b0cbd8a
     '21': FA-ccin2p3-1b0cbd8a
     '23': FA-ccin2p3-2461cbe0
-    '22': FA-ccin2p3-444f056d
   handoff:
     state: 'Part (a) DONE, part (c) DONE, step 19 DONE, step 16 DONE (read 2026-11-26: level-file arm new-family median MSE
       0.309 vs trial 5 1.144, post-hoc 0.577, LLM 0.940; bias^2 0.122 vs given 0.096: kept by the design''s 1.38x, MSE drop
