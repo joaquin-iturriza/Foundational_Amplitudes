@@ -28637,7 +28637,7 @@ entries:
     agent: aca73c11d45c78e03
     state: working
     since: '2026-11-26T14:19:39+00:00'
-    state_at: '2026-11-26T14:19:39+00:00'
+    state_at: '2026-11-26T14:20:26.553000+00:00'
     context: 71212
     context_at: '2026-11-26T14:20:41+00:00'
   findings:
