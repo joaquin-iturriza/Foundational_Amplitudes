@@ -29875,7 +29875,7 @@ entries:
       - 'pretrained A2 beats scratch A2 on uug/uugg hard bins: report'
       - 'not: report as level/loses'
   step_waits:
-    '24': step 20's real fair-NLO parent run (tag kit_fairnlo_a2, not yet submitted)
+    '24': FA-lxplus-828d67d6
     '20': FA-ccin2p3-3895a2a7 FA-ccin2p3-e0587622
     '27': FA-ccin2p3-5c3fb7fa (read the CC CPU job ccj_03dedf7197c8 of kit_bakar_figs collect -> kit_bakar_figs_a2.json when
       it wakes)
