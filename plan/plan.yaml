@@ -29705,6 +29705,16 @@ entries:
       0-10), as the previous owner dropped the EW one-loop pools. Old smoke dir cannot be removed by hand: new tag kit_fairnlo_a2_smoke2,
       smoke FA-lxplus-fc131d66; arm smokes read runs/data_saving/dsave_parent_finale_kit_fairnlo_a2_smoke2; the real parent
       keeps tag kit_fairnlo_a2. Chain on lxplus (data only there).'
+  - at: '2026-11-26T09:33:27+00:00'
+    text: '2026-11-26 ~10:35. Step 20 arm smokes all broke at init (E9493/E9494; DeepSeek triage did not answer, logs read):
+      FT FA-lxplus-0c10620e and SCR-A2 FA-lxplus-89c91852 on fit_affine_multiplicity''s assert (one target process = one multiplicity,
+      data.affine_multiplicity_std inherited from the A2 parent); V/B FA-lxplus-3805efe5 on Hydra (data.target_over_born absent
+      from the parent''s saved config). Fixed @9921db7f4: experiment.py takes the shared standardization at one multiplicity
+      (identical to the affine fit there), fairnlo_arms.py passes ++data.target_over_born; smokes resubmitted as tags *_smoke2:
+      FA-lxplus-2149304f (FT), FA-lxplus-9fc1e04e (SCR-A2), FA-lxplus-35ac6ab5 (V/B), step 20 waits on them. Step 22: driver
+      kit_hpo_tt_divform_rezero had stalled since ~05:35 (site submit now refuses without --disk-gb; 776 failed submits; divform
+      10/16 observed + 1 retry, rezero 9/16 + 2 retries); drive.py --disk-gb @86115d2d5 (trial peak ~40 MB: runs/kit_hpo_ttvirt_thr_*
+      on CC 643/665 MB over ~17 dirs), driver relaunched with --disk-gb 0.1 (log ~/.local/share/ccorch/detached/20261126-103246_kit_hpo_tt_divform_rezero.log).'
   step_why:
     20:
       feeds: the KIT NLO statement in the draft
