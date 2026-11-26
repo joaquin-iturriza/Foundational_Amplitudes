@@ -47036,6 +47036,32 @@ entries:
       sd <- measured noise: the event bootstrap in the job (step 17''s shift_flat_sd 0.026-0.037); 3 of 4 subsets <- measured:
       oracle_const''s own subset error is reported beside, one subset may sit inside the noise where the constant''s sampling
       cost is small'
+    fix_at: '2026-11-26T18:45:46+00:00'
+    fix: 'Check 3 (seeds against the measured spread): the network''s seed spread for this very level error is measured and
+      the design ignores it: docs/results.tex l.8510-8514 (D83, norm_explore4.py) gives the diagram regressor''s 0.045 as
+      one draw; ten ensembles of three seeds give median 0.087, range 0.016 to 0.19. Attempt C is one 3-seed ensemble (seeds
+      0-2) read against that single lucky draw (0.047) with a bar of 0.094, so seed alone can put C on either side of the
+      bar, and its event bootstrap (predictions fixed) does not see this noise. Fix: read C (each variant) over the same ten
+      3-seed ensembles as norm_explore4 (a CPU cost, an existing read of the reference to match, so it is the investigation''s
+      own work under D566; if you judge it a seed change against a sibling, ask Joaquin instead) and compare its median and
+      range against the regressor''s 0.087 (0.016-0.19), or state why one draw suffices. Check 4 (outcome and sources): (i)
+      0.094 is sourced as ''2x the regressor''s 0.047'' from a 1.47x spread between two level definitions; 1.47 does not give
+      2. Re-base the ''level kept'' bar on the measured ensemble spread above (e.g. C''s ensemble median within the regressor''s
+      10-ensemble range or not above its median 0.087 by more than its spread) and cite l.8513. (ii) ''3 of 4 subsets'' has
+      no source giving that count; give a measured number (oracle_const''s or the regressor''s subset error against its bootstrap
+      sd per subset, from existing data or stated as read first in the job) or require all 4. (iii) the yes for ''holds when
+      the same process is sampled another way'' (Joaquin D566: ''this has to perform correctly in individual events regardless
+      of that'') only asks C to beat the regressor''s constant on each subset; a constant is known to shift on a half-split
+      (it moves by about the within-pool correlation times 0.8 sigma), so a variant with e_all 0.09 and e_s_lo 0.4 against
+      the constant''s 0.6 would read as sampling-independent while missing his aim. Add to the yes that the variant''s level
+      is also kept on each subset (e_S within the level-kept bar, or e_S - e_all within 2 bootstrap sd), with the _fit floor
+      beside it. Passing as is: check 0 (one CPU job, cheap), 1 (same events, network, descriptors, folds; only the target
+      form moves), 2 (perevent_level_mlp.json: shift_flat constant 0.176 sd 0.037 vs per-event map 0.084, norm_explore3.json
+      0.0447 vs 0.0658 confirmed; caches 99c164da.../b39fc80c.../train55296_val10000_test10000 present on CC, 16 GB free on
+      /sps), 5 (searched anchored, conditional mean, intercept, per-process slope, c_p, sampling-independent, per-event level,
+      window restriction in results.tex and plan.yaml: found the hybrid reference scale c_p (l.5820) and catalog_v4 kshot
+      affine t=a+bq (plan), neither the same question), 8 (x0/scales from training events, subsets used only to score), 9-19
+      not applicable or hold (no training, no sweep, test events are the pools'' first 2000 at generator default).'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
