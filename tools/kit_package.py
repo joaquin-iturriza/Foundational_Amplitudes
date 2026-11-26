@@ -56,8 +56,10 @@ is scored. Each run is rebuilt on its own statistics from the benchmark's bulk_t
 recipe), which needs KIT_HARDPS_DIR.
 Reproducibility: a prediction depends on the event alone (read in its own frame, no augmentation; the frames'
 degeneracy regularization uses noise that is a function of the particle, not of a random generator). CPU threads are
-pinned to 1 (KIT_THREADS), at which the package on CPU reproduces our predictions (made on GPU) exactly: the
-asymptotic-factor models move with the thread count (at 4 threads by up to 5.5e-3 in log10 on ee_tt's Sudakov bins,
+pinned to 1 (KIT_THREADS). CPU and our GPU predictions differ by rounding: our own
+predictions (made on GPU) differ from the CPU ones by up to 2.6e-5 (ee_uug), 6.6e-5 (ee_uugg) and, on ee_tt, 2e-4 (bulk),
+4.9e-4 (threshold) and 5.5e-3 (Sudakov bins) in log10.
+The asymptotic-factor models move with the thread count (at 4 threads by up to 5.5e-3 in log10 on ee_tt's Sudakov bins,
 4.9e-4 at threshold, 2.6e-5 on ee_uug), a rounding sensitivity well below their errors there.
 """
 README_STANDALONE = """FA surrogates of e+e- -> u u~ g, e+e- -> u u~ g g (|M|^2) and e+e- -> t t~ one-loop virtual (finite part)
@@ -99,6 +101,16 @@ def cfg_of(run):
     return yaml.safe_load(open(os.path.join(run, "config.yaml")))
 
 
+PLACEHOLDER = "@PKG_DIR@"   # cmd_relocate replaces the config's base_dir string by the package's own path
+
+
+def _anonymize(p):
+    """Replace the build machine's base_dir in a copied config.yaml by PLACEHOLDER (no site path ships)."""
+    txt = open(p).read()
+    old = re.search(r"^base_dir: (.*)$", txt, re.M).group(1).strip()
+    open(p, "w").write(txt.replace(old, PLACEHOLDER))
+
+
 def cmd_build(a):
     out = os.path.abspath(a.out)
     assert not os.path.exists(out), f"{out} exists"
@@ -123,6 +135,7 @@ def cmd_build(a):
         best = [p for p in (os.path.join(run, "models", "model_run0_best.pt" + x) for x in ("", ".gz")) if os.path.exists(p)]
         assert best, f"{run}: no best checkpoint"
         shutil.copy2(best[0], os.path.join(dst, "models"))
+        _anonymize(os.path.join(dst, "config.yaml"))
         cfg = cfg_of(run)
         rec = os.path.expandvars(cfg["data"]["processes_file"])
         os.makedirs(os.path.join(out, "runs", "kit", "recipes"), exist_ok=True)
@@ -141,7 +154,7 @@ def cmd_build(a):
     open(os.path.join(out, "sites", "sites.yaml"), "w").write("{}\n")
     if a.standalone:
         _standalone(out, models)
-    json.dump({"commit": commit, "models": models, "built_from": ROOT}, open(os.path.join(out, "models.json"), "w"), indent=1)
+    json.dump({"commit": commit, "models": models}, open(os.path.join(out, "models.json"), "w"), indent=1)
     open(os.path.join(out, "README.txt"), "w").write(README_STANDALONE if a.standalone
                                                      else README.format(name=os.path.basename(out), tol=TOL))
     subprocess.run(["tar", "czf", out + ".tar.gz", "-C", os.path.dirname(out), os.path.basename(out)], check=True)
@@ -307,13 +320,13 @@ def _check_all(a, meta, env, pkg, worst):
     for m in meta["models"]:
         if a.only and m["run"] not in a.only:
             continue
-        own = os.path.join(meta["built_from"], "runs", "kit", m["run"], "kit_benchmark", "predictions.h5")
+        own = os.path.join(ROOT, "runs", "kit", m["run"], "kit_benchmark", "predictions.h5")
         # --n 0: the benchmark file itself, every event (the pool the job predicted)
         small = _subset(kh.h5_path(m["file"]), os.path.join(env["SCRATCH"], f"{m['run']}_first{a.n}.h5"), a.n) \
             if a.n else kh.h5_path(m["file"])
         out = os.path.join(env["SCRATCH"], m["run"])
         # --repo: the repository's own code on the original run dir (code drift since the predictions vs a package defect)
-        src = meta["built_from"] if a.repo else pkg
+        src = ROOT if a.repo else pkg
         subprocess.run([sys.executable, "tools/kit_predict.py", f"runs/kit/{m['run']}", "--h5", small, "--out", out],
                        cwd=src, env=dict(env, PYTHONPATH=src, **({"OMP_NUM_THREADS": str(a.threads), "KIT_THREADS": str(a.threads)}
                                                        if a.threads else {})),
