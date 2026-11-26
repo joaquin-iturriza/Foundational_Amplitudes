@@ -196,8 +196,8 @@ def plot(path, figs):
 
     # slide 7: uugg g->gg azimuth
     az = d["ee_uugg_me2"]["azimuth"]
-    fig, axs = ps.figure(ncols=3)    # the third cell holds the legend: inside a panel it covered the curves
-    panels = [(fig, x) for x in axs[:2]]
+    fig, axs = ps.figure(ncols=2)
+    panels = [(fig, x) for x in axs]
     (f1, a1), (f2, a2) = panels
     ev = next(v for v in az.values() if abs(v["y"] - 1e-5) < 1e-9)["event"]
     a1.plot(ev["phi"], ev["truth"], "-", color="k", lw=2, label="MadGraph truth")
@@ -215,12 +215,12 @@ def plot(path, figs):
         a2.plot(y, [np.median(v["rms"][lab]) for v in rows], mk, color=c, label=NAME.get(lab, lab))   # true values, no floor
     a2.set_xscale("log"); a2.set_yscale("log")
     a2.set_xlabel(r"collinearity $y=s_{gg}/s$"); a2.set_ylabel(r"rms over events of $h$")
-    ps.legend_cell(axs[2], [a1, a2], fontsize=ps.LEGEND_MIN_PT)
+    leg(a2, [a1, a2], ncol=2)   # one column covered the curves (make_room's growth cap)
     print("FIGURE", ps.save(f1, os.path.join(figs, "slide7_uugg_azimuth")))
 
     # slide 8: log-MSE per stratum, bulk dotted (ours from kit_result.json, his from his evaluate.py files)
-    fig, axs = ps.figure(ncols=3)    # the third cell holds the legend: inside a panel it covered the curves
-    panels = [(fig, x) for x in axs[:2]]
+    fig, axs = ps.figure(ncols=2)
+    panels = [(fig, x) for x in axs]
     for (fig, ax), proc, f, xl in zip(panels, ("ee_uugg_me2", "ee_tt_virt_finite"), ("soft_x", "threshold_beta"),
                                       (r"soft gluon in $u\bar ugg$: $x=2E_g/\sqrt{s}$",
                                        r"$t\bar t$ virtual at threshold: $\beta$")):
@@ -240,21 +240,21 @@ def plot(path, figs):
         ax.set_yscale("log"); ax.set_ylim(lo / 3, None)     # the bulk lines are inside the axes, as on his slide
         ax.set_xscale("log"); ax.set_xlabel(xl); ax.set_ylabel("log-MSE per bin")
     # one legend over both panels: every label of either (uugg and tt carry different MLP arms)
-    ps.legend_cell(axs[2], list(axs[:2]), fontsize=ps.LEGEND_MIN_PT)
+    leg(axs[1], axs, ncol=2)   # one column covered the curves (make_room's growth cap)
     print("FIGURE", ps.save(fig, os.path.join(figs, "slide8_logmse")))
 
     # slide 9: the summary table
     print(summary(d))
 
 
-def leg(ax, axes):
+def leg(ax, axes, **kw):
     """one legend inside `ax` holding every label of `axes` once"""
     import plot_style as ps
     hl = {}
     for a in axes:
         for h, l in zip(*a.get_legend_handles_labels()):
             hl.setdefault(l, h)
-    ps.legend(ax, handles=list(hl.values()), labels=list(hl))
+    ps.legend(ax, handles=list(hl.values()), labels=list(hl), **kw)
 
 
 def edges(stratum):
