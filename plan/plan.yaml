@@ -28507,6 +28507,8 @@ entries:
     state: working
     since: '2026-11-26T02:04:32.890000+00:00'
     state_at: '2026-11-26T02:04:32.890000+00:00'
+    context: 223429
+    context_at: '2026-11-26T02:18:58+00:00'
   findings:
   - at: '2026-11-10T03:33:04+00:00'
     text: 'Data: KIT package (888 MB tar, 2.7 GB with the tar) on CC at $DATA_DIR/kit_hardps/hardps_benchmark (fetched by
