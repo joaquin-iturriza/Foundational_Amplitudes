@@ -37,6 +37,7 @@ sys.path.insert(0, os.path.join(ROOT, "analysis", "catalog_v4"))
 import stats_net as sn  # noqa: E402
 from dipole_residual import log_prop, mdot  # noqa: E402
 from sklearn.ensemble import HistGradientBoostingRegressor  # noqa: E402
+from sklearn.linear_model import RidgeCV  # noqa: E402
 from sklearn.model_selection import GroupKFold  # noqa: E402
 from sklearn.neural_network import MLPRegressor  # noqa: E402
 from sklearn.preprocessing import StandardScaler  # noqa: E402
@@ -222,6 +223,12 @@ def mmap_pools(dirs):
 # events are drawn with another density over x), and the network maps (process, diagrams) -> (c_p, b_p). Prediction
 # per event: c^ + b^ . (x - x0).
 ANCH = {"C_s": ("L",), "C_sqE": ("L", "q", "E"), "C_sqEP": ("L", "q", "E", "logP")}
+# D566 attempt D (--anchor process): the same form at a process-intrinsic anchor x0_p = a ridge map (RidgeCV on the
+# standardized process + diagram descriptors) of the training processes' median x, cross-fitted by relabelling class on
+# them and fitted on all of them for the held-out: a function of the process alone, so c_p is the level at the
+# process's own typical point (little leverage) and no statistic of the scored dataset enters. *_own (x0_p = the pool's
+# own median, a statistic of the scored pool) is a diagnostic of the anchor map's error only.
+ANCH_D = {"D_s": ("L",), "D_sqE": ("L", "q", "E"), "D_s_own": ("L",), "D_sqE_own": ("L", "q", "E")}
 SUBSETS = ("all", "s_lo", "s_hi", "q_hard", "q_soft")
 NENS = 10
 
@@ -244,7 +251,8 @@ def anchor_fit(X, y, lam=1e-3):
     return np.concatenate([[ym - xm @ b], b])
 
 
-def anchored(D, tr, ho, new, rel, meta, grp, pfeat, lev, events, nboot=30):
+def anchored(D, tr, ho, new, rel, meta, grp, pfeat, lev, events, nboot=30, mode="global"):
+    ANCH = globals()["ANCH"] if mode == "global" else ANCH_D
     rng = np.random.default_rng(0)
     Xs = rng.normal(size=(500, 2)); assert np.allclose(anchor_fit(np.column_stack([Xs, np.ones(500)]),
                                                                  1.5 + Xs @ [2.0, -1.0], 1e-9), [1.5, 2, -1, 0], atol=1e-6)
@@ -271,12 +279,36 @@ def anchored(D, tr, ho, new, rel, meta, grp, pfeat, lev, events, nboot=30):
                       for r in seeds], 0).reshape(len(ho), -1) * ts + tm
         return {**dict(zip(tr, cf)), **dict(zip(ho, hp))}
 
+    def anchor_map(med):  # x0_p from the process alone: cross-fit on train, full fit for the held out
+        a = np.zeros((len(D), med.shape[1]))
+        it = {n: i for i, n in enumerate(D)}
+        itr, iho = [it[n] for n in tr], [it[n] for n in ho]
+        def fit(i):
+            sc = StandardScaler().fit(Xp_tr[i])
+            return sc, RidgeCV(alphas=np.logspace(-3, 3, 13)).fit(sc.transform(Xp_tr[i]), med[i])
+        for i, j in GroupKFold(5).split(Xp_tr, med, grp):
+            sc, r = fit(i)
+            a[np.array(itr)[j]] = r.predict(sc.transform(Xp_tr[j])).reshape(len(j), -1)
+        sc, r = fit(np.arange(len(tr)))
+        a[iho] = r.predict(sc.transform(Xp_ho)).reshape(len(ho), -1)
+        return {n: a[it[n]] for n in D}
+
     X, T = {}, {}
     for tag, cols in ANCH.items():
         allx = np.concatenate([np.column_stack([D[n][c] for c in cols]) for n in tr])
         x0, sx = np.median(allx, 0), allx.std(0)
+        own = {n: np.median(np.column_stack([D[n][c] for c in cols]), 0) for n in D}
+        if mode == "global":
+            x0p = {n: x0 for n in D}
+        elif tag.endswith("_own"):
+            x0p = own
+        else:
+            x0p = anchor_map(np.array([own[n] for n in tr]))
+            out.setdefault("anchor_err", {})[tag] = {   # the map's miss of the pool's own median, in units of sx
+                g: np.median(np.abs((np.array([x0p[n] for n in ns]) - np.array([own[n] for n in ns])) / sx), 0).tolist()
+                for g, ns in (("new", new), ("train_crossfit", tr))}
         out.setdefault("anchor", {})[tag] = {"x0": x0.tolist(), "scale": sx.tolist()}
-        X[tag] = {n: (np.column_stack([D[n][c] for c in cols]) - x0) / sx for n in D}
+        X[tag] = {n: (np.column_stack([D[n][c] for c in cols]) - x0p[n]) / sx for n in D}
         T[tag] = {n: anchor_fit(X[tag][n], D[n]["y"]) for n in D}
         pred[tag + "_fit"] = {n: T[tag][n][0] + X[tag][n] @ T[tag][n][1:] for n in D}   # the form's own floor
     sub = {n: subsets(D[n]) for n in D}
@@ -291,7 +323,11 @@ def anchored(D, tr, ho, new, rel, meta, grp, pfeat, lev, events, nboot=30):
 
     # ten 3-seed ensembles (seeds 3k..3k+2), as norm_explore4's read of the regressor (results.tex l.8510-8514: its
     # 0.045 is one draw, ten ensembles median 0.087, 0.016 to 0.19); regressor_ens = the same network on the pool mean
-    ens = {c: [] for c in ["regressor_ens"] + list(ANCH) + [t + "_trueb" for t in ANCH]}
+    ens = {c: [] for c in ["regressor_ens"] + list(ANCH) + [t + "_trueb" for t in ANCH]
+           + ([t + "_bcls" for t in ANCH] if mode != "global" else [])}
+    # attempt D: slopes shrunk fully to the mean true slope of the training processes with the same multiplicity
+    bcls = {t: {k: np.mean([T[t][n][1:] for n in tr if meta[n]["n_out"] == k], 0) for k in {meta[n]["n_out"] for n in tr}}
+            for t in ANCH}
     ybar = np.array([[D[n]["y"].mean()] for n in tr])
     for k in range(NENS):
         seeds = range(3 * k, 3 * k + 3)
@@ -300,6 +336,8 @@ def anchored(D, tr, ho, new, rel, meta, grp, pfeat, lev, events, nboot=30):
             Th = net_fit(np.array([T[tag][n] for n in tr]), seeds)
             P[tag] = {n: Th[n][0] + X[tag][n] @ Th[n][1:] for n in D}
             P[tag + "_trueb"] = {n: Th[n][0] + X[tag][n] @ T[tag][n][1:] for n in D}   # level predicted, slopes true
+            if mode != "global":
+                P[tag + "_bcls"] = {n: Th[n][0] + X[tag][n] @ bcls[tag][meta[n]["n_out"]] for n in D}
         for c, pc in P.items():
             ens[c].append({g: {s: float(np.median([e_of(pc, n)[s] for n in ns])) for s in SUBSETS}
                            for g, ns in (("new", new), ("train_crossfit", tr))})
@@ -338,7 +376,8 @@ def anchored(D, tr, ho, new, rel, meta, grp, pfeat, lev, events, nboot=30):
     out["families"] = {c: {g: {s: float(np.median([R[c][n][s] for n in ns])) for s in SUBSETS} | {"n": len(ns)}
                            for g, ns in fams.items()} for c in cands}
     out["per_process_new"] = {meta[n]["process"]: {c: R[c][n] for c in cands} for n in new}
-    json.dump(out, open(os.path.join(HERE, "data", "perevent_anchored.json"), "w"), indent=1)
+    json.dump(out, open(os.path.join(HERE, "data", "perevent_anchored" + ("" if mode == "global" else "_D") + ".json"), "w"),
+              indent=1)
     for c in cands:
         print(c, {g: {s: round(v, 4) for s, v in summ[c][g].items() if s != "boot_sd"} for g in ("new", "relabels")})
 
@@ -351,6 +390,8 @@ def main():
     ap.add_argument("--mmap", nargs="+", help="read each process's first train-role events from these memmap base "
                     "caches (data_mmap: <key>/<depth> dirs) instead of $SCRATCH/amp_data_cache's pools")
     ap.add_argument("--anchored", action="store_true", help="D566 attempt C, output data/perevent_anchored.json")
+    ap.add_argument("--anchor", choices=("global", "process"), default="global", help="--anchored's x0: one constant "
+                    "(attempt C) or a process-intrinsic x0_p (attempt D, output data/perevent_anchored_D.json)")
     ap.add_argument("--search", type=int, default=0, help="step 20: DyHPO GP trials on the content-signature "
                     "cross-fit (1 network seed per fit), then the best read as candidate B[_mlp]_tuned")
     a = ap.parse_args()
@@ -398,7 +439,7 @@ def main():
         return np.array(f, float)
 
     if a.anchored:
-        return anchored(D, tr, ho, new, rel, meta, grp_p, pfeat, lev, a.events)
+        return anchored(D, tr, ho, new, rel, meta, grp_p, pfeat, lev, a.events, mode=a.anchor)
     global CANDS
     if a.model == "mlp":
         CANDS = CANDS[:-1] + ("B_mlp",)
