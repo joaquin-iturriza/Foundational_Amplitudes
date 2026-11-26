@@ -50,7 +50,7 @@ ARMS = {"a_trial5": ("LLoCa, same setup as LLM", ps.C.blue, "o"),
         "b_h32": ("his setup, 32 heads", ps.C.purple, "v"),
         "b_h64": ("his setup, 64 heads", ps.C.vermillion, "s"),
         "b_h120": ("his setup, 120 heads", ps.C.yellow, "P"),
-        "level_file": ("LLoCa, same setup as LLM + diagrams to remove bias", "#17BECF", "d"),
+        "level_file": ("LLoCa, same setup as LLM\n+ diagrams to remove bias", "#17BECF", "d"),
         "c_control": ("our setup, control", ps.C.green, "<"),
         "c_best": ("LLoCa + new preprocessing", ps.C.orange, "^"),
         # --part bias only (level_source.py): a small network's level error from the process alone, no events
