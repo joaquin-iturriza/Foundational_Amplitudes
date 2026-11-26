@@ -47369,6 +47369,48 @@ entries:
       job finished well inside the 3 h limit. Searched for: anchor map, anchor, phase-space median, reference median, attempt
       E, HistGradientBoosting, kinematic descriptor in docs/results.tex, plan.yaml and site decisions, plus the entry''s dead
       ends A-D. Nothing found beyond attempts C and D (the matches are the unrelated e+e- collider anchor).'
+  - at: '2026-11-26T22:50:01+00:00'
+    question: 'Step 15 (D564, Joaquin: ''despite the llm being so much worse at training and at relabels, it seems to extrapolate
+      better, we should understand why this is the case''): the pooled new-set gap to the LLM is carried by g g > t b~ w-
+      / g g > b t~ w+ (our searched best MSE 36.8/35.7, bias -5.66/-5.58, against the LLM''s 2.2/2.5), and on them the internal
+      top''s off-shellness explains 0.81 of the error''s variance (eta2, data/c_best_factor_split.json) with no monotone trend
+      (spearman 0.11): is the error the near-pole region (the s-channel/decay top on its shell), given that the same network
+      has the trained q q~ initial-state twins (same final state, same reachable pole) right to MSE 0.0011-0.0022? Yes: the
+      gap is the transfer of a resonance''s level from q q~ to the new g g initial state, the question that a configuration
+      of ours can then test; no: the pole is not the carrier and the gap stays a level question (step 16''s level file, D566).'
+    prior: 'Step 15 findings 2026-11-25 (plan llm_compare): the new-set error is a misplaced level (pooled bias^2 share 0.85-0.89),
+      the gg->tbW pair carries the pooled gap (without it new 1.42-1.71 vs LLM 1.17), level and shape both wrong on the pair
+      (rho -0.12/-0.11 in our setup); the LLM''s median level error on the 43 new 0.231 vs our control 0.209 and his-setup
+      8 heads 0.86. Step 16 level file: new median MSE 0.309 (LLM 0.94) but the pair worse (44.4/40.6), bias -6.39/-6.09 vs
+      the given level''s -3.81. Step 22 (no off-shellness input, FA-ccin2p3-1b480869): pair bias^2 43.8/42.1 vs 30.7/32.1,
+      the input does not drive it; on g g > t t~ h d depends on |off-shellness| on both pole sides (eta2 0.565). This design
+      differs: the pair''s error against the top''s off-shellness in 2D, beside its trained q q~ twins (never read per event).
+      Searched docs/results.tex (sec:llmcmp), plan llm_compare and site decisions for ''tbW'', ''tbxwm'', ''resonan'', ''pole'',
+      ''twin'', ''initial state'': nothing beyond the above.'
+    measure: factor_split.py @HEAD (TBW panels) on the held-out per-event CSV of the searched best (FA-ccin2p3-29ce8950, runs/llmcmp_c_qperp/trial_1860/llm_events_heldout.csv
+      on CC, the 2026-11-26 21:54 re-read with offshell_<pdg> columns, first 5000 test events per process), a CPU job on CC
+      (site run --job), output data/c_best_factor_split.json rewritten with the 2D histogram and the binned mean of d = pred
+      - true of log|M|^2 in 20 quantile bins of offshell_6 for g g > t b~ w- and g g > b t~ w+ (all other numbers unchanged
+      by construction). Figure factor_split --fig --panels tbw --x offshell_6.
+    check: 'Existing data: data/c_best_factor_split.json (same run, held-out CSV): eta2 of d on offshell_6 0.815 / 0.806 on
+      the gg pair against 0.0 for offshell_25 and 0.05 for log F: the measure separates by the internal top; the pair''s two
+      2-means groups (72% at d ~ -6.7, 28% at -2.8, separation 3.0) are what the binned mean will place on the off-shellness
+      axis.'
+    fixed: The run (searched best of part (c), its checkpoint and shared statistics), its test events (first 5000 per process),
+      the off-shellness input as the run computes it, factor_split's statistics and bins. No training.
+    control: 'The trained q q~ twins (u u~, d d~, s s~, c c~ > t b~ w- / b t~ w+: same final state, the pole reachable) read
+      by the same run: seen MSE of log|M|^2 0.0011-0.0022 (data/c_best_seen.json, tools/llm_score.py), so their error is below
+      0.05 in every region; beside them the held-out g g > t t~ X processes already histogrammed (figs/c_best_factor_split_offshell_6.png).'
+    seeds: One run (seed 42), as every arm of the entry; the per-event read has no seed; 5000 events per process (bin-mean
+      noise from the 2D histogram counts).
+    outcome: 'Yes (pole carries the gap): on the gg pair the binned mean of d within the bins nearest the pole (|offshell_6|
+      smallest fifth) is below -3 while elsewhere it is within 2 of 0,: report to Joaquin with the figure; next a configuration
+      that tests the transfer (its own design: e.g. the pole''s level given per event, D566''s per-event level). No (a): the
+      gg pair''s d is flat in the off-shellness (no bin set differs from the rest by more than 2): the pole is not the carrier;
+      the gap stays the pair''s level (step 16, D566).'
+    sources: '-3 and within 2 of 0 <- measured: the pair''s two 2-means groups at d = -6.7 and -2.8 (data/c_best_factor_split.json),
+      a bar halfway to the low group and its sd 2.2 (sd_d); smallest fifth <- attempt C/D''s singular-fifth subset convention
+      (perevent_level.py subsets)'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
