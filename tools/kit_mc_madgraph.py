@@ -226,8 +226,8 @@ def cmd_figure(a):
     import plot_style as ps
     ps.use()
     d = json.load(open(a.json))
-    panels = ps.panels(2)
-    (f1, a1), (f2, a2) = panels
+    fig, axs = ps.figure(ncols=2, nrows=2)
+    (a1, a2), (a3, cell) = axs
     runs = sorted(d, key=lambda k: d[k]["process"])
     lab = {"ee_uug": r"$e^+e^-\to u\bar ug$", "ee_uugg": r"$e^+e^-\to u\bar ugg$"}
     cols = [ps.C.blue, ps.C.vermillion, ps.C.green, ps.C.orange]
@@ -237,14 +237,26 @@ def cmd_figure(a):
                     [max(abs(x) for x in e["bias_band"]) - abs(e["bias"])]], fmt="o", color=cols[i], label=lab[e["process"]])
         a1.plot([i], [e["bias_stat"]], "_", color=cols[i], ms=14)
         x = [1 - float(q) for q in QS] + [1 / e["n"]]
-        a2.plot(x, [e["eps2"][str(q)] for q in QS] + [e["eps2"]["max"]], "o-", color=cols[i], label=lab[e["process"]])
+        a2.plot(x, [e["eps2"][str(q)] for q in QS] + [e["eps2"]["max"]], "o-", color=cols[i])
     a1.plot([], [], "_", color=ps.C.grey, ms=14, label="MC error")
     a1.set_yscale("log"); a1.set_xticks(range(len(runs)), [lab[d[k]["process"]] for k in runs])
     a1.set_ylabel(r"$|\hat\sigma/\sigma-1|$"); a1.set_xlim(-0.5, len(runs) - 0.5)
-    a2.set_xscale("log"); a2.set_xlabel(r"$1-q$ ($r_{\max}$ at the $q$-quantile of $r$; leftmost: the maximum)")
+    a2.set_xscale("log"); a2.set_xlabel(r"$1-q$")
     a2.set_ylabel(r"$\epsilon_2=\langle r\rangle/r_{\max}$")
-    a1.legend(); a2.legend()
-    ps.save_panels(panels, a.out)
+    if a.tt:   # the one-loop virtual: the threshold scan's exact quadrature per sqrt s (kit_threshold_scan collect)
+        t = json.load(open(a.tt))
+        b, vex = np.asarray(t["beta"]), np.asarray(t["sigma_v_exact"])
+        sv = t["surrogates"][a.tt_run]
+        a3.plot(b, np.asarray(sv["sigma_v"]) / vex - 1, "o-", color=ps.C.green, ms=3,
+                label=r"$t\bar t$ virtual: $\sigma[\hat V]/\sigma[V]-1$")
+        r = np.array([x if x is not None else np.nan for x in sv["ratio"]])
+        a3.plot(b, r, "s--", color=ps.C.orange, ms=3, label=r"$t\bar t$: $\hat\sigma_{\rm NLO}/\sigma_{\rm NLO}-1$")
+        a3.axhline(0, color="k", lw=0.8)
+        a3.set_xscale("log"); a3.set_xlabel(r"$\beta=\sqrt{1-4m_t^2/s}$"); a3.set_ylabel("relative bias")
+    else:
+        a3.set_axis_off()
+    ps.legend_cell(cell, [a1, a2, a3], fontsize=ps.LEGEND_MIN_PT)
+    print("FIGURE", ps.save(fig, a.out))
 
 
 def main():
@@ -257,7 +269,7 @@ def main():
     p.add_argument("run")
     m = sub.add_parser("metrics"); m.add_argument("--dir", required=True); m.add_argument("--out", required=True)
     m.add_argument("--boot", type=int, default=1000)
-    fg = sub.add_parser("figure"); fg.add_argument("json"); fg.add_argument("--out", required=True)
+    fg = sub.add_parser("figure"); fg.add_argument("json"); fg.add_argument("--out", required=True); fg.add_argument("--tt", help="the threshold scan's JSON (kit_threshold_scan collect)"); fg.add_argument("--tt-run")
     sub.add_parser("selfcheck")
     a = ap.parse_args()
     {"gen": cmd_gen, "predict": cmd_predict, "metrics": cmd_metrics, "figure": cmd_figure,
