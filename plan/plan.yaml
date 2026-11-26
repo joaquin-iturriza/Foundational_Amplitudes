@@ -29809,6 +29809,14 @@ entries:
       0.372 (31.1% negative), ee_mumu_ew_nlo 0.323 (66.2%), ee_uu_ew_nlo 0.180 (78.0%), 5000 val events each: untrained, the
       readout works. Arm smokes (_smoke4) placed by site pick: FT FA-ccin2p3-3895a2a7 and SCR-A2 FA-ccin2p3-e0587622 (smoke
       parent copied to CC by site copy, 32 MB), V/B FA-lxplus-abac4281.'
+  - at: '2026-11-26T14:09:42+00:00'
+    text: '2026-11-26 ~15:20. D573 export code (tools/kit_package.py build --standalone, check runs predict.py on examples
+      vs expected; tools/kit_predict.py refuses a V/B scoring without born) is written but UNCOMMITTED: the repo-reviewer
+      pillar (agent af95f6062fb15e7e4, lock held) returned FIX: (1) standalone check (fixed in the diff), (2) V/B born placeholder
+      (fixed in the diff), (3) sweep/drive.py --disk-gb required broke tests/test_drive_repick.py and tests/test_drive_sync_fail.py
+      (not fixed: mechanical-worker). Diff backup /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/kit_export_uncommitted.diff.
+      Next owner: fix (3), continue that reviewer with the fixes, on PASS commit tools/kit_package.py tools/kit_predict.py,
+      then the export''s design and CPU job (hand-off).'
   step_why:
     20:
       feeds: whether the fair one-loop fine-tune with sign-changing pools in beats scratch A2 and the V/B baseline on the
