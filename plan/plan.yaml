@@ -42101,6 +42101,19 @@ entries:
       CSV without offshell columns, factor_split --vars-from join) still to send on lxplus when a GPU there fits (pick sent
       1 h jobs to CC, where the smoke model is absent); the run''s scoring will be on CC with the baseline CSV on lxplus,
       so its factor_split join needs the CSV copied.'
+  - at: '2026-11-26T02:30:49+00:00'
+    text: '2026-11-26 step 19 readout (D567/D564): untuned his-setup control retrain FA-ccin2p3-0165aa58 scored by FA-lxplus-8516d84c
+      (job_llm_score.sh EVENTS=1, run copied to lxplus runs/llmcmp_a_adamw_const_cc/trial_9000), data @77f6a8741: data/split/control_heldout.json,
+      data/control_retrain_{seen,heldout}.json, data/events/control_heldout_events.csv (untracked, as the other arms''). Pooled
+      RMSE of log|M|^2 seen 0.154 / held out 1.381, against the first run FA-lxplus-cb9273f1''s 0.139 / 1.042 (data/control_{seen,heldout}.json,
+      kept for the MSE figure): same config and seed, validation best within 1.23x, but held-out per-process MSE retrain/first
+      median 1.89 (0.26-214 over 139): a same-setup rerun spread on held out about 1.8x, wider than the 1.38x width spread
+      used as margin in steps 13/14/16, not yet re-based. Untuned retrain vs tuned trial 5 (error_split.py @77f6a8741; medians):
+      new 43 MSE-bias^2 0.283 vs 0.287 (tuning does not change the level-removed shape error on new families), bias^2 2.99
+      vs 0.86 (3.5x, above the 1.9x rerun spread); relabels 96 MSE-bias^2 0.0458 vs 0.0143 (3.2x), bias^2 0.0092 vs 0.0013.
+      Figures redrawn with the untuned arm, beside *_before_untuned.{png,pdf}: figs/all_arms_bias_heldout_per_process.png,
+      figs/all_arms_shape_heldout_per_process.png, figs/shape_dists.png (two representative processes changed by the median-spread
+      rule: multi-H bbx_ahh -> uux_zhh, gg->Wqq'' gg_csxwm -> gg_udxwm).'
   step_waits:
     '8': FA-ccin2p3-1969f226 FA-ccin2p3-caf1170e
     '13': FA-ccin2p3-623a3af6
