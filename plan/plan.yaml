@@ -34432,6 +34432,17 @@ entries:
       maximum means the |M_hat|^2-adapted sampling reached tails the exact sample under-sampled. tt: bias per sqrt s and integrated
       over the window, against the flat-bulk 5.83e-4.'
     sources: D571, D574, D575; slide 11 of analysis/kit_benchmark/source/hardps_benchmark_slides.pdf
+    passed_at: '2026-11-26T16:45:10+00:00'
+    reviewer: 'Re-check of the 16:44 revision: job_kit_mc_madgraph.sh @723088fb6 exports KIT_THREADS=1 for surr and tt_bulk
+      before every step (gen check, served integrand, predict --surr, exact-sample re-score, tt predict), so the integrated
+      and the scored |M_hat|^2 are the same 1-thread predictor; outcome now reads sigma_hat/sigma-1 (~1.7e-3 error vs ~1.5e-3
+      effect, stated unresolving) as slide 11''s number and a wiring check (sigma_hat/sigma = E_exact[u] exactly; beyond 3
+      errors = KITSURR fault fixed first), resolved bias E_exact[u]-1 at 1 thread (5.2e-6 uug, 1.2e-4 uugg); wall time from
+      local serve stats (2.6 ms/eval, 141k evals per 2000 uug events) -> uug ~0.5 h, uugg ~1.2 h, tt_bulk ~0.2 h, limits 4:00/4:00/1:00,
+      700 MB x 32 serves < 64G. Measure moves: local surrogate run sigma_hat 0.12140+-0.00083 vs exact 0.121861, server =
+      kit_predict to 0; E[u]-1 differs across surrogates (-1.65e-3/-3.31e-3 flat). Searched results.tex for madevent, unweighting
+      effic, second-stage, slide 11, kit-mc, integrated virtual/correction, and the entry''s findings: prior covers sec:kit-mc
+      and the 19:00/02:59 findings. Serves Joaquin''s 2026-11-26 14:38/16:27 words and D571/D575.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
