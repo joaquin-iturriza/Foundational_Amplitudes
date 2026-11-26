@@ -48150,6 +48150,7 @@ entries:
       full) -> wait on the cc_disk owner''s freeing, then one resubmission'
     '1': steps 2 and 4
     '2': the notes-editor review of par:cbs_update (e05fc9e32), batched with the D563 write-up
+    '6': step 5 (par:cbs_horizon write-up) and the notes-editor pass
   targets:
   - batch: noise_smoke
     wall_h: 0.4
