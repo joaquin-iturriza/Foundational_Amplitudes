@@ -42412,6 +42412,11 @@ entries:
     blocks_steps:
     - 21
     - 23
+    answered_at: '2026-11-26T20:21:35+00:00'
+    decision: D589
+    withdrawn_at: '2026-11-26T20:21:35+00:00'
+    withdrawn_why: his 'Do whatever needs to be done' settles it; the sync block was fixed in our repo (61c2b9698), CC's file
+      untouched
   - ask: 'Permission classifier refusal: syncing our code to CC is blocked by an untracked file there, analysis/catalog_daniel/data/perevent_anchored.json,
       written by our own per-event job; the committed version must replace it. The fix is renaming CC''s copy to perevent_anchored.json.pre_sync
       (nothing deleted), which the permission classifier refused. OK to rename it?'
