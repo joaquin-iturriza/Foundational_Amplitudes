@@ -45821,9 +45821,9 @@ entries:
       it is'
   owner:
     agent: a5ba353786b0cf99d
-    state: working
+    state: stopped
     since: '2026-11-25T13:58:11.325000+00:00'
-    state_at: '2026-11-26T01:21:26.002000+00:00'
+    state_at: '2026-11-26T01:26:22.088000+00:00'
     context: 109797
     context_at: '2026-11-26T01:34:08+00:00'
   designs:
@@ -49382,9 +49382,9 @@ entries:
       goes into the D392 setup only below every trained momentum (coordinator, 2026-11-25)'
   owner:
     agent: a12f73f92c7b46127
-    state: working
+    state: stopped
     since: '2026-11-25T23:17:54.598000+00:00'
-    state_at: '2026-11-26T01:21:24.571000+00:00'
+    state_at: '2026-11-26T01:29:35.767000+00:00'
     context: 77446
     context_at: '2026-11-25T23:46:10+00:00'
   designs:
