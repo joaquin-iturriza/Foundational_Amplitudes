@@ -33445,6 +33445,19 @@ entries:
       @5555a0f0); 5x validation jump <- a measured spread: the ladder seeds'' blow-ups, jumps of five-fold or more between
       two validations against same-HP seed noise of 1.5x median (results.tex sec:ladder); 100 GPU-h <- D570 names this work
       (CLAUDE.md GPU budget)'
+    passed_at: '2026-11-26T02:29:00+00:00'
+    reviewer: 'Re-check after FIX. 47e14eae''s config.yaml on CC (dsave_parent_finale_zng_uq_w_lr1p89e-3_cc) confirms the
+      corrected list: shared_standardization true, affine_multiplicity_std false, target_physics_factor and orders true, input_soft_eps
+      1e-8, input_pair_logs 7, lr 1.89e-3, float32. The plain target is D570''s extrapolating configuration (A2). affine_multiplicity_std
+      (experiment.py ~2485: mu_N = a + bN, one sigma, which keeps A2''s one-std assert) is the draft''s multiplicity preprocessing,
+      already run at ladder rung 9 (tp3_jaff_r9, results.tex ~16604). Blow-up rerun rule stated, with 5x and half-lr sources.
+      V/B now runs on the parent''s config, differing from SCR-A2 only in the factor and the V/B target. Verdicts are per
+      D. Prior now names d0b132b6/03ea3719, D402, D425 (300 epochs at batch D/2 = 600 steps, below the D391 minima) and the
+      u u~ -> t t~ one-loop choice. The rate is read from the D=1e4 smoke before the arms are sized; upper bound <= 44 GPU-h,
+      under D570''s 100. Check 2: factor 3.55 -> 0.010 on the deepest Coulomb bin; fine-tune vs scratch 1.58-6.23 vs 0.82;
+      V/B 3.9x. Check 3: 1/7 and 7 against the test rerun spread 0.78-6.96, one seed (D315). Disk: /sps/lpnhe 17 GB free now.
+      Searched: fair_nlo, fair NLO, fairnlo, fair one-loop, family held out, shared/affine standardization, affine_multiplicity,
+      input_asym_factor, Bakar, 47e14eae, finale, jaff.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
