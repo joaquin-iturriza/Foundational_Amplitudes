@@ -48515,12 +48515,10 @@ entries:
     answered_at: '2026-11-25T01:01:32.066000+00:00'
     decision: D556
   owner:
-    agent: af74e499d5513dfe4
-    state: closed
-    since: '2026-11-25T00:05:14+00:00'
-    state_at: '2026-11-25T02:16:44.617000+00:00'
-    context: 288140
-    context_at: '2026-11-25T01:58:26+00:00'
+    agent: a7580c28f015ad776
+    state: working
+    since: '2026-11-26T03:33:13+00:00'
+    state_at: '2026-11-26T03:33:13+00:00'
   designs:
   - at: '2026-11-24T14:30:34+00:00'
     question: 'What uses CC''s /sps/lpnhe group space (512 GiB, 98% used, 15 GB free on 2026-11-24) inside our area where
