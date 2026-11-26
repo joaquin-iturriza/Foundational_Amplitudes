@@ -43385,6 +43385,23 @@ entries:
       export_for_suprio.zip 871,452 bytes, README lists all three models. Level-removed shape MSE-bias^2 (same setup / + diagrams
       / new preprocessing): gbx_bxhh 0.58/0.19/0.57, bbx_htamtap 0.85/0.18/0.057, scx_wpwmwm 0.48/0.28/0.50, ssx_zzz 0.081/0.018/0.13,
       gg_csxwm 0.071/0.078/0.006, gg_ttxz 0.34/0.37/1.07.'
+  - at: '2026-11-26T20:57:06+00:00'
+    text: '2026-11-26 step 21/22 read (D567/D564, passed design): no-off-shellness arm (FA-ccin2p3-1b480869, interactive held-out
+      re-read 21:35, data/split/c_nooffshell_heldout.json @d80fe0a55) against c_best (input on). gg->ttH: MSE-bias^2 0.681
+      vs 5.94 (8.7x lower, below the 2.97 bar), 2-means separation 3.57 vs 12.1 (<= 4: split gone), minority 15% vs 48%; d
+      against the joined internal-top off-shellness (baseline re-read on CC with offshell columns, 21:54, row join asserted
+      to 1e-4): eta2 0.565 (> 0.25), AUC 0.52, spearman 0.007: d depends on |off-shellness| on both sides alike (near the
+      pole |o|~2.7 d ~ -2 to -3, far |o|~3.3 d ~ 0; figs/c_nooffshell_factor_split_offshell_6.png) -> design branch ''groups
+      gone, pole dependence kept'': the signed input made the two groups, the network still misplaces the near-pole region
+      from the momenta alone; the fix question goes to Joaquin. gg->t b W pair: bias^2 43.8/42.1 vs 30.7/32.1 (worse 1.4x/1.3x;
+      ''pair no'': the input does not drive the pair''s level error), MSE-bias^2 3.72/3.76 vs 4.74/4.85 (not <= 2.37/2.43).
+      Other gg->ttX MSE-bias^2: ttA 0.23 vs 0.87, ttZ 0.58 vs 1.07, gtt 0.082 vs 0.144. New-43 medians (level_file_read.py
+      --tags c_best c_nooffshell, data/step22_nooffshell_read.json @d80fe0a55): MSE-bias^2 0.209 vs 0.135 (1.55x worse, beyond
+      the 1.5x margin), bias^2 0.427 vs 0.314 (1.36x, within), MSE 0.641 vs 0.979; H+tau family MSE-bias^2 ~1 vs 0.003-0.1
+      (figs/step22_nooffshell_shape_heldout_per_process.png). Held-out pooled RMSE 1.186 vs 1.178; best val_loss_no_reg -5.718
+      vs -6.03. Seen pooled RMSE: scoring on gpu_v100_interactive (started 21:47 CET, writes runs/llmcmp_c_nooffshell/trial_1860/llm_score_seen.json).
+      Correction to my decision (xxxix): the baseline''s CC CSV had no offshell columns (only the lxplus re-read FA-lxplus-e3b67532
+      had them); re-read on CC 2026-11-26 21:54 with them.'
   step_waits:
     '15': FA-ccin2p3-1b0cbd8a
     '21': FA-ccin2p3-1b0cbd8a
