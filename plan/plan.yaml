@@ -48450,6 +48450,12 @@ entries:
       Fn 128''s best at 2% of its log lr window [7.67e-3, 6.90e-2] (lower edge): a bound, its best may lie below; question
       to Joaquin. Train/val at stable end 0.24-0.26 except Muon 128 0.63, Adam 2048 0.94. Figure figs/ft_ep50.png, caption
       check OK.'
+  - at: '2026-11-26T04:01:35+00:00'
+    text: '2026-11-26 par:cbs_horizon + fig:cbs_horizon written (4b744779f, claims verified, src ft_bcrit.py ep50 @ae99a4010):
+      D563 takes the design''s ''persists'' branch in every arm (r50 4.60/9.86/1.45 > 1.22); per cell E50/E400 Muon 1.17 equal
+      / 1.66 worse, Adam 4.68 worse / 0.743 better, Fn 1.02 equal / 1.39 worse (bound) at 2048/128. Sweep-ended notice (cbs_b2048,
+      cbs_b4096, cbs_b8192, cbs_b16384, cbs_b32768, cbs_smoke_b32768 on CC and lxplus): all read in par:cbs_scan (scan_state.py
+      @8fb4916cb), nothing left to read. Next: notes-editor on par:cbs_update + par:cbs_horizon.'
   handoff:
     state: 'D560 part B written: par:cbs_update + fig:cbs_update (e05fc9e32, claims verified; NO: no in-run measure finds
       B_crit, the scan''s B_crit stands, rule a short batch scan; momentum-aware measure not tested). D563 read done (ft_bcrit.py
