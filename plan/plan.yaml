@@ -16531,9 +16531,9 @@ entries:
     '35': '2026-12-03'
   owner:
     agent: ac4f3bf623a93600d
-    state: stopped
+    state: working
     since: '2026-11-25T13:18:03+00:00'
-    state_at: '2026-11-25T13:42:37.552000+00:00'
+    state_at: '2026-11-26T00:03:22.263000+00:00'
     context: 268062
     context_at: '2026-11-25T13:47:05+00:00'
   designs:
@@ -34098,9 +34098,9 @@ entries:
       me this exactly?''; Fig. 15 stays out under his hold, no rerun asked'
   owner:
     agent: a9673ff5df07651dd
-    state: stopped
+    state: working
     since: '2026-11-21T17:02:36+00:00'
-    state_at: '2026-11-25T00:07:05.254000+00:00'
+    state_at: '2026-11-26T00:03:23.493000+00:00'
     context: 246207
     context_at: '2026-11-26T00:03:38+00:00'
   step_waits:
