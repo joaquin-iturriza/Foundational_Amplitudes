@@ -73,6 +73,8 @@ def predict(run_dir, splits, out, h5=None):
     import yaml
     if yaml.safe_load(open(os.path.join(run_dir, "config.yaml")))["data"].get("target_over_born"):
         # a V/B run: the scored events' exact Born beside the pool, from the same file's born target
+        with h5py.File(src, "r") as f:   # a missing born would be read as 1 (group_rows' placeholder): refuse
+            assert all("born" in f[f"{sp}/{st}"] for sp, st, _ in blocks), "a V/B run needs the exact born in every group"
         meta = kh.metadata(stem)
         kh.write_born(np.concatenate([kh.stratum_rows(stem, "born", sp, st, src)[:, -1] for sp, st, _ in blocks])
                       * kh.strip_factor(meta, "born"), pool)

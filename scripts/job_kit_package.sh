@@ -6,12 +6,13 @@
 #SBATCH --error=%x_%j.err
 # kit_benchmark step 5: build the KIT checkpoint + inference package (tools/kit_package.py build) and check that it
 # alone reproduces every packaged run's predictions (kit_package.py check, CPU, float64). CPU only.
-#     site submit ccin2p3 FA scripts/job_kit_package.sh --item kit_benchmark -- <out dir> <run_dir>[=<label>] ...
+#     site submit ccin2p3 FA scripts/job_kit_package.sh --item kit_benchmark -- [--standalone] <out dir> <run_dir>[=<label>] ...
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 #     ... -- check <kit_package.py check args>                                         # the check alone
 if [ "$1" = check ]; then shift; python tools/kit_package.py check "$@" && echo "RUN_DONE"; exit; fi
+SA=; if [ "$1" = --standalone ]; then SA=--standalone; shift; fi    # D573: ships training events + predict.py
 OUT="$1"; shift
-python tools/kit_package.py build --out "$OUT" --runs "$@" && python tools/kit_package.py check --pkg "$OUT" \
+python tools/kit_package.py build $SA --out "$OUT" --runs "$@" && python tools/kit_package.py check --pkg "$OUT" \
     && echo "RUN_DONE"

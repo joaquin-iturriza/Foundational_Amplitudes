@@ -17,7 +17,7 @@ def test_failed_sync_exits_before_submit(monkeypatch):
                                waves=None)
     monkeypatch.setattr(drive, "site", fake_site)
     monkeypatch.setattr(drive, "Sweep", lambda c, a: sw)
-    monkeypatch.setattr(sys, "argv", ["drive.py", "--config", "x.yaml", "--item", "i", "--sites", "ccin2p3"])
+    monkeypatch.setattr(sys, "argv", ["drive.py", "--config", "x.yaml", "--item", "i", "--sites", "ccin2p3", "--disk-gb", "0.1"])
     with pytest.raises(SystemExit) as e:
         drive.main()
     assert "sync of ccin2p3 failed" in str(e.value)
@@ -34,7 +34,7 @@ def _setup(monkeypatch, calls, porcelain):
     monkeypatch.setattr(drive, "site", fake_site)
     monkeypatch.setattr(drive, "Sweep", lambda c, a: sw)
     monkeypatch.setattr(drive.subprocess, "run", lambda *a, **k: types.SimpleNamespace(stdout=porcelain))
-    monkeypatch.setattr(sys, "argv", ["drive.py", "--config", "x.yaml", "--item", "i", "--sites", "ccin2p3"])
+    monkeypatch.setattr(sys, "argv", ["drive.py", "--config", "x.yaml", "--item", "i", "--sites", "ccin2p3", "--disk-gb", "0.1"])
 
 
 def test_own_config_uncommitted_refused(monkeypatch):
@@ -69,7 +69,7 @@ def test_site_down_at_sync_is_left_out(monkeypatch):
     monkeypatch.setattr(drive, "site", fake_site)
     monkeypatch.setattr(drive, "Sweep", lambda c, a: sw)
     monkeypatch.setattr(drive.subprocess, "run", lambda *a, **k: types.SimpleNamespace(stdout=""))
-    monkeypatch.setattr(sys, "argv", ["drive.py", "--config", "x.yaml", "--item", "i", "--allow-jeanzay"])
+    monkeypatch.setattr(sys, "argv", ["drive.py", "--config", "x.yaml", "--item", "i", "--allow-jeanzay", "--disk-gb", "0.1"])
     monkeypatch.setattr(drive.time, "sleep", lambda s: None)
     with pytest.raises(SystemExit) as e:
         drive.main()

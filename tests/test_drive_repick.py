@@ -94,7 +94,7 @@ def test_retry_submit_without_run_id_keeps_hp_healthy(monkeypatch):
                                gpu_min_mem=None, hours=1.0, config_rel="c.yaml", issued=lambda: 4,
                                trials=lambda *st: [t])
     monkeypatch.setattr(drive, "site", lambda *a, **k: "submitted nothing")
-    a = types.SimpleNamespace(item="x", dry_run=False)
+    a = types.SimpleNamespace(item="x", dry_run=False, disk_gb=0.1)
     try:
         drive.Sweep.submit(sw, "lxplus", a, t)
         raise AssertionError("no error")
