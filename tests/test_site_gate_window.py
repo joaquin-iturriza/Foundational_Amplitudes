@@ -54,3 +54,11 @@ def test_cancelled_unstarted_counts_zero_and_array_mixes():
            "16_0|FAILED|360|60|gres/gpu=1|gres/gpu=1\n16_1|RUNNING|100|60|gres/gpu=1|gres/gpu=1\n")
     assert _window(out, [{"jobid": "15", "gpu_h": 10.0}]) == 0.0
     assert abs(_window(out, [{"jobid": "16", "gpu_h": 2.0}]) - (1.0 + 0.1)) < 1e-6
+
+
+def test_declared_gpu_hours_charged_d569():
+    g = _gate()
+    cmd = ["--time=167:00:00", "--gres=gpu:1", "--wrap=true"]
+    assert g.sbatch_gpu_hours(cmd, {"CCORCH_DECLARED_GPUH": "117"})[0] == 117
+    assert g.sbatch_gpu_hours(cmd, {})[0] == 167
+    assert g.sbatch_gpu_hours(cmd + ["--array=0-2"], {"CCORCH_DECLARED_GPUH": "10"})[0] == 30
