@@ -2694,6 +2694,18 @@ def cmd_item(a):
     print("plan: site item %s attached" % a.id)
 
 
+def passes_at(cmd, commit):
+    """Whether shell check `cmd` passes in a temporary detached worktree at `commit`."""
+    tmp = tempfile.mkdtemp(prefix="plan_before_")
+    wt = os.path.join(tmp, "wt")
+    try:
+        subprocess.run(["git", "worktree", "add", "--detach", wt, commit], cwd=ROOT, check=True, capture_output=True)
+        return subprocess.run(cmd, shell=True, cwd=wt, capture_output=True, timeout=600).returncode == 0
+    finally:
+        subprocess.run(["git", "worktree", "remove", "--force", wt], cwd=ROOT, capture_output=True)
+        shutil.rmtree(tmp, True)
+
+
 def cmd_check(a):
     """Set the check that finishes an entry. --replace changes a DONE entry's check (e.g. one too slow for the daily
     recheck): it must pass now, since the entry is done; only a trivially true check is refused."""
@@ -2728,11 +2740,18 @@ def cmd_check(a):
     if a.replace and r.returncode != 0:
         sys.exit("plan: %r fails now, and %s is done: reopen it (plan reopen) rather than give it a failing check"
                  % (a.done_when, a.id))
+    before = getattr(a, "before", None)
     if not a.replace and r.returncode == 0:
-        sys.exit("plan: %r already passes in the checkout: it would finish the entry with nothing done; check "
-                 "what this entry still has to produce" % a.done_when)
+        if not before:
+            sys.exit("plan: %r already passes in the checkout: it would finish the entry with nothing done; check "
+                     "what this entry still has to produce (work finished earlier: --before COMMIT, a commit where "
+                     "the check fails)" % a.done_when)
+        if passes_at(a.done_when, before):
+            sys.exit("plan: %r also passes at %s: it does not depend on this entry's work" % (a.done_when, before))
     with transaction() as (d, st):
         e = entry(d, a.id)
+        if before and not a.replace and r.returncode == 0:
+            e["checked_before"] = before
         if a.replace and e.get("done_when"):
             e.setdefault("history", []).append({"at": now().isoformat(), "was_done_when": e["done_when"]})
         e["done_when"] = a.done_when
@@ -3589,7 +3608,8 @@ def main(argv=None):
         A("--done-when", required=True, help="shell command, exit 0 = the entry is finished"),
         A("--replace", action="store_true", help="change a done entry's check (it must pass now)"),
         A("--stale", action="store_true", help="an open entry's check names the wrong files: the old one must fail, the new one pass (needs --why)"),
-        A("--why", help="with --stale: what in the old check was wrong"))
+        A("--why", help="with --stale: what in the old check was wrong"),
+        A("--before", help="an open entry's check already passes: accepted if it fails at this commit (recorded as checked_before)"))
     cmd("recheck", cmd_recheck, "rerun the done entries' done_when checks with no time limit",
         A("id", nargs="?", help="only this entry"))
     cmd("ref", cmd_ref, "set the entry's notes_ref", ID,
