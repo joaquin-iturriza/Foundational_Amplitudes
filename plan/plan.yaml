@@ -34546,6 +34546,24 @@ entries:
     withdrawn_at: '2026-11-17T11:53:00+00:00'
     withdrawn_why: 'Joaquin 2026-11-17: ''We already know there is a problem with the finetune start, why are you showing
       me this exactly?''; Fig. 15 stays out under his hold, no rerun asked'
+  - ask: 'Permission classifier refusal: checking the lab relay lpnclaude03''s ssh port directly (a TCP probe) was refused,
+      and the relay''s sshd is a lab machine we cannot reach or fix. Jean Zay is reached only through lpnclaude03, which refuses
+      ssh on port 22 since 2026-11-20. Can you find out whether the lab closed ssh on lpnclaude03 on purpose, and whether
+      there is another registered address we should go through to Jean Zay?'
+    at: '2026-11-26T03:52:08+00:00'
+    searched: '~/.ssh/config (ProxyJump lpnclaude03; 2026-10-13 note), site list (relay refused), site decisions (none on
+      the relay); his messages: 2026-11-14T04:31 (draft LaTeX paste), 2026-11-06T22:31 (generation time), 2026-11-20T15:11
+      (open points), 2026-10-26T17:15 (allow-rules naming ssh lpnclaude03), 2026-10-26T17:18 (same, permission rules), 2026-11-10T02:08
+      (KIT email), 2026-10-31T03:38 (site submit output), 2026-10-31T03:39 (site submit output), 2026-10-05T02:23 (uu->gg),
+      2026-09-30T14:48 (Jean Zay allowed for everything: usage), 2026-10-02T08:24 (results on Jean Zay), 2026-10-04T19:25
+      (scratchpad outputs), 2026-10-10T01:38 (Jean Zay hours), 2026-10-10T02:08 (Jean Zay storage), 2026-10-10T16:48 (fix
+      Jean Zay, before the relay closed), 2026-10-15T01:13 (TF32), 2026-10-29T19:44 (design step 1), 2026-11-02T05:06 (probe
+      complaint), 2026-11-24T18:48 (lab LLM tokens), 2026-11-12T00:33 (wake-ups), 2026-11-17T01:19 (figure corrections), 2026-11-25T17:03
+      (lxplus kinit), 2026-10-30T09:35 (generation), 2026-11-16T20:00 (writing skill): none says why lpnclaude03 refuses ssh
+      or names another route'
+    blocks: draft_rewrite step 4 (Fig. 14 right needs Jean Zay's 448-process data_stats.json) and every Jean Zay job
+    blocks_steps: &id002
+    - 4
   owner:
     agent: a9673ff5df07651dd
     state: stopped
@@ -35296,6 +35314,23 @@ entries:
       if:
       - 'every arm shares one standardization: replot, rebuild, send'
       - 'arms differ in standardization: recompute per-process MSE from each run''s metrics and say so'
+  ask: 'Permission classifier refusal: checking the lab relay lpnclaude03''s ssh port directly (a TCP probe) was refused,
+    and the relay''s sshd is a lab machine we cannot reach or fix. Jean Zay is reached only through lpnclaude03, which refuses
+    ssh on port 22 since 2026-11-20. Can you find out whether the lab closed ssh on lpnclaude03 on purpose, and whether there
+    is another registered address we should go through to Jean Zay?'
+  waiting_since: '2026-11-26T03:52:08+00:00'
+  searched: '~/.ssh/config (ProxyJump lpnclaude03; 2026-10-13 note), site list (relay refused), site decisions (none on the
+    relay); his messages: 2026-11-14T04:31 (draft LaTeX paste), 2026-11-06T22:31 (generation time), 2026-11-20T15:11 (open
+    points), 2026-10-26T17:15 (allow-rules naming ssh lpnclaude03), 2026-10-26T17:18 (same, permission rules), 2026-11-10T02:08
+    (KIT email), 2026-10-31T03:38 (site submit output), 2026-10-31T03:39 (site submit output), 2026-10-05T02:23 (uu->gg),
+    2026-09-30T14:48 (Jean Zay allowed for everything: usage), 2026-10-02T08:24 (results on Jean Zay), 2026-10-04T19:25 (scratchpad
+    outputs), 2026-10-10T01:38 (Jean Zay hours), 2026-10-10T02:08 (Jean Zay storage), 2026-10-10T16:48 (fix Jean Zay, before
+    the relay closed), 2026-10-15T01:13 (TF32), 2026-10-29T19:44 (design step 1), 2026-11-02T05:06 (probe complaint), 2026-11-24T18:48
+    (lab LLM tokens), 2026-11-12T00:33 (wake-ups), 2026-11-17T01:19 (figure corrections), 2026-11-25T17:03 (lxplus kinit),
+    2026-10-30T09:35 (generation), 2026-11-16T20:00 (writing skill): none says why lpnclaude03 refuses ssh or names another
+    route'
+  blocks: draft_rewrite step 4 (Fig. 14 right needs Jean Zay's 448-process data_stats.json) and every Jean Zay job
+  blocks_steps: *id002
 - id: zng_uq_benchmark
   title: Our model on the Z + n gluon UQ datasets (Zenodo 16793011)
   question: 'How does our latest setup (emission-scale target, HETEROSC, mu-P LLoCa), from scratch and fine-tuned from a pretraining,
@@ -38900,7 +38935,7 @@ entries:
       (a pasted LaTeX template); 2026-11-10T02:08 (draft and slide uploads); 2026-10-26T17:18 (settings warnings relayed from
       another session); 2026-10-15T02:49 and 2026-10-06T00:17 (old transfer-study plan instructions, not this sentence)'
     blocks: nothing
-    blocks_steps: &id002 []
+    blocks_steps: &id003 []
   owner:
     agent: a275e674e217bc7c6
     state: stopped
@@ -41160,7 +41195,7 @@ entries:
     (a pasted LaTeX template); 2026-11-10T02:08 (draft and slide uploads); 2026-10-26T17:18 (settings warnings relayed from
     another session); 2026-10-15T02:49 and 2026-10-06T00:17 (old transfer-study plan instructions, not this sentence)'
   blocks: nothing
-  blocks_steps: *id002
+  blocks_steps: *id003
   writeup: ae083a6ab
   runs_override: the 14 listed sweeps were driven by sweep/drive.py with their state on the local machine (sweeps_local/<name>;
     'local' has no site registry); each summary.txt lists every trial finished, 0 failed, and every result is read in results.tex
@@ -47186,7 +47221,7 @@ entries:
       2026-10-06T00:17 (old transfer plan); 2026-10-05T21:17 (a pin on an old plot); 2026-10-02T11:24 (tf32 speed, not the
       batch); 2026-10-06T16:02 (a forwarded colleague message)
     blocks: nothing
-    blocks_steps: &id003 []
+    blocks_steps: &id004 []
   owner:
     agent: a7b288b537965af86
     state: working
@@ -48436,7 +48471,7 @@ entries:
     2026-10-06T00:17 (old transfer plan); 2026-10-05T21:17 (a pin on an old plot); 2026-10-02T11:24 (tf32 speed, not the batch);
     2026-10-06T16:02 (a forwarded colleague message)
   blocks: nothing
-  blocks_steps: *id003
+  blocks_steps: *id004
 - id: cc_disk
   title: What uses disk on CC and what can be deleted
   question: 'What is using the disk on CC (checkout runs/sweeps, datasets, memmap caches, scratch, MG5 work dirs), against
