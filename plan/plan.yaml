@@ -29694,7 +29694,7 @@ entries:
       - 'FT below SCR-A2 and V/B per D past the design''s 1/7 bar: report the recipe as the fair-NLO answer to KIT'
       - 'FT not below them: report per D where it loses, with the parent''s curves'
   step_waits:
-    '20': FA-lxplus-91319d3e
+    '20': FA-lxplus-637c9017
     '22': drive.py searches kit_hpo_ttvirt_thr_divform and kit_hpo_ttvirt_thr_rezero (detached kit_hpo_tt_divform_rezero,
       pid 2843282)
     '24': FA-lxplus-91319d3e (prebuild; step 20's smoke parent, arm smokes and real parent follow it, FT after the real parent)
