@@ -5,7 +5,7 @@ His points: the "pID emb. only (baseline)" runs, seeds 0-2, from his own per-pro
 data/suprio_cond/): the median over the seeds, the bar from the lowest to the highest seed; MSE = rmse^2, |bias| =
 |level|, MSE - bias^2 = shape^2. His order of the processes: the x positions read off his figure
 (talks/progress_oct2026b/data/draft_pid_by_process.json, {"interp"|"extrap": {name: [x, MSE]}}; not committed). Ours: a run's
-data/<tag>_heldout.json from tools/llm_score.py (first 1e4 test events per process, shared affine statistics).
+data/split/<tag>_heldout.json from tools/llm_score.py (first 1e4 test events per process, shared affine statistics).
 Process families and labels: analysis/catalog_daniel/classes_default.json (test_group, process).
     python analysis/llm_compare/heldout_per_process.py [--tag a_trial5 ...] [--out NAME]
 Default: every arm read so far (each tag of ARMS with a score file), one fixed name, colour and marker per arm, one fixed
@@ -59,7 +59,9 @@ ARMS = {"a_trial5": ("LLoCa, same setup as LLM", ps.C.blue, "o"),
 YLIM = (1e-7, 1e3)   # one range for every figure: his 1e-3..1e3 extended below our lowest point; never data-dependent
 # --part bias (step 15): the level offset |bias| = |mean(pred - true)| in log|M|^2 (ours: tools/llm_score.py's split,
 # data/split/<tag>_heldout.json; his: |level|); its own fixed range
-PART = {"mse": ("data", YLIM, r"MSE$(\log|\mathcal{M}|^2)$", "mse"),
+# every part reads one scoring pass, data/split/ (the pass carrying the bias), so shape = MSE - bias^2 exactly; data/<tag>
+# is an earlier pass of the same events and checkpoint, equal up to float32 inference noise (<=1.4% where MSE ~1e-6)
+PART = {"mse": (os.path.join("data", "split"), YLIM, r"MSE$(\log|\mathcal{M}|^2)$", "mse"),
         "bias": (os.path.join("data", "split"), (1e-5, 1e2), r"$|$bias$|$ of $\log|\mathcal{M}|^2$", "bias"),
         # --part shape (D567): the error with the level removed, MSE - bias^2 = scale + floor (same split files; his:
         # shape^2); the MSE figure's range
@@ -70,7 +72,7 @@ LEVEL_ONLY = ("lvl_feat", "lvl_diag")   # no events, no shape
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--tag", nargs="+", default=None, help="default: every arm of ARMS whose data/<tag>_heldout.json exists")
+    ap.add_argument("--tag", nargs="+", default=None, help="default: every arm of ARMS whose data/split/<tag>_heldout.json exists")
     ap.add_argument("--out", default=None, help="default all_arms (mse) or all_arms_<part>")
     ap.add_argument("--no-level-nets", action="store_true", help="bias: leave out the level networks (no total or shape)")
     ap.add_argument("--part", choices=list(PART), default="mse")
@@ -78,7 +80,7 @@ def main():
     ddir, ylim, ylabel, llm_stat = PART[a.part]
     a.out = a.out or ("all_arms" if a.part == "mse" else "all_arms_" + a.part)
     tags = a.tag or [t for t in ARMS if os.path.exists(os.path.join(HERE, ddir, f"{t}_heldout.json"))
-                     and not ((a.part == "shape" or a.no_level_nets) and t in LEVEL_ONLY)]
+                     and not ((a.part != "bias" or a.no_level_nets) and t in LEVEL_ONLY)]
     assert all(t in ARMS for t in tags), f"no fixed name for {set(tags) - set(ARMS)}: add it to ARMS"
     draft = json.load(open(os.path.join(ROOT, "talks", "progress_oct2026b", "data", "draft_pid_by_process.json")))
     val = {"mse": lambda q: q["mse_logm2"], "bias": lambda q: abs(q["bias_logm2"]),
