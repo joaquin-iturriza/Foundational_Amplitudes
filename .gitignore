@@ -185,4 +185,5 @@ talks/progress_oct2026b/data/
 analysis/agent_redesign/mechanical_watch.json
 .claude/hooks/.owner_handoff_test
 .claude/.compact_checked
+.claude/.compact_refused
 .claude/.sent_figs
