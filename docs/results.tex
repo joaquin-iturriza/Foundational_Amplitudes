@@ -10607,14 +10607,15 @@ $0.64$); the full rescale reaches $0.11$ and $0.20$ there, at the bulk cost of p
 changed strata fall at the seed median, the least the shallowest, $x\in[10^{-3},10^{-2}]$, where $95375$ of its events change: $-1.00$
 decades at $10^4$ and $-0.67$ at $10^5$, inside that stratum's own seed spread of $0.98$ at $10^5$. The design's yes
 branch is met at both sizes: the soft-limit gain is kept, without cost on any stratum or on the bulk, and with
-$Z+4g$ untouched. In the D392 setup (the finale parent of \texttt{scripts/job\_datasaving\_parent.sh}, whose
-fine-tunes train on $Z+4g$) the rule is set at $x_0=10^{-5}$, not $0.009$: one of the finale's processes,
-$u\bar d\to e\nu g$, has neutrinos down to $x=1.99\times10^{-5}$ ($481$ momenta below $x=0.009$ over its training,
-validation and test pools, all neutrinos), while every other pool's softest momentum lies at $x\ge0.0099$ and the
-$Z+4g$ training pool's at $0.00923$. No finale pool has a momentum below $x_0=10^{-5}$, so the finale trains exactly as
-without rescale, and the $Z+4g$ kit has no momentum below $x=0.009$: in that setup the rule changes nothing that is
-trained or scored. At $x_0=10^{-5}$ a momentum at $x=10^{-7}$ enters the model at $x=3.5\times10^{-6}$, against
-$1.6\times10^{-3}$ at $x_0=0.009$, so the soft-limit gain measured above at $x_0=0.009$ is not shown for $x_0=10^{-5}$.
+$Z+4g$ untouched. In the D392 setup (the finale parent of \texttt{scripts/job\_datasaving\_parent.sh}, whose fine-tunes train on
+$Z+4g$) the rule is the same, $x_0=0.009$, with neutrinos exempt (\texttt{model.input\_soft\_skip\_neutrinos}): one of
+the finale's processes, $u\bar d\to e\nu g$, has neutrinos down to $x=1.99\times10^{-5}$ ($481$ momenta below
+$x=0.009$ over its training, validation and test pools, all neutrinos), and a soft neutrino, coupling to no gluon or
+photon, has no soft singularity to resolve. Every other pool's softest momentum lies at $x\ge0.0099$ and the $Z+4g$
+training pool's at $0.00923$; counted through the model's own rescale, the rule changes $0$ momenta in the $90$ pools of
+the finale, $Z+4g$ and $u\bar ug$, so the finale trains exactly as without rescale. $u\bar ug$ has no neutrino, so the
+exemption must leave its scores unchanged: rescored with it, the six runs reproduce every stratum of both arms above to
+$1.8\times10^{-4}$ decades, and the soft-limit gain of Fig.~\ref{fig:selres_support} is the one the finale carries.
 Finale parents trained before this change carry the full rescale, so a comparison across the change mixes the two.
 % src: python3 analysis/selective_rescale/support_rule.py read @6214117b7
 % claim: 1e4.deep_off=4924
@@ -10633,15 +10634,17 @@ Finale parents trained before this change carry the full rescale, so a compariso
 % claim: 1e5.shallow_dec=-0.67
 % claim: 1e5.shallow_spread=0.98
 % allow: 0.009 0.1 10^4 10^5 43 44 10^{-7} 10^{-6} 10^{-3} 10^{-2} 4g 2 because they are the thresholds, the training sizes, the seeds, the strata edges, the process Z+4g and the square of |M|
-% plan selective_rescale, step 3 (par:selres_support): the rule in the D392 setup, x0=1e-5
-% src: python3 analysis/selective_rescale/support_rule.py minima --cached @94ec344b0
+% plan selective_rescale, step 4 (par:selres_support): the rule in the D392 setup, x0=0.009, neutrinos exempt
+% src: python3 analysis/selective_rescale/support_rule.py minima --cached @1e7bb5eb2
 % claim: finale_min=1.99e-5
 % claim: finale_below_0.009=481
 % claim: finale_min_others=0.0099
 % claim: zng_train_min=0.00923
-% claim: enter_1e-7_x0_1e-05=3.5e-6
-% claim: enter_1e-7_x0_0.009=1.6e-3
-% allow: 10^{-5} 392 because they are the finale's threshold x0 and the decision number D392
+% claim: moved_nu_exempt=0
+% claim: n_pools=90
+% src: python3 analysis/selective_rescale/support_rule.py read_nu @1e7bb5eb2
+% claim: max_dec=1.8e-4
+% allow: 392 because it is the decision number D392
 
 \begin{figure}[H]
   \centering
