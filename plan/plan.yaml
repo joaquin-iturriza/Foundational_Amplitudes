@@ -28346,7 +28346,10 @@ entries:
     - FA-ccin2p3-f45f434a
     - FA-ccin2p3-f6b2ece9
     - FA-ccin2p3-fcad1510
-    commit: afa583cc3
+    - FA-lxplus-2149304f
+    - FA-lxplus-35ac6ab5
+    - FA-lxplus-9fc1e04e
+    commit: 86115d2d5
     paths:
     - analysis/kit_benchmark/data/kit_curves_read.json
     - analysis/kit_benchmark/data/kit_fig_A.json
