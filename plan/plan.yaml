@@ -28543,7 +28543,7 @@ entries:
     agent: a8f9a3b8d28dab422
     state: stopped
     since: '2026-11-26T03:33:40.885000+00:00'
-    state_at: '2026-11-26T08:19:07+00:00'
+    state_at: '2026-11-26T08:19:34.140000+00:00'
     context: 227085
     context_at: '2026-11-26T08:19:07+00:00'
   findings:
@@ -41519,9 +41519,9 @@ entries:
     decision: D553
   owner:
     agent: a017802b37deeafec
-    state: working
+    state: stopped
     since: '2026-11-26T08:13:59.747000+00:00'
-    state_at: '2026-11-26T08:13:59.747000+00:00'
+    state_at: '2026-11-26T08:26:56.176000+00:00'
     context: 170154
     context_at: '2026-11-26T08:31:27+00:00'
   step_why:
