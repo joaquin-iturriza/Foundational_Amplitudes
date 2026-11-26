@@ -28331,12 +28331,6 @@ entries:
     31: 'Protocol B on the three A2 models (D575, design PASS ~16:40): smoke FA-ccin2p3-58bc2125 (B, tt A2, 50 steps); on
       its clean end site pick + 6 runs job_kit.sh B and B_bulk 3000 steps with --env KIT_FROM=runs/kit/kit_A_ee_{uug_me2,uugg_me2,tt_virt_finite}_n100000_t1831_hpo_asym_cont,
       tags a2B (limit 1:30), then B vs B_bulk per family'
-    32: 'Slide-11 MadGraph MC test (design PASS ~17:10, D571/D574/D575): submit on CC (site pick first) scripts/job_kit_mc_madgraph.sh
-      --item kit_benchmark --disk-gb 0.2 -- ee_uug runs/kit/mc_madgraph 100000 runs/kit/kit_A_ee_uug_me2_n100000_t1831_hpo_asym_cont;
-      same for ee_uugg (kit_A_ee_uugg_me2_..._asym_cont); and -- tt runs/kit/kit_A_ee_tt_virt_finite_n100000_t1831_hpo_asym_cont;
-      plan target first (uugg MadEvent time unmeasured: 6 h limit). Reviewer asks two cheap asserts in gen: every KIT bulk_test
-      event passes the coded cut; all LHE weights equal. Then fetch the JSONs, kit_mc_madgraph.py figure, report with the
-      differences from slide 11 first (tt scan covers sqrt s 346-432 GeV only)'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -29915,11 +29909,6 @@ entries:
       if:
       - 'B beats B_bulk on a family: report the gain'
       - 'level: A2 already extrapolates from bulk there'
-    32:
-      feeds: 'Bakar''s slide-11 end-user test: sigma bias and eps2 of the surrogates in a MadGraph MC'
-      if:
-      - 'numbers in: figure + numbers to Joaquin today'
-      - 'a job breaks: read its log, fix, resubmit'
   step_waits:
     '24': FA-lxplus-828d67d6
     '20': FA-ccin2p3-3895a2a7 FA-ccin2p3-e0587622
@@ -29927,7 +29916,6 @@ entries:
     '25': FA-ccin2p3-acb1d3a6
     '31': FA-ccin2p3-58bc2125
     '30': FA-ccin2p3-42ae3468
-    '32': FA-ccin2p3-6eb41dd6 FA-ccin2p3-76945fa6 FA-ccin2p3-44f737bc
   handoff:
     state: '2026-11-26 ~17:15. ORDER (coordinator): package, then slide-11 MC test, then slide 5-9 figures, D575 runs alongside.
       (1) PACKAGE (D573/D574): code committed and reviewed (9032d1238, d5e9f0b87, 45a1e906b; predict.py writes log10_me2 /
