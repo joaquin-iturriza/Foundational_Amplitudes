@@ -42401,7 +42401,7 @@ entries:
     decision: D578
   owner:
     agent: a9f2cdb0c287c4018
-    state: working
+    state: closed
     since: '2026-11-26T18:21:45+00:00'
     state_at: '2026-11-26T19:18:22.665000+00:00'
     context: 230030
@@ -43338,30 +43338,33 @@ entries:
     '21': FA-ccin2p3-1b0cbd8a
     '23': FA-ccin2p3-2461cbe0
   handoff:
-    state: 'Part (a) DONE, part (c) DONE, step 19 DONE, step 16 DONE (read 2026-11-26: level-file arm new-family median MSE
-      0.309 vs trial 5 1.144, post-hoc 0.577, LLM 0.940; bias^2 0.122 vs given 0.096: kept by the design''s 1.38x, MSE drop
-      3.70x not resolved by the re-measured 5.2x rerun spread; gg->tbW worse; data @77079efe5, figs/step16_level_file{,_bias}_heldout_per_process.png).
-      Single-seed margin re-based: rerun_spread.py @e7fbadada, ratio of medians seen 1.07 / relabels 2.53 / new 5.20 (finding
-      2026-11-26 08:25); steps 13/14 texts still say 1.38: read them with both. Step 8: 64-head smoke passed (FA-ccin2p3-e0a1abe4:
-      2.43 s/step H100, peak 39.4 GB, sigma stage 0.66 h with 2 validations); job_config_smoke.sh now runs the sigma stage
-      with 2 validations (@2458c2084); full width runs ~12/22/46/99 GPU-h at 16/32/64/120 heads, ~180 in all, above D536''s
-      100: waiting on Joaquin''s go (the plan ask was refused as matching part (a)''s answered budget ask; the main session
-      records the question). 120-head smoke not run: no disk (needs ~17.7 GB transient with save_last=false; CC 19 GB, EOS
-      23.8 GB) and no 80G GPU on lxplus. DISK RISK: part (b) 120-head run FA-ccin2p3-f0b997a2 on CC needs ~15 GB more at its
-      end (~11-29) with ~19 GB free. Open ask: second seed (seed 43) of trial 5 and the level-file arm. Step 21 (no-off-shellness
-      arm FA-ccin2p3-1b480869) and steps 13/14 running; step 15 waits on step 21.'
-    decisions: 'Joaquin''s: D522-D528, D536, D537, D553, D564, D566, D567. Mine (re-justify): earlier hand-offs'' (i)-(xxxii);
-      (xxxiii) margin for set medians = ratio of the two reruns'' medians (not the per-process 1.89x); (xxxiv) step 8 smokes
-      and runs with training.save_last=false (best kept, run_trial deletes the last anyway; disk); (xxxv) smoke sigma stage
-      2 validations (smoke only, full runs keep 25); (xxxvi) step 16 scored with EVENTS=1 on CC; (xxxvii) deleted our smoke
-      debris zz_smoke_..._c_width_64884115 and _64893197 on CC after reading'
-    ruled_out: As before.
-    running: FA-ccin2p3-1b480869 (step 21 run), FA-ccin2p3-623a3af6 (step 13, 64 heads), FA-ccin2p3-f0b997a2 (step 14, 120
-      heads)
-    files: analysis/llm_compare/{rerun_spread.py, level_file_read.py, heldout_per_process.py (arm level_file)}, analysis/llm_compare/data/{rerun_spread.json,
-      step16_level_file_read.json, step16_level_vs_a5.json, level_file_{seen,heldout}.json, split/level_file_heldout.json,
-      level_val_trial_7002.txt}, analysis/llm_compare/figs/step16_level_file{,_bias}_heldout_per_process.png, scripts/job_config_smoke.sh
-    written: '2026-11-26T14:58:58+00:00'
+    state: 'Part (a), part (c), steps 16, 19 DONE (as before). Step 21/22 no-off-shellness arm FA-ccin2p3-1b480869 trained
+      clean (V100, 60,840 steps 13.45 h + sigma 1.78 h; best val_loss_no_reg -5.718 at validation 20/20 vs baseline trial_1860
+      -6.03); its score FA-ccin2p3-1b0cbd8a (job_llm_score.sh EVENTS=1 seen+held out, REREAD) pending on CC; steps 21 and
+      15 wait on it; then factor_split.py --csv runs/llmcmp_c_nooffshell/trial_1860/llm_events_heldout.csv --vars-from runs/llmcmp_c_qperp/trial_1860/llm_events_heldout.csv
+      as a CC CPU job (site run --job), error_split.py, read against the design''s outcomes; NOT added to Joaquin''s final
+      figures (D579 arm set). Step 23 (Joaquin 2026-11-26 bias-removed distributions): shape_dists.py @3ccc6b2cc restricted
+      to the final arm set; level_file events re-read FA-ccin2p3-2461cbe0 pending (step 23 waits on it); a mechanical worker
+      is redrawing shape_dists.py from a_trial5/c_best and exporting for Suprio (its files, uncommitted: shape_dists.py, export_for_suprio.py:
+      not mine to touch); LLM has no per-event predictions (data/suprio_cond per-process only). D566 attempt C DONE as a dead
+      end (FA-ccin2p3-444f056d, data/perevent_anchored.json @c00b40d98, figs/perevent_anchored.png): C_s keeps the level (0.248
+      vs control 0.219, range 0.098-0.369) but is not correct on the re-sampled subsets (0.42/0.28/0.44/0.96 vs constant 0.18/0.24/0.23/0.58);
+      the form with true per-process coefficients is sampling-robust (0.0003-0.018), the predicted anchored intercept carries
+      the error (leverage at a global anchor). Next: step 24 attempt D (process-intrinsic anchor), to design, review and run:
+      perevent_level.py --anchored is the base (add an anchor mode), same ensembles/control/subsets/bars as attempt C''s passed
+      design. Repo-reviewer backlog: FIX FIRST on tools/kit_bakar_figs.py collect_searched except SystemExit (kit_benchmark''s,
+      not ours); lock held, not advanced; D566 files passed.'
+    decisions: 'Joaquin''s: D522-D528, D536, D537, D553, D564, D566, D567, D576-D579. Mine (re-justify): earlier (i)-(xxxvii);
+      (xxxviii) step 21 arm scored seen + held out (design measure 3 needs seen pooled RMSE; step text said ONLY=heldout);
+      (xxxix) factor_split join against the baseline''s CC CSV (the one c_best_factor_split.json was read from), not the lxplus
+      re-read''s; (xl) D566 attempts read on the memmap base caches'' first 2000 train-role events (CC has no train pools;
+      same events as the pools'' first 2000; float32 momenta not checked against step 17''s float64); (xli) attempt C bars
+      per its passed design (control''s ten-ensemble max; all four subsets, Joaquin''s ''regardless of that'')'
+    ruled_out: 'As before, plus D566 attempt C (global-anchor conditional form): dead end recorded 2026-11-26'
+    running: FA-ccin2p3-1b0cbd8a (step 21 score), FA-ccin2p3-2461cbe0 (step 23 level_file events)
+    files: analysis/catalog_daniel/{perevent_level.py (--anchored, --mmap), perevent_anchored_fig.py, data/perevent_anchored.json},
+      analysis/catalog_daniel/figs/perevent_anchored.png, scripts/job_perevent_level.sh (PEL_ANCHORED, PEL_MMAP), analysis/llm_compare/shape_dists.py
+    written: '2026-11-26T19:22:46+00:00'
   designs:
   - at: '2026-11-22T04:13:14+00:00'
     question: 'Part (a), D525: in the conditions of Suprio''s LLM pID run (D524, D526, D527: our catalog_daniel regeneration
