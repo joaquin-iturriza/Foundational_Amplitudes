@@ -41566,9 +41566,9 @@ entries:
     - 16
   owner:
     agent: a017802b37deeafec
-    state: working
+    state: stopped
     since: '2026-11-26T08:13:59.747000+00:00'
-    state_at: '2026-11-26T08:43:57.491000+00:00'
+    state_at: '2026-11-26T08:49:02.400000+00:00'
     context: 170154
     context_at: '2026-11-26T08:31:27+00:00'
   step_why:
