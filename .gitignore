@@ -189,3 +189,5 @@ analysis/agent_redesign/mechanical_watch.json
 .claude/.compact_*
 .claude/.sent_figs
 analysis/kit_benchmark/source/
+analysis/llm_compare/export_for_suprio/
+analysis/llm_compare/export_for_suprio.zip

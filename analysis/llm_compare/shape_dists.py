@@ -29,7 +29,10 @@ FINAL = ("a_trial5", "level_file", "c_best")
 def main():
     tags = list(FINAL)
     miss = [t for t in tags if not os.path.exists(os.path.join(HERE, "data", "events", f"{t}_heldout_events.csv"))]
-    assert not miss, f"no data/events/<tag>_heldout_events.csv for {miss}"
+    for t in miss:
+        print(f"skipping arm {t}: no data/events/{t}_heldout_events.csv")
+    tags = [t for t in tags if t not in miss]
+    assert tags, "no arm has events"
     meta = {"dc_" + p["folder"]: p for p in json.load(open(os.path.join(DAN, "classes_default.json")))["processes"]}
     rel = set(json.load(open(os.path.join(DAN, "heldout_twins.json"))))
     ev = {}
@@ -66,6 +69,7 @@ def main():
         print(meta[n]["process"], meta[n]["test_group"], {t: round(s, 4) for t, s in zip(tags, sh[n])})
     ps.legend(axes[2, 0], "upper right", ncol=2)   # a 7th cell leaves an empty one or overflows the page; ncol=2 brings the font down
     ps.save(fig, os.path.join(HERE, "figs", "shape_dists"))
+    return tags, pick, ev, meta   # export_for_suprio.py reuses the drawn set
 
 
 if __name__ == "__main__":
