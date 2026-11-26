@@ -42146,11 +42146,6 @@ entries:
       job_llm_score.sh EVENTS=1 ONLY=heldout; read factor_split.py on gg->ttX and gg->tbW, heldout_per_process.py all parts,
       error_split.py against the control. Prior: results.tex l.9373-9426 (off-shellness adopted, ~50x in-distribution), l.10855,
       kit_benchmark off arms (D418), none on held-out new families. Its design and design review first.'
-    23: 'Joaquin 2026-11-26 ''can you also redo the plots that show the true vs predicted distributions with the bias removed?'':
-      shape_dists.py redrawn with the final arm set of heldout_per_process.py @2fc2f1076 (a_trial5, level_file, c_best; same
-      names/colours/markers), families as before; level_file''s per-event CSV from REREAD FA-ccin2p3-2461cbe0 (job_llm_score.sh
-      ONLY=heldout EVENTS=1), rows checked against a_trial5''s true_logm2; LLM per-event predictions do not exist here (only
-      per-process summaries in data/suprio_cond), said in the caption'
     24: 'Attempt D: the same, with a process-intrinsic anchor x0_p (a fixed function of the process alone, e.g. a ridge fit
       of the training processes'' median x on the regressor''s descriptors; no statistic of the scored dataset), so c_p is
       the level at the process''s own typical point (little leverage) and b_p carries the sampling dependence; slopes optionally
@@ -42456,11 +42451,6 @@ entries:
       - 'split gone and new-set shape/level better: the input''s sign misleads on new families; report, then the fix question
         (e.g. |o| only) to Joaquin'
       - 'split stays: the input is not the cause; report, next candidate the diagram encoder'
-    23:
-      feeds: 'Joaquin''s request 2026-11-26: bias-removed true vs predicted distributions with the final arm set'
-      if:
-      - 'CSV rows match: draw, look once, hand back png+pdf with caption'
-      - 'rows do not match: find why (event selection of llm_score) before drawing'
     24:
       feeds: 'D566: a per-event, sampling-independent level from process and diagram information that keeps the level gain
         on new families'
@@ -43388,7 +43378,6 @@ entries:
   step_waits:
     '15': FA-ccin2p3-1b0cbd8a
     '21': FA-ccin2p3-1b0cbd8a
-    '23': FA-ccin2p3-2461cbe0
     '24': FA-ccin2p3-df622fc5
   handoff:
     state: 'Part (a), part (c), steps 16, 19 DONE (as before). Step 21/22 no-off-shellness arm FA-ccin2p3-1b480869 trained
