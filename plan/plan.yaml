@@ -47141,7 +47141,7 @@ entries:
       <commits> (par:cbs_scan 145d14839, par:cbs_update e05fc9e32, par:cbs_horizon)'
   done_when: for l in sec:noisescale par:cbs_scan par:cbs_regimes par:cbs_update par:cbs_horizon; do grep -q "label{$l}" docs/results.tex
     || exit 1; done && test -s analysis/critical_batch/data/ft_bcrit_ep50.json && test -s analysis/critical_batch/figs/ft_ep50.pdf
-  notes_ref: sec:noisescale
+  notes_ref: par:cbs_horizon
   match: zz_cbs_*,cbs_*
   evidence:
     runs:
