@@ -2,7 +2,7 @@
 """The e+e- -> t t~ threshold scan of kit_benchmark (Gudrun): sigma(sqrt s) at LO and NLO QCD around 2 m_t, exact and
 with the surrogate's one-loop virtual, like Fig. 1 of arXiv:1506.06864 at fixed order.
 
-    python tools/kit_threshold_scan.py build   [--dir D]           # MadLoop standalone, its check on KIT points, scan file
+    python tools/kit_threshold_scan.py build   [--dir D] [--window bulk]  # MadLoop standalone, its check on KIT points, scan file
     python tools/kit_threshold_scan.py nlo     [--dir D] --part k/K # MG5_aMC fixed-order LO and NLO cross sections
     python tools/kit_threshold_scan.py predict [--dir D] <run_dir> ...   # surrogate log10 V on the scan points
     python tools/kit_threshold_scan.py collect [--dir D] --out <json>    # the cross sections per sqrt s
@@ -18,6 +18,10 @@ exact). The exact NLO is MG5_aMC's fixed-order e+ e- > t t~ [QCD] (real emission
 mu_R = M_Z, where alpha_s = 0.118 (at this order sigma depends on mu_R only through alpha_s). The surrogate's NLO
 replaces the exact virtual by the network's:
     sigma_NLO^surr = sigma_NLO^exact + sigma[V_surr] - sigma[V_exact]   (both V at mu_R = sqrt s, alpha_s = 0.118)
+--window bulk (slide 11's one-loop test over KIT's whole e+e- -> t t~ bulk, D571): sqrt s at N_BETA Gauss-Legendre nodes
+over the bulk window [BULK_LO, BULK_HI] GeV (sqrt s flat there, beta 0.2..0.98), same cos nodes; collect then writes
+sigma[V] per sqrt s and the window's integral int sigma[V] d sqrt s (its Gauss-Legendre weights), exact and per
+surrogate, and no NLO (MG5_aMC's runs are the threshold scan's).
 Checks: build compares the standalone's Born and finite part with KIT's stored values on its bulk_test and threshold
 points (they must agree, else the scan's V is not KIT's); collect compares the quadrature's sigma_LO with MG5_aMC's.
 """
@@ -40,14 +44,20 @@ GEV2_PB = 0.3893794e9
 MT, MZ, ALPHA_S = 173.0, 91.188, 0.118
 N_BETA, BETA_LO, BETA_HI, N_COS = 32, 1e-3, 0.6, 16
 PROC = "kit_ee_tt_virt"          # the standalone's name under mg5_pipeline_final.WORK_DIR (its own: m_t = 173)
+BULK_LO, BULK_HI = 353.1, 1738.7      # the ee_tt bulk window (its metadata), asserted in build
 DEFAULT_DIR = os.path.join("runs", "kit", "threshold_scan")
 
 
-def grid():
+def grid(window="scan"):
     """sqrt s (N_BETA,), beta, cos nodes and weights (N_COS,), momenta (N_BETA * N_COS, 4, 4) in KIT order (e+ along
     +z, e-, t, t~), the cos index fastest."""
-    beta = np.geomspace(BETA_LO, BETA_HI, N_BETA)
-    sq = 2 * MT / np.sqrt(1 - beta ** 2)
+    if window == "bulk":
+        x, _ = np.polynomial.legendre.leggauss(N_BETA)
+        sq = BULK_LO + (BULK_HI - BULK_LO) * (x + 1) / 2
+        beta = np.sqrt(1 - 4 * MT ** 2 / sq ** 2)
+    else:
+        beta = np.geomspace(BETA_LO, BETA_HI, N_BETA)
+        sq = 2 * MT / np.sqrt(1 - beta ** 2)
     c, w = np.polynomial.legendre.leggauss(N_COS)
     s_ = np.sqrt(1 - c ** 2)
     mom = []
@@ -89,6 +99,9 @@ def kit_file():
 def cmd_build(a):
     import h5py
     a.dir = os.path.abspath(a.dir)
+    if a.window == "bulk":
+        from tools import kit_hardps as kh
+        assert f"sqrt(s) flat in [{BULK_LO},{BULK_HI}] GeV" in kh.metadata("ee_tt")["bulk"], kh.metadata("ee_tt")["bulk"]
     ev = madloop()
     os.makedirs(a.dir, exist_ok=True)
     check = {}
@@ -105,7 +118,7 @@ def cmd_build(a):
         bulk = {k: f["bulk_test/bulk"][k][:1000] for k in f["bulk_test/bulk"]}
     worst = max(max(v.values()) for v in check.values())
     assert worst < a.tol, f"the standalone does not reproduce KIT's values (worst {worst:.2e} >= {a.tol})"
-    sq, beta, c, w, mom = grid()
+    sq, beta, c, w, mom = grid(a.window)
     r = ev(mom)
     assert (r["rc"] // 100 != 4).all(), "an unstable MadLoop point on the scan"
     assert (r["fin"] > 0).all(), "a non-positive virtual on the scan (log10 V undefined)"
@@ -124,7 +137,9 @@ def cmd_build(a):
             g["singular_var"] = np.full(len(c), beta[i])
     os.replace(path + ".tmp", path)
     json.dump({"sqrts": sq.tolist(), "beta": beta.tolist(), "cos": c.tolist(), "w": w.tolist(), "check": check,
-               "n_check": a.n_check}, open(os.path.join(a.dir, "scan_grid.json"), "w"), indent=1)
+               "n_check": a.n_check, "window": a.window,
+               "w_sqrts": (np.polynomial.legendre.leggauss(N_BETA)[1] * (BULK_HI - BULK_LO) / 2).tolist()
+               if a.window == "bulk" else None}, open(os.path.join(a.dir, "scan_grid.json"), "w"), indent=1)
     print(f"SCAN_BUILT {path}: {len(sq)} sqrt s x {len(c)} cos nodes; worst check {worst:.2e}")
 
 
@@ -277,6 +292,26 @@ def cmd_collect(a):
     out = {"sqrts": sq.tolist(), "beta": beta.tolist(), "check": g["check"],
            "sigma_lo_quad": sigma_pb(sq, beta, w, born).tolist(),
            "sigma_v_exact": sigma_pb(sq, beta, w, vex).tolist(), "surrogates": {}}
+    if g.get("window") == "bulk":     # the integrated virtual over KIT's bulk window, no NLO (module docstring)
+        wsq = np.asarray(g["w_sqrts"])
+        out["window"], out["w_sqrts"] = "bulk", wsq.tolist()
+        out["int_sigma_v_exact"] = float(wsq @ np.asarray(out["sigma_v_exact"]))
+        for p in sorted(glob.glob(os.path.join(a.dir, "pred", "*", "predictions.h5"))):
+            with h5py.File(p, "r") as f:
+                v = np.concatenate([10 ** f[k]["log10_abs_virt_finite"][:] for k in idx])
+                run = str(f.attrs["run_dir"])
+            sv = sigma_pb(sq, beta, w, v)
+            iv = float(wsq @ sv)
+            out["surrogates"][os.path.basename(run)] = {
+                "run_dir": run, "sigma_v": sv.tolist(), "bias": (sv / np.asarray(out["sigma_v_exact"]) - 1).tolist(),
+                "int_sigma_v": iv, "int_bias": iv / out["int_sigma_v_exact"] - 1}
+            print("CLAIM " + json.dumps({"run": os.path.basename(run), "window": "bulk",
+                                         "int_bias": iv / out["int_sigma_v_exact"] - 1,
+                                         "bias_min": float(min(out["surrogates"][os.path.basename(run)]["bias"])),
+                                         "bias_max": float(max(out["surrogates"][os.path.basename(run)]["bias"]))}))
+        json.dump(out, open(a.out, "w"), indent=1)
+        print(f"COLLECTED {a.out}")
+        return
     nlo = [json.load(open(p)) for p in sorted(glob.glob(os.path.join(a.dir, "nlo", "sqrts_*.json")))]
     got = {r["i"]: r for r in nlo}
     ok = lambda r: r if r and "sigma" in r else None      # a point MG5_aMC could not run (its tests failed): no exact NLO
@@ -404,6 +439,7 @@ def main():
     b = sub.add_parser("build")
     b.add_argument("--n-check", type=int, default=200)
     b.add_argument("--tol", type=float, default=1e-8)
+    b.add_argument("--window", choices=("scan", "bulk"), default="scan", help="bulk: KIT's ee_tt bulk window")
     n = sub.add_parser("nlo")
     n.add_argument("--part", default="0/1")
     n.add_argument("--acc", type=float, default=1e-3)
