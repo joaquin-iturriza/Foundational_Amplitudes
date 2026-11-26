@@ -42347,7 +42347,7 @@ entries:
       the partial trial_7001 stays): site submit refused (1 GB need + 5 GB margin > 5.5 GB); it goes once caf1170e ends and
       its smoke dir (16 GB, debris once its SMOKE_EXIT is read) is deleted. The 64-head smoke is resubmitted then too.'
   step_waits:
-    '8': FA-ccin2p3-1969f226 FA-ccin2p3-caf1170e
+    '8': '2026-11-27'
     '13': FA-ccin2p3-623a3af6
     '14': FA-ccin2p3-f0b997a2
     '15': FA-ccin2p3-0ca1d68d
