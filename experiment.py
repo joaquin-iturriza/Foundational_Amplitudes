@@ -1280,10 +1280,17 @@ class AmplitudeExperiment(BaseExperiment):
             if getattr(model, "input_asym_factor", False):   # the target's std in nats (wrappers._asym_mu)
                 sds = np.atleast_1d(np.asarray(self.prepd_std, dtype=np.float64)).ravel()
                 assert np.allclose(sds, sds[0]), f"model.input_asym_factor needs one target std, got {sds}"
-                trafos = [list(self.cfg.data.amp_trafos)] + [list(t) for t in (getattr(self, "_amp_trafos_pp", None) or [])]
-                assert all(t[0] == "log" for t in trafos) and not self.cfg.data.get("target_physics_factor", False) \
+                # per-dataset transforms when resolved per pool (the global one is then only representative: signedlog
+                # as soon as one pool changes sign), else the global one
+                trafos = ([list(t) for t in self._amp_trafos_pp] if getattr(self, "_amp_trafos_pp", None)
+                          else [list(self.cfg.data.amp_trafos)])
+                # a sign-changing pool under training.sign_head takes abslog:<s>, log max(|M|^2, s): the same natural
+                # log away from the zeros (the singular limits included), its sign from the sign row (D572)
+                ok = lambda t: t[0] == "log" or (getattr(self, "_sign_head", False) and str(t[0]).startswith("abslog:"))
+                assert all(ok(t) for t in trafos) and not self.cfg.data.get("target_physics_factor", False) \
                     and not self.cfg.data.get("target_over_born", False), \
-                    f"model.input_asym_factor models log|M|^2 (natural log, no divided-out factor), got trafos {trafos}"
+                    f"model.input_asym_factor models log|M|^2 (natural log, no divided-out factor; abslog with " \
+                    f"training.sign_head), got trafos {trafos}"
                 model.asym_sd.fill_(float(sds[0]))
             model.setup_particle_features(
                 use_pids=use_pids,

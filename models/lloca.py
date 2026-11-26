@@ -156,7 +156,9 @@ class LLOCAMuPTransformer(nn.Module):
         assert not self.sign_channel or loss == "HETEROSC", "sign_channel is the HETEROSC readout's sign row"
         # rows read from the live (non-detached) features: mu, and the sign logit when present
         self.n_main = out_channels + (1 if self.sign_channel else 0) + self.extra_main
-        assert not (self.extra_main and self.sign_channel), "extra_main is not combined with the sign row"
+        # with extra_main the sign row follows the extra rows: [mu (k), extra, sign (1), sigma (k)]; the wrapper takes the
+        # extra rows out before pooling, leaving the het sign layout [mu, sign, sigma] (kit_benchmark D572: A2 with a sign)
+        assert not (self.extra_main and sign_branch), "sign_branch reads the sign at row out_channels: no extra_main"
         # sign_branch: the sign logit (readout row out_channels) is computed by a copy of the last transformer block on
         # detached features and frames (models/transformer_lloca_mup.py MuPTransformer.sign_block), so the sign loss
         # never reaches the shared trunk nor its clipped update (plan catalog_coverage step 73); sign_branch_blocks k:
@@ -226,10 +228,11 @@ class LLOCAMuPTransformer(nn.Module):
                     r = ref_sd[name]
                     if t.shape == r.shape:
                         t.copy_(r)
-                    else:                       # a readout tensor: rows [mu (k), sign (1), sigma (k)]
+                    else:                       # a readout tensor: rows [mu (k), extra, sign (1), sigma (k)]
                         assert name.startswith("linear_out.") and t.shape[0] == r.shape[0] + 1, (name, t.shape, r.shape)
-                        t[:k].copy_(r[:k])
-                        t[k + 1:].copy_(r[k:])
+                        j = k + self.extra_main
+                        t[:j].copy_(r[:j])
+                        t[j + 1:].copy_(r[j:])
             del ref
         if layer_norm is not True:
             # model.net.layer_norm=false: the blocks' pre-norms become identities (kit_benchmark: does normalisation

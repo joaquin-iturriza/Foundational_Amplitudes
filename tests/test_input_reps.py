@@ -416,13 +416,14 @@ def test_asym_factor():
     assert abs(gaps[-1]) < 1e-4 and abs(gaps[0]) > abs(gaps[-1]), gaps
 
     # (3) through the wrapper
-    def wrap(loss="MSE", gmax=None, **fl):
+    def wrap(loss="MSE", gmax=None, sign=False, **fl):
         from models.lloca import LLOCAMuPTransformer
         ns = 16 + 15 * bool(fl.get("input_pair_logs"))
         torch.manual_seed(0)
         net = LLOCAMuPTransformer(num_scalars=ns, hidden_channels_mlp=16, num_layers_mlp=2, in_channels=ns + 4,
                                   attn_reps="8x0n+2x1n", out_channels=1, num_blocks=2, num_heads=2, loss=loss,
-                                  extra_main=int(bool(fl.get("input_asym_factor"))), frames_gamma_max=gmax)
+                                  extra_main=int(bool(fl.get("input_asym_factor"))), frames_gamma_max=gmax,
+                                  sign_channel=sign)
         w = AmplitudeLLoCaWrapper(net, token_size=0, d_particle_hidden=16, **fl)
         w.setup_particle_features(use_pids=False, property_matrix=G)
         if w.input_asym_factor:
@@ -442,6 +443,15 @@ def test_asym_factor():
         assert float((a[:, 0] - out(wrap(loss, input_pair_logs=6), p)[:, 0]).abs().max()) > 1e-3, "the flag does not move mu"
         if loss == "HETEROSC":
             assert w.net.n_main == 2 and w.net.net.linear_out.out_features == 3 and bool((a[:, 1] > 0).all())
+    # with the het sign row (D572: A2 on log|M| of a sign-changing pool): readout rows [mu, alpha, sign, sigma], output
+    # [mu, sign logit, sigma]; at one seed mu and sigma equal the model's without the sign row, which takes row 2
+    ws, w0 = wrap("HETEROSC", input_pair_logs=6, input_asym_factor=True, sign=True), wrap("HETEROSC", input_pair_logs=6,
+                                                                                         input_asym_factor=True)
+    a, b_ = out(ws, p), out(w0, p)
+    assert ws.net.n_main == 3 and ws.net.net.linear_out.out_features == 4 and a.shape == (2, 3)
+    assert torch.equal(a[:, [0, 2]], b_), (a, b_)
+    W, W0 = ws.net.net.linear_out.weight, w0.net.net.linear_out.weight
+    assert torch.equal(W[[0, 1, 3]], W0) and not torch.equal(W[2], W0[1])
     # the single-log flag: a learned scalar, no effect on an event without a heavy coloured leg
     w1 = wrap(input_pair_logs=6, input_asym_factor=True, input_asym_sudakov_single=True)
     assert w1.asym_kappa is not None and w1.asym_kappa.shape == (1,)
