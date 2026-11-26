@@ -28318,10 +28318,6 @@ entries:
       there)'
     24: 'Fair one-loop FT at every D when the parent FA-lxplus-828d67d6 (runs/data_saving/dsave_parent_finale_kit_fairnlo_a2)
       ends: fairnlo_arms.py FT lines, then read FT vs SCR-A2 vs V/B per D (design PASS 2026-11-26T02:27 / 13:00)'
-    25: 'D573/D574 standalone KIT package v7 (A2 models of sec:kit-mc; predict.py writes log10_me2 / log10_abs_virt_finite
-      + the value under the benchmark''s names; @1d050c7c37): build+check CPU job FA-ccin2p3-5c3fb7fa -> runs/kit_export/fa_kit_surrogates_v7.tar.gz;
-      on PACKAGE_OK fetch the tarball (site fetch --what all), clean local venv per README on examples/*, copy to analysis/kit_benchmark/export/,
-      hand Joaquin path and size'
     29: 'Slide-10 metrics never reported: bias, 99th percentile, |M|^2-weighted relative error per bin and the azimuth harmonic
       h (computed by his evaluate.py, kit_result.json) into the slide-9-style summary for A2 (fine-tunes when they exist)'
     30: 'Protocol A pretrained, ee_qqg/qqgg families held out, A2, uug/uugg (D575, design PASS): parent smoke FA-ccin2p3-42ae3468
@@ -29901,11 +29897,6 @@ entries:
       if:
       - 'FT below SCR-A2 and V/B past 1/7: the fair-NLO answer to KIT'
       - 'not: per D where it loses, with the parent''s curves'
-    25:
-      feeds: 'D573/D574: KIT runs our surrogates in their own MC'
-      if:
-      - 'check reproduces log10 within 2e-6 and clean venv matches: hand back tarball'
-      - 'a stage differs: locate (stats, threads, dtype, relocation), fix, rebuild'
     29:
       feeds: Bakar's slide-10 metrics reported
       if:
@@ -29925,7 +29916,6 @@ entries:
     '24': FA-lxplus-828d67d6
     '20': FA-ccin2p3-3895a2a7 FA-ccin2p3-e0587622
     '29': FA-ccin2p3-58bc2125 FA-ccin2p3-42ae3468
-    '25': FA-ccin2p3-6d36ce17
     '31': FA-ccin2p3-58bc2125
     '30': FA-ccin2p3-42ae3468
   handoff:
