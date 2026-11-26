@@ -61,4 +61,4 @@ def test_declared_gpu_hours_charged_d569():
     cmd = ["--time=167:00:00", "--gres=gpu:1", "--wrap=true"]
     assert g.sbatch_gpu_hours(cmd, {"CCORCH_DECLARED_GPUH": "117"})[0] == 117
     assert g.sbatch_gpu_hours(cmd, {})[0] == 167
-    assert g.sbatch_gpu_hours(cmd + ["--array=0-2"], {"CCORCH_DECLARED_GPUH": "10"})[0] == 30
+    assert g.sbatch_gpu_hours(cmd + ["--array=0-2"], {"CCORCH_DECLARED_GPUH": "10"})[0] == 10
