@@ -47411,6 +47411,29 @@ entries:
     sources: '-3 and within 2 of 0 <- measured: the pair''s two 2-means groups at d = -6.7 and -2.8 (data/c_best_factor_split.json),
       a bar halfway to the low group and its sd 2.2 (sd_d); smallest fifth <- attempt C/D''s singular-fifth subset convention
       (perevent_level.py subsets)'
+    fix_at: '2026-11-26T22:53:23+00:00'
+    fix: '(1) Outcome (check 4): the yes branch cannot occur and the no branch is ruled out by the existing data, so the likely
+      result falls in neither. On the g g > t b~ w- / g g > b t~ w+ pair the mean of d = pred - true is -5.66/-5.58 (data/c_best_factor_split.json).
+      For 80% of events to sit within 2 of 0, the closest-to-pole fifth would need a mean of d <= -20, which the 2-means groups
+      (-6.7 and -2.8) and D_EDGES +-10 rule out. ''Flat, no bin set off by more than 2'' contradicts eta2 0.81 (bin means''
+      sd ~ sqrt(0.81)*2.19 ~ 2.0). The ''within 2'' bar comes from sd_d 2.2, which is the spread of single events, not the
+      noise of a bin mean (~2.19/sqrt(250) = 0.14 per bin of 250 events). Fix: state yes/no as a contrast, e.g. the mean of
+      d in the pole region minus its mean elsewhere, or the share of the low group (72%) inside the pole region against outside
+      it, with the bar taken from the measured bin-mean noise, and add a branch for ''it depends on off-shellness but not
+      at the pole''. Each threshold cites its source. (2) The measure does not select the pole region (check 2). offshell_6
+      is the standardized signed log of (s_prop - M^2) (factor_split.py docstring; experiment.py _resolve_offshell_stats,
+      mean/std subtracted), so the pole s = M^2 lies at (0 - mu)/sd, not at offshell_6 = 0. ''The smallest fifth of |offshell_6|''
+      is therefore not ''nearest the pole''. Fix: read the run''s off-shellness mean/sd (and the signed-log scale) from its
+      saved statistics, then bin on the distance to the pole (|s - M^2|, or |offshell_6 - pole value|). Define the pole region
+      from that, e.g. the fifth closest to the pole, using the quoted subset convention. (3) Readout not shown written (check
+      15). The TBW tuple in factor_split.py includes dc_uux_tbxwm/dc_uux_btxwp, which are trained processes and are absent
+      from the held-out CSV (0 of them in c_best_factor_split.json). fig(--panels tbw) indexes o[''processes''][n] and will
+      KeyError. The design also says the twins are not read per event (commit d18771a37 dropped the seen events option). Fix:
+      drop the q q~ panels from the tbw figure and keep the pooled control, stated as the bound it gives: seen MSE 0.0014-0.0020
+      in c_best_seen.json bounds any fifth''s mean |d| at <= sqrt(0.002/0.2) ~ 0.1, far below the bars. Alternatively, read
+      the twins per event. Either way, show the figure call on the rewritten JSON. Update prior/control so they no longer
+      say ''beside its twins'' if the twins are not drawn. Checks 0, 1, 3, 5-19 hold: CPU-only re-read, no training, one existing
+      run, no seeds axis, no HP/loss/preprocessing change.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
