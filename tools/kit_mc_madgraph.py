@@ -72,6 +72,26 @@ def h5(d, proc):
     return os.path.join(d, f"{proc}.h5")
 
 
+def cut_pass(mom, g0):
+    """The coded dummy_cuts in numpy: (N,) True where s_ij/s >= 0.01 for every final pair (i, j>=g0), mom (N, n, 4)."""
+    m2 = lambda p: p[..., 0] ** 2 - (p[..., 1:] ** 2).sum(-1)
+    s, n = m2(mom[:, 0] + mom[:, 1]), mom.shape[1]
+    return np.all([m2(mom[:, i] + mom[:, j]) >= 0.01 * s for i in range(2, n - 1) for j in range(max(i + 1, g0), n)],
+                  axis=0)
+
+
+def lhe_weights(path):
+    """XWGTUP of every event of an LHE file (the line after each <event>)."""
+    import gzip
+    w, nxt = [], False
+    with gzip.open(path, "rt") as f:
+        for line in f:
+            if nxt:
+                w.append(float(line.split()[2])); nxt = False
+            nxt = nxt or line.lstrip().startswith("<event")
+    return np.asarray(w)
+
+
 def cmd_gen(a):
     import h5py
     import mg5_pipeline_final as mg
@@ -90,6 +110,9 @@ def cmd_gen(a):
     pdgs = [p["pdg"] for p in meta["particles"]]
     n = len(pdgs)
     g = pdgs.index(21) + 1                          # first gluon leg (MadGraph order = the generate line's)
+    with h5py.File(kh.h5_path(a.proc), "r") as K:   # the coded cut is KIT's bulk: every bulk_test event passes it
+        bt = K["bulk_test/bulk/momenta"][:]
+        assert cut_pass(bt, g - 1).all(), f"{(~cut_pass(bt, g - 1)).sum()} KIT bulk_test events fail the coded cut"
     f = os.path.join(ev, "SubProcesses", "dummy_fct.f")
     src = open(f).read()
     import re
@@ -113,6 +136,9 @@ def cmd_gen(a):
     fa_pdgs = [pdgs[i] for i in perm_kit]
     slot = mg.row_to_slot_perm(fa_pdgs, [f"generate {gen}"])
     mom, aqcd, _ = mg.read_lhe_pp(f"{ev}/Events/run_01/unweighted_events.lhe.gz", pdgs)
+    w = lhe_weights(f"{ev}/Events/run_01/unweighted_events.lhe.gz")
+    assert len(w) == len(mom) and np.allclose(w, w[0], rtol=1e-6), f"LHE weights not equal: {w.min()}..{w.max()}"
+    assert cut_pass(mom, g - 1).all(), "a MadEvent event fails the coded cut"
 
     def exact(m_kit):
         with mg.CppDriverPipe(drv, sa) as pipe:
