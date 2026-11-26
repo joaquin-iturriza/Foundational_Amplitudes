@@ -34128,6 +34128,61 @@ entries:
       The loss is HETEROSC. A2 with plain momenta matches the KIT A2 models. The recipe diff at 6a6ca8839 removes only ee_uug,
       ee_uugg, ee_bbbarg and ee_bbbargg. The parent runs with memmap=false, so there is no shared cache. D575 covers all of
       this work.'
+  - at: '2026-11-26T14:52:04+00:00'
+    question: 'D575 (Bakar''s protocols for the A2 models): (i) protocol B on the three A2 models (runs/kit/kit_A_ee_{uug_me2,uugg_me2,tt_virt_finite}_n100000_t1831_hpo_asym_cont):
+      does continuing each with the hard_train strata added (B) improve the deep hard bins over the same continuation on bulk
+      only (B_bulk)? (ii) protocol A pretrained with the target family held out, A2, for ee->uug and ee->uugg (Bakar: ''The
+      most interesting test for me is whether the model gets these limits without seeing hard data, in particular when pretrained
+      with the target process held out''): does a fine-tune from an A2 pretraining without the ee_qqg/ee_qqgg families beat
+      A2 from scratch at the same config on the hard bins?'
+    prior: 'Searched plan kit_benchmark findings, results.tex sec:kit-mc and kit A/B paragraphs, decisions D570-D575. (i)
+      Protocol B so far only on the 11-10 scratch n=9e5 models (finding 2026-11-10T10:20, kit_fig_B.json): B vs B_bulk deepest-bin
+      gains 0.15-6.5 decades (uug soft 0.15, coll 0.9; uugg soft 1.1, coll_gg 1.7; tt virt threshold 0.56, Sudakov 2.5); never
+      on A2. (ii) 12 fine-tunes from the non-A2 family-held-out parent runs/kit/kit_pretrain_heldout (findings 2026-11-11T04:42,
+      06:37): at lr_scale 1.0 uug deepest soft log-MSE 2140 vs 14180 from scratch; at lr_scale 0.1 uug soft 2.59 decades and
+      uugg soft 1.78 decades below scratch, collinear unchanged at both lr; the tt fine-tune search kit_hpo_tt_ft_r5 chose
+      lr_scale 2.49: the lr axis moves this verdict. A2 adds a readout row and changes the target standardization (affine
+      multiplicity std), so a non-A2 checkpoint cannot start an A2 model; the only A2 pretraining is the fair one-loop parent
+      (recipe transfer_finale_kit_fairnlo.yaml), which contains ee_uug, ee_uugg, ee_bbbarg, ee_bbbargg. New recipe recipes/transfer_finale_kit_heldout_qqg.yaml
+      @6a6ca8839 = that recipe minus those four (the families of recipes/gen_kit_pretrain.py, Bakar''s ''if uug is the target,
+      then ddg, bbg and the scan variants should go too'').'
+    measure: 'Every run scored at its end by tools/kit_predict.py (Bakar''s evaluate.py): log10-MSE per hard_test stratum
+      and bulk_test, bias, p99, |M|^2-weighted error, fitted exponents; collected by tools/kit_figures.py collect; per family
+      the median over strata of log10(arm/control log-MSE) (tools/kit_readout.py --vs) and the deepest-bin log-MSE and exponent.
+      (i) B vs B_bulk per process; (ii) FT (each lr) vs SCR-A2 per process; beside: the existing asym_cont scratch runs and
+      Bakar''s MLP.'
+    check: '(i) B moved the measure on the scratch models by 0.15-6.5 decades in the deepest bins (finding 2026-11-10T10:20).
+      (ii) The held-out start moved it on uug/uugg directly: soft bins 0.57-2.59 decades below scratch (findings 2026-11-11T04:42,
+      06:37), lr-dependent; the A2 head map from a multiplicity-affine A2 parent ran clean in the fair FT smoke FA-lxplus-da06f228
+      (mu_4 = -2.536).'
+    fixed: '(i) scripts/job_kit.sh modes B and B_bulk with --env KIT_FROM=<A2 run>: base config and best weights of that run,
+      its target and off-shellness stats kept, 3000 steps (the 11-10 B''s continuation length, finding 2026-11-10T10:20),
+      its lr and schedule, float64, HETEROSC + mu_mse selection + sigma stage, seed 42; 6 runs (3 processes x B, B_bulk).
+      (ii) parent: scripts/job_datasaving_parent.sh finale recipe=recipes/transfer_finale_kit_heldout_qqg.yaml with every
+      flag of the fair parent FA-lxplus-828d67d6 (flags=off lr=1.89e-3, A2 flags, affine multiplicity std, sign_head) tag=kit_heldoutqqg_a2,
+      64000 steps, limit 14 h target 10 h; arms per process (uug, uugg), job_kit.sh kit_ee_<p>__me2 100000 1831 with the asym_cont
+      run''s HPs read from its config.yaml on CC (uug: WSD cooldown 0.125, lr 0.01251006, muon_wd 0.05224253, reg 4.881444e-07,
+      warmup 0.1902839, eta_min 1.045745e-08, ema false; uugg: lr 0.01152379, muon_wd 0.1624777, reg 7.777018e-07, warmup
+      0.1763589, eta_min 8.308557e-09, ema false), fine_tune.offshell_stats=own: FT1 = A_ft KIT_PARENT=runs/data_saving/dsave_parent_finale_kit_heldoutqqg_a2
+      KIT_LR_SCALE 1 tag heldoutqqg_ft; FT0.1 = same at KIT_LR_SCALE 0.1 tag heldoutqqg_ft01 (the lr where the earlier held-out
+      fine-tunes gained most); SCR-A2 = same args, mode A (fine_tune null), tag heldoutqqg_scra2, submitted as soon as the
+      parent''s config.yaml exists (it needs no weights); FT waits for the parent''s end. Smokes first (D395: B on A2 configs
+      and the new recipe are new paths): B on the tt A2 run 50 steps through scoring; parent iters=50; then FT and SCR-A2
+      50 steps from the smoke parent. Cost: B 6 x ~0.9 h = 5.4; parent <= 14 (target 10); 6 arms x ~0.65 = 3.9; smokes ~1:
+      <= 25 GPU-h, under D575''s 100. Disk: B/arms ~80 MB each, parent ~1 GB; lxplus EOS and CC /sps read before submission.'
+    control: '(i) B_bulk: the same continuation from the same A2 run on bulk only (only the hard_train strata differ). (ii)
+      SCR-A2: same base config (the held-out parent''s), data, steps, HPs, scoring; only the start differs. Beside: the asym_cont
+      A2 scratch runs (trial-1262 base) and Bakar''s MLP (his evaluate.py files).'
+    seeds: 'One seed (42) per run (D315); spread: t t~ V same-HP rerun spread 0.78-6.96 (results.tex sec:datasaving).'
+    outcome: 'Per process and hard family (soft, collinear, azimuth; tt: Coulomb, Sudakov), R = arm/control log-MSE, median
+      over strata: BEATS R < 1/7, LOSES R > 7, else LEVEL. (i) B BEATS B_bulk on a family: hard points still teach A2 there;
+      LEVEL: A2 already extrapolates there from bulk (protocol A suffices). (ii) the better of FT1 and FT0.1 per process (named)
+      BEATS SCR-A2: the held-out pretraining transfers the universal soft/collinear limits (Bakar''s question, positive);
+      neither beats it: the feature rule''s next step, the fine-tune search of kit_hpo_tt_ft_r5 (lr_scale [0.1, 10], layer_decay
+      [0.75, 1]) for that process, best against best, before any ''no transfer'' statement. Blow-up: a validation jump > 5x
+      reruns once at half lr.'
+    sources: 1/7 and 7 <- t t~ V same-HP rerun spread 0.78-6.96 (results.tex sec:datasaving, the passed step-20 design's bar);
+      5x jump <- sec:ladder seeds' blow-ups against 1.5x seed noise; 100 GPU-h <- D575 names this work
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
