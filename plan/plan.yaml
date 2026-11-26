@@ -28337,8 +28337,6 @@ entries:
       (1-thread pinning, check subset); package the sec:kit-mc A2 models'
     27: 'Bakar slides 5-9 his-layout figures (tools/kit_bakar_figs.py, drawn 11-12 with the pre-A2 transformer): redraw with
       the A2 models beside his MLP'
-    28: Protocol B (continue from A with hard_train) on the A2 models (run so far only on the 11-10 scratch model); needs
-      a design and review
     29: 'Slide-10 metrics never reported: bias, 99th percentile, |M|^2-weighted relative error per bin and the azimuth harmonic
       h (computed by his evaluate.py, kit_result.json) into the slide-9-style summary for A2 (fine-tunes when they exist)'
     30: 'Protocol A pretrained with the target held out for uug/uugg with A2: exists only for tt (and without A2); the fair
@@ -29875,11 +29873,6 @@ entries:
       if:
       - 'A2 ahead of the MLP on the hard bins: the figures carry it'
       - 'behind on some: the figures show where'
-    28:
-      feeds: Bakar's protocol B for the KIT models we report
-      if:
-      - 'B improves the hard bins over A2''s A: report the gain per family'
-      - 'no gain: A2 already extrapolates, reported'
     29:
       feeds: Bakar's slide-10 metrics reported
       if:
@@ -29896,7 +29889,6 @@ entries:
     '25': the repo-reviewer pillar run (blocks the commit of tools/kit_package.py --standalone, uncommitted in trunk)
     '26': a new owner (the previous closed at its context limit, 2026-11-26 ~15:30); after step 25/26's package
     '27': a new owner (the previous closed at its context limit, 2026-11-26 ~15:30); after step 25/26's package
-    '28': a new owner (the previous closed at its context limit, 2026-11-26 ~15:30); after step 25/26's package
     '29': a new owner (the previous closed at its context limit, 2026-11-26 ~15:30); after step 25/26's package
     '30': a new owner (the previous closed at its context limit, 2026-11-26 ~15:30); after step 25/26's package
   handoff:
