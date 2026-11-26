@@ -42409,9 +42409,24 @@ entries:
       time), 2026-11-11T02:02 (a session outage), 2026-10-22T00:52 (launch waits), 2026-10-15T02:49 (results hand-off): none
       is about renaming a file on CC'
     blocks: the two evaluations moved to CC's interactive GPU partition and any CC submission
+    blocks_steps:
+    - 21
+    - 23
+  - ask: 'Permission classifier refusal: syncing our code to CC is blocked by an untracked file there, analysis/catalog_daniel/data/perevent_anchored.json,
+      written by our own per-event job; the committed version must replace it. The fix is renaming CC''s copy to perevent_anchored.json.pre_sync
+      (nothing deleted), which the permission classifier refused. OK to rename it?'
+    at: '2026-11-26T19:46:02+00:00'
+    searched: 'CLAUDE.md (never touch a cluster by hand; site sync moves code) and site decisions through D588: none covers
+      a classifier-refused rename on CC. His messages flagged by term: 2026-11-14T04:31 (a LaTeX template), 2026-10-26T17:18
+      (hook warnings), 2026-11-20T15:11 (exploring open points), 2026-10-29T05:31 (session review), 2026-11-24T14:11 (batch
+      size), 2026-11-06T22:31 (generation time), 2026-11-11T02:02 (a session outage), 2026-10-22T00:52 (launch waits), 2026-10-15T02:49
+      (results hand-off): none is about renaming a file on CC'
+    blocks: the two evaluations moved to CC's interactive GPU partition, the attempt D CPU job (design passed), and any CC
+      submission (lxplus and Jean Zay unreachable)
     blocks_steps: &id004
     - 21
     - 23
+    - 24
   owner:
     agent: a85970e976cb8ac83
     state: working
@@ -47531,13 +47546,14 @@ entries:
   ask: 'Permission classifier refusal: syncing our code to CC is blocked by an untracked file there, analysis/catalog_daniel/data/perevent_anchored.json,
     written by our own per-event job; the committed version must replace it. The fix is renaming CC''s copy to perevent_anchored.json.pre_sync
     (nothing deleted), which the permission classifier refused. OK to rename it?'
-  waiting_since: '2026-11-26T19:31:45+00:00'
-  searched: 'CLAUDE.md (never touch a cluster by hand; site sync moves code) and site decisions: none covers a classifier-refused
-    rename on CC. His messages flagged by term: 2026-11-14T04:31 (a LaTeX template), 2026-10-26T17:18 (hook warnings), 2026-11-20T15:11
-    (exploring open points), 2026-10-29T05:31 (session review), 2026-11-24T14:11 (batch size), 2026-11-06T22:31 (generation
-    time), 2026-11-11T02:02 (a session outage), 2026-10-22T00:52 (launch waits), 2026-10-15T02:49 (results hand-off): none
-    is about renaming a file on CC'
-  blocks: the two evaluations moved to CC's interactive GPU partition and any CC submission
+  waiting_since: '2026-11-26T19:46:02+00:00'
+  searched: 'CLAUDE.md (never touch a cluster by hand; site sync moves code) and site decisions through D588: none covers
+    a classifier-refused rename on CC. His messages flagged by term: 2026-11-14T04:31 (a LaTeX template), 2026-10-26T17:18
+    (hook warnings), 2026-11-20T15:11 (exploring open points), 2026-10-29T05:31 (session review), 2026-11-24T14:11 (batch
+    size), 2026-11-06T22:31 (generation time), 2026-11-11T02:02 (a session outage), 2026-10-22T00:52 (launch waits), 2026-10-15T02:49
+    (results hand-off): none is about renaming a file on CC'
+  blocks: the two evaluations moved to CC's interactive GPU partition, the attempt D CPU job (design passed), and any CC submission
+    (lxplus and Jean Zay unreachable)
   blocks_steps: *id004
 - id: lab_llm_trial
   title: Lab LLMs in place of some subagents
