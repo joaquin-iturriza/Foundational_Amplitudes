@@ -1,5 +1,5 @@
 """Step 20 arm submissions (design PASS 2026-11-26T02:27): prints one `site submit` per arm and D.
-python3 arms20.py <site> <parent_dir> <limit HH:MM:SS> [--smoke]  (--smoke: D=1e4 only, 50 steps, tags *_smoke3)"""
+python3 arms20.py <site> <parent_dir> <limit HH:MM:SS> [--smoke]  (--smoke: D=1e4 only, 50 steps, tags *_smoke4)"""
 import sys
 site, parent, limit = sys.argv[1:4]
 smoke = "--smoke" in sys.argv
@@ -21,7 +21,7 @@ common = lambda h: (f"training.scheduler=CosineAnnealingLR training.muon_weight_
                     f"training.cosanneal_warmup_frac={h['wu']} training.cosanneal_eta_min={h['eta']} ema={h['ema']} training.ema_decay={h['ed']}")
 for d in ([10000] if smoke else D):
     t = 50 if smoke else T[d]
-    sfx = "_smoke3" if smoke else ""  # _smoke, _smoke2: the 2026-11-26 failed smokes left their dirs
+    sfx = "_smoke4" if smoke else ""  # _smoke.._smoke3: earlier smokes left their dirs (D572 resmoke: _smoke4)
     f, s = FT[d], SCR[d]
     sub = f"site submit {site} FA scripts/job_kit.sh --item kit_benchmark --hdr=--time={limit} --env KIT_PARENT={parent}"
     print(f"{sub} --env KIT_LR_SCALE={f['ls']} -- kit_ee_tt__virt_finite {d} {t} A_ft training.lr={BASE_FT_LR[d]} fine_tune.layer_decay={f['ld']} fine_tune.offshell_stats=own {common(f)} tag=fairnlo_ft_d{d}{sfx}")
