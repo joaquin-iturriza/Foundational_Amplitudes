@@ -28528,12 +28528,10 @@ entries:
     withdrawn_why: Step 22 is the NO branch of this entry's passed 10:47 design; D570 releases kit_benchmark and the two searches
       cost 19.2 GPU-h, under the 30 GPU-h line (main session, 2026-11-26)
   owner:
-    agent: a753fb41b3f480c1d
-    state: closed
-    since: '2026-11-26T02:44:45.162000+00:00'
-    state_at: '2026-11-26T03:24:08.440000+00:00'
-    context: 213813
-    context_at: '2026-11-26T03:24:23+00:00'
+    agent: a8f9a3b8d28dab422
+    state: working
+    since: '2026-11-26T03:33:40.885000+00:00'
+    state_at: '2026-11-26T03:33:40.885000+00:00'
   findings:
   - at: '2026-11-10T03:33:04+00:00'
     text: 'Data: KIT package (888 MB tar, 2.7 GB with the tar) on CC at $DATA_DIR/kit_hardps/hardps_benchmark (fetched by
@@ -47173,7 +47171,7 @@ entries:
     agent: a7b288b537965af86
     state: working
     since: '2026-11-25T15:23:33+00:00'
-    state_at: '2026-11-26T03:24:11.710000+00:00'
+    state_at: '2026-11-26T03:33:15.162000+00:00'
     context: 218167
     context_at: '2026-11-26T03:32:45+00:00'
   designs:
