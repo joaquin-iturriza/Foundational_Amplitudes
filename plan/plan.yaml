@@ -29901,6 +29901,13 @@ entries:
       rms 6.6e-4, one sign change; equals the earlier flat-bulk MC estimate 5.83e-4. Threshold scan at 1 thread identical
       to the 8-thread one at 4 digits (-0.292 at beta 1e-3, +6.4e-4 at 0.6). Figure analysis/kit_benchmark/figs/kit_mc_slide11_tt.png.
       Tree part FA-ccin2p3-aacf91cc/706a0f6f pending on CC htc.'
+  - at: '2026-11-26T23:55:55+00:00'
+    text: 'E9620 (FA-ccin2p3-42ae3468, held-out pretraining smoke) FAILED at init_data, not training: RuntimeError in datagen.ensure_dataset
+      (datagen.py:537) ''require_cache: dataset for (ee_uu, train, 100000 ev) not prebuilt at /sps/lpnhe/jiturrizaramirez01/tmp/amp_data_cache/ee_uu_25-1000GeV_train_amplitudes.npy
+      (recipe_id=bfd1410e3763e06f). Run the prebuild job first: sbatch prebuild_recipes.sh <spec.yaml>''. Recipe recipes/transfer_finale_kit_heldout_qqg.yaml
+      (25 processes incl. kit_ee_tt__born__hard), git 4c14bc47. Fix: run the prebuild job for that recipe on CC-IN2P3 (prebuild_recipes.sh
+      with the recipe spec) so all 25 train/val caches exist, then resubmit the smoke. DeepSeek triage did not answer; cause
+      read by hand from the whole log (66 lines).'
   step_why:
     20:
       feeds: 'D570: FT vs SCR-A2 vs V/B on the KIT hard bins'
