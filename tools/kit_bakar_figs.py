@@ -146,6 +146,42 @@ def collect(out):
     print(f"-> {out}")
 
 
+# the searched from-scratch transformers, the "transformer" of tools/kit_vs_mlp.py (its SCRATCH), as (site, run dir):
+# one transformer in the whole KIT deck (2026-11-26)
+SEARCHED = {"ee_uug_me2": ("ccin2p3", "runs/kit_hpo_uug_plain/trial_1918"),
+            "ee_uugg_me2": ("ccin2p3", "runs/kit_hpo_uugg_plain/trial_0798"),
+            "ee_tt_virt_finite": ("lxplus", "runs/kit_hpo_ttvirt_thr/trial_0131")}
+
+
+def collect_searched(base, out):
+    """`base` (a collect output) with its "transformer" replaced by the SEARCHED trials, read on their sites by the
+    same SITE script over the same events"""
+    from analysis.common.readers import site_python
+    import shlex
+    d = json.load(open(base))
+    for site in sorted({s for s, _ in SEARCHED.values()}):
+        models = {p: [("transformer", [r])] for p, (s, r) in SEARCHED.items() if s == site}
+        part = site_python(SITE, [shlex.quote(json.dumps(models)), shlex.quote(json.dumps({})), str(PER_DECADE)],
+                           "KITBAKAR", site=site, timeout=3600)
+        for p, n in part.items():
+            o = d[p]
+            o["result"]["transformer"] = n["result"]["transformer"]
+            for f, b in n["bins"].items():
+                assert b["x"] == o["bins"][f]["x"] and b["truth"] == o["bins"][f]["truth"], f"{p} {f}: other events"
+                o["bins"][f] = {k: v for k, v in o["bins"][f].items() if k.split("#")[0] != "transformer"}
+                o["bins"][f].update({k: v for k, v in b.items() if k.startswith("transformer#")})
+            if n["vb"]:
+                assert n["vb"]["x"] == o["vb"]["x"]
+                o["vb"] = {k: v for k, v in o["vb"].items() if k.split("#")[0] != "transformer"}
+                o["vb"].update({k: v for k, v in n["vb"].items() if k.startswith("transformer#")})
+            for st, a in n["azimuth"].items():
+                assert a["event"]["truth"] == o["azimuth"][st]["event"]["truth"]
+                o["azimuth"][st]["rms"]["transformer"] = a["rms"]["transformer"]
+                o["azimuth"][st]["event"]["transformer"] = a["event"]["transformer"]
+    json.dump(d, open(out, "w"))
+    print(f"-> {out}")
+
+
 def seeds(d, lab):
     """the per-seed series of a model label in a binned dict, median over seeds"""
     ks = [k for k in d if k.split("#")[0] == lab]
@@ -360,9 +396,15 @@ def main():   # dup-ok: argparse collect/plot boilerplate, every kit tool has it
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
     c = sub.add_parser("collect"); c.add_argument("--out", required=True)
+    c.add_argument("--searched", metavar="BASE", help="BASE with its transformer replaced by the SEARCHED trials")
     p = sub.add_parser("plot"); p.add_argument("data"); p.add_argument("--figs", required=True)
     a = ap.parse_args()
-    collect(a.out) if a.cmd == "collect" else plot(a.data, a.figs)
+    if a.cmd == "plot":
+        plot(a.data, a.figs)
+    elif a.searched:
+        collect_searched(a.searched, a.out)
+    else:
+        collect(a.out)
 
 
 if __name__ == "__main__":
