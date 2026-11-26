@@ -1,7 +1,7 @@
 """llm_compare D566 attempt C: the level error on the 43 new held-out processes, on the full pools and on the same
 processes re-sampled by restricting each pool (sqrt s_hat below / above its median, a harder cut on the smallest pair
 invariant, its singular fifth), for the per-process level from process and diagrams (constant per process) and the
-anchored per-event levels c^ + b^.(x - x0) (data/perevent_anchored.json, perevent_level.py --anchored). Points: the
+anchored per-event levels c^ + b^.(x - x0) (data/perevent_anchored_C.json, perevent_level.py --anchored). Points: the
 median over ten 3-seed network ensembles of the new-set median level error; bars: the ensembles' min to max; the
 pool's own true mean (one number per pool, no network) beside them.
     python analysis/catalog_daniel/perevent_anchored_fig.py [D]
@@ -32,7 +32,7 @@ ARMS_D = (("regressor_ens", "one level per process", ps.C.blue, "s"),
 def main():
     sfx = "_D" if sys.argv[1:] == ["D"] else ""
     arms = ARMS_D if sfx else ARMS
-    d = json.load(open(os.path.join(HERE, "data", f"perevent_anchored{sfx}.json")))
+    d = json.load(open(os.path.join(HERE, "data", "perevent_anchored" + (sfx or "_C") + ".json")))
     E, S = d["ensembles"], d["summary"]
     x = np.arange(len(SUBS))
     fig, (ax, lax) = ps.figure(ncols=2)

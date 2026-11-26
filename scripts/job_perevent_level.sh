@@ -13,10 +13,10 @@ _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
 # PEL_ANCHORED=1 (D566 attempt C): --anchored on the memmap base caches PEL_MMAP (<key>/<depth> under
-# $SCRATCH/amp_mmap_cache, space-separated), output perevent_anchored.json; PEL_ANCHOR=process (attempt D): the
+# $SCRATCH/amp_mmap_cache, space-separated), output perevent_anchored_C.json; PEL_ANCHOR=process (attempt D): the
 # process-intrinsic anchor, output perevent_anchored_D.json
 if [ -n "${PEL_ANCHORED:-}" ]; then
-  A=${PEL_ANCHOR:-global}; J=analysis/catalog_daniel/data/perevent_anchored$([ "$A" = process ] && echo _D).json
+  A=${PEL_ANCHOR:-global}; J=analysis/catalog_daniel/data/perevent_anchored$([ "$A" = process ] && echo _D || echo _C).json
   OMP_NUM_THREADS=4 python analysis/catalog_daniel/perevent_level.py --anchored --anchor "$A" --model mlp \
     --mmap $(for k in $PEL_MMAP; do echo "$SCRATCH/amp_mmap_cache/$k"; done) && echo "PEL_JSON $(python -c \
     "import json; d=json.load(open('$J')); print(json.dumps(d['summary']))")" \

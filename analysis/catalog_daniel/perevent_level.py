@@ -376,7 +376,7 @@ def anchored(D, tr, ho, new, rel, meta, grp, pfeat, lev, events, nboot=30, mode=
     out["families"] = {c: {g: {s: float(np.median([R[c][n][s] for n in ns])) for s in SUBSETS} | {"n": len(ns)}
                            for g, ns in fams.items()} for c in cands}
     out["per_process_new"] = {meta[n]["process"]: {c: R[c][n] for c in cands} for n in new}
-    json.dump(out, open(os.path.join(HERE, "data", "perevent_anchored" + ("" if mode == "global" else "_D") + ".json"), "w"),
+    json.dump(out, open(os.path.join(HERE, "data", "perevent_anchored" + ("_C" if mode == "global" else "_D") + ".json"), "w"),
               indent=1)
     for c in cands:
         print(c, {g: {s: round(v, 4) for s, v in summ[c][g].items() if s != "boot_sd"} for g in ("new", "relabels")})
@@ -389,7 +389,7 @@ def main():
     ap.add_argument("--model", choices=("hgb", "mlp"), default="hgb")
     ap.add_argument("--mmap", nargs="+", help="read each process's first train-role events from these memmap base "
                     "caches (data_mmap: <key>/<depth> dirs) instead of $SCRATCH/amp_data_cache's pools")
-    ap.add_argument("--anchored", action="store_true", help="D566 attempt C, output data/perevent_anchored.json")
+    ap.add_argument("--anchored", action="store_true", help="D566 attempt C, output data/perevent_anchored_C.json")
     ap.add_argument("--anchor", choices=("global", "process"), default="global", help="--anchored's x0: one constant "
                     "(attempt C) or a process-intrinsic x0_p (attempt D, output data/perevent_anchored_D.json)")
     ap.add_argument("--search", type=int, default=0, help="step 20: DyHPO GP trials on the content-signature "
