@@ -29833,6 +29833,15 @@ entries:
       (not fixed: mechanical-worker). Diff backup /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/kit_export_uncommitted.diff.
       Next owner: fix (3), continue that reviewer with the fixes, on PASS commit tools/kit_package.py tools/kit_predict.py,
       then the export''s design and CPU job (hand-off).'
+  - at: '2026-11-26T14:29:00+00:00'
+    text: '2026-11-26 ~15:40 @1d050c7c37. D573/D574 package: export code committed (9032d1238, d5e9f0b87, 45a1e906b; repo-reviewer
+      re-check PASS): predict.py writes Bakar''s slide-11 interface (log10_me2 / log10_abs_virt_finite float64 under the benchmark''s
+      names, and the value under the target name); the package was missing noise_scale.py and siteconf.py (+ sites/sites.yaml,
+      shipped empty), now shipped; 5 drive.py tests fixed (--disk-gb). The uncommitted export diff had been reverted in the
+      shared checkout by someone else; re-applied from the scratchpad backup. Design PASS 14:25; build+check CPU job FA-ccin2p3-5c3fb7fa
+      (-> runs/kit_export/fa_kit_surrogates_v7). Slide 5-9 redraw with the A2 models + evaluate.py''s bias/p99/|M|^2-weighted
+      error/azimuth h summary: tools/kit_bakar_figs.py @45a1e906b, collect CPU job ccj_03dedf7197c8 on CC -> analysis/kit_benchmark/data/kit_bakar_figs_a2.json.
+      Protocol B dropped (D574: needs training); fair one-loop real parent and arms held under D574.'
   step_why:
     20:
       feeds: whether the fair one-loop fine-tune with sign-changing pools in beats scratch A2 and the V/B baseline on the
