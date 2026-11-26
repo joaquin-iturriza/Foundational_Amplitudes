@@ -29891,6 +29891,7 @@ entries:
       it wakes)
     '25': FA-ccin2p3-5c3fb7fa
     '31': FA-ccin2p3-58bc2125
+    '30': FA-ccin2p3-42ae3468
   handoff:
     state: '2026-11-26 ~15:00 UTC. Step 20 (D570 + D572 signed A2, design PASS 13:00): parent smoke FA-lxplus-f7c30433 clean
       (0.58 s/it over 50 steps incl. start-up; kit_sign_read wrong sign after 50 steps 0.37/0.32/0.18 on uubar_ddbar_nlo/ee_mumu_ew_nlo/ee_uu_ew_nlo:
