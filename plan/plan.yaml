@@ -28322,8 +28322,6 @@ entries:
       + the value under the benchmark''s names; @1d050c7c37): build+check CPU job FA-ccin2p3-5c3fb7fa -> runs/kit_export/fa_kit_surrogates_v7.tar.gz;
       on PACKAGE_OK fetch the tarball (site fetch --what all), clean local venv per README on examples/*, copy to analysis/kit_benchmark/export/,
       hand Joaquin path and size'
-    27: 'Bakar slides 5-9 his-layout figures (tools/kit_bakar_figs.py, drawn 11-12 with the pre-A2 transformer): redraw with
-      the A2 models beside his MLP'
     29: 'Slide-10 metrics never reported: bias, 99th percentile, |M|^2-weighted relative error per bin and the azimuth harmonic
       h (computed by his evaluate.py, kit_result.json) into the slide-9-style summary for A2 (fine-tunes when they exist)'
     30: 'Protocol A pretrained, ee_qqg/qqgg families held out, A2, uug/uugg (D575, design PASS): parent smoke FA-ccin2p3-42ae3468
@@ -29891,11 +29889,6 @@ entries:
       if:
       - 'check reproduces log10 within 2e-6 and clean venv matches: hand back tarball'
       - 'a stage differs: locate (stats, threads, dtype, relocation), fix, rebuild'
-    27:
-      feeds: showing Joaquin Bakar's asks done his way (slides 10, 13)
-      if:
-      - 'A2 ahead of the MLP on the hard bins: the figures carry it'
-      - 'behind on some: the figures show where'
     29:
       feeds: Bakar's slide-10 metrics reported
       if:
@@ -29919,7 +29912,6 @@ entries:
   step_waits:
     '24': FA-lxplus-828d67d6
     '20': FA-ccin2p3-3895a2a7 FA-ccin2p3-e0587622
-    '27': a reviewer
     '29': FA-ccin2p3-5c3fb7fa (read the CC CPU job ccj_03dedf7197c8 of kit_bakar_figs collect -> kit_bakar_figs_a2.json when
       it wakes)
     '25': FA-ccin2p3-1b18c76c
