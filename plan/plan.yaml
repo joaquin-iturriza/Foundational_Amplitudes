@@ -29732,6 +29732,16 @@ entries:
     text: 2026-11-26 ~12:00. Step 20 FT smoke FA-lxplus-da06f228 (@a569fc3fd) clean through every stage on H100 NVL, 0.16
       s/iter (50-step mean); head mapped from the A2 parent at mu_4 = -2.536 (mu row x4.372, bias -2.827). All three arm smokes
       (FT, SCR-A2, V/B) pass D395. The real parent and then the arms wait only on Joaquin's uubar_ddbar_nlo question.
+  - at: '2026-11-26T11:44:35+00:00'
+    text: '2026-11-26 ~12:45. Step 22 searches done (driver kit_hpo_tt_divform_rezero rc 0; 16/16 trials each, 0 failed; wave
+      2 of each went out suggested from wave 1''s penalties only, i.e. unguided, Joaquin''s open question on it unanswered).
+      Read with tools/kit_curves.py sweep -> analysis/kit_benchmark/data/kit_hpo_tt_divform_rezero.json (curve_quality on
+      val/train mu-MSE, chosen = lowest best val among good trials): div-form chosen hp0741 (lr 7.28e-3, val mu-MSE 2.20e-6,
+      sep 2.15, 12/16 good); ReZero chosen hp0905 (lr 1.03e-2, val mu-MSE 5.98e-7, sep 1.64, 13/16 good). Baseline (kit_hpo_ttvirt_thr
+      chosen hp0131, lr 1.78e-3, val mu-MSE 7.10e-7, sep 1.94; kit_hpo.json): best against best div-form 2.20e-6/7.10e-7 =
+      3.1x worse, ReZero 5.98e-7/7.10e-7 = 0.84 (16% lower). Hard strata next (10:47 design NO branch): rescore FA-ccin2p3-32df7421
+      of both chosen trials (REREAD), step 22 waits on it; then kit_figures collect + kit_readout --vs against hp0131''s scored
+      strata (kit_fig_A_hpo.json).'
   step_why:
     20:
       feeds: the KIT NLO statement in the draft
