@@ -48180,9 +48180,7 @@ entries:
       42 as the runs repeated). Terms searched: overshoot, step size, update, noise scale (results.tex); D532, D536, D560
       (decisions); plus the first-read data files above, which the prior names but does not carry through to the predicted
       B_dL.'
-  step_waits:
-    '4': 'the detached ep50_collect2 (pid 2901036) ending: COLLECTED -> ft_bcrit.py ep50 read and figure; FAILED (CC /sps
-      full) -> wait on the cc_disk owner''s freeing, then one resubmission'
+  step_waits: {}
   targets:
   - batch: noise_smoke
     wall_h: 0.4
