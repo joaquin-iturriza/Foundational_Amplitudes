@@ -29945,7 +29945,7 @@ entries:
     '24': FA-lxplus-828d67d6
     '20': 'next owner: event E9622 (arm smokes done), then site pick + SCR-A2 and V/B arms'
     '29': FA-lxplus-828d67d6
-    '31': FA-ccin2p3-58bc2125
+    '31': 'next owner: the ended B smoke''s log read, then site pick and the 6 protocol-B runs'
     '30': 'next owner: event E9620, the failed parent smoke''s log read before any resubmission'
     '32': FA-ccin2p3-aacf91cc FA-ccin2p3-706a0f6f
   handoff:
