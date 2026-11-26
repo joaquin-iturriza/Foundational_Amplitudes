@@ -13,14 +13,11 @@
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
-export KIT_THREADS="${SLURM_CPUS_PER_TASK:-8}"
+export KIT_THREADS=1     # every surrogate read at 1 thread: the package's predictor and the served MadEvent integrand
 if [ "$1" = tt ]; then
     D=runs/kit/threshold_scan
     python tools/kit_threshold_scan.py predict --dir "$D" "$2" && \
     python tools/kit_threshold_scan.py collect --dir "$D" --out "$D/kit_threshold_scan_mcmg.json" && echo "RUN_DONE"; exit
-fi
-if [ "$1" = tt_bulk ] || [ "$1" = surr ]; then
-    export KIT_THREADS=1     # every surrogate read at 1 thread: the package's predictor and the served MadEvent integrand
 fi
 if [ "$1" = tt_bulk ]; then
     D=runs/kit/tt_bulk_window
