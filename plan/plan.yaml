@@ -47483,6 +47483,17 @@ entries:
     sources: '2 contrast_se <- measured: the two means'' standard errors from the events (factor_split pole_split); 0.19 <-
       measured: the twins'' largest seen MSE 0.0069 (data/c_best_seen.json) over a fifth of events, sqrt(0.0069/0.2); fifth
       closest to the pole <- attempt C/D''s singular-fifth subset convention (perevent_level.py subsets)'
+    passed_at: '2026-11-26T22:57:02+00:00'
+    reviewer: 'CPU-only re-read of the searched best (FA-ccin2p3-29ce8950) held-out CSV, no training. Check 2: eta2 of d on
+      offshell_6 0.815/0.806 on the gg->tbW pair (c_best_factor_split.json), so bin means spread about 2.0 nats. The pole
+      now sits at -mu/sd of the run''s own offshell_stats, which is right because the input is (sign(o) log1p|o| - mu)/sd
+      and o=0 maps there (data_mmap.py osh_transformed; factor_split.py @3e748b197 poles/pole_split). Check 4: yes, opposite
+      and ''depends but not at the pole'' branches as a near-minus-far contrast with 2 se from the events and the twins''
+      bound. Check 3: twins'' seen MSE 0.0011-0.0069 (c_best_seen.json, max dc_bbx_btxwp 0.00685), giving sqrt(0.0069/0.2)=0.19.
+      Check 15: TBW is now the gg pair only, so the earlier KeyError on the q q~ panels is gone. Searched results.tex and
+      site decisions for tbxwm, ''g g > t b'', pole, off-shell, offshell_6, twin, initial state, resonan, extrapolat: nothing
+      beyond the prior. Not verified locally: data_stats.json of trial_1860 holds offshell_stats (the script reads it on CC
+      and fails loudly if it is missing).'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
