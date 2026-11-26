@@ -41820,6 +41820,24 @@ entries:
       12 h and sent the 0.5 h smoke to CC with a 6.8 h start). Sync to lxplus first refused: step 20''s outputs analysis/catalog_daniel/data/perevent_level{,_mlp}_search.json
       were untracked there and tracked by b501ac2a2; same content (canonical JSON md5 equal), moved aside to *.pre_sync on
       lxplus.'
+  - at: '2026-11-26T01:37:35+00:00'
+    text: '2026-11-26 steps 19 and 22. Step 19: untuned his-setup control retrain FA-ccin2p3-0165aa58 (CC trial_9000, H100
+      NVL, 60,840 steps in 235 min, 4.04 h total, clean) best val_loss_no_reg (MSE of z, mean over processes) 8.376e-4 at
+      the last validation (20 of 20), against the first run FA-lxplus-cb9273f1''s 6.786e-4 (validation 19 of 20; its last
+      9.82e-4): 1.23x, inside each run''s own validation-to-validation jumps at constant lr (retrain 1.99e-3 -> 9.73e-4 ->
+      8.38e-4 over the last three; first run 6.79e-4 -> 9.82e-4), so the retrain reproduces it within its noise; lines in
+      analysis/llm_compare/data/a_val_control_retrain.txt. Its run dir copied to lxplus as runs/llmcmp_a_adamw_const_cc/trial_9000
+      (site pick put the score on lxplus; lxplus''s own trial_9000 holds the first run''s remains, kept); score FA-lxplus-8516d84c
+      (job_llm_score.sh EVENTS=1, seen + held out, REREAD=FA-ccin2p3-0165aa58). Step 22: smoke FA-lxplus-a1b7d826 SMOKE_EXIT
+      0 (sigma stage, test, plots; opened base cache 99c164da on lxplus; the run never builds derived inputs outside a prebuild
+      and raises when they are missing, so it read the prebuilt feat_722a8424). site pick placed the run on CC (lxplus: 0
+      GPUs fitting after the score took the last): CC prebuilds of the arm''s derived inputs FA-ccin2p3-e3d477b8 (train) /
+      -03cb73a0 (held out) (base caches 99c164da/b39fc80c present on CC with qperp''s feat only), and the run FA-ccin2p3-1b480869
+      (trial_job.sh, sweep_config_llmcmp_c_nooffshell.yaml @fa499b8c0, code 3f82666c53, trial_1860''s exact HPs, --mem 20G
+      --cpus 4 --gpu-min-mem 32G --time 22h, afterok on both prebuilds), target 16 h. The smoke''s own score (readout check:
+      CSV without offshell columns, factor_split --vars-from join) still to send on lxplus when a GPU there fits (pick sent
+      1 h jobs to CC, where the smoke model is absent); the run''s scoring will be on CC with the baseline CSV on lxplus,
+      so its factor_split join needs the CSV copied.'
   step_waits:
     '8': FA-ccin2p3-1969f226 FA-ccin2p3-caf1170e
     '13': FA-ccin2p3-623a3af6
