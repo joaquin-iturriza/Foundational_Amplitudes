@@ -34335,6 +34335,36 @@ entries:
       -> tails as seen before; lower at the maximum -> the |M_hat|^2-adapted sampling reaches tails the exact one under-sampled.
       tt: bias per sqrt s and integrated over the window; |integrated bias| vs the flat-bulk 5.83e-4 estimate.'
     sources: D571, D574, D575; slide 11 of analysis/kit_benchmark/source/hardps_benchmark_slides.pdf
+    fix_at: '2026-11-26T16:42:56+00:00'
+    fix: '1) Surrogate thread count (checks 2, 15): the design fixes the surrogate at float64, 1 CPU thread (the package gate),
+      but scripts/job_kit_mc_madgraph.sh @8e3d2dd36 exports KIT_THREADS=SLURM_CPUS_PER_TASK (8, or the 32 the design asks),
+      and only the madevent subprocess env is set to 1 (tools/kit_mc_madgraph.py gen, env[''KIT_THREADS'']=''1''). So on CC
+      (a) the gen-time check ''server = kit_predict <1e-9'' compares a 32-thread Predictor with a 32-thread kit_predict, not
+      with the 1-thread serve MadEvent actually integrates; (b) predict --surr (r = |M|^2/|M_hat|^2 on the unweighted events)
+      and tt_bulk''s kit_threshold_scan predict score at 8-32 threads, where tools/kit_predict.py''s own comment records the
+      A2 models moving by up to 5.5e-3 in log10 (1.3% in |M_hat|^2) against 1 thread. That is comparable to or above the effects
+      read (tt integrated bias ~5.8e-4, eps2 tails set by single events). The local test passed only because KIT_THREADS was
+      unset (1) locally. Fix: KIT_THREADS=1 for every surrogate evaluation in the surr and tt_bulk modes (gen check, predict
+      --surr, tt predict), and say in the report whether the 19:00 exact-sample numbers (same script, KIT_THREADS=8) are recomputed
+      at 1 thread or carry this caveat. 2) Outcome for the cross-section bias (checks 3, 4): sigma_hat comes from a separate
+      MadEvent integration with error about 1.2e-3 (uugg 2.34e-5/0.0198), so sigma_hat/sigma-1 carries about 1.7e-3 combined
+      error against an expected -1.4e-3 to -1.6e-3. It cannot resolve the bias, and ''consistent within errors'' will hold
+      whatever the bias is. The ''no'' branch is also wrong: int |M_hat|^2 does not depend on the grid, so sigma_hat/sigma
+      = E_exact[u] exactly, and a disagreement beyond about 3 sigma means a fault in the KITSURR wiring (a channel or helicity
+      path without the factor, a misordered batch), not ''the grid changes sigma_hat''. Fix: state that the direct number
+      is the slide-11 quantity with its error and serves as a wiring check (disagreement beyond 3 sigma: find the fault before
+      reporting), with E_exact[u]-1 at 1 thread as the resolved bias beside it. Or raise MadEvent''s target precision until
+      the error is below the effect, and give that cost. 3) No wall-time target or job limits (checks 13, 15; CLAUDE.md, state
+      every batch''s wall-time target): the local run gives about 2.6 ms per surrogate evaluation (serve stats: 61440 events
+      in 158 s) and 141k evaluations for 2000 uug events. The design gives no evaluation count for 1e5 events (read it from
+      the exact run''s MadEvent log: points per channel in survey and refine), no figure for how many serve processes run
+      at once, no uugg rate (6 particles, more channels), and no --time per job (the script defaults to 6 h). Joaquin needs
+      the answer today (D574), so the design must state when each of the three jobs ends. Also read each serve''s memory from
+      the local run, since 32 serves each rebuild the run with its 1e5 train pool, against the 64G asked. Checks that hold:
+      slide 11 as written serves his words of 2026-11-26 14:38 and 16:27 and D571/D575; the control is the exact run with
+      the same cards, cut and iseed, with vector_size and nb_warp stated; prior covers sec:kit-mc and the 19:00 finding; no
+      training, so the loss, preprocessing, HPO and lr checks do not apply; KIT bulk_test tt virtual is positive over the
+      window (kit_predict asserts it), so the per-sqrt s ratio has no sign crossing.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
