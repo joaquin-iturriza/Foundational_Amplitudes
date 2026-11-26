@@ -5,7 +5,7 @@ panel pred/true (ps.true_pred_hist). Processes: every new family in Suprio's lay
 each by its process at the median (lower median) of the across-arm spread of MSE - bias^2 of these events (worst/best
 ratio): a representative example, never the extreme (CLAUDE.md; repo review 2026-11-25). The legend sits in the gg->Wqq'
 panel, whose narrow peak leaves its upper corners free.
-Events: data/events/<tag>_heldout_events.csv (tools/llm_score.py --events-out, first 5000 test events per process).
+Arms: FINAL below (the comparison's final arm set). Events: data/events/<tag>_heldout_events.csv (tools/llm_score.py --events-out, first 5000 test events per process).
     python analysis/llm_compare/shape_dists.py
 Output: figs/shape_dists.{png,pdf}.
 """
@@ -21,11 +21,15 @@ import plot_style as ps  # noqa: E402
 from heldout_per_process import ARMS, GROUPS, proc_label  # noqa: E402
 
 DAN = os.path.join(ROOT, "analysis", "catalog_daniel")
+# the final arm set of the comparison's figures (Joaquin 2026-11-26, heldout_per_process.py @2fc2f1076), legend order;
+# the LLM has no per-event predictions here (data/suprio_cond: per-process summaries only), so it is not drawn
+FINAL = ("a_trial5", "level_file", "c_best")
 
 
 def main():
-    tags = [t for t in ARMS if os.path.exists(os.path.join(HERE, "data", "events", f"{t}_heldout_events.csv"))]
-    assert tags, "no data/events/<tag>_heldout_events.csv"
+    tags = list(FINAL)
+    miss = [t for t in tags if not os.path.exists(os.path.join(HERE, "data", "events", f"{t}_heldout_events.csv"))]
+    assert not miss, f"no data/events/<tag>_heldout_events.csv for {miss}"
     meta = {"dc_" + p["folder"]: p for p in json.load(open(os.path.join(DAN, "classes_default.json")))["processes"]}
     rel = set(json.load(open(os.path.join(DAN, "heldout_twins.json"))))
     ev = {}
