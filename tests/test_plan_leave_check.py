@@ -159,6 +159,30 @@ def test_subagent_stop_corrupt_plan_refuses_only_the_owner():
             fh.write(good)
 
 
+def test_leave_check_refuses_uncommitted_owned_paths():
+    """A temporary git repo: only a modified/untracked, non-ignored path under analysis/<id>/ or a hand-off file fails."""
+    setup_module()
+    repo = os.path.join(TMP, "repo")
+    os.makedirs(os.path.join(repo, "analysis", "agent_redesign"))
+    os.makedirs(os.path.join(repo, "analysis", "other"))
+    g = lambda *c: subprocess.run(["git", "-C", repo, *c], check=True, capture_output=True)
+    g("init", "-q")
+    for f in ("analysis/agent_redesign/a.json", "data/x.json", ".gitignore"):
+        os.makedirs(os.path.dirname(os.path.join(repo, f)), exist_ok=True)
+        open(os.path.join(repo, f), "w").write("ignored.pdf\n" if f == ".gitignore" else "1")
+    g("add", "."); g("-c", "user.name=t", "-c", "user.email=t@t", "commit", "-qm", "i")
+    plan.ROOT = repo
+    with plan.transaction() as (d, st):
+        plan.entry(d, "agent_redesign")["handoff"] = {"files": "data/x.json, tools/y.py"}
+    assert plan.dirty_owned("agent_redesign") == []
+    open(os.path.join(repo, "analysis/other/z"), "w").write("1")          # not owned
+    open(os.path.join(repo, "analysis/agent_redesign/ignored.pdf"), "w").write("1")   # gitignored
+    assert plan.dirty_owned("agent_redesign") == []
+    open(os.path.join(repo, "analysis/agent_redesign/new.txt"), "w").write("1")       # untracked, owned
+    open(os.path.join(repo, "data/x.json"), "w").write("2")                           # modified hand-off file
+    assert sorted(plan.dirty_owned("agent_redesign")) == ["analysis/agent_redesign/new.txt", "data/x.json"]
+
+
 if __name__ == "__main__":
     n = 0
     for k, f in list(globals().items()):

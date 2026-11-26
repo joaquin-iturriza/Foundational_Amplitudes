@@ -1667,8 +1667,24 @@ def leave_problems(eid, t=None):
     return out
 
 
+def dirty_owned(eid):
+    """Uncommitted, not gitignored paths (git status --porcelain) the entry owns: analysis/<id>/ and every path in its
+    hand-off `files` (a prefix match, so a directory covers what is under it). A dirty shared checkout blocks every
+    other entry's `site sync`."""
+    h = (entry(load()[0], eid).get("handoff") or {}).get("files") or ""
+    own = ["analysis/%s/" % eid] + [x.rstrip("/") for x in re.findall(r"[\w.\-]+(?:/[\w.\-*]+)+/?", str(h))]
+    r = subprocess.run(["git", "-C", ROOT, "status", "--porcelain", "-uall"], capture_output=True, text=True)
+    paths = [l[3:].split(" -> ")[-1].strip('"') for l in r.stdout.splitlines()]
+    return [p for p in paths if any(p == o or p.startswith(o.rstrip("/") + "/") for o in own)]
+
+
 def cmd_leave_check(a):
     bad = leave_problems(a.id)
+    dirty = dirty_owned(a.id)
+    if dirty:
+        sys.exit("plan: %s: uncommitted files of this entry block every other entry's `site sync`:\n  %s"
+                 % (a.id, "\n  ".join("%s: commit it by name (git commit -m ... -- %s) or restore it" % (p, p)
+                                      for p in dirty)))
     if bad:
         sys.exit("plan: %s: before ending your turn, put each of these in flight, under `plan wait %s <step> --on "
                  "<run ids | a date YYYY-MM-DD | what it waits on>`, or drop it (plan drop-next):\n  %s"
