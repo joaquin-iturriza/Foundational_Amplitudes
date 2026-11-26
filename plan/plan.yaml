@@ -34047,6 +34047,17 @@ entries:
       from a clean local CPU venv on examples, hand it to Joaquin. FAIL: locate the stage (stats rebuild, threads, dtype,
       relocation) and fix in kit_package/kit_predict, rebuild.'
     sources: TOL 2e-6 <- tools/kit_package.py README (measured CPU-GPU rounding, 546dd9c22); D573, D574 Joaquin's words
+    passed_at: '2026-11-26T14:25:01+00:00'
+    reviewer: 'CPU-only build+check of the D573 standalone KIT package, no training (D574 ''no more trainings''): smallest
+      route to Joaquin''s ask, one job (scripts/job_kit_package.sh --standalone, 4 CPU, 2 h). Check 2: the same kit_package.py
+      check moved 0 -> 5.5e-3 log10 with the thread setting on v5 (FA-ccin2p3-d56c5264 vs 83880457, plan findings 2026-11-14),
+      v6 gave 0.00 on all 38 strata (0d3b978a); the new standalone path is read by predict.py on examples/ against the runs''
+      own predictions.h5, and a stats mismatch fails loudly (rebuild_run asserts rebuilt stats vs data_stats.json, rtol 1e-6).
+      Check 3: no seeds, deterministic at KIT_THREADS=1. Check 4: TOL 2e-6 sourced to 546dd9c22 (measured CPU-GPU rounding).
+      Control = the runs'' own predictions; models unchanged; no loss/preprocessing/HPO/lr axis (checks 9-12, 17 n/a). Disk
+      ~0.2 GB vs 15 GB free on CC /sps (df read now; 98% used, not this job''s). Searched results.tex for standalone / kit_package
+      / kit package / package v / predict.py (no prior standalone package; v5/v6 in plan findings), plan kit_benchmark findings,
+      site decisions for package/export/checkpoint (D573, D574).'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
