@@ -29912,8 +29912,7 @@ entries:
   step_waits:
     '24': FA-lxplus-828d67d6
     '20': FA-ccin2p3-3895a2a7 FA-ccin2p3-e0587622
-    '29': FA-ccin2p3-5c3fb7fa (read the CC CPU job ccj_03dedf7197c8 of kit_bakar_figs collect -> kit_bakar_figs_a2.json when
-      it wakes)
+    '29': FA-ccin2p3-58bc2125 FA-ccin2p3-42ae3468
     '25': FA-ccin2p3-1b18c76c
     '31': FA-ccin2p3-58bc2125
     '30': FA-ccin2p3-42ae3468
