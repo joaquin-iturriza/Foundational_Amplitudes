@@ -116,6 +116,7 @@ talks/**/*.nav
 talks/**/*.snm
 talks/**/*.toc
 talks/**/*_overleaf.zip
+analysis/kit_benchmark/export/*.tar.gz
 
 # stray scratch files that keep landing at the repo root
 /py.py
