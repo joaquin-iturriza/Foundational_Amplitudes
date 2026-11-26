@@ -43456,6 +43456,11 @@ entries:
       gate; feature-rule No branch; disk 2.6 of 16 GB; smoke + wall 16 h). Prebuilds FA-ccin2p3-6fa10d57 (train) / -a1f973ec
       (held out) running; next: gate on tp meta props of dc_gg_tbxwm/btxwp and the q q~ twins, then the 50-step smoke, its
       held-out score, then the run.'
+  - at: '2026-11-26T23:58:36+00:00'
+    text: '2026-11-27 01:00 step 26: prebuilds done (train tp_093fc6bb655b4d1b038fdfd3 in 39 s, 382/1352 processes carry a
+      factor; held out tp_5fef4ac19c49f4791e12311f in 6 s, 38/139). Gate PASSED: dc_gg_tbxwm and dc_gg_btxwp carry 1 propagator
+      each (held-out meta), the q q~ twins dc_{uux,ddx,ssx,ccx,bbx}_{tbxwm,btxwp} 1 each (train meta). Smoke FA-ccin2p3-776cdd69
+      (scripts/job_config_smoke.sh sweep/sweep_config_llmcmp_c_tprop.yaml 50, 20G, 2 h limit) submitted.'
   step_waits:
     '25': FA-ccin2p3-d34fae85
     '26': FA-ccin2p3-776cdd69
