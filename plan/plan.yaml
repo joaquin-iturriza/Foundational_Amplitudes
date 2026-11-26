@@ -42455,7 +42455,7 @@ entries:
       untouched
   owner:
     agent: a3442332bd5ff4a7c
-    state: working
+    state: closed
     since: '2026-11-26T23:15:16+00:00'
     state_at: '2026-11-26T23:53:27.882000+00:00'
     context: 227616
@@ -43465,31 +43465,33 @@ entries:
     '25': FA-ccin2p3-d34fae85
     '26': FA-ccin2p3-776cdd69
   handoff:
-    state: 'Step 25 (D566 attempt E) in flight: FA-ccin2p3-d34fae85 (htc CPU, 4 h limit, target 2 h; perevent_level.py --anchored
-      --anchor map @ad9f541, design passed 2026-11-26), writes analysis/catalog_daniel/data/perevent_anchored_E.json on CC
-      (PEL_JSON summary in its log; fetch the json via site run cat or the log line); read it against the passed outcome (E
-      map''s ten-ensemble new median <= regressor_ens max, subsets within bar or 2 sd, beat the constant where it moves),
-      figure perevent_anchored_fig.py E, caption, check_caption; on NO with D_sqE_own still passing, attempt F = the reference
-      phase-space anchor (plan step_why 25). First E job FA-ccin2p3-fb348771 cancelled by me (kin() log 0, fixed). Step 15
-      (D564) read DONE 2026-11-27 (finding recorded): the gg->tbW pair''s error sits at the internal top''s pole (near-pole
-      fifth mean d -7.65/-7.56 vs -5.16/-5.08, se 0.05; V-shaped binned curve, floor -7.96 at the pole, -1.1 at the far ends),
-      trained q q~ twins right (seen MSE <= 0.0069); figure figs/c_best_factor_split_offshell_6_tbw.png drawn, looked at,
-      caption passes check_caption; not yet sent to Joaquin by the main session. Step 15 dropped, continued as step 26 (resonance
-      level per event; blocked by memmap lacking data.target_propagators/resonance_per_event: data_mmap.py:871): next owner
-      starts it (worktree, extend data_mmap, tests, repo review, smoke, design, review, one ~15 GPU-h run).'
+    state: 'Step 26 (target_propagators arm, design PASSED 2026-11-26T23:40, config sweep/sweep_config_llmcmp_c_tprop.yaml
+      @581530563, code 1ca3514c0): prebuilds done, tp-meta gate passed (gg tbW pair and the five q q~ twin pairs carry the
+      top factor). Smoke FA-ccin2p3-776cdd69 in flight (step 26 waits on it). On SMOKE_EXIT 0: (2) site submit job_llm_score.sh
+      --env RUN=<smoke run dir runs/zz_smoke/zz_smoke_sweep_config_llmcmp_c_tprop_<jobid>> --env ONLY=heldout --env EVENTS=1
+      (as step 22''s smoke read), check the pair''s log_factor column differs from c_best''s on the same events (Breit-Wigner
+      log <= 0, down to ~-9.5 at the pole) and factor_split.py reads it; (3) the run: site pick FA --jobs 1 --mem 20G (separate
+      call), then site submit auto FA sweep/trial_job.sh --hdr=--mem=20G --hdr=--time=22:00:00 --hdr=--cpus-per-task=4 --hdr=--gpu-min-mem=32G
+      --disk-gb 2 -- --sweep-config sweep/sweep_config_llmcmp_c_tprop.yaml --detached --trial-idx 1860 --hp-idx 1860 --t-steps
+      60840 --hp training.lr=0.001603605 --hp training.muon_weight_decay=0.02796892 --hp training.regularization_lambda=4.685537e-08
+      --hp training.cosanneal_warmup_frac=0.1908437 --hp training.cosanneal_eta_min=4.115949e-09 --hp ema=true --hp training.ema_decay=0.9831303;
+      plan target --batch tprop_run --wall 16 --jobs 1 first. Then read per the passed design (llm_score held-out/seen, factor_split
+      --pole-run on the arm''s own dir, heldout_per_process with c_best and c_tprop, factor_split tbw figure for both). Step
+      25 (attempt E, FA-ccin2p3-d34fae85) still RUNNING at 01:00 (log only the Slurm header so far): read per the passed design
+      when it ends (handoff of 2026-11-26 below). Note: site submit to a named site after a refused submit fails with ''no
+      quota left'' (the refused call spent the pick unit); site submit auto works.'
     decisions: 'Joaquin''s: D522-D528, D536, D537, D553, D564, D566, D567, D576-D579, D584-D589. Mine (re-justify): earlier
-      (i)-(xlv); (xlvi) attempt E tests three anchor maps (network ten seeds, + kinematics, tree) in one job, ridge and own
-      median re-run as matched control and floor; (xlvii) kin() threshold floored at 10 GeV (catalog_v4''s edge for trees
-      without mass or cut leg); (xlviii) step 15''s control is the trained twins'' seen MSE bound (0.19 nats), not a per-event
-      seen re-read (the bound settles it, reviewer agreed); (xlix) the pole located at -mu/sd of the run''s own offshell_stats;
-      (l) data/c_best_factor_split.json now the CC re-read with poles (MSEs identical to the lxplus read).'
-    ruled_out: 'As before; D566 attempts A-D dead ends. Step 15: the pair''s error is not spread evenly over its events (eta2
-      0.81, contrast 53 se).'
-    running: FA-ccin2p3-d34fae85 (attempt E, CPU, htc)
-    files: analysis/catalog_daniel/{perevent_level.py (--anchor map, kin()), perevent_anchored_fig.py [D|E]}, scripts/job_perevent_level.sh
-      (PEL_ANCHOR=map), analysis/llm_compare/{factor_split.py (--pole-run, --panels tbw), data/c_best_factor_split.json},
-      analysis/llm_compare/figs/c_best_factor_split_offshell_6_tbw.png, scratchpad test_attemptE.py
-    written: '2026-11-26T23:03:37+00:00'
+      (i)-(l); (li) step 26 lever = data.target_propagators (the target-side factor) rather than resonance_per_event (the
+      input lever stays the No branch''s alternative); (lii) tp cache keyed by train caps (straddle read on the run''s train
+      selection, matching in memory); t-channel option asserted off on memmap; (liii) scripts/submit_interactive.sh deleted
+      (repo review blocker; its D589 jobs done); (liv) Partly/No boundary = the same-setup contrast spread 1.34 (trial_1860
+      vs trial_9000), data/pole_contrast_spread @21727e59c.'
+    ruled_out: 'As before; D566 attempts A-D dead ends; step 15: the pair''s error is not spread evenly (eta2 0.81).'
+    running: FA-ccin2p3-776cdd69 (step 26 smoke), FA-ccin2p3-d34fae85 (step 25 attempt E, CPU)
+    files: data_mmap.py (tp_key_doc, _build_tp), experiment.py (_tp_settings/_tp_props/_tp_logF), tests/test_memmap_data.py,
+      sweep/sweep_config_llmcmp_c_tprop.yaml, analysis/llm_compare/data/pole_contrast_spread/*_fs.json, analysis/llm_compare/factor_split.py,
+      analysis/catalog_daniel/{perevent_level.py, perevent_anchored_fig.py E}
+    written: '2026-11-26T23:59:10+00:00'
   designs:
   - at: '2026-11-22T04:13:14+00:00'
     question: 'Part (a), D525: in the conditions of Suprio''s LLM pID run (D524, D526, D527: our catalog_daniel regeneration
