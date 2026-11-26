@@ -24,7 +24,7 @@ sys.path.insert(0, ROOT)
 
 T = "runs/kit/kit_A_{p}_n100000_t8000_{tag}"
 A2 = "runs/kit/kit_A_{p}_n100000_t1831_hpo_asym_cont"   # the asymptotic-factor (A2) models of sec:kit-mc, packaged for KIT (D573)
-A2L = "transformer, asymptotic factor"   # the JSON key (kit_bakar_figs_a2.json); drawn as NAME[A2L]
+A2L = "transformer, asymptotic factor"   # the JSON key (kit_bakar_figs_a2.json); drawn as kit_figures.MODELS["factor"]
 M = "runs/kit_mlp/kit_A_{p}_n100000_t14400_mlp{arm}_s{s}"
 # per process: (label, run dirs); MLP arms list their three seeds (medians over seeds)
 MODELS = {
@@ -153,70 +153,74 @@ def seeds(d, lab):
 
 
 def plot(path, figs):
+    """slides 5-8 in the style of every KIT figure: names, colours, markers and lines of kit_figures.MODELS, the process
+    label and legend as tools/kit_vs_mlp.py draws them (Joaquin 2026-11-26: the deck's figures coherent)"""
     import plot_style as ps
+    from matplotlib.ticker import NullFormatter
+    from tools.kit_figures import MODELS, XLAB, model_style
+    from tools.kit_vs_mlp import MED_LAB, PROCESS, _legend
     ps.use()
     os.makedirs(figs, exist_ok=True)
     d = json.load(open(path))
-    labs = [A2L, "transformer", "no frames", "no frames, no off-shellness", "MLP, log invariants", "MLP, raw invariants"]
-    style = dict(zip(labs, [("*-", ps.C.vermillion), ("o-", ps.C.purple), ("v-", ps.C.orange), ("D-", ps.C.yellow),
-                            ("o-", ps.C.blue), ("s-", ps.C.green)]))
-    style[THR] = ("^-", ps.C.sky)
-    labs = labs + [THR]
-    present = lambda dd: [lab for lab in labs if lab not in DROP and any(k.split("#")[0] == lab for k in dd)]
+    labs = list(KEY)   # the legend's order, the one of tools/kit_vs_mlp.py
+    present = lambda dd: [lab for lab in labs if any(k.split("#")[0] == lab for k in dd)]
+    _, tc, _, tls = model_style("truth")
+    truth = dict(ls=tls, color=tc, label=MODELS["truth"][0])
+
+    def draw(ax, x, y, lab, **kw):
+        name, c, mk, ls = model_style(KEY[lab])
+        ax.plot(x, y, marker=mk, ls=ls, color=c, label=name, **kw)
 
     # slide 5: V/B median per beta bin
     vb = d["ee_tt_virt_finite"]["vb"]
     fig, ax = ps.figure()
     x = np.array(vb["x"])
-    ax.plot(x, CF * np.pi * ALPHA_S / (2 * x), "k--", lw=1, label=r"$C_F\pi\alpha_s/(2\beta)$")
-    ax.plot(x, vb["truth"], "o", color="k", ms=3, label="MadLoop truth")
+    ax.plot(x, vb["truth"], **truth)
     for lab in present(vb):
-        mk, c = style[lab]
-        ax.plot(x, seeds(vb, lab), mk, color=c, ms=3, label=NAME.get(lab, lab))
+        draw(ax, x, seeds(vb, lab), lab)
+    ax.plot(x, CF * np.pi * ALPHA_S / (2 * x), "k--", label=r"$C_F\pi\alpha_s/(2\beta)$")
     ax.axvspan(0.2, 1.0, color=ps.C.grey, alpha=0.2, lw=0)
     ax.set_xscale("log"); ax.set_yscale("log")
-    ax.set_xlabel(r"top velocity $\beta$"); ax.set_ylabel(r"$V/B$ (median per bin)")
-    ps.legend(ax)
+    ax.set_xlabel(XLAB["threshold_beta"]); ax.set_ylabel(r"median $V/B$")
+    ps.process_label(ax, PROCESS["ee_tt_virt_finite"])
+    _legend([ax], None, PROCESS["ee_tt_virt_finite"], (0, "upper left"))   # upper right: the band, make_room never clears it
     print("FIGURE", ps.save(fig, os.path.join(figs, "slide5_tt_coulomb")))
 
-    # slide 6: uug median log10|M|^2 per soft x and collinear y bin
+    # slide 6: uug median log10|M|^2 per collinear y and soft x bin (the panel order of kitvm_median_*)
     b = d["ee_uug_me2"]["bins"]
     fig, axs = ps.figure(ncols=2)
-    panels = [(fig, x) for x in axs]
-    for (fig, ax), f, xl in zip(panels, ("soft_x", "coll_y"), (r"soft gluon: $x=2E_g/\sqrt{s}$",
-                                                              r"collinear: $y=s_{qg}/s$ ($q$ or $\bar q$)")):
+    for ax, f in zip(axs, ("coll_y", "soft_x")):
         x = np.array(b[f]["x"])
-        ax.plot(x, b[f]["truth"], "-", color="k", lw=2, label="MadGraph truth")
+        ax.plot(x, b[f]["truth"], **truth)
         for lab in present(b[f]):
-            mk, c = style[lab]
-            ax.plot(x, seeds(b[f], lab), mk, color=c, ms=3, label=NAME.get(lab, lab))
-        ax.set_xscale("log"); ax.set_xlabel(xl); ax.set_ylabel(r"median $\log_{10}(|\mathcal{M}|^2/\mathrm{GeV}^{-2})$")
-    leg(axs[0], axs)
+            draw(ax, x, seeds(b[f], lab), lab)
+        ax.set_xscale("log"); ax.xaxis.set_minor_formatter(NullFormatter())
+        ax.set_xlabel(XLAB[f]); ax.set_ylabel(MED_LAB)
+        ps.process_label(ax, PROCESS["ee_uug_me2"])
+    _legend(list(axs), None, PROCESS["ee_uug_me2"], (0, "upper left"))
     print("FIGURE", ps.save(fig, os.path.join(figs, "slide6_uug_limits")))
 
     # slide 7: uugg g->gg azimuth
     az = d["ee_uugg_me2"]["azimuth"]
-    fig, axs = ps.figure(ncols=2)
-    panels = [(fig, x) for x in axs]
-    (f1, a1), (f2, a2) = panels
+    fig, (a1, a2) = ps.figure(ncols=2)
     ev = next(v for v in az.values() if abs(v["y"] - 1e-5) < 1e-9)["event"]
-    a1.plot(ev["phi"], ev["truth"], "-", color="k", lw=2, label="MadGraph truth")
-    for lab in [l for l in labs if l in ev and l not in DROP]:
-        mk, c = style[lab]
-        a1.plot(ev["phi"], np.median(ev[lab], 0), mk, color=c, ms=2, label=NAME.get(lab, lab))
+    a1.plot(ev["phi"], ev["truth"], **truth)
+    for lab in [l for l in labs if l in ev]:
+        draw(a1, ev["phi"], np.median(ev[lab], 0), lab, markevery=len(ev["phi"]) // 8)   # a marker per point hid the curves
     a1.set_xticks([0, np.pi, 2 * np.pi], ["0", r"$\pi$", r"$2\pi$"])
     a1.set_xlabel(r"azimuth $\varphi$ of the $gg$ pair")
     a1.set_ylabel(r"$\log_{10}|\mathcal{M}|^2-$ mean over $\varphi$")
     rows = sorted(az.values(), key=lambda v: v["y"])
     y = [v["y"] for v in rows]
-    a2.plot(y, [v["rms"]["truth"] for v in rows], "o-", color="k", label="MadGraph truth")
-    for lab in [l for l in labs if l in rows[0]["rms"] and l not in DROP]:
-        mk, c = style[lab]
-        a2.plot(y, [np.median(v["rms"][lab]) for v in rows], mk, color=c, label=NAME.get(lab, lab))   # true values, no floor
-    a2.set_xscale("log"); a2.set_yscale("log")
-    a2.set_xlabel(r"collinearity $y=s_{gg}/s$"); a2.set_ylabel(r"rms over events of $h$")
-    leg(a2, [a1, a2], ncol=2)   # one column covered the curves (make_room's growth cap)
-    print("FIGURE", ps.save(f1, os.path.join(figs, "slide7_uugg_azimuth")))
+    a2.plot(y, [v["rms"]["truth"] for v in rows], **truth)
+    for lab in [l for l in labs if l in rows[0]["rms"]]:
+        draw(a2, y, [np.median(v["rms"][lab]) for v in rows], lab)   # true values, no floor
+    a2.set_xscale("log"); a2.set_yscale("log"); a2.xaxis.set_minor_formatter(NullFormatter())
+    a2.set_xlabel(XLAB["coll_gg_y"]); a2.set_ylabel(r"rms over events of $h$")
+    for a in (a1, a2):
+        ps.process_label(a, PROCESS["ee_uugg_me2"])
+    _legend([a1, a2], None, PROCESS["ee_uugg_me2"], (1, "upper left"))
+    print("FIGURE", ps.save(fig, os.path.join(figs, "slide7_uugg_azimuth")))
 
     # slide 8: log-MSE per stratum, bulk dotted (ours from kit_result.json, his from his evaluate.py files)
     fig, axs = ps.figure(ncols=2)
@@ -227,15 +231,15 @@ def plot(path, figs):
         for lab, rows, his in table_rows(d[proc]):
             if lab.endswith(" (rerun)"):   # his own evaluate.py numbers are drawn; our reruns of them stay in the table
                 continue
-            mk, c = style.get(lab, ("o-", ps.C.grey))
+            name, c, mk, _ = model_style(KEY[lab])
             dash = "--" if his else "-"
             # by the bin's lower edge, numerically: a string sort put 1e-05 after 0.001 and the line ran back over itself
             st = sorted(((k, v) for k, v in rows.items() if k.startswith(f)), key=lambda kv: edges(kv[0])[0])
             xs = [np.sqrt(np.prod(edges(k))) for k, _ in st]
-            ax.plot(xs, [v for _, v in st], marker=mk[0], ls=dash, color=c, ms=3, label=NAME.get(lab, lab) + (", Bakar" if his else ""))
+            ax.plot(xs, [v for _, v in st], marker=mk, ls=dash, color=c, label=name + (", Bakar" if his else ""))
             if "bulk" in rows:
-                ax.axhline(rows["bulk"], color=c, ls=":", lw=1)
-        ax.plot([], [], ls=":", color=ps.C.grey, lw=1, label="bulk (dotted, same colour)")
+                ax.axhline(rows["bulk"], color=c, ls=":")
+        ax.plot([], [], ls=":", color=ps.C.grey, label="bulk (dotted, same colour)")
         lo = min([r["bulk"] for _, r, _ in table_rows(d[proc]) if "bulk" in r] + [ax.get_ylim()[0]])
         ax.set_yscale("log"); ax.set_ylim(lo / 3, None)     # the bulk lines are inside the axes, as on his slide
         ax.set_xscale("log"); ax.set_xlabel(xl); ax.set_ylabel("log-MSE per bin")
@@ -273,8 +277,11 @@ def metrics(res):
     return lm, {k.split("/")[0]: v["pred"] for k, v in res.get("slopes", {}).items()}
 
 
-NAME = {A2L: "asymptotic factor", THR: "MLP, log + threshold"}   # short legend entries for long keys
-DROP = ("no frames", "no frames, no off-shellness")   # pre-A2 ablations: not drawn beside A2
+# JSON label -> kit_figures.MODELS key (its name and style on every KIT figure); the pre-A2 ablations ("no frames",
+# "no frames, no off-shellness") are not drawn beside A2
+KEY = {A2L: "factor", "transformer": "scratch", THR: "MLP thr", "MLP, log invariants": "MLP log",
+       "MLP, raw invariants": "MLP raw"}
+DROP = ("no frames", "no frames, no off-shellness")
 
 
 def table_rows(e):

@@ -37,7 +37,7 @@ import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-from tools.kit_figures import OFF, XLAB, YCAP, clip_plot, family, off_entry, sci  # noqa: E402
+from tools.kit_figures import MODELS, OFF, XLAB, YCAP, clip_plot, family, model_style, off_entry, sci  # noqa: E402
 
 DATA = os.path.join(ROOT, "analysis/kit_benchmark/data")
 PROCS = {"ee_uug_me2": ("ee_uug", "me2"), "ee_uugg_me2": ("ee_uugg", "me2"), "ee_tt_virt_finite": ("ee_tt", "virt_finite")}
@@ -154,10 +154,11 @@ def _st(k):
     return k.split("/")[1]
 
 
-# one plain-words name per model, the same in every figure (Joaquin 2026-11-17: a figure reads on its own)
-NAME = {"factor": "transformer + asymptotic factor", "scratch": "transformer",
-        "MLP log": "MLP, log invariants", "MLP raw": "MLP, raw invariants",
-        r"MLP log+$\beta$": "MLP, log invariants\n" + r"and $\log(s_{t\bar t}-4m_t^2)$"}
+# legend symbol -> kit_figures.MODELS key: one name and style per model in every KIT figure (Joaquin 2026-11-17,
+# 2026-11-26); this order is the legend's
+KEY = {"factor": "factor", "scratch": "scratch", r"MLP log+$\beta$": "MLP thr", "MLP log": "MLP log",
+       "MLP raw": "MLP raw"}
+NAME = {s: MODELS[k][0] for s, k in KEY.items()}
 PROCESS = {"ee_uug_me2": r"$e^+e^-\to u\bar u g$", "ee_uugg_me2": r"$e^+e^-\to u\bar u gg$",
            "ee_tt_virt_finite": r"$e^+e^-\to t\bar t$, one loop"}
 # panels in reading order; the azimuth strata are a scan in the gluons' azimuth at three fixed y (not a y scan of
@@ -172,7 +173,8 @@ STRATUM = {"coll_y_1e-07_1e-06": r"collinear, $10^{-7}<y<10^{-6}$", "soft_x_1e-0
            "sudakov_sqrts_15000_50000": r"$15<\sqrt{s}<50$ TeV"}
 MSE_LAB = r"MSE$(\log_{10}|\mathcal{M}|^2)$"
 LEG_PT = 7.5   # ps.LEGEND_MIN_PT: the legends sit inside panels whose data leave little room (Joaquin 2026-11-17)
-LOGM = r"$\log_{10}(|\mathcal{M}|^2/\mathrm{GeV}^{-2})$"
+LOGM = r"$\log_{10}|\mathcal{M}|^2$"   # no unit: GeV^-2 on u u~ g, GeV^-4 on u u~ g g, none on t t~
+MED_LAB = r"median $\log_{10}|\mathcal{M}|^2$"
 
 
 def _grid(n):
@@ -230,9 +232,7 @@ def plot(figs):
     A = json.load(open(os.path.join(DATA, "kit_fig_A_hpo.json")))
     M = json.load(open(os.path.join(DATA, "kit_fig_mlp_reruns.json")))
     B = json.load(open(os.path.join(DATA, "kit_bakar_figs.json")))
-    C = ps.C
-    sty = {"factor": (C.blue, "o", "-"), "scratch": (C.vermillion, "s", "-"), r"MLP log+$\beta$": (C.purple, "^", "--"),   # not black: the truth's
-           "MLP log": (C.green, "^", "--"), "MLP raw": (C.grey, "x", ":")}
+    sty = {s: model_style(k)[1:] for s, k in KEY.items()}
     written = []
     bulk = {}
     paper_med = {}
@@ -279,7 +279,8 @@ def plot(figs):
                 ty = [y for _, y in tr["median"][fam]]
                 pad = max(1.0, max(ty) - min(ty))
                 lo, hi = min(ty) - pad, max(ty) + pad
-                ax.plot(*zip(*tr["median"][fam]), "-", color="k", label="truth")
+                _, tc, _, tls = model_style("truth")
+                ax.plot(*zip(*tr["median"][fam]), ls=tls, color=tc, label=MODELS["truth"][0])
                 for sym, m in med.items():
                     if sym in drop:
                         continue
@@ -289,7 +290,7 @@ def plot(figs):
                         off_entry(ax)
                 ax.set_xscale("log"); ax.xaxis.set_minor_formatter(NullFormatter())
                 ax.set_xlabel(XLAB.get(fam, fam))
-                ax.set_ylabel(r"median $\log_{10}|\mathcal{M}|^2$")
+                ax.set_ylabel(MED_LAB)
                 ps.process_label(ax, PROCESS[p], loc="upper right")
             _legend(axs, spare, PROCESS[p], LEG_AT["median"][p])
             written.append(ps.save(fig, os.path.join(figs, fname)))

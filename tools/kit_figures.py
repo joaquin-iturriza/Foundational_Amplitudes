@@ -35,6 +35,21 @@ sys.path.insert(0, ROOT)
 # hollow triangle pointing the way the value lies, the most extreme of each curve printed beside it, and the legend gets an "off the scale" entry
 YCAP = 1e2
 OFF = "off the scale, value printed"
+# one name, colour (a plot_style C name, or matplotlib's), marker and line style per model in every KIT figure
+# (Joaquin 2026-11-26: the deck's figures coherent); tools/kit_vs_mlp.py and tools/kit_bakar_figs.py draw from it
+MODELS = {"truth": ("truth", "k", None, "-"),
+          "factor": ("transformer + asymptotic factor", "blue", "o", "-"),
+          "scratch": ("transformer", "vermillion", "s", "-"),
+          "MLP thr": ("MLP, log invariants\n" + r"and $\log(s_{t\bar t}-4m_t^2)$", "purple", "^", "--"),
+          "MLP log": ("MLP, log invariants", "green", "^", "--"),
+          "MLP raw": ("MLP, raw invariants", "grey", "x", ":")}
+
+
+def model_style(key):
+    """(name, colour, marker, line style) of a MODELS key"""
+    import plot_style as ps
+    name, c, mk, ls = MODELS[key]
+    return name, getattr(ps.C, c, c), mk, ls
 
 
 def clip_plot(ax, x, y, lo, hi, fmt, **kw):
@@ -360,10 +375,11 @@ def summary(paths, out):
             for fam, x in v["families"].items():
                 vals.setdefault((m["file"], m["target"]), {}).setdefault(m["tag"].removeprefix("hpo_"), {})[fam] = x[key]
     procs = [p for p in FAMS if p in vals]
-    # one style per arm across the panels; the fine-tunes share hollow black markers, one shape per parent
+    # one style per arm across the panels, the transformers' and the MLP's as MODELS; green and purple left to the
+    # MLPs; the fine-tunes share hollow black markers, one shape per parent
     C = ps.C
     sty = {"scratch": (C.vermillion, "s"), r"scratch+$\beta$": (C.vermillion, "s"), "scratch-nobeta": (C.orange, "s"),
-           "factor": (C.blue, "o"), "factor+log": (C.sky, "o"), "div-form": (C.green, "D"), "ReZero": (C.purple, "^"),
+           "factor": (C.blue, "o"), "factor+log": (C.sky, "o"), "div-form": (C.orange, "D"), "ReZero": (C.sky, "P"),
            "FT": ("k", "v"), "FT searched": ("k", "v"), "FT+LO": ("k", "d"), r"FT+LO+$\beta$": ("k", "d"), "FT+1L": ("k", "d"),
            r"FT+1L+$\beta$": ("k", "d")}
     sym = lambda p, t: "scratch-nobeta" if p[0] == "ee_tt" and t == "softpair" else SHORT[t]
@@ -385,8 +401,9 @@ def summary(paths, out):
             print(f"DEEPEST {p[0]} {WORDS[sym(p, t)]!r}: " + ", ".join(f"{f} {vals[p][t][f]:.3g}" for f, _ in fams
                                                                        if f in vals[p][t]))
         ref = [(i, MLP[(*p, f)][2]) for i, (f, _) in enumerate(fams) if (*p, f) in MLP]
-        ax.hlines([y for _, y in ref], [i - 0.4 for i, _ in ref], [i + 0.4 for i, _ in ref], color="k",
-                  label="MLP, log invariants")
+        mlp, mc, _, mls = model_style("MLP log")   # green and dashed, as on every KIT figure (MODELS)
+        ax.hlines([y for _, y in ref], [i - 0.4 for i, _ in ref], [i + 0.4 for i, _ in ref], color=mc, ls=mls,
+                  label=mlp)
         ax.set_xticks(range(len(fams)), [lab for _, lab in fams])
         ax.set_xlim(-0.6, len(fams) - 0.4)
         ax.set_yscale("log")
