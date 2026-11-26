@@ -33816,6 +33816,28 @@ entries:
     sources: 1/7 and 7 <- the test same-HP rerun spread 0.78-6.96 of t t~ V runs (measured, results.tex sec:datasaving, diag_readout.py
       @5555a0f0); 5x validation jump <- the ladder seeds' blow-ups against 1.5x seed noise (results.tex sec:ladder); 100 GPU-h
       <- D570 names this work
+    fix_at: '2026-11-26T12:59:29+00:00'
+    fix: '(1) Disk on lxplus not stated (check 14). The 02:27 design sized disk against CC /sps/lpnhe (17 GB free); this one
+      moves the whole chain to lxplus and gives no disk per job and no free space there. Pools are loaded in memory (smoke2
+      RUN_SUMMARY memmap false) and the three restored pools'' train/val/test files are already in /eos/user/j/joiturri/tmp/amp_data_cache
+      and /eos/user/j/joiturri/datasets (read now), so no new cache is needed. Fix: state disk per job (parent: real size
+      from smoke2''s dir, 31 MB at 50 steps, plus checkpoints and sigma_stage/preds_*.npz at full size, about 1 GB; arms about
+      80 MB each, 15 of them) and the free EOS user quota read now (df on /eos/user only shows the 2.2 PB pool, not your quota;
+      eos quota printed no user line: use e.g. ''eos quota /eos/user/j/joiturri -m'' parsed for uid, or ''eos root://eosuser.cern.ch
+      quota''), with margin. (2) The sign readout is not tied to an output of this config (check 15). The design says the
+      wrong-sign fraction comes from tools/signed_ab_score.py --arm head ''or from the run''s validation''. signed_ab_score
+      needs a GPU job (not in the cost) and reads magnitude with prepd_mean[0], wrong under data.affine_multiplicity_std (mu_N
+      = a + bN). The run itself writes the per-event sign (key ''sign'', [pred, true]) and process_id to sigma_stage/preds_val.npz
+      when training.sign_head is on (experiment.py ~3447-3450), and analysis/catalog_v2/signed_compare.py already reads that
+      key. Fix: name one committed tool that reads the wrong-sign fraction per signed pool from the parent''s sigma_stage/preds_val.npz,
+      and show it run on the parent smoke''s output before the real parent goes. (3) The per-pool val comparison with 47e14eae
+      does not compare like with like on the three signed pools. 47e14eae ran with training.sign_head false (its config.yaml
+      on CC: sign_head false, preprocess_per_dataset true, signedlog_quantile 0.01), so it trained those pools on the signed
+      log; the new parent trains them on abslog. Their val MSEs are in different target spaces. Fix: say so and either leave
+      those three pools out of that comparison or read both runs on log max(|v|, s) (the A/B footing of results.tex 2026-10-24).
+      Everything else holds: the one change against the 02:27 pass is the recipe (+3 signed pools, D572) and training.sign_head=true;
+      arms are unchanged and matched; HETEROSC; 1/7 and 7 sourced from the 0.78-6.96 rerun spread; the smoke re-runs every
+      stage; cost <= 44 GPU-h under D570.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
