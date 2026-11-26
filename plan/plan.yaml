@@ -45747,6 +45747,9 @@ entries:
       against our own output and tokens saved per instance; proposal of what to route'
     6: 'Read the design-review replay (159 rounds, two arms, Qwen and DeepSeek; detach review_replay): lab_wake_trial.py reviews-report,
       agreement split by full design read and slice, every FIX missed read by hand; proposal or no route'
+    7: Commit the 429/500 retry of tools/lab_wake_trial.py on branch labwake (worktrees/wt-labwake, where the replays run),
+      merge into trunk and remove the worktree with scripts/remove_worktree.sh once repo-reviewer a81bfbcbf3da8af32 passes
+      the backlog
   done_when: null
   notes_ref: par:labllm1
   match: zz_labllm_*
@@ -46543,6 +46546,11 @@ entries:
       - 'an arm''s agreement above always-FIX''s Wilson upper bound (0.635): propose ''a lab PASS skips Opus'', FIX missed
         as the cost, Opus tokens saved'
       - 'no arm above it: keep reviews on Opus, misses listed'
+    7:
+      feeds: that the replays' code is committed before their numbers are reported (D551)
+      if:
+      - 'repo-reviewer passes: commit, merge, remove the worktree after the replays end'
+      - 'it blocks on lab_wake_trial.py: fix, re-check with the same reviewer'
 - id: critical_batch
   title: Critical batch size from the gradient noise scale
   question: What is the critical batch size of our canonical setup, measured from the gradient noise scale B_simple = tr(Sigma)/|G|^2
