@@ -189,5 +189,13 @@ def test_outside_legend_refused(tmp_path):
 
 
 def test_legendless_pdf_refusal_names_draft_route(tmp_path):
-    bad, _ = sc.legend_findings({"files": [str(tmp_path / "kit_section_pages.pdf")], "caption": ""}, "/", drafts=str(tmp_path))
+    bad, _ = sc.legend_findings({"files": [os.path.join(sc.ROOT, "analysis", "zz_nolegend", "kit_section_pages.pdf")], "caption": ""}, "/", drafts=str(tmp_path))
     assert bad and "draft_" in bad[0]
+
+
+def test_documents_outside_project_pass_but_fa_figure_without_legend_refused(tmp_path):
+    assert sc.legend_findings({"files": ["/home/joaquin/CSI_2nd_year_DRAFT.pdf"], "caption": ""}, "/",
+                              drafts=str(tmp_path)) == ([], [])
+    fig = os.path.join(sc.ROOT, "analysis", "zz_nolegend", "figs", "x.png")
+    bad, _ = sc.legend_findings({"files": [fig], "caption": ""}, "/", drafts=str(tmp_path))
+    assert bad and "not drawn through ps.save" in bad[0]

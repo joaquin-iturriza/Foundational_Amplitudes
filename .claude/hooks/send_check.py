@@ -313,6 +313,8 @@ def legend_findings(tool_input, cwd, drafts=None):
         p = p if os.path.isabs(p) else os.path.join(cwd, p)
         if is_deck(p) or is_draft(p) or is_run_plot(p) or "run_plots" in os.path.normpath(p).split(os.sep):
             continue
+        if p.lower().endswith(".pdf") and (is_document(p) or not os.path.abspath(p).startswith(os.path.abspath(ROOT) + os.sep)):
+            continue                              # a PDF outside the checkout, or of several pages, is a document
         stems = draft_stems(drafts) if stems is None else stems
         lg0 = read_legend(p)
         made_by_tool = lg0 is not None and os.path.basename(lg0[0]) == "draft_figure.py"   # the figure itself
