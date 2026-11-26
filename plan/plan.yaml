@@ -47140,7 +47140,7 @@ entries:
     6: 'Close: once par:cbs_update (e05fc9e32) and par:cbs_horizon pass the notes-editor, plan done critical_batch --writeup
       <commits> (par:cbs_scan 145d14839, par:cbs_update e05fc9e32, par:cbs_horizon)'
   done_when: null
-  notes_ref: null
+  notes_ref: sec:noisescale
   match: zz_cbs_*,cbs_*
   evidence:
     runs:
