@@ -46974,6 +46974,68 @@ entries:
       field states both flags. The rest stands as passed at 22:47: checks 2 and 3 on c_best_factor_split.json (gg->ttH offshell_6
       eta2 0.934, separation 12.14; gg->t b W pair bias^2 30.7/32.1 against spread 1.03-1.8x), check 5 terms offshell/off-shell/off-shellness/offshell_per_event/held/zero-shot/without/ablat
       plus internal_mass_scalars.'
+  - at: '2026-11-26T18:42:30+00:00'
+    question: 'D566 attempt C (Joaquin 2026-11-25: a per-process level ''depends on how that data was sampled ... this has
+      to perform correctly in individual events regardless of that. I believe there is a way to marry these two ideas''):
+      does a per-event level built from the process and its diagrams, with no statistic of the scored dataset, keep the per-process
+      diagram regressor''s level skill on the 43 new families AND hold when the same process is sampled another way? Form:
+      per training process, log|M|^2 = c_p + b_p.(x - x0) fitted on its events (a conditional mean, which a change of the
+      sampling density over x does not move where the form holds), x per event in three variants: C_s (log s_hat), C_sqE (+
+      q = Lmin - log s_hat, E soft-emission sum), C_sqEP (+ log P, the diagrams'' propagator product at the event''s invariants:
+      candidate A''s factor, here with a learned per-process coefficient); x0 and scales = medians/std over all training events
+      (constants of the method); the regressor''s network and descriptors (norm_explore3 2x64 MLP, stats_net features + 5
+      diagram descriptors, 3 seeds, cross-fit by relabelling class) map process -> (c_p, b_p); prediction per event c^ + b^.(x
+      - x0).'
+    prior: 'Dead end A (perevent_level.py --surrogate, data/perevent_level_surrogate.json): log P at coefficient 1 or a fitted
+      global 0.57/0.66 plus a content-only level: new median level error 6.3/3.1, multi-Higgs 857/360 (the propagator factor
+      misplaces new-family levels). Dead end B (step 17/20, data/perevent_level{,_mlp}{,_search}.json): one per-event map
+      g(process, descriptors, log s_hat, q, E, log P) -> log|M|^2: new 3.64/1.63 untuned, 4.75/2.64 tuned (tree/network);
+      its sampling shift flat-in-log-s_hat 0.084 vs the constant''s 0.176 (bootstrap sd 0.026-0.037): per-event inputs remove
+      sampling dependence but the event-level fit loses the across-process level. Regressor (norm_explore3.json): B|diag|sampled
+      0.0447 new, B|diag|flat (level reweighted flat in log s_hat) 0.0658, B|nodiag 0.448/0.182; shared 44.7. results.tex
+      l.8013-8045 (D83): surrogates'' per-event r^2 0.69 on new for the propagator product, no surrogate mean beats the statistics
+      predictor as a level. Searched: anchor, intercept, covariate shift, sampling-independent, reference point in docs/results.tex
+      and plan.yaml; site decisions D566: none on an anchored conditional level. Differs: C keeps the regressor''s per-process
+      learner (where its skill lives) and changes only its target to the conditional form''s coefficients, so the per-event
+      dependence enters as a per-process slope, not as one event-level fit.'
+    measure: 'perevent_level.py --anchored @cbd3fa919 (CPU job, CC, memmap base caches 99c164da4365de9d7c017b75 and b39fc80c8b10edbe4b07f6a0,
+      depth train55296_val10000_test10000, first 2000 train-role events per process = the pools'' first 2000, as step 17).
+      Per process, err = pred - log|M|^2, sigma_p = std of log|M|^2 over its 2000 events; level error e_S = mean(err over
+      S)^2 / sigma_p^2 on S = all events, and on the same process re-sampled exactly by restriction (an unweighted pool restricted
+      to a window is that window''s pool): s_lo / s_hi (sqrt s_hat below / above the pool''s median: another collider window),
+      q_hard (q above median: a harder cut), q_soft (lowest fifth of q: the singular region); spread std(err)/sigma_p. Medians
+      over the 43 new, the 96 relabels, and the 1352 training (cross-fitted); event-bootstrap sd of the new medians (30 resamples).
+      Candidates: shared, regressor (frozen level_file_B_diag), oracle_const (each pool''s own true mean: the floor any per-process
+      number fitted on the pool hits on its subsets), C_s/C_sqE/C_sqEP and diagnostics _fit (true per-process c,b: the form''s
+      own floor) and _trueb (c predicted, slopes true).'
+    check: 'Existing data: the measure moves with per-event vs per-process level: step 17''s data/perevent_level_mlp.json,
+      sampling shift (flat-in-log-s_hat reweighting) of a constant level 0.176 sigma (sd 0.037) vs the per-event map 0.084
+      (sd 0.026) on the 43 new; and the level definition moves the new-set error 0.0447 (pool mean) vs 0.0658 (flat-reweighted
+      mean) in norm_explore3.json. Code: anchor_fit recovers (c,b) exactly on synthetic data and its intercept moves 0.702
+      -> 0.712 (true 0.7) when the sample is restricted to x > 0.5; anchored() ran end to end on synthetic processes locally;
+      the job asserts the references reproduce (shared ~47, regressor ~0.044, within 10%) before writing. The memmap base
+      holds each pool''s first events in pool order with raw |M|^2 and momenta boosted to the incoming pair''s frame (data_mmap._build_base):
+      the invariants used do not change.'
+    fixed: Events (first 2000 train-role per process), the 1352/43/96 split (classes_default.json, heldout_twins.json), the
+      regressor's network, descriptors, seeds and cross-fit folds (perevent_level mlp, GroupKFold(5) by weak_key), diagram
+      sidecars and log P (dipole_residual.log_prop), the subsets' definitions; no training job, no new data.
+    control: The per-process diagram regressor's constant level (data/level_file_B_diag.json, new median 0.044-0.047), on
+      the same events and subsets; beside it oracle_const (the pool's own true mean) and shared.
+    seeds: Network seeds 0-2 averaged (as the regressor); events fixed; noise = event bootstrap (30).
+    outcome: 'Level kept: median e_all over the 43 new <= 0.094 for a C variant; partly kept: 0.094-0.45; lost: >= 0.45. Sampling-independent:
+      on each of s_lo, s_hi, q_hard, q_soft the variant''s new median e_S below the regressor constant''s by more than 2 x
+      sqrt(sd_C^2 + sd_reg^2) (event bootstrap). (Yes) a variant keeps the level and is sampling-independent on at least 3
+      of the 4 subsets: report to Joaquin; next its training-run design (the per-event c^+b^.x as the level the network''s
+      target is taken against, replacing the level file). (No, level lost) read _trueb against C: if _trueb keeps the level
+      the predicted slopes carry the error (next: shrink slopes toward a class mean or predict c at a process-intrinsic anchor);
+      if _fit itself misses on the subsets the linear form is wrong (next: a nonlinear per-process form). (No, subsets) the
+      variant follows the constant on the subsets: next attempt from _fit''s subset errors.'
+    sources: '0.094 <- measured: 2x the regressor''s own new median 0.047 (perevent_level_mlp.json), the spread between two
+      level definitions of the same regressor being 1.47x (0.0447 vs 0.0658, norm_explore3.json); 0.45 <- measured: the content-only
+      network''s new median 0.448 (norm_explore3.json B|nodiag|sampled), the level without diagram information; 2 bootstrap
+      sd <- measured noise: the event bootstrap in the job (step 17''s shift_flat_sd 0.026-0.037); 3 of 4 subsets <- measured:
+      oracle_const''s own subset error is reported beside, one subset may sit inside the noise where the constant''s sampling
+      cost is small'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
