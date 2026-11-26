@@ -28584,9 +28584,9 @@ entries:
     decision: D572
   owner:
     agent: a494fd923f5e965f0
-    state: working
+    state: stopped
     since: '2026-11-26T12:37:43+00:00'
-    state_at: '2026-11-26T12:37:43+00:00'
+    state_at: '2026-11-26T13:05:37+00:00'
     context: 140504
     context_at: '2026-11-26T12:45:04+00:00'
   findings:
