@@ -186,13 +186,15 @@ def ledger_sync(d):
         if c is None:
             return
         items = dict(c.execute("SELECT id, status FROM items WHERE project=?", (PROJECT,)).fetchall())
-        holds = c.execute("SELECT id, covers FROM decisions WHERE project=? AND kind IN ('hold','forbid') AND "
+        holds = c.execute("SELECT id, covers, note FROM decisions WHERE project=? AND kind IN ('hold','forbid') AND "
                           "in_force=1 ORDER BY recorded", (PROJECT,)).fetchall()
         kinds = dict(c.execute("SELECT id, kind FROM decisions WHERE project=?", (PROJECT,)).fetchall())
     except sqlite3.Error:
         return
     held_by = {}
-    for did, cov in holds:
+    for did, cov, note in holds:
+        if kinds.get(did) == "forbid" and (note or "").strip():
+            continue                   # a forbid with a qualifier (its note, shown as "[...]") is a narrow rule, not a hold
         for x in (cov or "").split(","):
             held_by[x.strip()] = did                       # the latest hold in force covering it
     for e in d["entries"]:

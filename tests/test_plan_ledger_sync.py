@@ -28,9 +28,9 @@ def ledger(items, holds):
         os.remove(DB)
     c = sqlite3.connect(DB)
     c.execute("CREATE TABLE items (project TEXT, id TEXT, status TEXT)")
-    c.execute("CREATE TABLE decisions (id TEXT, project TEXT, kind TEXT, covers TEXT, in_force INTEGER, recorded INTEGER)")
+    c.execute("CREATE TABLE decisions (id TEXT, project TEXT, kind TEXT, covers TEXT, in_force INTEGER, recorded INTEGER, note TEXT)")
     c.executemany("INSERT INTO items VALUES ('FA',?,?)", items.items())
-    c.executemany("INSERT INTO decisions VALUES (?,'FA',?,?,?,?)", holds)
+    c.executemany("INSERT INTO decisions VALUES (?,'FA',?,?,?,?,?)", [tuple(h) + (None,) * (6 - len(h)) for h in holds])
     c.commit()
 
 
@@ -61,6 +61,16 @@ def test_forbid_stays_held():
                      {"id": "b", "status": "held", "hold_decision": "D6"}]}
     plan.ledger_sync(d)
     assert [e["status"] for e in d["entries"]] == ["held", "running"], d
+
+
+def test_narrow_forbid_does_not_hold():
+    # D1 hold superseded, D2 forbid with a bracketed qualifier (narrow rule: note set): entry runs; a bare forbid keeps it held
+    ledger({"a": "active", "b": "active"}, [("D1", "hold", "a", 0, 1), ("D2", "forbid", "x,a", 1, 2, "batch size not searched"),
+                                            ("D3", "forbid", "b", 1, 3)])
+    d = {"entries": [{"id": "a", "status": "held", "hold_decision": "D1"},
+                     {"id": "b", "status": "held", "hold_decision": "D3"}]}
+    plan.ledger_sync(d)
+    assert [e["status"] for e in d["entries"]] == ["running", "held"], d
 
 
 def test_held_item_without_decision_unchanged():
