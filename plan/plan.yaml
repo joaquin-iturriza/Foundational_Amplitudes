@@ -28625,7 +28625,7 @@ entries:
     withdrawn_why: 'D574: no more trainings for today''s reply; a pretrained held-out uug/uugg run is training'
   owner:
     agent: ab9a95f4397f48dfd
-    state: stopped
+    state: closed
     since: '2026-11-26T16:15:08+00:00'
     state_at: '2026-11-26T17:01:42.880000+00:00'
     context: 256886
@@ -29944,29 +29944,37 @@ entries:
     '30': FA-ccin2p3-42ae3468
     '32': FA-ccin2p3-aacf91cc FA-ccin2p3-706a0f6f
   handoff:
-    state: '2026-11-26 ~20:30 @4bc95aba2. D574 items done and relayed: (1) KIT package v9 analysis/kit_benchmark/export/fa_kit_surrogates_v9.tar.gz
-      (83.4 MB, PACKAGE_OK, standalone 6-7e-8 vs repo 1-thread predictor; GPU deltas in README; clean-venv test passed with
-      torch 2.15 since pip overrides the README''s 2.1.2 pin; DATA_DIR unset writes a 10-event val pool to ~/datasets: open
-      warts). (2) Slide-11 MadGraph MC test read (figure analysis/kit_benchmark/figs/kit_mc_madgraph.png, findings 19:00):
-      bias -1.62e-3 uug / -1.35e-3 uugg (systematic), eps2 max 0.965/0.402; tt integrated virtual -29% at threshold. Differences
-      from slide 11: MadEvent grid and first unweighting adapted to the exact |M|^2 (surrogate sample = reweighting by u),
-      tt only by quadrature on the threshold scan 346-432 GeV. (3) Slides 5-8 A2 redrawn @96c9ea7bb, captions checked. Repo-reviewer
-      launched by the main session on 80dbb06ac d9e647f6c dd2b2fd1b 7537eff46 96c9ea7bb. D575: steps 30/31 wait on CC smokes
-      FA-ccin2p3-42ae3468 / 58bc2125; 20/24 on arm smokes FA-ccin2p3-3895a2a7 / e0587622 and the lxplus parent FA-lxplus-828d67d6
-      (lxplus needs Joaquin''s cluster_up); step 29 (slide-10 metrics for fine-tunes) waits on them.'
-    decisions: 'Joaquin''s: D573 package, D574 answer today from existing models, D575 all Bakar''s requests run, D570, D572,
-      D315 one seed. Mine (re-justify): package gate = standalone vs repository''s 1-thread CPU predictor (the GPU predictions
-      are not reproducible on CPU by the repo itself, FA-ccin2p3-297e9b10), GPU deltas stated in README; package kit_data
-      carries source_sha256 so pool identity and mom_div match the run; MC test reweights the exact-|M|^2 MadEvent sample
-      by u (stated difference from slide 11); slide 7/8 legends two columns.'
-    ruled_out: Fine-tuning A2 from the non-A2 kit_pretrain_heldout parent; flat-bulk reweighting as the slide-11 test; a 2e-6
-      gate against GPU predictions.h5 for A2 models (unreachable on CPU).
-    running: FA-ccin2p3-42ae3468, FA-ccin2p3-58bc2125, FA-ccin2p3-3895a2a7, FA-ccin2p3-e0587622 (pending CC), FA-lxplus-828d67d6
-      (lxplus, unreachable)
-    files: tools/kit_package.py, tools/kit_hardps.py, tools/kit_mc_madgraph.py, tools/kit_bakar_figs.py, analysis/kit_benchmark/data/kit_mc_madgraph_ee_uugg.json,
-      analysis/kit_benchmark/data/kit_threshold_scan_mcmg.json, analysis/kit_benchmark/figs/kit_mc_madgraph.png, analysis/kit_benchmark/figs/bakar_a2/,
-      analysis/kit_benchmark/export/
-    written: '2026-11-26T16:06:38+00:00'
+    state: '2026-11-27 @bcee3530a. Slide-11 MC test done exactly as specified (D571/D574/D575; design PASS 2026-11-26 16:45).
+      One-loop part DONE and handed back: A2 tt virtual over KIT''s whole bulk window 353.1-1738.7 GeV (FA-ccin2p3-12d32b55,
+      tools/kit_threshold_scan.py --window bulk): integrated sigma[V_hat]/sigma[V]-1 = +5.83e-4, per sqrt s -9.2e-4..+1.18e-3;
+      threshold scan re-read at 1 thread (FA-ccin2p3-5343481a) identical to 8 threads (-0.292 at beta 1e-3). Figure analysis/kit_benchmark/figs/kit_mc_slide11_tt.png
+      (caption in the finding/hand-back, check_caption OK). Tree part IN FLIGHT (step 32): FA-ccin2p3-aacf91cc (uug) and FA-ccin2p3-706a0f6f
+      (uugg), MadEvent integrating and unweighting the surrogate |M_hat|^2 (gen --surrogate: KITSURR after SMATRIX, serve
+      over FIFOs, 1 thread, 1e5 events, 32 CPU, limit 4 h; outputs runs/kit/mc_madgraph/kit_mc_madgraph_<proc>_surr.json,
+      <proc>_surr_serve.jsonl). On their end: read the wiring check first (sigma_hat/sigma vs E_exact[u] re-scored at 1 thread,
+      within 3 MC errors, else a KITSURR fault to fix before any number), then sigma_hat/sigma-1 with its ~1.7e-3 error (slide-11
+      number, unresolving) beside E_exact[u]-1 (resolved bias), eps2 at max/q0.9999/0.999/0.99 with sigma share above cap;
+      fetch both JSONs to analysis/kit_benchmark/data/, draw python tools/kit_mc_madgraph.py figure_exact <jsons> --out analysis/kit_benchmark/figs/kit_mc_slide11
+      (writes _tree), look, check_caption, hand to Joaquin with the remaining differences from slide 11 stated first (alpha_c
+      multi-channel weights from exact diagrams, a partition of unity; tt by quadrature not MC; sigma_hat resolution). Then
+      write sec:kit-mc in results.tex with src/claim lines. Pending events for the next owner: E9620 (FA-ccin2p3-42ae3468
+      FAILED: protocol-A heldout-qqg parent smoke, step 30: read its log, fix, resubmit) and E9622 (arm smokes FA-ccin2p3-3895a2a7
+      FT and e0587622 SCR-A2 done: step 20, site pick then SCR-A2 + V/B at all five D via fairnlo_arms.py). Steps 24/29 wait
+      on the lxplus parent FA-lxplus-828d67d6 (lxplus needs Joaquin''s cluster_up); step 31 on smoke FA-ccin2p3-58bc2125.'
+    decisions: 'Joaquin''s: D571 (we run slide 11), D574 (evaluations only today), D575 (all Bakar''s requests run), D570,
+      D572, D315 one seed. Mine (re-justify): surrogate inside MadEvent by multiplying MadEvent''s own SMATRIX value by u=|M_hat|^2/|M|^2
+      (keeps MadEvent''s channel weights as a partition of unity; integrand exactly alpha_c |M_hat|^2); in-memory Predictor
+      = rebuild once + exp.init_data per batch (asserted equal to kit_predict); vector_size 1024; every surrogate read at
+      KIT_THREADS=1 (job script, all modes; reviewer FIX); tt integrated by 32x16 Gauss-Legendre over the bulk window instead
+      of an MC; tt figure x axis beta on symlog y.'
+    ruled_out: 'Patching matrix1.f (hel_recycling regenerates matrix1_optim.f); rebuilding the run per batch (~4 s each);
+      reweighting the exact-|M|^2 MadEvent sample as the slide-11 test (Joaquin: not what Bakar asked).'
+    running: FA-ccin2p3-aacf91cc, FA-ccin2p3-706a0f6f (step 32); FA-ccin2p3-58bc2125, FA-lxplus-828d67d6 (steps 31, 20/24);
+      events E9620, E9622 unhandled
+    files: tools/kit_mc_madgraph.py, tools/kit_threshold_scan.py, scripts/job_kit_mc_madgraph.sh, analysis/kit_benchmark/data/kit_tt_bulk_window.json,
+      analysis/kit_benchmark/data/kit_threshold_scan_mcmg.json, analysis/kit_benchmark/figs/kit_mc_slide11_tt.png, analysis/kit_benchmark/source/hardps_benchmark_slides.pdf
+      (slide 11)
+    written: '2026-11-26T23:53:59+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
