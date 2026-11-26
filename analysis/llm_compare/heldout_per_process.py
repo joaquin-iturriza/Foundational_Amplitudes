@@ -132,9 +132,9 @@ def main():
         ax._ps_equal_limits = True    # his fixed y range; the legend sits in the free band above the data
     # |bias| (9 entries): under the fixed range every corner of the top panel covers 97-137 points (ps.covered),
     # the bottom panel's lower left 3 at the default row spacing (ps.save refits 4 columns back to 3)
-    lax, loc = (axes[1], "lower left") if a.part == "bias" else (axes[0], "upper left")
+    lax, loc = axes[1], "lower left"   # the bottom panel is empty below ~0.01 in every part
     lax.fill_between([], [], color="0.88", label=r"$2\to2$ processes (others $2\to3$)")
-    ps.legend(lax, loc, ncol=3, **({"labelspacing": 0.1} if a.part == "bias" else {}))
+    ps.legend(lax, loc, ncol=3, labelspacing=0.1)
     ps.save(fig, os.path.join(HERE, "figs", f"{a.out}_heldout_per_process"))
     ps.PLOT_W_IN, ps.PLOT_H_IN = w0, h0
 
