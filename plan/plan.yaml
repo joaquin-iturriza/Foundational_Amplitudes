@@ -42466,6 +42466,21 @@ entries:
       CC it would take all the room the running part (b) 120-head run FA-ccin2p3-f0b997a2 needs at its end (best 8.5 GB now;
       at the end the last model 8.5 GB + gzip ~6.9 GB, ~15 GB more while 18 GB is free): RISK that run fills CC /sps again
       at its end (~11-29) unless space is freed before.'
+  - at: '2026-11-26T08:47:19+00:00'
+    text: '2026-11-26 step 16 read (D564; score FA-ccin2p3-2240c052 REREAD of FA-ccin2p3-0ca1d68d; level_file_read.py and
+      rerun_spread.py --a a_trial5 --b level_file @77079efe5, data/step16_level_file_read.json, data/step16_level_vs_a5.json).
+      Level-file arm vs part (a) trial 5, median per-process MSE of log|M|^2: new (43) 0.309 vs 1.144 (3.70x lower), below
+      the post-hoc substitution''s 0.577 and the LLM''s 0.940 (median over his seeds 0-2); below the LLM on 33/43 (trial 5
+      13; post-hoc 25). New median bias^2 0.122 vs 0.859 (level network''s own 0.096, 1.27x); MSE-bias^2 0.157 vs 0.287; the
+      trained network sits off its given level by median |bias - given bias| 0.17 (trial 5 1.27; 90% 0.76). Relabels (96)
+      0.0099 vs 0.0208 (2.1x lower), bias^2 0.0003 vs 0.0013. Seen median 0.00526 vs 0.00526, pooled RMSE seen 0.104 vs 0.117.
+      Pooled RMSE new 1.725 vs 1.767 (LLM 1.193, post-hoc 1.314): carried by the gg->t b W pair, MSE 44.4/40.6 vs 26.6/25.5,
+      bias -6.39/-6.09 against the given level''s own -3.81/-3.81 and trial 5''s -4.78/-4.74 (the network moved further from
+      truth than its given level on this pair). Held-out pooled 0.969 vs 1.003 (LLM 0.721). Against the design''s outcome
+      (1.38x): KEPT (new median below the post-hoc 0.577, 3.70x below trial 5, bias^2 within 1.38x of 0.096). Against the
+      re-measured rerun spread (new 5.2x, relabels 2.5x): 3.70x and 2.1x are inside it, not resolved by one seed; the bias^2
+      drop 7.0x is beyond it. Figures figs/step16_level_file_heldout_per_process.png (MSE) and figs/step16_level_file_bias_heldout_per_process.png
+      (|bias|, with the level network).'
   step_waits:
     '8': FA-ccin2p3-1cdc28b2
     '13': FA-ccin2p3-623a3af6
