@@ -29,10 +29,8 @@ FINAL = ("a_trial5", "level_file", "c_best")
 def main():
     tags = list(FINAL)
     miss = [t for t in tags if not os.path.exists(os.path.join(HERE, "data", "events", f"{t}_heldout_events.csv"))]
-    for t in miss:
-        print(f"skipping arm {t}: no data/events/{t}_heldout_events.csv")
-    tags = [t for t in tags if t not in miss]
-    assert tags, "no arm has events"
+    # one arm set for every figure of the comparison: a missing arm refuses, never a figure with fewer arms
+    assert not miss, f"no data/events/<tag>_heldout_events.csv for {miss}"
     meta = {"dc_" + p["folder"]: p for p in json.load(open(os.path.join(DAN, "classes_default.json")))["processes"]}
     rel = set(json.load(open(os.path.join(DAN, "heldout_twins.json"))))
     ev = {}
