@@ -47695,6 +47695,17 @@ entries:
       the retrain''s seen pooled RMSE ratio (data/rerun_spread.json); 1.34 <- measured: the pair''s contrast between the two
       part (c) runs (trial_1860 vs trial_9000: 1.34 on btxwp, 1.21 on tbxwm, factor_split.py on existing events); 5.07/4.92
       <- control MSE / 7.26'
+    passed_at: '2026-11-26T23:40:11+00:00'
+    reviewer: 'Re-check after FIX: one change only (sweep_config_llmcmp_c_tprop.yaml @581530563 vs _c_latest: sweep_name,
+      data.target_propagators); check 2: near-pole contrast moves across existing runs (-0.62 to -2.49 over eight arms, factor_split
+      --pole-run, scratchpad spread/*_fs.json), read c_best -2.494/-2.476 se 0.047/0.048 vs c_control -1.281/-1.134 = same-setup
+      spread 1.21/1.34 (confirmed), Partly/No boundary set on it; check 3: MSE bar 7.26 = p90 per-process factor of control/control_retrain
+      on the 43 new (rerun_spread.json confirmed), 1.11 seen ratio; gate on tp meta props for the pair and q q~ twins before
+      any GPU job; feature rule on No (same 8-trial DyHPO, ~128 GPU-h, to Joaquin); disk ~2.6 GB of CC''s 16 GB free (df 2026-11-27);
+      D395 smoke through sigma, test, llm_score EVENTS=1 and factor_split; wall target 14.7 h from trial_1860''s own 0.672
+      s/step + 2.39 h sigma, limit 22 h; HETEROSC. Check 5 searched: target_propagators, Breit, propagator, resonan, pole,
+      tbW, tbxwm, resonance_per_event in docs/results.tex, plan llm_compare, site decisions --project FA: only the ee-probe
+      Breit-Wigner A/B (results.tex l.14895-14935), cited in prior.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
