@@ -72,12 +72,13 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--tag", nargs="+", default=None, help="default: every arm of ARMS whose data/<tag>_heldout.json exists")
     ap.add_argument("--out", default=None, help="default all_arms (mse) or all_arms_<part>")
+    ap.add_argument("--no-level-nets", action="store_true", help="bias: leave out the level networks (no total or shape)")
     ap.add_argument("--part", choices=list(PART), default="mse")
     a = ap.parse_args()
     ddir, ylim, ylabel, llm_stat = PART[a.part]
     a.out = a.out or ("all_arms" if a.part == "mse" else "all_arms_" + a.part)
     tags = a.tag or [t for t in ARMS if os.path.exists(os.path.join(HERE, ddir, f"{t}_heldout.json"))
-                     and not (a.part == "shape" and t in LEVEL_ONLY)]
+                     and not ((a.part == "shape" or a.no_level_nets) and t in LEVEL_ONLY)]
     assert all(t in ARMS for t in tags), f"no fixed name for {set(tags) - set(ARMS)}: add it to ARMS"
     draft = json.load(open(os.path.join(ROOT, "talks", "progress_oct2026b", "data", "draft_pid_by_process.json")))
     val = {"mse": lambda q: q["mse_logm2"], "bias": lambda q: abs(q["bias_logm2"]),
