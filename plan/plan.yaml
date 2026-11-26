@@ -48089,7 +48089,8 @@ entries:
       - 'r50 <= 1.22 for an arm: the gain is the horizon for that arm'
       - 'r50 > 1.22: the gain persists at 50 epochs'
   step_waits:
-    '4': 'the detached ep50_collect (pid 2879414) ending: its DONE event, then ft_bcrit.py ep50 read and figure'
+    '4': 'the detached ep50_collect2 (pid 2901036) ending: COLLECTED -> ft_bcrit.py ep50 read and figure; FAILED (CC /sps
+      full) -> wait on the cc_disk owner''s freeing, then one resubmission'
     '1': steps 2 and 4
     '2': the notes-editor review of par:cbs_update (e05fc9e32), batched with the D563 write-up
   targets:
