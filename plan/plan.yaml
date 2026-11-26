@@ -28329,6 +28329,9 @@ entries:
     30: 'Protocol A pretrained with the target held out for uug/uugg with A2: exists only for tt (and without A2); the fair
       one-loop chain covers tt only, so uug/uugg pretrained-held-out A2 is NOT in any design; to design within the entry''s
       approval'
+    31: 'Protocol B on the three A2 models (D575, design PASS ~16:40): smoke FA-ccin2p3-58bc2125 (B, tt A2, 50 steps); on
+      its clean end site pick + 6 runs job_kit.sh B and B_bulk 3000 steps with --env KIT_FROM=runs/kit/kit_A_ee_{uug_me2,uugg_me2,tt_virt_finite}_n100000_t1831_hpo_asym_cont,
+      tags a2B (limit 1:30), then B vs B_bulk per family'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -29873,6 +29876,11 @@ entries:
       if:
       - 'pretrained A2 beats scratch A2 on uug/uugg hard bins: report'
       - 'not: report as level/loses'
+    31:
+      feeds: 'Bakar''s protocol B on the models we report: do hard points still teach A2'
+      if:
+      - 'B beats B_bulk on a family: report the gain'
+      - 'level: A2 already extrapolates from bulk there'
   step_waits:
     '24': FA-lxplus-828d67d6
     '20': FA-ccin2p3-3895a2a7 FA-ccin2p3-e0587622
