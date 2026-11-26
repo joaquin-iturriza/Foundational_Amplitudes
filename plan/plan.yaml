@@ -36189,6 +36189,7 @@ entries:
     route'
   blocks: draft_rewrite step 4 (Fig. 14 right needs Jean Zay's 448-process data_stats.json) and every Jean Zay job
   blocks_steps: *id002
+  checked_until: '2026-11-26T18:21:08+00:00'
 - id: zng_uq_benchmark
   title: Our model on the Z + n gluon UQ datasets (Zenodo 16793011)
   question: 'How does our latest setup (emission-scale target, HETEROSC, mu-P LLoCa), from scratch and fine-tuned from a pretraining,
