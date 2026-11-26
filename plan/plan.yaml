@@ -47434,6 +47434,55 @@ entries:
       the twins per event. Either way, show the figure call on the rewritten JSON. Update prior/control so they no longer
       say ''beside its twins'' if the twins are not drawn. Checks 0, 1, 3, 5-19 hold: CPU-only re-read, no training, one existing
       run, no seeds axis, no HP/loss/preprocessing change.'
+  - at: '2026-11-26T22:55:58+00:00'
+    question: 'Step 15 (D564, Joaquin: ''despite the llm being so much worse at training and at relabels, it seems to extrapolate
+      better, we should understand why this is the case''): the pooled new-set gap to the LLM is carried by g g > t b~ w-
+      / g g > b t~ w+ (our searched best MSE 36.8/35.7, bias -5.66/-5.58 of log|M|^2, against the LLM''s 2.2/2.5); on them
+      the internal top''s off-shellness input explains 0.815/0.806 of the error''s variance (eta2, data/c_best_factor_split.json)
+      with no monotone trend (spearman 0.11). Does the error sit at the top''s pole (s_prop = m_t^2, where the gg-initiated
+      t t~ -> t b W resonance lives), while the same network has the trained q q~ initial-state twins (same final state, same
+      reachable pole) right? If yes, the gap is the transfer of a resonance''s level from q q~ to the new g g initial state,
+      which a configuration of ours can then test.'
+    prior: 'Step 15 findings 2026-11-25 (plan llm_compare): the new-set error is a misplaced level (pooled bias^2 share 0.85-0.89);
+      the gg->tbW pair carries the pooled gap (without it new 1.42-1.71 vs LLM 1.17), level and shape both wrong on it (rho
+      -0.12/-0.11 in our setup); the LLM''s median new level error 0.231 vs our control 0.209. Step 16 level file: new median
+      MSE 0.309 (LLM 0.94) but the pair worse (44.4/40.6). Step 22 (no off-shellness input, FA-ccin2p3-1b480869): pair bias^2
+      43.8/42.1 vs 30.7/32.1 (the input does not drive it); on g g > t t~ h d depends on |off-shellness| on both pole sides
+      (eta2 0.565). New here: the pair''s error placed against the pole''s own position on the input axis. Searched docs/results.tex
+      (sec:llmcmp), plan llm_compare and site decisions for tbW, tbxwm, resonan, pole, twin, initial state: nothing beyond
+      the above.'
+    measure: 'factor_split.py @3e748b197 --csv runs/llmcmp_c_qperp/trial_1860/llm_events_heldout.csv (the searched best FA-ccin2p3-29ce8950,
+      its CC re-read of 2026-11-26 21:54 with offshell_<pdg> columns, first 5000 test events per process) --pole-run runs/llmcmp_c_qperp/trial_1860
+      --out analysis/llm_compare/data/c_best_factor_split.json, a CPU job on CC (site run --job; REREAD=FA-ccin2p3-29ce8950,
+      no GPU). The pole on the input axis = -mu/sd of the run''s own offshell_stats (data_stats.json; the input is (sign(o)
+      log1p|o| - mu)/sd, so s_prop = M^2 maps there). Per process of the pair: d = pred - true of log|M|^2; the fifth of events
+      closest to the pole against the other four fifths: mean d in each, contrast = near - far, its standard error (the two
+      means'' in quadrature), the low 2-means group''s share in each; the 2D histogram and the binned mean of d in 20 quantile
+      bins of offshell_6. Figure: factor_split.py --fig data/c_best_factor_split.json --panels tbw --x offshell_6 (d against
+      the top''s input, pole marked); the gg->ttX numbers and figure re-made by the same call.'
+    check: 'Existing data: data/c_best_factor_split.json (same run and events): eta2 of d on offshell_6 0.815/0.806 on the
+      pair against 0.0 on offshell_25 and 0.05 on log F, so the binned means spread by about sqrt(0.81) x 2.19 = 2.0 nats
+      across the input; the 2-means groups (72% at d = -6.7, 28% at -2.8) are what the near/far split places. Code: synthetic
+      CSV (scratchpad fs15: an error of -6 within |o| < 0.5 of the pole, stats mu 1, sd 2): the pole lands at -0.5 = -mu/sd,
+      near-fifth contrast -3.78 with se 0.14, far mean 0.0; the tbw and ttx figures draw.'
+    fixed: The run (searched best of part (c), checkpoint, shared statistics, off-shellness statistics), its first 5000 held-out
+      test events per process, factor_split's statistics and bins. No training, no new scoring.
+    control: 'The trained q q~ twins (u u~, d d~, s s~, c c~, b b~ > t b~ w- / b t~ w+), read by the same run: seen MSE of
+      log|M|^2 0.0011-0.0069 (data/c_best_seen.json, tools/llm_score.py), which bounds the mean |d| of any fifth of their
+      events at sqrt(0.0069 / 0.2) = 0.19 nats: the network has the pole right where it was trained on it. Not drawn per event
+      (their per-event CSV does not exist; the bound settles it).'
+    seeds: One run (seed 42), as every arm of the entry; no seed axis in the read; noise of each mean from its events (standard
+      error).
+    outcome: 'Yes (the pole carries the gap): on both processes of the pair the near-pole fifth''s mean d is below the far
+      mean by more than 2 contrast_se and by more than the twins'' bound 0.19: report to Joaquin with the figure; next a configuration
+      testing the transfer of the resonance''s level from q q~ to g g (its own design). Opposite: near minus far above +2
+      se: the error lies off the pole (the far off-shell tail), the resonance is placed right; next read where along the input
+      it sits (binned means) and what in that region differs from the twins. Depends on off-shellness but not at the pole:
+      |near - far| within 2 se while eta2 stays ~0.8: the dependence is between off-shell regions; reported with the binned
+      curve as the open question. In every branch the pair''s own numbers and the figure go to Joaquin.'
+    sources: '2 contrast_se <- measured: the two means'' standard errors from the events (factor_split pole_split); 0.19 <-
+      measured: the twins'' largest seen MSE 0.0069 (data/c_best_seen.json) over a fifth of events, sqrt(0.0069/0.2); fifth
+      closest to the pole <- attempt C/D''s singular-fifth subset convention (perevent_level.py subsets)'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
