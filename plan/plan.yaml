@@ -48609,6 +48609,23 @@ entries:
       2026-11-14T04:31, 2026-11-10T02:08, 2026-11-11T02:02, 2026-10-31T03:39, 2026-11-12T00:33, 2026-10-05T04:33, 2026-10-24T14:35,
       2026-10-09T03:51, 2026-10-29T13:18 (other subjects: paper template, draft plan, local /tmp, a submit log, hooks, physics,
       explanations, LLM use)'
+    blocks_steps:
+    - 3
+  - ask: 'Scope: deleting results beyond your D556 list (results on a site are deleted only under your decision). CC /sps/lpnhe
+      has 18.0 GiB free; the 60 GB floor needs ~42 GiB more; our own debris is spent (<0.2 GB left) and the prune tool frees
+      ~0.5 GiB a pass. May the zz_v4_* dirs be deleted: 27.6 GiB in 235 dirs of per-probe zero-shot predictions (npz) of catalog_v4
+      runs, which you kept on 2026-11-25? The rest stays: the training caches (58.7 + 33.6 GiB) are read by live jobs, runs/
+      is open entries'' results, and runs_from_lxplus (17.3 GiB, CC''s only copy) is moved only when lxplus EOS has room (it
+      has ~24 GB, under the 17.3 + 27 GB needed).'
+    at: '2026-11-26T04:05:50+00:00'
+    searched: 'site decisions --project FA (D19, D133, D136, D147, D149, D208, D550, D556) and the cc_disk hand-off (zz_v4_*
+      kept on 2026-11-25). Joaquin''s messages read: 2026-10-23T01:45 (asks whether the lxplus copies are needed; D556''s
+      keep list of 2026-11-25 is later), 2026-10-30T23:09 (freeing space is not his job: so this asks only the one call no
+      rule settles, deleting results), 2026-11-01T15:56 and 2026-10-29T19:06 (rebuildable caches and working dirs deleted
+      without asking: these are results, not those), 2026-11-24T23:35 (asks what costly results are: this names each), 2026-11-14T04:31,
+      2026-11-10T02:08, 2026-11-11T02:02, 2026-11-11T02:09, 2026-10-04T19:25, 2026-10-31T03:39, 2026-11-12T00:33, 2026-10-05T04:33,
+      2026-10-24T14:35, 2026-10-09T03:51, 2026-10-29T13:18 (other subjects: paper template, draft plan, local /tmp, cluster
+      outage, a run readout, a submit log, hooks, physics, explanations, LLM use)'
     blocks_steps: &id005
     - 3
   owner:
@@ -49162,20 +49179,19 @@ entries:
       - 'they fall short: list what holds the space by owner and entry, ask Joaquin for the costly part'
   ask: 'Scope: deleting results beyond your D556 list (results on a site are deleted only under your decision). CC /sps/lpnhe
     has 18.0 GiB free; the 60 GB floor needs ~42 GiB more; our own debris is spent (<0.2 GB left) and the prune tool frees
-    ~0.5 GiB a pass. What holds the rest, each with what it is: (a) llm_compare''s width and q_perp test runs, runs/llmcmp_b_width
-    10.9 + runs/llmcmp_c_qperp 6.3 GiB, mostly model checkpoints; (b) zz_v4_* 27.6 GiB, 235 dirs of per-probe zero-shot predictions
-    (npz) of catalog_v4 runs, which you kept on 2026-11-25; (c) runs_from_lxplus 17.3 GiB, lxplus sweeps'' trial dirs whose
-    only copy is on CC; the training caches (58.7 + 33.6 GiB) are read by live jobs and stay. May (a) and (b) be deleted,
-    and (c) copied back to lxplus and deleted on CC?'
-  waiting_since: '2026-11-26T04:01:27+00:00'
-  searched: 'site decisions --project FA (D19, D133, D136, D147, D149, D208, D550, D556) and the cc_disk hand-off (runs_from_lxplus
-    and zz_v4_* kept on 2026-11-25). Joaquin''s messages read: 2026-10-23T01:45 (asks whether the lxplus copies are needed;
-    D556''s keep list of 2026-11-25 is later), 2026-10-30T23:09 (freeing space is not his job: so this asks only the one call
-    no rule settles, deleting results), 2026-11-01T15:56 and 2026-10-29T19:06 (rebuildable caches and working dirs deleted
-    without asking: these are results, not those), 2026-11-24T23:35 (asks what costly results are: this names each), 2026-11-14T04:31,
-    2026-11-10T02:08, 2026-11-11T02:02, 2026-10-31T03:39, 2026-11-12T00:33, 2026-10-05T04:33, 2026-10-24T14:35, 2026-10-09T03:51,
-    2026-10-29T13:18 (other subjects: paper template, draft plan, local /tmp, a submit log, hooks, physics, explanations,
-    LLM use)'
+    ~0.5 GiB a pass. May the zz_v4_* dirs be deleted: 27.6 GiB in 235 dirs of per-probe zero-shot predictions (npz) of catalog_v4
+    runs, which you kept on 2026-11-25? The rest stays: the training caches (58.7 + 33.6 GiB) are read by live jobs, runs/
+    is open entries'' results, and runs_from_lxplus (17.3 GiB, CC''s only copy) is moved only when lxplus EOS has room (it
+    has ~24 GB, under the 17.3 + 27 GB needed).'
+  waiting_since: '2026-11-26T04:05:50+00:00'
+  searched: 'site decisions --project FA (D19, D133, D136, D147, D149, D208, D550, D556) and the cc_disk hand-off (zz_v4_*
+    kept on 2026-11-25). Joaquin''s messages read: 2026-10-23T01:45 (asks whether the lxplus copies are needed; D556''s keep
+    list of 2026-11-25 is later), 2026-10-30T23:09 (freeing space is not his job: so this asks only the one call no rule settles,
+    deleting results), 2026-11-01T15:56 and 2026-10-29T19:06 (rebuildable caches and working dirs deleted without asking:
+    these are results, not those), 2026-11-24T23:35 (asks what costly results are: this names each), 2026-11-14T04:31, 2026-11-10T02:08,
+    2026-11-11T02:02, 2026-11-11T02:09, 2026-10-04T19:25, 2026-10-31T03:39, 2026-11-12T00:33, 2026-10-05T04:33, 2026-10-24T14:35,
+    2026-10-09T03:51, 2026-10-29T13:18 (other subjects: paper template, draft plan, local /tmp, cluster outage, a run readout,
+    a submit log, hooks, physics, explanations, LLM use)'
   blocks_steps: *id005
 - id: cc_login_jobs
   title: 'CC login node: recurring and long scripts moved to Slurm (CC support''s email)'
