@@ -29749,8 +29749,7 @@ entries:
       - 'FT not below them: report per D where it loses, with the parent''s curves'
   step_waits:
     '20': FA-lxplus-da06f228
-    '22': drive.py searches kit_hpo_ttvirt_thr_divform and kit_hpo_ttvirt_thr_rezero (detached kit_hpo_tt_divform_rezero,
-      pid 2843282)
+    '22': FA-ccin2p3-32df7421
     '24': step 20's real fair-NLO parent run (tag kit_fairnlo_a2, not yet submitted)
   handoff:
     state: '2026-11-26 ~09:45 UTC. Step 20 (D570, fair one-loop protocol) on lxplus (its data exist only there; CC /sps/lpnhe
