@@ -238,10 +238,11 @@ ANCH_E = {"D_sqE": ("L", "q", "E"), "E_sqE_net": ("L", "q", "E"), "E_sqE_kin": (
 
 def kin(meta):
     """the final state's kinematic descriptors (Daniel's run card cuts pT > 10 GeV on every massless visible leg):
-    log of (sum of final masses + 10 GeV per cut leg)^2, the number of cut legs, the number of neutrinos"""
+    log of (sum of final masses + 10 GeV per cut leg, at least 10 GeV)^2, the number of cut legs, the number of neutrinos"""
     fin = meta["process"].split(">")[1].split()
     ncut = sum(p not in sn.MASS and sn.KIND[p] != "v" for p in fin)
-    return [np.log((sum(sn.MASS.get(p, 0.0) for p in fin) + 10.0 * ncut) ** 2), ncut,
+    # 10 GeV floor: a final state of neutrinos and massless uncut legs only has neither a mass nor a cut
+    return [np.log(max(sum(sn.MASS.get(p, 0.0) for p in fin) + 10.0 * ncut, 10.0) ** 2), ncut,
             sum(sn.KIND[p] == "v" for p in fin)]
 SUBSETS = ("all", "s_lo", "s_hi", "q_hard", "q_soft")
 NENS = 10
