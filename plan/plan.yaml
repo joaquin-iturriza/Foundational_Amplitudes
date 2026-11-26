@@ -42429,9 +42429,9 @@ entries:
     - 24
   owner:
     agent: a85970e976cb8ac83
-    state: working
+    state: stopped
     since: '2026-11-26T19:32:24+00:00'
-    state_at: '2026-11-26T19:33:48.078000+00:00'
+    state_at: '2026-11-26T19:46:29+00:00'
     context: 85103
     context_at: '2026-11-26T19:34:03+00:00'
   step_why:
