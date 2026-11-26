@@ -51571,8 +51571,10 @@ entries:
   match: kit_reply_deck_*
   evidence:
     runs: []
-    commit: null
-    paths: []
+    commit: fe50d1b28
+    paths:
+    - analysis/kit_benchmark/figs/reply_deck
+    - talks/kit_reply_nov2026/main.pdf
   dead_ends: []
   asks: []
   owner:
