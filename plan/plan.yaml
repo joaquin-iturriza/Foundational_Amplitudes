@@ -42138,11 +42138,6 @@ entries:
       (per-family errors in Suprio''s layout already in figs/*heldout_per_process.png; candidate causes: his input encoding/pID
       embedding, his target standardisation on held-out, our shared affine statistics on new multiplicities, model capacity),
       design review, then the configurations that test it within the GPU budget'
-    24: 'Attempt D: the same, with a process-intrinsic anchor x0_p (a fixed function of the process alone, e.g. a ridge fit
-      of the training processes'' median x on the regressor''s descriptors; no statistic of the scored dataset), so c_p is
-      the level at the process''s own typical point (little leverage) and b_p carries the sampling dependence; slopes optionally
-      shrunk toward the multiplicity-class mean; variants C_s and C_sqE (log P dropped: lost the level); same ten ensembles,
-      control, subsets and bars as attempt C''s passed design'
     25: 'attempt E (step 25): the D_sqE form with a better process-intrinsic anchor map, designed, reviewed and run as a CPU
       job on htc'
   done_when: null
@@ -42454,12 +42449,6 @@ entries:
       if:
       - 'a cause found that a configuration of ours can test: design and run it (investigation scope, GPU budget)'
       - 'no candidate survives the checks on existing data: report what was ruled out with its evidence'
-    24:
-      feeds: 'D566: a per-event, sampling-independent level from process and diagram information that keeps the level gain
-        on new families'
-      if:
-      - 'D keeps the level and is correct on all four subsets: report, then its training-run design'
-      - 'D fails: read _fit/_trueb again; next a nonlinear per-process form or a network target taken against c^+b^.x'
     25:
       feeds: 'D566: a per-event level from the process and its diagrams that keeps the level on new families and is correct
         regardless of sampling'
