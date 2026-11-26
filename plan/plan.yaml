@@ -42391,6 +42391,27 @@ entries:
       (16/32-head smokes, passed 11-25, 2.2 GB): 5.5 GB free. Repair of step 16 (identical flags, new run dir trial_7002 so
       the partial trial_7001 stays): site submit refused (1 GB need + 5 GB margin > 5.5 GB); it goes once caf1170e ends and
       its smoke dir (16 GB, debris once its SMOKE_EXIT is read) is deleted. The 64-head smoke is resubmitted then too.'
+  - at: '2026-11-26T08:25:40+00:00'
+    text: '2026-11-26 margin re-based (steps 13/14/16, hand-off): the single-seed margin of 1.38x (catalog_v4 seed spread)
+      is replaced by the same-setup rerun spread measured on this data, rerun_spread.py @e7fbadada (data/rerun_spread.json;
+      his setup, his optimizer settings, seed 42, first run FA-lxplus-cb9273f1 vs retrain FA-ccin2p3-0165aa58). Ratio of the
+      two runs'' median per-process MSE of log|M|^2: seen 1.07 (0.0105 vs 0.0112), relabels 2.53 (0.0276 vs 0.0697), new 5.20
+      (0.688 vs 3.58); pooled RMSE ratio 1.11 / 2.03 / 1.29; per-process factor median 1.29 / 2.26 / 1.97 (10-90%: 1.05-2.41,
+      1.12-8.2, 1.14-7.3). The hand-off''s ~1.8x was the per-process median over all 139 held out; a comparison of set medians
+      uses the ratio of medians: from now on a single-seed arm differs from its control only beyond 1.1x on seen, 2.5x on
+      relabels, 5.2x on new (median MSE) or 1.3x on new pooled RMSE. One pair of runs, so one sample of the spread. Step 16''s
+      design outcome (kept = new median below trial 5''s 1.144 by >1.38x and within 1.38x of the post-hoc 0.577) cannot resolve
+      ''kept'' at the new margin (1.144/0.577 = 1.98 < 5.2): read it with both margins. Step 16 rerun FA-ccin2p3-0ca1d68d
+      (trial_7002) ended clean: 60,840 steps on H100 NVL, 4.06 h, level_file sigma 5.3165 (trial 5 5.316), median |own mean
+      - level| over train 0.071, best val_loss_no_reg 3.78e-4 at validation 20/20 against trial 5''s 4.81e-4 (MSE of z, different
+      per-process means, same sigma); validation lines data/level_val_trial_7002.txt; scoring FA-ccin2p3-2240c052 (job_llm_score.sh
+      EVENTS=1, seen + held out). Step 8: 64-head smoke resubmitted on CC FA-ccin2p3-1cdc28b2 with training.save_last=false
+      (best model kept for the sigma stage and eval, the last model is deleted by run_trial anyway; peak ~50 instead of ~77
+      B/param: 64 heads ~4.4 GB, 120 heads ~17.7 GB), --disk-gb 4.5. 120-head smoke not sent: disk read 11-26 ~10:00, CC /sps
+      18 GB free, lxplus EOS 23.8 GB free (976.17 GB of 1.00 TB logical), and site pick fits no 64G/80G GPU on lxplus; on
+      CC it would take all the room the running part (b) 120-head run FA-ccin2p3-f0b997a2 needs at its end (best 8.5 GB now;
+      at the end the last model 8.5 GB + gzip ~6.9 GB, ~15 GB more while 18 GB is free): RISK that run fills CC /sps again
+      at its end (~11-29) unless space is freed before.'
   step_waits:
     '8': FA-ccin2p3-1cdc28b2
     '13': FA-ccin2p3-623a3af6
