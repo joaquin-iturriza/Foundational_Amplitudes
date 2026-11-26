@@ -49061,6 +49061,15 @@ entries:
       KEEP; memmap b39fc80c 1.50 GiB Daniel''s held-out (139 processes), used 0.7 d ago, in use (catalog_daniel_heldout):
       KEEP. Training cache amp_data_cache 58.73 GiB in 44,069 files: every entry touched within 14 days: KEEP. Nothing of
       the caches is unread; nothing deleted, no duplicate key (the three keys hold different pool sets).'
+  - at: '2026-11-26T03:57:10+00:00'
+    text: '2026-11-26 E9422: free 226 MiB 04:36 -> 18.0 GiB 04:48 (llm_compare cancelled its 120-head smoke FA-ccin2p3-caf1170e,
+      ~16 GB written from 04:00, and deleted 6.8 GB of its own smokes). Prune pass 04:xx 0.5 GiB (6.6 GiB since 2026-11-25
+      03:00). Our debris among what grew <0.2 GB, not deleted (rebuild_* 554 empty dirs, zz_v3_smoke 66 MiB, runs/zz_smoke
+      119 MiB). Holders apparent GiB (ccj_f90b0e0a28bb, ccj_2ab6a6df635b): amp_data_cache 58.7, amp_mmap_cache 33.6 (in use),
+      zz_v4_* 27.6 (kept D556), zz_catft_{sep,emafix,refit_emafix} 12.2 (kept), runs/ 128 (catalog_v4_short 15.5 critical_batch;
+      llmcmp_b_width 10.9 + llmcmp_c_qperp 6.3 llm_compare; kit 9.2 kit_benchmark; muon_hp_ft 6.1; catalog_v4_long 5.6; data_saving
+      4.4; tail ~56), runs_from_lxplus 17.3 (CC only copy, kept), .venv 5.8. 60 GB floor needs ~42 GiB more: only costly results,
+      Joaquin''s call.'
   step_waits:
     '2': 'step 3''s freed GB (it reads ccj_4f7a6e6248e3, ccj_a92263be3b0c, ccj_d7c7455d61ad): the write-up carries the E9422
       frees'
