@@ -47128,18 +47128,13 @@ entries:
   decisions:
   - D532
   next:
-    1: 'Close critical_batch once steps 2-4 are read and written up: plan done critical_batch with the write-up commits (par:cbs_scan
-      145d14839 plus the D560 part B and D563 write-ups). Both review backlogs it waited on have passed (repo-reviewer watermark
-      210db5bab, notes-editor c203b49ae contains 145d14839); worktrees wt-cbs-accum and wt-critbatch are removed'
-    2: 'D560 write-up: part B''s NO (finding 16:40): write par:cbs_update in docs/results.tex (B_simple 55.5, B_A 28-111 /
-      6-51, B_q 48-137 / 3-196 against B_crit 2500-6690 / 87-261; the momentum-0 step overshoots, dL<0 at every b), with figs
-      pretrain_update_bdl and zng4g_update_bdl (dl_read.py 40f9a2997, captions in the 16:05 hand-back, add B_q to the left
-      panel first), % src / % claim lines; then the batch rule for future runs as the design''s NO says: a short batch scan'
-    4: 'D563: the six Z+4g 1e4-event searches at 50 epochs (Muon scratch, Adam scratch, Fn; batch 2048 and 128; 19/19/16 and
-      19/16/16 trials), design passed 15:0x by a4f3d7192edf30268, lr windows by HPO rule 2 at 9e28b161d (header nit 584ba9b77),
-      driven by sweep/drive.py (detached zng_ep50_searches, log ~/.local/share/ccorch/detached/20261125-150854_zng_ep50_searches.log),
-      target 1.5 h for 105 jobs; when it ends: extend ft_bcrit.py to read the 50-epoch searches (sweeps_local/*_ep50*/results),
-      per-cell bests, r50 vs r400, E50 vs E400, lr-edge flags, and the figure of 50-epoch against 400-epoch curves'
+    5: 'D563 write-up: par:cbs_horizon in docs/results.tex after par:cbs_update, with fig ft_ep50 (ft_bcrit.py ep50 at ae99a4010,
+      data 98cf81a0c; caption in the 2026-11-26 hand-back, check_caption OK) and % src / % claim lines (src: python3 analysis/critical_batch/ft_bcrit.py
+      ep50 @<commit>; keys cells.<arm>|<b>.val_best, arms.<arm>.r50/r400, cells.*.E50_over_E400, cells.Fn|128.lr_pos): r50
+      4.60/9.86/1.45 > 1.22 for Muon/Adam/Fn, the batch-128 gain persists at 50 epochs (not the horizon); Fn 128 reported
+      as a bound (lower lr edge)'
+    6: 'Close: once par:cbs_update (e05fc9e32) and par:cbs_horizon pass the notes-editor, plan done critical_batch --writeup
+      <commits> (par:cbs_scan 145d14839, par:cbs_update e05fc9e32, par:cbs_horizon)'
   done_when: null
   notes_ref: null
   match: zz_cbs_*,cbs_*
@@ -48142,21 +48137,16 @@ entries:
       (decisions); plus the first-read data files above, which the prior names but does not carry through to the predicted
       B_dL.'
   step_why:
-    1:
-      feeds: the entry's close
-      if:
-      - 'steps 2-4 written up and reviewed: plan done'
-      - 'a step still open: wait on it'
-    2:
-      feeds: 'D560: which batch number to trust and a rule for future runs'
-      if:
-      - 'write-up passes the notes-editor: report to Joaquin under D560 and close step 1'
-      - 'notes-editor blocks: fix and re-check'
-    4:
+    5:
       feeds: 'D563: is the batch-128 gain at 400 epochs a horizon effect'
       if:
-      - 'r50 <= 1.22 for an arm: the gain is the horizon for that arm'
-      - 'r50 > 1.22: the gain persists at 50 epochs'
+      - 'written and claims verified: run the notes-editor on par:cbs_update + par:cbs_horizon (backlog 158/200 + this)'
+      - 'Joaquin answers the Fn 128 edge question with a run: design it (window 3x down, 16 trials), design-review, submit'
+    6:
+      feeds: the entry's close
+      if:
+      - 'notes-editor passes: plan done'
+      - 'notes-editor blocks: fix and continue the same reviewer'
   step_waits:
     '4': 'the detached ep50_collect2 (pid 2901036) ending: COLLECTED -> ft_bcrit.py ep50 read and figure; FAILED (CC /sps
       full) -> wait on the cc_disk owner''s freeing, then one resubmission'
