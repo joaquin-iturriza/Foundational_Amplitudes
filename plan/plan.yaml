@@ -28296,6 +28296,12 @@ entries:
     answers_after: '2026-11-26T08:33:53+00:00'
     covers:
     - kit_benchmark
+  - said_at: '2026-11-26T13:52:31.991000+00:00'
+    text: Okay, then let's give them the checkpoint and an easy way to run things so that they do it themselves
+    decision: D573
+    answers_after: '2026-11-26T08:33:53+00:00'
+    covers:
+    - kit_benchmark
   decisions:
   - D363
   - D401
@@ -28303,6 +28309,7 @@ entries:
   - D428
   - D493
   - D572
+  - D573
   next:
     20: 'Step 20 (D570, D572 signed A2, design PASS 2026-11-26 13:00): parent smoke FA-lxplus-f7c30433 (dsave_parent_finale_kit_fairnlo_a2s_smoke,
       recipe @62bb84df6 with the 3 sign-changing one-loop pools, ++training.sign_head=true); on its clean end read tools/kit_sign_read.py
@@ -28455,6 +28462,8 @@ entries:
     blocks: the uugg and uug-T searches only
     blocks_steps:
     - 15
+    answered_at: '2026-11-26T13:52:31.991000+00:00'
+    decision: D573
   - ask: 'Scope: the KIT HP search (step 15) covers uug with the plain target and tt virtual (~24 GPU-h). Should it also cover
       uugg and uug with the T target (step 16)? About 16 GPU-h more, ~40 GPU-h in all, over the 30 GPU-h line. Without it
       uugg stays at the HP point where validation leaves training at about step 1000.'
