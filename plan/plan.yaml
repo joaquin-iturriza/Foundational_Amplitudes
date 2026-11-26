@@ -29640,6 +29640,17 @@ entries:
       added 1.58-6.23 (scratch 7.48/0.82, factor 0.023/0.077). Repo-reviewer ae24955df7b1a36a7 re-check: item cleared; backlog
       not advanced only because of other entries'' unreviewed changes (157b5d08 zng_uq_benchmark; uncommitted mg5_pipeline_final.py,
       tools/kit_hardps.py, tools/kit_predict.py, collect_catft_curves.py), lock still held.'
+  - at: '2026-11-26T02:59:38+00:00'
+    text: '2026-11-26 @6bedf8e71. Step 23 (D571) Monte Carlo test, tools/kit_mc_test.py on CC CPU job 64879010 (package v6
+      models, KIT bulk_test 2e5 events each; region variable over singular gluon pairs, shares sum to 1): PASS on all three,
+      |bias| and its 16-84% band below the exact sigma''s MC error. Bias (band) / MC error: uug -1.65e-3 (-1.67,-1.63e-3)
+      / 1.21e-2, n_star 1.1e7; uugg -3.31e-3 (-4.50,-2.11e-3) / 1.12e-2, n_star 2.3e6; tt virtual +5.83e-4 (5.79,5.87e-4)
+      / 1.90e-3, n_star 2.1e6. Efficiencies exact / surrogate first stage / second stage x / both: uug 2.59e-3 / 2.59e-3 /
+      0.886 / 2.29e-3 (x at 0.999 quantile 0.989, overweight share 5.9e-6); uugg 1.92e-3 / 2.60e-3 / 0.562 / 1.46e-3 (0.682,
+      3.1e-5); tt 0.246 / 0.244 / 0.967 / 0.236 (0.990, 3.9e-6). Exact |M|^2 evaluations per unweighted event 1/eff_exact
+      -> 1/eff_x: uug 386 -> 1.13, uugg 520 -> 1.78, tt 4.1 -> 1.03. Region biases flat (uug -0.14..-0.20%; uugg -0.74% in
+      s_min/s 0.01-0.02 carrying 65% of sigma, +0.36..+0.44% above; tt +0.051..+0.061% in every sqrt s bin). Figure pending
+      (histogram rerun).'
   step_why:
     20:
       feeds: the KIT NLO statement in the draft
