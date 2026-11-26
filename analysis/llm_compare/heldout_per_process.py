@@ -50,6 +50,7 @@ ARMS = {"a_trial5": ("his setup, 8 heads", ps.C.blue, "o"),
         "b_h32": ("his setup, 32 heads", ps.C.purple, "v"),
         "b_h64": ("his setup, 64 heads", ps.C.vermillion, "s"),
         "b_h120": ("his setup, 120 heads", ps.C.yellow, "P"),
+        "level_file": ("his setup, 8 heads, level from diagrams", "#17BECF", "d"),
         "c_control": ("our setup, control", ps.C.green, "<"),
         "c_best": ("our setup, searched", ps.C.orange, "^"),
         # --part bias only (level_source.py): a small network's level error from the process alone, no events

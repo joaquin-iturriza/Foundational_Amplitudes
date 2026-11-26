@@ -23,6 +23,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--a", default="control")
     ap.add_argument("--b", default="control_retrain")
+    ap.add_argument("--out", default="rerun_spread", help="data/<out>.json")
     a = ap.parse_args()
     sp = suprio.split()
     out = {"a": a.a, "b": a.b}
@@ -39,7 +40,7 @@ def main():
                      "pooled_ratio": float(max(ma.mean(), mb.mean()) / min(ma.mean(), mb.mean())) ** 0.5,
                      "per_process_factor_median": float(np.exp(np.median(r))),
                      "per_process_factor_p10_p90": [float(np.exp(np.quantile(r, 0.1))), float(np.exp(np.quantile(r, 0.9)))]}
-    json.dump(out, open(os.path.join(HERE, "data", "rerun_spread.json"), "w"), indent=1)
+    json.dump(out, open(os.path.join(HERE, "data", a.out + ".json"), "w"), indent=1)
     print(json.dumps(out))
 
 
