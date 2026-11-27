@@ -35287,6 +35287,62 @@ entries:
       decades, confirmed with kit_readout on kit_fig_heldoutqqg.json); check 3 (bar +-0.845 decades from the t t~ V rerun
       spread, D315 one seed); check 12 (16 trials per D428/D430, same as the sibling kit searches); budget ~9 GPU-h, under
       D575.'
+  - at: '2026-11-27T11:56:55+00:00'
+    question: 'Step 34 next attempt (D575 part ii, the passed held-out qqg design''s ''neither'' branch, read on the fixed
+      reruns): on e+e- -> u u~ g g, does the best fine-tune from the A2 pretraining with every q q~ g process held out (runs/data_saving/dsave_parent_finale_kit_heldoutqqg_a2),
+      found by a DyHPO search over the fine-tuning HPs, beat A2 from scratch (SCR-A2, FA-ccin2p3-ff4af2bc) on the uugg hard
+      families (soft, g->gg, q->qg, azimuth)? Both hand-set fine-tunes (lr 0.01152 and 0.001152, SCR-A2''s other HPs) fail
+      to beat it on any family after the asym_sd fix (finding ~13:45). (Revision after the review FIX: lr centre, control,
+      disk, inherited settings.)'
+    prior: 'Searched plan kit_benchmark findings (2026-11-13 ~15:00 the uugg plain search, 2026-11-27 ~12:00 step 30, ~12:40/~13:10
+      the bug, ~13:45 steps 34/35), results.tex (ft_r5, heldout, kit_hpo, hp0798), site decisions D575. Found: (1) step 34
+      fixed reruns on uugg vs SCR-A2, R = median log10(FT/SCR log-MSE): lr 0.01152 soft +2.24, g->gg +2.05, q->qg +1.40, azimuth
+      +2.08 (all LOSES); lr 0.001152: +0.88 LOSES, +0.57, +0.18, +0.57 LEVEL; exponents at the lower lr -2.21/-1.03/-1.01
+      vs truth -2.00/-0.99/-0.97. (2) SCR-A2''s HPs are trial hp0798 of kit_hpo_uugg_plain, a search on the plain-input config,
+      not on A2 (corrects the first version of this design). (3) Template: step 21''s kit_hpo_tt_ft_r5 (16 trials, 1831 WSD,
+      lr fixed near its parent''s, lr_scale [0.1,10], layer_decay [0.75,1]) chose lr_scale 2.49, layer_decay 0.97, val mu-MSE
+      2.89e-7 vs searched scratch 7.1e-7. This design: the same search on the held-out qqg A2 parent and uugg (sweep/sweep_config_kit_hpo_uugg_ft_heldoutqqg.yaml
+      @d19d1aa5f), lr fixed at the parent''s 0.00189 (rule 4), so the two step-34 arms sit at lr_scale 6.1 and 0.61 inside
+      the window. uug: the lr-1 fine-tune BEATS on collinear but blew up (26x); its half-lr rerun FA-ccin2p3-5b8a7e13 decides
+      whether a uug search follows.'
+    measure: 'DyHPO picks the best trial on validation mu-MSE (val_loss_no_reg at the best checkpoint), the template''s objective.
+      The chosen trial is scored by tools/kit_predict.py (Bakar''s evaluate.py; job_kit.sh KIT_SCORE_ONLY with KIT_SCORE_DIR=<trial
+      dir>, as trial_0798 FA-ccin2p3-e281e8b1), collected by kit_figures collect under alias kit_A_ft_ee_uugg_me2_n100000_t1831_heldoutqqg_ftbest,
+      read with kit_readout --vs against SCR-A2: per family the median over strata of log10(FT/SCR log-MSE), deepest-bin log-MSE,
+      bias and exponent (--slide10). Curves with kit_curves sweep (curve_quality, blow-ups).'
+    check: 'The measure moves with the searched axis on existing data: lr 0.01152 -> 0.001152 on uugg moved R by -1.36 (soft),
+      -1.48 (g->gg), -1.21 (q->qg), -1.51 (azimuth) decades (step 34 reruns, kit_fig_heldoutqqg.json), exponents from -1.87/-0.74/-0.73
+      to -2.21/-1.03/-1.01; both points are inside the new window (lr_scale 6.1, 0.61), and the window reaches a decade below
+      the better one (1.9e-4). Fix active on this parent (head-map line ''+6.113 std 1.454'' on uugg).'
+    fixed: 'Parent dsave_parent_finale_kit_heldoutqqg_a2 (its config.yaml as base: A2 inputs, asymptotic factor, HETEROSC
+      + sigma stage, MuonAdamW, WSD cooldown 1/8, batch 16384), start model_run0_best.pt.gz. Settings the sweep sets that
+      differ from the parent''s config.yaml, each with its reason: training.iterations 1831 vs 64000 (the KIT A protocol''s
+      300 epochs of 1e5, as SCR-A2 and step 34); training.lr 0.00189 = the parent''s (unchanged; rule 4); data.processes_file
+      kit_A_ee_uugg_me2_n100000_t8000_softpair.recipe.yaml vs the pretraining catalog (the target process, 1e5 train / 1e5
+      val, SCR-A2''s pool); data.eval_subsample null vs 10000 (full KIT val, as SCR-A2); training.dtype float64 vs float32
+      and heterosc_select mu_mse vs nll (job_kit.sh''s KIT setting, as SCR-A2 and step 34); fine_tune.pretrained_path the
+      parent, target_stats own and offshell_stats own vs parent (the A_ft setup of step 34; own target stats with the fixed
+      head map); training.increment_steps null, warm_start_idx null (a single fresh run); evaluation.train_subsample 2000
+      and memmap false equal the parent''s. Searched (template space): lr_scale [0.1,10] log, layer_decay [0.75,1], muon_weight_decay
+      [1e-3,0.3], regularization_lambda [1e-10,1e-6], cosanneal_warmup_frac [0.05,0.2], eta_min [1e-10,1e-7], ema, ema_decay
+      [0.9,0.999]. 16 trials, waves 6/5/5, sweep/drive.py at site pick''s width (CC, lxplus; parent copied to lxplus, 56 MB).
+      Wall: step-34 uugg FT trained 31 min on V100 -> trial target 0.55 h, limit 1 h; 16 x 0.55 = 8.8 GPU-h + 0.3 scoring,
+      under D575''s 100. Disk: 82 MB per trial (step-34 uugg FT run dir) x 16 = 1.3 GB at most on one site, against CC /sps
+      8.5 GB free and lxplus EOS 2.2 PB free (read 2026-11-27 ~14:20), the step-32/33 arrays writing to CC alongside.'
+    control: 'SCR-A2 uugg (FA-ccin2p3-ff4af2bc, kit_A_ee_uugg_me2_n100000_t1831_heldoutqqg_scra2): the A2 config from random
+      init at hp0798 (searched on the plain config), same pool, steps, batch, seed, scoring. Since its HPs were not searched
+      on A2, a BEATS is confirmed only against the best of the same 16-trial template search (waves 6/5/5, ~9 GPU-h, D575)
+      for A2 from scratch on uugg, run on a BEATS; a NO stands against SCR-A2 (the tuning asymmetry favours the fine-tune).
+      Beside: the two step-34 fine-tunes.'
+    seeds: 'One seed (42) per trial (D315); spread: t t~ V same-HP rerun spread 0.78-6.96 in test loss (sec:datasaving), hence
+      the 1/7 and 7 bars.'
+    outcome: 'Per hard family, R = best FT / control log-MSE, median over strata: BEATS R < 1/7, LOSES R > 7, else LEVEL.
+      Best FT BEATS SCR-A2 on a family: run the A2 from-scratch search; transfer of that limit is claimed only if the best
+      FT still BEATS the best from-scratch trial there. No family BEATS SCR-A2: no transfer at this pretraining on uugg, reported
+      with exponents and the search''s spread. A best trial that blew up (val jump > 5x) is listed apart and the next-best
+      clean trial read.'
+    sources: 1/7 and 7 <- t t~ V same-HP rerun spread 0.78-6.96 (results.tex sec:datasaving), the bar of the passed step-30
+      and step-34 designs; 5x jump <- sec:ladder seeds' blow-ups vs 1.5x seed noise; 100 GPU-h <- D575 names this work
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
