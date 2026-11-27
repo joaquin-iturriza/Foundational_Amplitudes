@@ -51,6 +51,7 @@ MODELS = {"truth": ("truth", "k", None, "-"),
           "FT": ("fine-tuned", "sky", "v", "-"),
           "FTlr": (r"fine-tuned, lr scale $0.126$", "sky", "*", "none"),  # fair one-loop D=1e3 rerun
           "FT01": (r"fine-tuned, lr scale $0.1$", "purple", "v", "--"),   # the same fine-tune at a tenth of the lr
+          "FT05": (r"fine-tuned, lr scale $0.5$", "orange", "v", "--"),   # held-out uug: the half-lr rerun (step 34)
           "SCR": ("from scratch", "blue", "o", "-"),
           "VB": ("from scratch on $V/B$,\nexact Born", "vermillion", "s", "--")}
 
@@ -561,7 +562,8 @@ SLIDE10 = {"a2": ((("factor", ("A", None)), ("B_bulk", ("B_bulk", None)), ("B", 
            # the held-out qqg protocol (steps 30/34): from scratch on the held-out parent's config vs fine-tuned from it
            # (tags _ftfix: the reruns after the asym_sd head-map fix ff4f2e0cf; the void _ft/_ft01 stay in the data)
            "heldout": ((("SCR", ("A", "heldoutqqg_scra2")), ("FT", ("A_ft", "heldoutqqg_ftfix")),
-                        ("FT01", ("A_ft", "heldoutqqg_ftfix01"))), ("ee_uug", "ee_uugg"))}
+                        ("FT01", ("A_ft", "heldoutqqg_ftfix01")), ("FT05", ("A_ft", "heldoutqqg_ftfix05"))),
+                       ("ee_uug", "ee_uugg"))}
 
 
 def slide10_fig(path, out, arms="a2"):
@@ -594,9 +596,10 @@ def slide10_fig(path, out, arms="a2"):
     for ax, (m, lab) in zip(axs.flat, metrics):
         for i, (key, rk) in enumerate(arms):
             name, c, mk, _ = model_style(key)
-            v = np.array([runs[(stem, rk)]["strata"][k][m] for stem, k, _ in rows])
+            # an arm without a run on a process (the uug-only half-lr rerun) leaves those rows empty
+            v = np.array([runs[(stem, rk)]["strata"][k][m] if (stem, rk) in runs else np.nan for stem, k, _ in rows])
             neg = v < 0
-            yy = y + (i - 1) * 0.22
+            yy = y + (i - (len(arms) - 1) / 2) * 0.2
             ax.scatter(np.abs(v[~neg]), yy[~neg], color=c, marker=mk, label=name, zorder=3)
             if neg.any():
                 ax.scatter(np.abs(v[neg]), yy[neg], facecolors="none", edgecolors=c, marker=mk, zorder=3)
