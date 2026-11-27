@@ -30510,6 +30510,12 @@ entries:
       error, both fixed @97e5a4836/@bea2d312d). drive.py holds the next wave until a lost trial is retried, so ''requeue at
       its end'' would never come: driver stopped and relaunched with --retry-lost --retry-failed FA-lxplus-0d74eb88 (detach
       kit_hpo_uug_ft_heldoutqqg_r2, 16:45 CET).'
+  - at: '2026-11-27T17:48:36+00:00'
+    text: 'Step 39 data: ttg rebuild (WT 0, @1f216b9a3) passed: KIT_TTG_DONE $DATA_DIR/kit_like/fa_ee_ttg.h5 (413 MB), soft
+      slope -1.9993 (expected -2); hard_test medians log10|M|^2: soft x 1e-7..1e-2 6.82, 4.82, 2.82, 0.83, -1.18 (2 decades
+      a decade, the 1/x^2 limit); quasi-collinear 1-cos 1e-7..1e-1 -5.84, -5.83, -5.84, -5.82, -5.68, -5.31 (flat below 1e-4:
+      the dead cone, no divergence); threshold beta 1e-4..1e-1 -6.77 flat (no tree Coulomb term); bulk -6.06. Copied to lxplus
+      (site copy). Smoke next.'
   step_why:
     32:
       feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
