@@ -85,7 +85,9 @@ def _band(ax, x, v, nb, **st):
 def plot():
     import matplotlib.pyplot as plt
     import plot_style as ps
+    import json
     z = np.load(NPZ)
+    J = {}
     S = {"m": dict(color=ps.C.blue, label=r"$\ln|\mathcal{M}|^2$"),
          "t": dict(color=ps.C.vermillion, label=r"target with emission scales")}
     for k, (_, q, lab) in PROC.items():
@@ -119,11 +121,15 @@ def plot():
         plt.close(fig)
         iq = lambda x: np.subtract(*np.quantile(x, [0.84, 0.16])) / 2
         r = np.corrcoef(ly, v["m"])[0, 1], np.corrcoef(ly, v["t"])[0, 1]
+        J[k] = {"w_m": iq(v["m"]), "w_t": iq(v["t"]), "slope_y_m": slopes["m"], "slope_y_t": slopes["t"],
+                "slope_s_m": np.polyfit(z[f"{k}/lnshat"], v["m"], 1)[0], "slope_s_t": np.polyfit(z[f"{k}/lnshat"], v["t"], 1)[0],
+                "ly_q01": np.quantile(ly, 0.01)}
         print(f"PROC {k}: n={lm.size} (|M|^2 <= 0: {int(z[f'{k}/neg'])}); half 16-84% width ln|M|^2 {iq(v['m']):.2f}, "
               f"target {iq(v['t']):.2f}; std {v['m'].std():.2f}, {v['t'].std():.2f}; slope against log10 y_min "
               f"{slopes['m']:.2f}, {slopes['t']:.2f} (corr {r[0]:.2f}, {r[1]:.2f}); log10 y_min 1-99% "
               f"{np.quantile(ly, 0.01):.1f} to {np.quantile(ly, 0.99):.1f}; slope against ln s_hat "
               f"{np.polyfit(z[f'{k}/lnshat'], v['m'], 1)[0]:.2f}, {np.polyfit(z[f'{k}/lnshat'], v['t'], 1)[0]:.2f}")
+    print(json.dumps({k: {a: float(b) for a, b in d.items()} for k, d in J.items()}))
 
 
 if __name__ == "__main__":

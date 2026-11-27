@@ -153,6 +153,7 @@ def stats(r, s="test"):
 
 
 def report(R):
+    J = {}
     for (probe, arm), r in sorted(R.items(), key=lambda x: (x[0][0], ARMS.index(x[0][1]))):
         v, te = (stats(r, "val") if "val_true" in r else None), stats(r, "test")
         # where the MSE(log|M|^2) sits: the share of it from the events with the 10% largest true |M|^2
@@ -167,6 +168,11 @@ def report(R):
               f"MSE {lr2[top].sum() / lr2.sum():.2f}; median|Delta| top-10% {np.median(ad[top]):.3g}, rest "
               f"{np.median(ad[~top]):.3g}; Z window 80-100 GeV share of events {np.mean(zw):.3f}, of MSE "
               f"{lr2[zw].sum() / lr2.sum():.2f}")
+        J.setdefault(probe, {})[arm] = {"mse": te["mse"], "med": te["med_abs_delta"],
+                                        "z_events": float(np.mean(zw)), "z_mse": float(lr2[zw].sum() / lr2.sum()),
+                                        "top_mse": float(lr2[top].sum() / lr2.sum()),
+                                        "top_over_rest": float(np.median(ad[top]) / np.median(ad[~top]))}
+    return J
 
 
 def _binned_median(v, ad, nb=10):
@@ -176,7 +182,7 @@ def _binned_median(v, ad, nb=10):
     return 0.5 * (e[1:] + e[:-1]), np.array([np.median(ad[k == i]) for i in range(nb)])
 
 
-def plot(R):
+def plot(R, J):
     import matplotlib.pyplot as plt
     import plot_style as ps
     from scipy.stats import spearmanr
@@ -239,6 +245,9 @@ def plot(R):
         m = np.array([np.mean(np.log(R[probe, a]["test_pred"] / R[probe, a]["test_true"]) ** 2) for a in arms])
         d = np.array([stats(R[probe, a])["med_abs_delta"] for a in arms])
         rho = spearmanr(m, d).correlation
+        J[probe]["spearman"] = float(rho)
+        J[probe]["rank_mse"] = {a: int(i) + 1 for i, a in enumerate(np.array(arms)[np.argsort(m)])}
+        J[probe]["rank_med"] = {a: int(i) + 1 for i, a in enumerate(np.array(arms)[np.argsort(d)])}
         print(f"RANK {probe}: Spearman(MSE(ln|M|^2), median|Delta|) over {len(arms)} arms = {rho:.2f}; "
               f"MSE order {[arms[i] for i in np.argsort(m)]}; median|Delta| order {[arms[i] for i in np.argsort(d)]}")
         ax.scatter(m, d, marker=mk, color=c, label=PROBES[probe])
@@ -253,5 +262,6 @@ if __name__ == "__main__":
         collect()
     else:
         R = load()
-        report(R)
-        plot(R)
+        J = report(R)
+        plot(R, J)
+        print(json.dumps(J))
