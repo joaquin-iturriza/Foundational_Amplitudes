@@ -34947,6 +34947,52 @@ entries:
       the vec-32 serve call counts, limit 4x target; D395 smoke (2-part array + surr_combine through metrics) gates the batch;
       chi2 stop p<2.7e-3 = the passed 3-error rule. Searched results.tex (sec:kit-mc, vector_size, MadEvent surrogate), entry
       findings and dead ends, decisions D570-D579.'
+  - at: '2026-11-27T10:34:04+00:00'
+    question: 'Step 34 (held-out qqg A2, D575 part ii, the step-30 design rerun after a bug fix): does a fine-tune from the
+      A2 pretraining with every q q~ g family held out (runs/data_saving/dsave_parent_finale_kit_heldoutqqg_a2, FA-ccin2p3-69541363)
+      beat A2 from scratch at the same config on the uug and uugg hard bins, now that the fine-tune''s asymptotic factor runs
+      in its own units? Step 30''s four fine-tunes ran with the parent''s target std as the factor''s output divisor (finding
+      2026-11-27 ~12:40: asym_sd 3.0365 = parent''s, own 1.4780), which scales every singular slope by s_o/s_p = 0.487; they
+      are void as a transfer test. Same arms as the passed 2026-11-26 14:47/14:52 design (FT lr_scale 1 and 0.1 per process)
+      on the fixed code @ff4f2e0cf; the DyHPO FT search of the ''neither'' branch follows only if these still lose.'
+    prior: 'Searched plan kit_benchmark findings (2026-11-11T04:42, 06:37, 2026-11-27T10:18, 12:40), results.tex kit A/B and
+      fine-tune paragraphs, decisions D570-D575. (a) Step 30 (FA-ccin2p3-69de38db 48701a30 1a1c9a47 b6abfc18 vs SCR-A2 6f1a5dad
+      ff4af2bc): FT1/FT0.1 log-MSE 3-46 in the deepest uug/uugg limit bins vs SCR-A2 7e-5..0.06, exponents FT1 uug soft -0.95
+      coll -0.50 (truth -2/-1) = 0.487 x truth = s_o/s_p, bias -1.8..-6.7 decades; bulk within 0.1-0.5 decades. Cause read
+      on CC and fixed @ff4f2e0cf (asym_out shift/std; the map keeps the parent''s readouts and unit; tested exact to 1e-9
+      in bulk, soft x 1e-6 and collinear y 1e-7). (b) Non-A2 held-out fine-tunes 11-10/11 (kit_pretrain_heldout): lr 1 uug
+      soft 0.82 decades below scratch, lr 0.1 2.59 below; collinear unchanged. Differs from (a) only in the code fix and the
+      run tags (heldoutqqg_ftfix, heldoutqqg_ftfix01).'
+    measure: 'As the passed design: each run scored at its end by tools/kit_predict.py (Bakar''s evaluate.py): log10-MSE per
+      hard_test stratum and bulk_test, bias, p99, |M|^2-weighted error, fitted exponents; collected by tools/kit_figures.py
+      collect into analysis/kit_benchmark/data/kit_fig_heldoutqqg.json; per family the median over strata of log10(FT/SCR-A2
+      log-MSE) (tools/kit_readout.py --vs) and the deepest-bin log-MSE and exponent. Plus a load check: each fine-tune''s
+      logged ''validation before any update (step 0)'' must now be the parent''s zero-shot level (O(1) standardized), not
+      1.82e3 as in step 30.'
+    check: 'The bug moves the measure: step-30 FT1 exponents are 0.487 x truth (-0.95/-2.00 soft, -0.50/-1.00 collinear),
+      s_o/s_p = 1.4780/3.0365 = 0.487 read from the checkpoints on CC; the step-0 validation 1.82e3 shows the start was not
+      the parent''s function. The fix restores the parent''s function exactly at load (tests/test_head_map_own_stats.py, fails
+      on the old code).'
+    fixed: 'Everything of the passed step-30 arms: scripts/job_kit.sh A_ft kit_ee_<p>__me2 100000 1831, KIT_PARENT=runs/data_saving/dsave_parent_finale_kit_heldoutqqg_a2,
+      SCR-A2''s HPs verbatim per process (uug: WSD cooldown 0.125, lr 0.01251006, muon_wd 0.05224253, reg 4.881444e-07, warmup
+      0.1902839, eta_min 1.045745e-08, ema false; uugg: lr 0.01152379, muon_wd 0.1624777, reg 7.777018e-07, warmup 0.1763589,
+      eta_min 8.308557e-09, ema false), fine_tune.offshell_stats=own, target_stats own, float64, HETEROSC + mu_mse selection
+      + sigma stage, seed 42; KIT_LR_SCALE 1 (tag heldoutqqg_ftfix) and 0.1 (tag heldoutqqg_ftfix01). Only the code differs
+      (@ff4f2e0cf). 4 runs x 1 V100; wall from step 30''s same runs: 40 min submit-to-end each -> target 0.8 h, limit 4 h
+      (script default). 3.2 GPU-h under D575''s 100. Disk ~80 MB each on CC /sps. No smoke: same job script, config and data
+      as step 30 (run end to end there); the changed load is covered by the unit test and the step-0 check.'
+    control: 'SCR-A2 per process (FA-ccin2p3-6f1a5dad uug, ff4af2bc uugg): same base config (the held-out parent''s), data,
+      steps, HPs, scoring; only the start differs; already run, valid (asym_sd = its own std 1.4780, read on CC). Beside:
+      step 30''s buggy FTs, shown only as the cause found.'
+    seeds: 'One seed (42) per run (D315); spread: single-process same-HP rerun spread 1.1x-30x in loss (results.tex ~13232).'
+    outcome: 'As the passed design: per process and hard family (soft, collinear, azimuth), R = FT/SCR-A2 log-MSE, median
+      over strata: BEATS R < 1/7, LOSES R > 7, else LEVEL. Either FT arm BEATS on a family: the held-out pretraining transfers
+      that limit (Bakar''s question, positive). Neither FT arm BEATS on any family: the passed design''s next attempt, a DyHPO
+      search over the fine-tuning HPs per process (kit_hpo_tt_ft_r5 template), best FT against SCR-A2. Load check fails (step-0
+      validation not O(1)): the fix is incomplete, read before any score. Blow-up: a validation jump > 5x reruns once at half
+      lr.'
+    sources: 1/7 and 7 <- t t~ V same-HP rerun spread 0.78-6.96 (results.tex sec:datasaving, the passed step-20/step-30 designs'
+      bar); 5x jump <- sec:ladder seeds' blow-ups against 1.5x seed noise; 100 GPU-h <- D575 names this work
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
