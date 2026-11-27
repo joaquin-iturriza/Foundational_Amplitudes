@@ -4,6 +4,7 @@ median predicted log10|M|^2 against the truth's, along the stratum family's sing
 
     python tools/kit_figures.py collect <run dir>[=<KIT run name>] ... > out.txt     (on the site: reads the runs and the KIT files)
     python tools/kit_figures.py plot <collected.json> [--out analysis/kit_benchmark/figs]
+    python tools/kit_figures.py protocolB <collected.json> --out <base>   (protocol B vs bulk-only, slide-8 layout)
 
 collect, per run dir (runs/kit/kit_<mode>_<file>_<target>_n<N>_t<T>[_tag]): its kit_benchmark/kit_result.json
 (KIT's src/evaluate.py numbers, through tools/kit_predict.py) and predictions.h5, and the KIT file's truth and
@@ -42,7 +43,9 @@ MODELS = {"truth": ("truth", "k", None, "-"),
           "scratch": ("transformer", "vermillion", "s", "-"),
           "MLP thr": ("MLP, log invariants\n" + r"and $\log(s_{t\bar t}-4m_t^2)$", "purple", "^", "--"),
           "MLP log": ("MLP, log invariants", "green", "^", "--"),
-          "MLP raw": ("MLP, raw invariants", "grey", "x", ":")}
+          "MLP raw": ("MLP, raw invariants", "grey", "x", ":"),
+          "B": ("hard points added", "green", "D", "-"),        # protocol B (KIT_FROM = an A2 run, hard_train added)
+          "B_bulk": ("bulk only", "orange", "o", "--")}       # its control: the same continuation, bulk only
 
 
 def model_style(key):
@@ -423,6 +426,79 @@ def summary(paths, out):
                       "mlp": {f"{p[0]}_{p[1]}": {f: MLP[(*p, f)][2] for f, _ in FAMS[p] if (*p, f) in MLP} for p in procs}}))
 
 
+def protocol_b(path, out):
+    """Protocol B of the A2 models in the layout of Bakar's slide 8 (the KIT reply deck): one figure per process
+    (<out>_<file>), one panel per hard family, log-MSE per stratum against the stratum's median singular variable for
+    the continuation with hard points (mode B) and on bulk only (B_bulk); each run's bulk_test log-MSE dotted, same
+    colour; the legend inside the first panel."""
+    import plot_style as ps
+    from matplotlib.ticker import NullFormatter
+    fams = {"ee_uug": ("coll_y", "soft_x"), "ee_uugg": ("coll_gg_y", "coll_qg_y", "soft_x", "azimuth_gg_y"),
+            "ee_tt": ("threshold_beta", "sudakov_sqrts")}
+    runs = {(r["file"], r["mode"]): r for r in d_runs(path) if r["mode"] in ("B", "B_bulk")}
+    for stem, fl in fams.items():
+        fig, axs = ps.figure(2, len(fl) // 2, squeeze=False)
+        for ax, fam in zip(axs.flat, fl):
+            for mode in ("B_bulk", "B"):
+                r = runs[(stem, mode)]
+                name, c, mk, ls = model_style(mode)
+                st = sorted((v["x"], v["logmse"]) for k, v in r["strata"].items()
+                            if k.startswith("hard_test/") and family(k.split("/")[1]) == fam)
+                ax.plot([x for x, _ in st], [y for _, y in st], color=c, marker=mk, ls=ls, label=name)
+                ax.axhline(next(v["logmse"] for k, v in r["strata"].items() if k.startswith("bulk_test/")),
+                           color=c, ls=":")
+            ax.set_xscale("log"); ax.set_yscale("log"); ax.xaxis.set_minor_formatter(NullFormatter())
+            ax.set_xlabel(XLAB[fam]); ax.set_ylabel(r"MSE$(\log_{10}|\mathcal{M}|^2)$")
+            ps.process_label(ax, PROC[(stem, "virt_finite" if stem == "ee_tt" else "me2")])
+        first = axs.flat[0]
+        first.plot([], [], color=ps.C.grey, ls=":", label="bulk test")
+        ps.legend(first, "upper left"); ps.make_room(first)
+        print("saved", ps.save(fig, f"{out}_{stem}"))
+
+
+FAMNAME = {"soft_x": "soft", "coll_y": "collinear", "coll_qg_y": r"$q\to qg$", "coll_gg_y": r"$g\to gg$",
+           "azimuth_gg_y": "azimuth", "threshold_beta": "threshold", "sudakov_sqrts": "Sudakov"}
+
+
+def slide10_fig(path, out):
+    """Bakar's slide-10 metrics (KIT evaluate.py: log-MSE, bias, 99th percentile of |pred - truth|, |M|^2-weighted
+    relative error) on bulk_test and the deepest stratum of each hard family, for the A2 model (mode A, tag
+    hpo_asym_cont) and its protocol-B continuations (B_bulk, B): one panel per metric, the bins on the y axis; a negative
+    bias is drawn hollow at |bias|."""
+    import plot_style as ps
+    from tools.kit_readout import deepest
+    runs = {(r["file"], r["mode"]): r for r in d_runs(path) if r["mode"] in ("A", "B", "B_bulk")}
+    rows = []
+    for stem in ("ee_uug", "ee_uugg", "ee_tt"):
+        r = runs[(stem, "A")]
+        pl = PROC[(stem, "virt_finite" if stem == "ee_tt" else "me2")]
+        rows.append((stem, next(k for k in r["strata"] if k.startswith("bulk_test/")), pl + " bulk"))
+        for fam, (st, _, _) in sorted(deepest(r["strata"]).items()):
+            rows.append((stem, next(k for k in r["strata"] if k.startswith(f"hard_test/{st}/")),
+                         pl + ", " + FAMNAME[fam]))
+    metrics = (("logmse", r"MSE$(\log_{10}|\mathcal{M}|^2)$"), ("bias", r"$|$bias$|$ of $\log_{10}|\mathcal{M}|^2$"),
+               ("p99_abs", r"99th percentile of $|\Delta\log_{10}|\mathcal{M}|^2|$"),
+               ("me2_weighted_rel_err", r"$|\mathcal{M}|^2$-weighted relative error"))
+    fig, axs = ps.figure(2, 2, sharey=True)
+    y = np.arange(len(rows))[::-1]
+    for ax, (m, lab) in zip(axs.flat, metrics):
+        for i, (key, mode) in enumerate((("factor", "A"), ("B_bulk", "B_bulk"), ("B", "B"))):
+            name, c, mk, _ = model_style(key)
+            v = np.array([runs[(stem, mode)]["strata"][k][m] for stem, k, _ in rows])
+            neg = v < 0
+            yy = y + (i - 1) * 0.22
+            ax.scatter(np.abs(v[~neg]), yy[~neg], color=c, marker=mk, label=name, zorder=3)
+            if neg.any():
+                ax.scatter(np.abs(v[neg]), yy[neg], facecolors="none", edgecolors=c, marker=mk, zorder=3)
+        ax.set_xscale("log"); ax.set_xlabel(lab)
+        ax.set_yticks(y); ax.set_yticklabels([t for _, _, t in rows])
+    ps.legend(axs.flat[0], "lower left"); ps.make_room(axs.flat[0])
+    print("saved", ps.save(fig, out))
+
+
+def d_runs(path):
+    return json.load(open(path))["runs"].values()
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -438,8 +514,16 @@ def main():
     s = sub.add_parser("summary")
     s.add_argument("verdict", nargs="+", help="tools/kit_readout.py --verdict jsons")
     s.add_argument("--out", default=os.path.join(ROOT, "analysis", "kit_benchmark", "figs", "kit_deepest_A_hpo"))
+    b = sub.add_parser("protocolB", help="protocol B of the A2 models, slide-8 layout (KIT reply deck)")
+    b.add_argument("data"); b.add_argument("--out", required=True)
+    t = sub.add_parser("slide10", help="slide-10 metrics of the A2 models and their protocol-B continuations")
+    t.add_argument("data"); t.add_argument("--out", required=True)
     a = ap.parse_args()
-    if a.cmd == "collect":
+    if a.cmd == "slide10":
+        slide10_fig(a.data, a.out)
+    elif a.cmd == "protocolB":
+        protocol_b(a.data, a.out)
+    elif a.cmd == "collect":
         collect(a.run_dirs)
     elif a.cmd == "summary":
         summary(a.verdict, a.out)
