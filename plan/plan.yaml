@@ -43913,6 +43913,13 @@ entries:
       (held out), with the arm config''s fixed_params. Next on the prebuilds: arm smoke, its held-out score with level_subsets
       --check-factor, then the arm run. The design''s --hp-idx 1163 became --hp-idx = trial-idx so each run gets its own run
       directory, as step 16''s 7002 did; the HPs are the same.'
+  - at: '2026-11-27T04:09:52+00:00'
+    text: '2026-11-27 05:10 CET step 27: arm tp_ prebuilds read: FA-ccin2p3-99d211ad (train, 1352 processes) built tp_12d42aa90d0ca98fc7951e98
+      in 179 s, FA-ccin2p3-ea7163d9 (held out, 139) built tp_ecbe2d4d9866febbad5e63ce in 26 s, both RUN_DONE (code @6ecc823b5).
+      Arm D395 smoke FA-ccin2p3-2fbcce14 (scripts/job_config_smoke.sh sweep/sweep_config_llmcmp_level_events.yaml 50, 20G,
+      2 h, code @052eb433e) submitted; step 27 waits on it; on SMOKE_EXIT 0 its held-out llm_score (ONLY=heldout EVENTS=1)
+      + level_subsets --check-factor, and the arm run (trial 7201) in parallel with that read. Controls FA-ccin2p3-220f71a8/-540fc068
+      at iteration 1000 after 575 s (9.7 h estimate, V100). Step 26 FA-ccin2p3-4ba88991 at 13521/60840 (11.9 h estimate).'
   step_waits:
     '26': FA-ccin2p3-4ba88991
     '27': FA-ccin2p3-2fbcce14
