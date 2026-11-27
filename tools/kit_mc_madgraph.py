@@ -269,7 +269,9 @@ def cmd_gen(a):
     env = dict(os.environ)
     if a.surrogate:
         patch_surrogate(ev)
-    if a.surrogate or "KIT_MC_VEC" in os.environ:   # KIT_MC_VEC on an exact run: MadEvent's vector_size alone
+    # KIT_MC_VEC on an exact run: MadEvent's vector_size alone; KIT_MC_VEC=0: MadEvent's default card (vector_size
+    # appended on CC gave events at sqrt s 1.1035 GeV in the exact integrand too, 2026-11-27)
+    if VEC and (a.surrogate or "KIT_MC_VEC" in os.environ):
         with open(f"{ev}/Cards/run_card.dat", "a") as rc:   # hidden parameters: absent from the card until set
             rc.write(f" {VEC} = vector_size ! kit_mc_madgraph: events per surrogate call\n 1 = nb_warp\n")
     if a.surrogate:
@@ -283,7 +285,7 @@ def cmd_gen(a):
     with open(log, "a") as lf:
         subprocess.run([f"{ev}/bin/generate_events", "run_01", "-f"], cwd=ev, stdout=lf, stderr=subprocess.STDOUT,
                        check=True, env=env)
-    if a.surrogate or "KIT_MC_VEC" in os.environ:
+    if VEC and (a.surrogate or "KIT_MC_VEC" in os.environ):
         vs = open(f"{ev}/Source/vector.inc").read()
         assert re.search(rf"WARP_SIZE={VEC}\)", vs), f"vector_size {VEC} not compiled in: {vs}"
     banner = sorted(__import__("glob").glob(f"{ev}/Events/run_01/*_banner.txt"))[0]
