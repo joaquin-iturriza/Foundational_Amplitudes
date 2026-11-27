@@ -28445,6 +28445,15 @@ entries:
       / hp0798 verbatim from runs/kit/kit_A_ee_<p>_n100000_t1831_hpo_asym_cont/config.yaml, tag hpo_emis_matched; job_kit.sh
       mode A, 1831 steps, scored by kit_predict). Design after step 34b''s review verdict (one latest design at a time), then
       add both to tools/kit_zoom.py RUNS as the matched emission arm beside the searched one (trial_1493/1196). ~1 GPU-h.'
+    39: 'D600 (b): e+e- -> t t~ g, factor vs emission scales vs plain transformer, every relevant limit (soft gluon at fixed
+      gluon-top angle; gluon quasi-collinear to a top, mass-regulated dead cone, at fixed x; threshold beta of the t t~ pair
+      at fixed x; bulk zoom). Needs: (1) wrappers._asym_terms has no massive emitter (its own shortcut note: CDST''s massive
+      Q -> Q g dipole missing, ''add when a t t~ g target is fit''): add the quasi-collinear massive dipole / massive eikonal,
+      unit test; (2) a KIT-like ttg file: 1e5+1e5 bulk (catalog ee_ttbarg sqrt s window as uug''s 1 TeV) and hard_test strata
+      by soft x 1e-7..1e-2 and by gluon-top angle, generated with the MadGraph standalone path of tools/kit_mc_madgraph /
+      mg5_pipeline_final (fa-generation: probe, then the batch); (3) three runs (factor, emission scales, plain) at one searched
+      HP point (a 16-trial template search on the plain arm as for uug, ~9 GPU-h, or the uug factor HPs if Joaquin prefers
+      quick: ask), scored; (4) kit_zoom over it. Design and review before any job; budget stated in the design.'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -30430,6 +30439,11 @@ entries:
       if:
       - 'factor wins at matched HPs: say by how much, both measures'
       - 'level/emission wins: no factor advantage in the bulk core'
+    39:
+      feeds: 'D600: what the factor and the emission scales do with one divergence suppressed'
+      if:
+      - 'factor helps in the soft limit and the bulk: report with numbers'
+      - 'no difference (mass regulates collinear): say so with numbers'
   step_waits:
     '32': FA-ccin2p3-a8d68ffe
     '33': FA-ccin2p3-ddd2e7a7
