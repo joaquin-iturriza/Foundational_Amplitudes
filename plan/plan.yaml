@@ -36520,6 +36520,8 @@ entries:
     3: 'Het loss vs MSE (Fig. 9, removed from the draft by Joaquin 2026-11-13): come back to it. The het network leaves ~1-11%
       of 2->2 test events unfitted with large sigma (median |Delta| better 118/146, MSE worse on most 2->2); evaluation checked,
       no bug; training precision not checked'
+    4: 'D601: rewrite the asymptotic-factor paragraph of Sec. 7 with precise formulas, term and coefficient counts for example
+      processes and their scaling, and stability from the KIT runs'
   done_when: null
   notes_ref: null
   match: none
@@ -37480,6 +37482,11 @@ entries:
       if:
       - 'Joaquin returns to it: design the follow-up he asks for'
       - 'never: stays out of the paper'
+    4:
+      feeds: Joaquin's D601 request for a precise rewrite of the asymptotic factor paragraph
+      if:
+      - 'reviewer passes: send Joaquin the paragraph, diff, PDF and zip'
+      - 'reviewer fails: fix and re-review'
   ask: 'Permission classifier refusal: checking the lab relay lpnclaude03''s ssh port directly (a TCP probe) was refused,
     and the relay''s sshd is a lab machine we cannot reach or fix. Jean Zay is reached only through lpnclaude03, which refuses
     ssh on port 22 since 2026-11-20. Can you find out whether the lab closed ssh on lpnclaude03 on purpose, and whether there
