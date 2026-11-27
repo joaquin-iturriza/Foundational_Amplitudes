@@ -30537,8 +30537,7 @@ entries:
     '34': 'detach kit_hpo_uug_ft_heldoutqqg_r2 (drive.py relaunched 2026-11-27 16:45 CET with --retry-lost --retry-failed:
       trials 0, 2 lost and 3 failed on the fixed EOS faults; a lost trial holds the next wave, so the first drive had sat
       idle since 15:04)'
-    '39': ttg rebuild CC CPU job ccj_3a07615b7f4f (slurm 65003701), read by rerunning 'site --timeout 14400 run --job --allow-stale
-      --item kit_benchmark ccin2p3 FA -- python tools/kit_ttg.py build'
+    '39': FA-ccin2p3-5ad7429c
   handoff:
     state: '2026-11-27 ~16:50 UTC (owner aaa71f1f2ab069880). D604 done and sent: kit_zoom @0cf9efef0 (kitzoom_paper_relmed
       = the draft''s median figure in median |Delta|; 28 kitzoom figures; captions scratchpad kb16/caps.json). Events E9800
