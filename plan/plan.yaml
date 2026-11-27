@@ -35552,6 +35552,57 @@ entries:
       CC /sps/lpnhe 8.76 GB free vs tens of MB per job; KIT bulk_test/hard_test; HETEROSC both arms. Searched: hpo_uug_T,
       hpo_uugg_T, trial_1493, hp1493, hp1196, emission scale, asymptotic factor, fixed band, other variable, relative error,
       unweighted, seed spread, fixed HPs, single-process, 6.96.'
+  - at: '2026-11-27T13:21:23+00:00'
+    question: 'Step 34 (b) (D575 part ii, the passed held-out qqg design''s ''neither'' branch, read on the fixed reruns):
+      on e+e- -> u u~ g, does the best fine-tune from the A2 pretraining with every q q~ g process held out (runs/data_saving/dsave_parent_finale_kit_heldoutqqg_a2),
+      found by a DyHPO search over the fine-tuning HPs, beat A2 from scratch (SCR-A2, FA-ccin2p3-6f1a5dad) on the u u~ g hard
+      families (soft, collinear)? Both hand-set fine-tunes (lr_scale 1 = lr 0.01251 and its half) blew up (26x and 95x validation
+      jumps) and neither is a clean result.'
+    prior: 'Searched plan kit_benchmark findings (2026-11-27 ~13:45 steps 34/35, ~15:20 the half-lr rerun, ~14:20 UTC its
+      blow-up), results.tex (heldout, kit_hpo, ft_r5, hp1918), site decisions D575. Found: (1) step 34 fixed reruns on uug
+      vs SCR-A2, R = median log10(FT/SCR log-MSE): lr 0.01251 collinear -1.72 BEATS but blew up (26x val jump, listed apart);
+      lr 0.001251 collinear +0.40 LEVEL, soft +2.87 LOSES; half lr 0.006255 collinear +0.23 LEVEL, soft +1.78 LOSES, but a
+      95x val jump at eval 13/50 recovered only in the cooldown (listed apart). (2) SCR-A2 uug at hp1918 of kit_hpo_uug_plain
+      (plain-input search, not A2): bulk 2.8e-6, soft 6.8e-5, collinear 7.4e-3. (3) Template: step 21''s kit_hpo_tt_ft_r5
+      and step 36''s uugg search (sweep_config_kit_hpo_uugg_ft_heldoutqqg.yaml, design PASS 2026-11-27, lr fixed at the parent''s
+      0.00189, lr_scale [0.1,10], layer_decay [0.75,1]), running now (first wave val mu-MSE 2.0e-4..1.0e-3). This design:
+      the same search on the uug pool (sweep/sweep_config_kit_hpo_uug_ft_heldoutqqg.yaml), so the step-34 uug arms sit at
+      lr_scale 6.6, 3.3 and 0.66 inside the window.'
+    measure: 'DyHPO picks the best trial on validation mu-MSE (val_loss_no_reg at the best checkpoint), the template''s objective.
+      The chosen trial is scored by tools/kit_predict.py (job_kit.sh KIT_SCORE_ONLY with KIT_SCORE_DIR=<trial dir>), collected
+      by kit_figures collect under alias kit_A_ft_ee_uug_me2_n100000_t1831_heldoutqqg_ftbest, read with kit_readout --vs against
+      SCR-A2: per family the median over strata of log10(FT/SCR log-MSE), deepest-bin log-MSE, bias and exponent. Curves with
+      kit_curves sweep (curve_quality, blow-ups).'
+    check: 'The measure moves with the searched axis on existing data: lr_scale 6.6 -> 0.66 on uug moved R collinear -1.72
+      -> +0.40 and soft from (blown-up) to +2.87 (step 34 reruns, kit_fig_heldoutqqg.json), and the half-lr point gave collinear
+      +0.23, soft +1.78: R moves by 0.5-2 decades across the window. Fix active on this parent (head-map line ''asym output
+      shift +4.517 std 1.478'' on uug).'
+    fixed: 'Parent dsave_parent_finale_kit_heldoutqqg_a2 (its config.yaml as base: A2 inputs, asymptotic factor, HETEROSC
+      + sigma stage, MuonAdamW, WSD cooldown 1/8, batch 16384), start model_run0_best.pt.gz. Settings the sweep sets that
+      differ from the parent''s config.yaml: training.iterations 1831 vs 64000 (KIT A protocol, 300 epochs of 1e5, as SCR-A2
+      and step 34); training.lr 0.00189 = the parent''s (rule 4); data.processes_file kit_A_ee_uug_me2_n100000_t8000_softpair.recipe.yaml
+      (the target, 1e5 train / 1e5 val, SCR-A2''s pool); data.eval_subsample null vs 10000; training.dtype float64 and heterosc_select
+      mu_mse (job_kit.sh''s KIT setting); fine_tune.pretrained_path the parent, target_stats own, offshell_stats own; training.increment_steps
+      null, warm_start_idx null; evaluation.train_subsample 2000 and memmap false equal the parent''s. Searched (template
+      space): lr_scale [0.1,10] log, layer_decay [0.75,1], muon_weight_decay [1e-3,0.3], regularization_lambda [1e-10,1e-6],
+      cosanneal_warmup_frac [0.05,0.2], eta_min [1e-10,1e-7], ema, ema_decay [0.9,0.999]. 16 trials (D428), waves 6/5/5, sweep/drive.py
+      at site pick''s width. Wall: step-34 uug FT trained ~30 min on V100 (as uugg''s 31 min) -> trial target 0.55 h, limit
+      1 h; 16 x 0.55 = 8.8 GPU-h + 0.3 scoring, under D575''s 100 with step 36''s 9. Disk: 82 MB per trial x 16 = 1.3 GB at
+      most, CC /sps 8.76 GB free, lxplus EOS PB free.'
+    control: 'SCR-A2 uug (FA-ccin2p3-6f1a5dad, kit_A_ee_uug_me2_n100000_t1831_heldoutqqg_scra2): the A2 config from random
+      init at hp1918 (searched on the plain config), same pool, steps, batch, seed, scoring. Since its HPs were not searched
+      on A2, a BEATS is confirmed only against the best of the same 16-trial template search for A2 from scratch on uug, run
+      on a BEATS; a NO stands against SCR-A2 (the tuning asymmetry favours the fine-tune). Beside: the step-34 fine-tunes,
+      listed apart.'
+    seeds: 'One seed (42) per trial (D315); spread: t t~ V same-HP rerun spread 0.78-6.96 (sec:datasaving), the bar of the
+      passed step-34/36 designs.'
+    outcome: 'Per hard family, R = best FT / control log-MSE, median over strata: BEATS R < 1/7, LOSES R > 7, else LEVEL.
+      Best FT BEATS SCR-A2 on a family: run the A2 from-scratch search; transfer of that limit is claimed only if the best
+      FT still BEATS its best trial. No family BEATS: no transfer at this pretraining on uug, reported with exponents and
+      the search''s spread. A best trial that blew up (val jump > 5x) is listed apart and the next-best clean trial read.'
+    sources: 1/7 and 7 <- t t~ V same-HP rerun spread 0.78-6.96 (results.tex sec:datasaving), the bar of the passed step-30/34/36
+      designs (the fine-tune-vs-scratch comparison of the same kind); 5x jump <- sec:ladder seeds' blow-ups vs 1.5x seed noise;
+      100 GPU-h <- D575 names this work
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
