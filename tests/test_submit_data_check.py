@@ -125,7 +125,89 @@ def test_refused_submit_returns_its_pick_unit():
             os.environ["SUBMIT_TEST"] = old_test
 
 
+def test_reserve_then_spend():
+    """registered as `reserve` + `spend`: PreToolUse holds the unit (a second dry check on the same last unit refuses),
+    PostToolUse spends it, a `site:` refusal releases it, a reservation a parallel hook's refusal left unconfirmed
+    lapses after RESERVE_TTL, and a chain spends every unit it reserved."""
+    import json, time
+    home = tempfile.mkdtemp()
+    pl = os.path.join(home, ".local", "share", "ccorch", "placement")
+    os.makedirs(pl)
+    f = os.path.join(pl, "FA.json")
+    old_home, old_test = os.environ.get("HOME"), os.environ.get("SUBMIT_TEST")
+    os.environ["HOME"] = home
+    os.environ.pop("SUBMIT_TEST", None)
+    g.RUNS_DB = _db([])
+    g.design = lambda *a: []
+    g.budget = lambda *a: []
+    g._site_data_ok = lambda site, r: (True, "ok")
+    g.RESERVE = True
+    cmd = "site submit ccin2p3 FA scripts/job_catalog_v3_short.sh --item x -- v4_dimensionless_muon_default50"
+    a = {"tool_input": {"command": cmd}, "tool_use_id": "a"}
+    b = {"tool_input": {"command": cmd}, "tool_use_id": "b"}
+    q = lambda: json.load(open(f))["quota"]
+    put = lambda quota: json.dump({"ts": int(time.time()), "quota": quota}, open(f, "w"))
+    try:
+        put({"ccin2p3": 1})
+        assert g.problems(a) == [] and q()["ccin2p3"] == 1            # held, not spent
+        assert any(p.startswith("placement:") for p in g.problems(b))  # the held unit is not offered twice
+        g.spend(dict(a, hook_event_name="PostToolUse"))
+        assert q()["ccin2p3"] == 0 and g._reservations() == []
+        put({"ccin2p3": 1})
+        assert g.problems(a) == []
+        g.spend(dict(a, hook_event_name="PostToolUseFailure", error="Exit code 2\nsite: working copy has uncommitted"))
+        assert q()["ccin2p3"] == 1 and g._reservations() == []        # refused by site: released
+        assert g.problems(a) == []
+        g.spend(dict(a, hook_event_name="PostToolUseFailure", error="Exit code 1\nsbatch: error"))
+        assert q()["ccin2p3"] == 0                                     # not a site: refusal: counted as gone
+        put({"ccin2p3": 1})
+        assert g.problems(a) == []                                     # a parallel hook refuses: no Post event
+        r = json.load(open(g._reserved_file()))
+        r[0]["ts"] -= g.RESERVE_TTL + 1
+        json.dump(r, open(g._reserved_file(), "w"))
+        assert g.problems(b) == []                                     # the lapsed reservation is free again
+        g.spend(dict(b, hook_event_name="PostToolUse"))
+        assert q()["ccin2p3"] == 0
+        two = cmd + " ; " + cmd.replace("FA scripts", "FA scripts/other_").replace("ccin2p3", "lxplus")
+        put({"ccin2p3": 1, "lxplus": 1})
+        c = {"tool_input": {"command": two}, "tool_use_id": "c"}
+        assert g.problems(c) == [], g.problems(c)
+        g.spend(dict(c, hook_event_name="PostToolUseFailure", error="Exit code 2\nsite: working copy has uncommitted"))
+        assert q() == {"ccin2p3": 0, "lxplus": 0}                      # a chain: its submissions may have gone
+        g.spend({"tool_input": {"command": "site poll FA"}, "tool_use_id": "d", "hook_event_name": "PostToolUse"})
+        assert q() == {"ccin2p3": 0, "lxplus": 0}
+    finally:
+        g.RESERVE = False
+        os.environ["HOME"] = old_home or ""
+        if old_test is not None:
+            os.environ["SUBMIT_TEST"] = old_test
+
+
+def test_reserve_concurrent():
+    """two processes reserving 50 units each on one site keep all 100 reservations (the placement lock), and a third
+    at quota 100 is refused."""
+    import json, subprocess, time
+    home = tempfile.mkdtemp()
+    pl = os.path.join(home, ".local", "share", "ccorch", "placement")
+    os.makedirs(pl)
+    json.dump({"ts": int(time.time()), "quota": {"ccin2p3": 100}}, open(os.path.join(pl, "FA.json"), "w"))
+    code = ("import sys; sys.path.insert(0, %r); import submit_guard as g\n"
+            "for i in range(50):\n    assert g._reserve({'tool_use_id': sys.argv[1] + str(i)}, 'FA', 'ccin2p3') == 'ok'\n"
+            % os.path.join(ROOT, ".claude", "hooks"))
+    env = dict(os.environ, HOME=home)
+    ps = [subprocess.Popen([sys.executable, "-c", code, t], env=env) for t in ("a", "b")]
+    assert [p.wait() for p in ps] == [0, 0]
+    old = os.environ.get("HOME")
+    os.environ["HOME"] = home
+    try:
+        assert len(g._reservations()) == 100
+        assert g._reserve({"tool_use_id": "c"}, "FA", "ccin2p3") != "ok"
+    finally:
+        os.environ["HOME"] = old or ""
+
+
 if __name__ == "__main__":
     test_arm_recipe(); test_chained_on_prebuild_passes_without_read(); test_refused_command_keeps_its_pick_unit()
-    test_refused_submit_returns_its_pick_unit()
+    test_refused_submit_returns_its_pick_unit(); test_reserve_then_spend(); test_reserve_concurrent()
     print("ok")
+

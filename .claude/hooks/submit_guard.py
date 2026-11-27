@@ -33,7 +33,7 @@ A command is refused (exit 2, every reason found) when
 Each check's verdict is the old guard's on the same command (tests/test_hooks_real.py replays the night's submissions
 through both). It fails closed on a submission like design_guard did; a command that submits nothing is never refused.
 Env for tests: the PLAN_* variables of tools/plan.py; SUBMIT_RUNS_DB (default the site registry); HOME (placement)."""
-import hashlib, json, os, re, shlex, sqlite3, sys, time
+import contextlib, fcntl, hashlib, json, os, re, shlex, sqlite3, sys, time
 
 HOOKS = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HOOKS)
@@ -120,7 +120,46 @@ def placement(cmd, scan):
     return []
 
 
+_LOCK = [0]
+
+
+@contextlib.contextmanager
+def _placement_lock():
+    """one lock over the placement files (the plan's quota, the reservations, the spent log), so concurrent hooks of
+    several agents never lose each other's write; re-entrant within one process."""
+    if _LOCK[0]:
+        _LOCK[0] += 1
+        try:
+            yield
+        finally:
+            _LOCK[0] -= 1
+        return
+    d = os.path.expanduser("~/.local/share/ccorch/placement")
+    os.makedirs(d, exist_ok=True)
+    fh = open(os.path.join(d, ".lock"), "a")
+    fcntl.flock(fh, fcntl.LOCK_EX)
+    _LOCK[0] = 1
+    try:
+        yield
+    finally:
+        _LOCK[0] = 0
+        fcntl.flock(fh, fcntl.LOCK_UN)
+        fh.close()
+
+
+def _locked(fn):
+    def run(*a, **k):
+        with _placement_lock():
+            return fn(*a, **k)
+    return run
+
+
 def spend_unit(project, site, dry=False):
+    with _placement_lock():
+        return _spend_unit(project, site, dry)
+
+
+def _spend_unit(project, site, dry=False):
     f = os.path.join(os.path.expanduser("~/.local/share/ccorch/placement"), "%s.json" % project)
     if not os.path.exists(f):
         return "no placement recorded for this project"
@@ -132,7 +171,7 @@ def spend_unit(project, site, dry=False):
     quota = d.get("quota") or ({d["site"]: 1} if d.get("site") else {})
     if age > PLACEMENT_MAX_AGE:
         return "last `site pick` is %d min old; pick again" % (age // 60)
-    left = int(quota.get(site, 0))
+    left = int(quota.get(site, 0)) - (_held(project, site) if dry else 0)
     if left <= 0:
         have = ", ".join("%s %d" % kv for kv in quota.items() if kv[1] > 0) or "nothing"
         return "no quota left for %r in the last plan (left: %s)" % (site, have)
@@ -1064,8 +1103,19 @@ def problems(inp):
             elif SUBMITTING.search(scan):
                 out.append("%s: the check failed (%s: %s) on a command that submits; refused until it can be read"
                            % (name, type(e).__name__, e))
-    if not out and (not only or "placement" in only):
-        # a unit of the last `site pick` is spent only by a command that goes: one refused by another check (data,
+    if not out and (not only or "placement" in only) and RESERVE:
+        # registered as `reserve` (with `spend` after the command): the unit is held, spent only once the command ran
+        try:
+            for site, project in named_submissions(scan):
+                if site != "auto" and not site.startswith("-"):
+                    v = _reserve(inp, project, site)
+                    if v != "ok":       # another agent took the last unit since the dry check
+                        out.append("placement: submission to '%s' for '%s' — %s; run `site pick %s` again"
+                                   % (site, project, v, project))
+        except Exception:
+            pass
+    elif not out and (not only or "placement" in only):
+        # (the old registration, no `reserve`) a unit of the last `site pick` is spent only by a command that goes: one refused by another check (data,
         # budget...) once spent it and left the plan short for the corrected resubmission (2026-10-30)
         try:
             for site, project in named_submissions(scan):
@@ -1077,6 +1127,62 @@ def problems(inp):
     return out
 
 
+RESERVE = False             # set by `submit_guard.py reserve` (PreToolUse); the flag sits in the hook command, so a
+RESERVE_TTL = 900           # session's hook snapshot always pairs reserve with spend; a reservation no PostToolUse
+                            # confirms (a parallel PreToolUse hook refused the command) lapses after 15 min
+
+
+def _reserved_file():
+    return os.path.join(os.path.expanduser("~/.local/share/ccorch/placement"), "reserved.json")
+
+
+def _reservations():
+    try:
+        d = json.load(open(_reserved_file()))
+    except Exception:
+        return []
+    return [x for x in d if time.time() - x.get("ts", 0) < RESERVE_TTL]
+
+
+def _held(project, site):
+    return sum(1 for x in _reservations() if x["project"] == project and x["site"] == site)
+
+
+def _use_key(inp):
+    """the tool call's own id (the same in PreToolUse and PostToolUse), else the command's hash"""
+    return inp.get("tool_use_id") or _cmd_key(inp)
+
+
+def _reserve(inp, project, site):
+    """hold one unit for this call: checked and written under the lock, so two calls never take the last unit."""
+    with _placement_lock():
+        v = _spend_unit(project, site, dry=True)
+        if v != "ok":
+            return v
+        d = _reservations() + [{"key": _use_key(inp), "project": project, "site": site, "ts": time.time()}]
+        f = _reserved_file()
+        json.dump(d, open(f + ".tmp", "w"))
+        os.replace(f + ".tmp", f)
+        return "ok"
+
+
+def spend(inp):
+    """PostToolUse and PostToolUseFailure (registered with `reserve`): the units this call reserved are spent, or just
+    released when a failure submitted nothing (one `site` step refused with a `site:` line, as refund reads it)."""
+    gone = not (inp.get("hook_event_name") == "PostToolUseFailure" and _nothing_submitted(inp))
+    with _placement_lock():
+        key, d = _use_key(inp), _reservations()
+        mine = [x for x in d if x["key"] == key]
+        if not mine:
+            return 0
+        f = _reserved_file()
+        json.dump([x for x in d if x["key"] != key], open(f + ".tmp", "w"))
+        os.replace(f + ".tmp", f)
+        for x in mine if gone else []:
+            _spend_unit(x["project"], x["site"])
+    return 0
+
+
 def _spent_file():
     return os.path.join(os.path.expanduser("~/.local/share/ccorch/placement"), "spent_pending.json")
 
@@ -1085,6 +1191,7 @@ def _cmd_key(inp):
     return hashlib.sha1(((inp.get("tool_input") or {}).get("command", "") or "").encode()).hexdigest()
 
 
+@_locked
 def _log_spent(inp, project, site):
     """the unit just spent, kept so the failure hook can return it if `site submit` itself refuses the command."""
     f = _spent_file()
@@ -1097,21 +1204,29 @@ def _log_spent(inp, project, site):
     json.dump(d, open(f, "w"))
 
 
-def refund(inp):
-    """PostToolUseFailure: a command that failed with a `site:` refusal (dirty working copy, ...) submitted nothing, so
-    the units it spent in problems() go back to the plan (2026-10-31: a refused `site submit` cost a `site pick` slot)."""
+def _nothing_submitted(inp):
+    """a failed command submitted nothing: one `site` step refused with a `site:` line (or `site sync && site submit`)."""
     cmd = (inp.get("tool_input") or {}).get("command", "") or ""
     # only a command that is one `site` step in all (one submission, nothing chained): in a chain the failing `site:`
     # line may belong to another step while an earlier submission went through, and its unit must stay spent
     steps = list(re.finditer(r"(?:^|[;&|(]|\$\()\s*site\s+(\S+)", cmd, re.M))
     if len(named_submissions(cmd)) != 1 or not steps:
-        return 0
+        return False
     # one `site` step, or `site sync ... && site submit ...`: a `&&` chain whose last step is the submission stops at
     # the first refusal, so the submission never ran (2026-11-26: sync refused over uncommitted changes kept the slot)
     if len(steps) > 1 and not (steps[-1].group(1) == "submit" and not re.search(r"[;|\n]|\|\|", cmd.strip())):
-        return 0
+        return False
     msg = "%s %s" % (inp.get("error", ""), json.dumps(inp.get("tool_response", "")))
     if not re.search(r"(^|\\n|\s)site: ", msg):
+        return False
+    return True
+
+
+@_locked
+def refund(inp):
+    """PostToolUseFailure: a command that failed with a `site:` refusal (dirty working copy, ...) submitted nothing, so
+    the units it spent in problems() go back to the plan (2026-10-31: a refused `site submit` cost a `site pick` slot)."""
+    if not _nothing_submitted(inp):
         return 0
     f = _spent_file()
     try:
@@ -1141,6 +1256,10 @@ def main():
         return 0
     if "refund" in sys.argv[1:]:
         return refund(inp)
+    if "spend" in sys.argv[1:]:
+        return spend(inp)
+    global RESERVE
+    RESERVE = "reserve" in sys.argv[1:]
     bad = problems(inp)
     if bad:
         sys.stderr.write("BLOCKED by submit_guard:\n" + "\n".join("  " + b for b in bad) + "\n")
