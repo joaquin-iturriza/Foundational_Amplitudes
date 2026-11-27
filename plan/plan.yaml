@@ -42686,7 +42686,7 @@ entries:
     blocks_steps: &id004 []
   owner:
     agent: a91889ef4874423bf
-    state: working
+    state: closed
     since: '2026-11-27T01:07:43+00:00'
     state_at: '2026-11-27T01:57:08.808000+00:00'
     context: 242284
@@ -43746,33 +43746,47 @@ entries:
     '26': FA-ccin2p3-4ba88991
     '27': detach lev_writer_submit (site submit of the level_events writer CPU job, PEL_WRITE=1; its run id is in ~/.local/share/ccorch/detached/20261127-032456_lev_writer_submit.log)
   handoff:
-    state: 'Step 26 (target_propagators arm, design PASSED 2026-11-26T23:40, config sweep/sweep_config_llmcmp_c_tprop.yaml
-      @581530563, code 1ca3514c0): prebuilds done, tp-meta gate passed (gg tbW pair and the five q q~ twin pairs carry the
-      top factor). Smoke FA-ccin2p3-776cdd69 in flight (step 26 waits on it). On SMOKE_EXIT 0: (2) site submit job_llm_score.sh
-      --env RUN=<smoke run dir runs/zz_smoke/zz_smoke_sweep_config_llmcmp_c_tprop_<jobid>> --env ONLY=heldout --env EVENTS=1
-      (as step 22''s smoke read), check the pair''s log_factor column differs from c_best''s on the same events (Breit-Wigner
-      log <= 0, down to ~-9.5 at the pole) and factor_split.py reads it; (3) the run: site pick FA --jobs 1 --mem 20G (separate
-      call), then site submit auto FA sweep/trial_job.sh --hdr=--mem=20G --hdr=--time=22:00:00 --hdr=--cpus-per-task=4 --hdr=--gpu-min-mem=32G
-      --disk-gb 2 -- --sweep-config sweep/sweep_config_llmcmp_c_tprop.yaml --detached --trial-idx 1860 --hp-idx 1860 --t-steps
-      60840 --hp training.lr=0.001603605 --hp training.muon_weight_decay=0.02796892 --hp training.regularization_lambda=4.685537e-08
-      --hp training.cosanneal_warmup_frac=0.1908437 --hp training.cosanneal_eta_min=4.115949e-09 --hp ema=true --hp training.ema_decay=0.9831303;
-      plan target --batch tprop_run --wall 16 --jobs 1 first. Then read per the passed design (llm_score held-out/seen, factor_split
-      --pole-run on the arm''s own dir, heldout_per_process with c_best and c_tprop, factor_split tbw figure for both). Step
-      25 (attempt E, FA-ccin2p3-d34fae85) still RUNNING at 01:00 (log only the Slurm header so far): read per the passed design
-      when it ends (handoff of 2026-11-26 below). Note: site submit to a named site after a refused submit fails with ''no
-      quota left'' (the refused call spent the pick unit); site submit auto works.'
+    state: 'Step 26 (target_propagators arm, passed design 2026-11-26T23:40): smoke FA-ccin2p3-776cdd69 clean; its held-out
+      read FA-ccin2p3-583cc541 passed the factor check (pair log_factor minus c_best''s: mean -7.9, floor -9.479 = 2 log(Gamma_t/M_t)
+      at the pole; factor_split reads it); the run FA-ccin2p3-4ba88991 (sweep_config_llmcmp_c_tprop.yaml @581530563, trial_1860
+      HPs, wall target 16 h, limit 22 h) RUNNING since 02:24; step 26 waits on it: read per the passed design (llm_score held-out
+      ONLY=heldout EVENTS=1 and seen, factor_split --pole-run on runs/llmcmp_c_tprop/trial_1860, level_file_read.py --tags
+      c_best c_tprop, heldout_per_process.py with c_best and c_tprop, factor_split --fig --panels tbw for both). Step 25 (attempt
+      E) DONE: YES with the network + kinematics anchor (new-43 ten-ensemble median 0.358 vs bar 0.369, every subset passes;
+      tree fails hard-cut; figure figs/perevent_anchored_E.png sent to the main session). Step 27 (attempt E''s YES branch,
+      training run with the per-event level): code merged a9cb3a715 (data.level_events + perevent_level.py --write-level-events
+      + sweep/sweep_config_llmcmp_level_events.yaml; repo review PASS of the branch at 2f7f8de3c). Writer CPU job being submitted
+      (detach lev_writer_submit); on its end read its log (level_events check line: the file''s own new-43 level error, full
+      and subsets), cat analysis/catalog_daniel/data/level_events_E_kin.json from CC (site run cat) and commit it on trunk;
+      then the design. OPEN DESIGN POINT (the repo reviewer''s seed finding): with (c,b) seeds 0-2 (matching step 16''s 3-seed
+      level file) the file is attempt E''s ensemble 0, its WORST kin draw (0.922 > bar), while step 16''s frozen file is a
+      lucky draw of its own (0.047 vs regressor_ens median 0.219): a 3-seed vs 3-seed comparison measures seed draws. Matched
+      alternative I favour: both levels from the same 30-seed average (per-event file and a per-process file from the same
+      network on the pool means, regressor_ens'' estimator), written by the same writer (code change: a seeds argument and
+      a second output, repo review), and TWO runs (control re-run with the 30-seed per-process file, arm with the per-event
+      file), ~2 x 12.6 h V100 (step 16''s rate) ~ 26 GPU-h < 30 at step 16''s own config; verify the rate from FA-ccin2p3-0ca1d68d''s
+      log before claiming it. Design must state: compare only in log|M|^2 space (the two runs'' val_loss_no_reg are on different
+      sigma scales); memmap needs a tp_ prebuild (CPU, scripts/job_mmap_prebuild.sh with the config''s fixed_params, train
+      and held-out recipes) since level_events rides the tp cache; the sampling question needs llm_score --events-out to carry
+      x = (log s_hat, Lmin - log s_hat, E) per event (momenta in the loader are standardized: read them from the memmap mom
+      array) or is left to the CPU read. Repo-reviewer backlog: still DUE (lock held by reviewer a0142276334a2a739) on a kit_benchmark
+      blocker (commit 2ad76d096, tools/kit_curves.py plot_runs saves only the last run''s figure); once fixed it advances
+      at a9cb3a715.'
     decisions: 'Joaquin''s: D522-D528, D536, D537, D553, D564, D566, D567, D576-D579, D584-D589. Mine (re-justify): earlier
-      (i)-(l); (li) step 26 lever = data.target_propagators (the target-side factor) rather than resonance_per_event (the
-      input lever stays the No branch''s alternative); (lii) tp cache keyed by train caps (straddle read on the run''s train
-      selection, matching in memory); t-channel option asserted off on memmap; (liii) scripts/submit_interactive.sh deleted
-      (repo review blocker; its D589 jobs done); (liv) Partly/No boundary = the same-setup contrast spread 1.34 (trial_1860
-      vs trial_9000), data/pole_contrast_spread @21727e59c.'
-    ruled_out: 'As before; D566 attempts A-D dead ends; step 15: the pair''s error is not spread evenly (eta2 0.81).'
-    running: FA-ccin2p3-776cdd69 (step 26 smoke), FA-ccin2p3-d34fae85 (step 25 attempt E, CPU)
-    files: data_mmap.py (tp_key_doc, _build_tp), experiment.py (_tp_settings/_tp_props/_tp_logF), tests/test_memmap_data.py,
-      sweep/sweep_config_llmcmp_c_tprop.yaml, analysis/llm_compare/data/pole_contrast_spread/*_fs.json, analysis/llm_compare/factor_split.py,
-      analysis/catalog_daniel/{perevent_level.py, perevent_anchored_fig.py E}
-    written: '2026-11-26T23:59:10+00:00'
+      (i)-(liv); (lv) step 26''s run submitted in parallel with the smoke''s held-out read (the training does not read it;
+      the read''s failure branch would have cancelled it); (lvi) data.level_events rides the target_propagators factor machinery
+      (one per-event log factor, divided out at evaluation) with c_p through data.level_file; (lvii) the writer mirrors step
+      16''s level file: final fits on all train processes (train in-sample, held out predicted), kin anchor map 10 seeds,
+      (c,b) network seeds 0-2 per the repo review (see the open design point); (lviii) step 27''s control and seeds are not
+      yet designed.'
+    ruled_out: 'As before; D566 attempts A-D dead ends; attempt E: ridge (0.383), network-only (0.415, partly) and tree +
+      kinematics (fails hard-cut subset) anchor maps; step 15: the pair''s error is not spread evenly (eta2 0.81).'
+    running: FA-ccin2p3-4ba88991 (step 26 run); the level_events writer CPU job (submit in detach lev_writer_submit)
+    files: data_mmap.py (tp_key_doc level_events), experiment.py (_level_events_slope, _tp_settings, level_events asserts),
+      analysis/catalog_daniel/perevent_level.py (write_level_events), scripts/job_perevent_level.sh (PEL_WRITE), sweep/sweep_config_llmcmp_level_events.yaml,
+      tests/test_level_events.py, analysis/catalog_daniel/data/perevent_anchored_E.json, analysis/catalog_daniel/figs/perevent_anchored_E.png,
+      sweep/sweep_config_llmcmp_c_tprop.yaml
+    written: '2026-11-27T02:26:07+00:00'
   designs:
   - at: '2026-11-22T04:13:14+00:00'
     question: 'Part (a), D525: in the conditions of Suprio''s LLM pID run (D524, D526, D527: our catalog_daniel regeneration
