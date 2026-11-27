@@ -44280,12 +44280,10 @@ entries:
     blocks_steps: &id004
     - 29
   owner:
-    agent: a854c89e3ac6e6139
-    state: closed
-    since: '2026-11-27T17:31:49+00:00'
-    state_at: '2026-11-27T18:45:19+00:00'
-    context: 173613
-    context_at: '2026-11-27T18:14:49+00:00'
+    agent: a9175c3092ed6c0f5
+    state: working
+    since: '2026-11-27T18:56:45+00:00'
+    state_at: '2026-11-27T18:56:45+00:00'
   step_why:
     28:
       feeds: 'D566: does the per-process level lever (step 16, kept regardless of sampling in step 27''s control) carry to
