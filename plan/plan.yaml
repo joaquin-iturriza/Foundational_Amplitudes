@@ -52651,7 +52651,7 @@ entries:
   match: kit_reply_deck_*
   evidence:
     runs: []
-    commit: 51a5e49f6
+    commit: 292e35a13
     paths:
     - analysis/kit_benchmark/data/kit_bakar_figs_searched.json
     - analysis/kit_benchmark/figs/reply_deck
