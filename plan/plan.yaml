@@ -28415,9 +28415,6 @@ entries:
       (recipe transfer_finale_kit_heldout_qqg.yaml @6a6ca8839); on its clean end the real parent (tag kit_heldoutqqg_a2, limit
       14 h, target 10 h) + FT1/FT0.1/SCR-A2 50-step smokes from the smoke parent; SCR-A2 real arms once the parent''s config
       exists, FT1/FT0.1 at the parent''s end'
-    31: 'Protocol B on the three A2 models (D575, design PASS ~16:40): smoke FA-ccin2p3-58bc2125 (B, tt A2, 50 steps); on
-      its clean end site pick + 6 runs job_kit.sh B and B_bulk 3000 steps with --env KIT_FROM=runs/kit/kit_A_ee_{uug_me2,uugg_me2,tt_virt_finite}_n100000_t1831_hpo_asym_cont,
-      tags a2B (limit 1:30), then B vs B_bulk per family'
     32: 'Slide 11 exact (design PASS 16:45): read FA-ccin2p3-aacf91cc (uug), 706a0f6f (uugg: MadEvent on the A2 surrogate)
       and 12d32b55 (tt virtual over the bulk window 353-1739 GeV); figure_exact; hand to Joaquin'
   done_when: null
@@ -30055,11 +30052,6 @@ entries:
       if:
       - 'best FT beats SCR-A2: positive transfer per family'
       - 'neither: fine-tune search best against best before any no-transfer statement'
-    31:
-      feeds: 'Bakar''s protocol B on the models we report: do hard points still teach A2'
-      if:
-      - 'B beats B_bulk on a family: report the gain'
-      - 'level: A2 already extrapolates from bulk there'
     32:
       feeds: 'D571/D575: Bakar''s slide-11 end-user test of the packaged A2 surrogates, done as he specified'
       if:
@@ -30069,7 +30061,6 @@ entries:
   step_waits:
     '24': FA-lxplus-828d67d6
     '29': FA-lxplus-828d67d6
-    '31': FA-ccin2p3-20f0e184 FA-ccin2p3-5a47d217 FA-ccin2p3-6ce1e90c FA-ccin2p3-7bb05caf FA-ccin2p3-77c0851e FA-ccin2p3-c72af479
     '32': FA-ccin2p3-b9d55720 FA-ccin2p3-96ce4464
     '30': FA-ccin2p3-1daf7f8f FA-ccin2p3-2f27a757
   handoff:
