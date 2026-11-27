@@ -30254,6 +30254,23 @@ entries:
       @33f188ffc. Held-out qqg parent FA-ccin2p3-69541363 finished cleanly 09:59; fine-tunes out @8bdfa20ea (job_kit.sh A_ft,
       KIT_PARENT runs/data_saving/dsave_parent_finale_kit_heldoutqqg_a2, n=1e5, 1831 steps, SCR-A2''s HPs per process): lr_scale
       1 uug 69de38db, uugg 48701a30; lr_scale 0.1 uug 1a1c9a47, uugg b6abfc18; target 0.8 h.'
+  - at: '2026-11-27T10:18:44+00:00'
+    text: '2026-11-27 ~12:00 @05b4c69ac. Step 30 readout (held-out qqg A2, D575): fine-tuning from the pretraining with every
+      q q~ g process held out does NOT reach the limits; the from-scratch control does. Runs: parent FA-ccin2p3-69541363;
+      FT lr_scale 1 uug 69de38db / uugg 48701a30, lr_scale 0.1 uug 1a1c9a47 / uugg b6abfc18; SCR-A2 uug 6f1a5dad / uugg ff4af2bc;
+      configs identical apart from the start weights, target_stats and lr_scale (diff of config.yaml on CC). KIT evaluate.py
+      via kit_predict, kit_figures collect -> analysis/kit_benchmark/data/kit_fig_heldoutqqg.json, kit_readout --slide10.
+      log-MSE SCR / FT1 / FT0.1: uug bulk 2.8e-6 / 6.2e-6 / 9.4e-6; uug soft x 1e-7..1e-6 6.8e-5 / 22.8 / 46 (exponent -2.00
+      / -0.95 / -0.42, truth -2.00); uug coll y 1e-7..1e-6 0.0074 / 4.47 / 6.41 (-0.99 / -0.50 / -0.39, truth -1.00); uugg
+      bulk 6.1e-5 / 4.6e-5 / 8.6e-5; uugg soft 0.021 / 34.2 / 23.5 (-1.98 / -0.65 / -0.88); coll gg 0.017 / 7.03 / 3.30; coll
+      qg 0.056 / 6.10 / 6.17; azimuth 0.018 / 8.56 / 4.28. Fine-tune bias in the deepest bins -1.8 to -6.7 decades (prediction
+      far below truth), |M|^2-weighted relative error ~1 in every limit bin. Bulk: FT within 0.1-0.5 decades of SCR either
+      way. Design branch: neither FT arm beats SCR-A2 -> the design''s next attempt is a kit_hpo_tt_ft_r5-style FT search,
+      best against best. Not yet checked (for the next design''s prior): whether the factor''s per-leg coefficients from the
+      parent, which never saw a q q~ g process, start suppressed so the singular terms never dominate in the limits (wrappers._asym_mu,
+      coefficients bounded within +-10 target std; fine_tune.target_stats=own re-standardizes the target). Figures: analysis/kit_benchmark/figs/kit_slide10_heldout.png
+      and the fair one-loop slide-10 metrics against D_train kit_slide10_fairnlo_{bulk,threshold,sudakov}.png (step 29); KIT
+      reply deck talks/kit_reply_nov2026/main.pdf slides 20 and 22-24.'
   step_why:
     29:
       feeds: Bakar's slide-10 metrics reported
