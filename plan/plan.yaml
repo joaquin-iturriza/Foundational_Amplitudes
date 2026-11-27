@@ -28729,12 +28729,10 @@ entries:
     withdrawn_at: '2026-11-26T14:20:55+00:00'
     withdrawn_why: 'D574: no more trainings for today''s reply; a pretrained held-out uug/uugg run is training'
   owner:
-    agent: a859ce5fe75ba63ff
-    state: closed
-    since: '2026-11-27T10:24:08+00:00'
-    state_at: '2026-11-27T10:56:31.417000+00:00'
-    context: 228856
-    context_at: '2026-11-27T10:56:40+00:00'
+    agent: a9632b46e8d54038b
+    state: working
+    since: '2026-11-27T11:25:15+00:00'
+    state_at: '2026-11-27T11:25:15+00:00'
   findings:
   - at: '2026-11-10T03:33:04+00:00'
     text: 'Data: KIT package (888 MB tar, 2.7 GB with the tar) on CC at $DATA_DIR/kit_hardps/hardps_benchmark (fetched by
