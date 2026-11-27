@@ -28425,11 +28425,10 @@ entries:
       array FA-ccin2p3-66fc3d1c (seeds 1001-1050, default card, 8 CPUs, target 1.5 h) -> surr_combine FA-ccin2p3-c5a3365b
       into runs/kit/mc_madgraph; on its end: wiring check sigma_hat/sigma vs E_exact[u], eps2, numbers into the reply deck;
       read the first parts'' serve stats against the 1.5 h estimate'
-    34: 'Held-out qqg A2, next attempt (the passed design''s ''neither'' branch, finding 2026-11-27 ~12:00: FT1/FT0.1 miss
-      every uug/uugg limit by 2-7 decades, SCR-A2 does not): design a kit_hpo_tt_ft_r5-style FT search per process (uug, uugg)
-      from runs/data_saving/dsave_parent_finale_kit_heldoutqqg_a2, best FT against SCR-A2 (FA-ccin2p3-6f1a5dad, ff4af2bc);
-      prior to read first: the factor''s per-leg coefficients the parent hands over (wrappers._asym_mu) and the target_stats=own
-      re-standardization, which an lr search may not reach'
+    34: 'Held-out qqg uug: the lr_scale-1 fine-tune (e095fc91) BEATS SCR-A2 on collinear (R -1.72) but its validation jumped
+      26x at eval 33; per the design its half-lr rerun (lr_scale 0.5, tag heldoutqqg_ftfix05) FA-ccin2p3-5b8a7e13 decides
+      uug: collect it (kit_figures collect), kit_readout --vs SCR-A2 uug, redraw kit_slide10_heldout with it and the deck
+      frame'
     35: '35: Fair one-loop FT redo after the asym_sd fix (@ff4f2e0cf): the 5 fair FT runs (D=100..1e4, parent dsave_parent_finale_kit_fairnlo_a2)
       at their unchanged stage-2 HPs (searched from the non-A2 treesin_r4 parent, so not touched by the bug), tags fairnlo_ftfix_d<D>;
       readout as step 29 (kit_figures collect, kit_readout --slide10, the three fair slide-10 figures and deck slides 22-24
@@ -30368,10 +30367,10 @@ entries:
       - 'wiring within 3 MC errors: numbers to Joaquin in the deck'
       - 'beyond: KITSURR or combine fault, fix and rerun'
     34:
-      feeds: 'Bakar: does the model get the limits without hard data when pretrained with the target family held out'
+      feeds: 'D575 (ii): does the held-out qqg pretraining transfer the uug limits'
       if:
-      - 'best FT beats SCR-A2: transfer, positive'
-      - 'neither: report to Joaquin that pretraining with the family held out does not carry the limits, with what was searched'
+      - 'rerun BEATS SCR-A2 on a uug family: transfer of that limit, reported, slide redrawn'
+      - 'rerun does not BEAT on any uug family: a uug fine-tune search like step 36''s, designed then'
     35:
       feeds: 'D570/D575: Bakar''s fair NLO protocol, does the pretraining transfer one-loop structure'
       if:
@@ -30381,7 +30380,6 @@ entries:
   step_waits:
     '32': FA-ccin2p3-a8d68ffe
     '33': FA-ccin2p3-ddd2e7a7
-    '34': FA-ccin2p3-e095fc91 FA-ccin2p3-79f93bfc FA-ccin2p3-4a978179 FA-ccin2p3-aee64be1
     '35': FA-ccin2p3-61a1649b FA-ccin2p3-8140c2e8 FA-ccin2p3-2470856b FA-ccin2p3-23020b3a FA-ccin2p3-fef5c4b7
   handoff:
     state: '2026-11-27 ~14:55 @0553d1e06. Step 34''s open check settled: a bug, not transfer. model.input_asym_factor''s asym_sd
