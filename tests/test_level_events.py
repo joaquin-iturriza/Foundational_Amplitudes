@@ -68,7 +68,7 @@ def test_level_subsets_factor_check(tmp_path):
         "p,%.6g,%.6g,%.6g,%.6g,%.6g,%.6g\n" % (y[i], y[i] + 0.3, lf_[i], *x[i]) for i in range(len(x)))
     c = tmp_path / "ok.csv"; c.write_text(rows(lf))
     out = level_subsets.read(str(c), ["p"], str(fp), nboot=2)
-    assert out["factor_check_max_abs"] < 1e-3 and abs(out["new"]["all"]["bias2"] - 0.09) < 1e-6
+    assert out["factor_check_p99_abs"] < 1e-3 and abs(out["new"]["all"]["bias2"] - 0.09) < 1e-6
     c.write_text(rows(lf[::-1]))
     with pytest.raises(AssertionError):
         level_subsets.read(str(c), ["p"], str(fp), nboot=2)

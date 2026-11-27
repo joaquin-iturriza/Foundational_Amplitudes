@@ -37,13 +37,16 @@ def read(csv, new, check=None, nboot=30):
     out = {}
     if check is not None:
         f = json.load(open(check))
-        dev = 0.0
+        dev = []
         for n, g in ev.groupby("process"):
             co = f["coef"][n]
             x = g[["log_shat", "q", "E"]].to_numpy()
-            dev = max(dev, float(np.abs(g.log_factor.to_numpy() + ((x - co["x0"]) / f["sx"]) @ co["b"]).max()))
-        out["factor_check_max_abs"] = dev
-        assert dev < 1e-2, f"log_factor differs from -b.(x - x0)/sx by {dev}"   # float32 momenta, %.6g CSV
+            dev.append(np.abs(g.log_factor.to_numpy() + ((x - co["x0"]) / f["sx"]) @ co["b"]))
+        dev = np.concatenate(dev)
+        out["factor_check_max_abs"], out["factor_check_p99_abs"] = float(dev.max()), float(np.quantile(dev, 0.99))
+        # the p99, not the max: float32 boosted momenta can move a near-collinear Lmin by ~1e-2 (repo review); a
+        # misaligned or misscaled column moves every event by O(1)
+        assert out["factor_check_p99_abs"] < 1e-2, f"log_factor differs from -b.(x - x0)/sx: {out}"
     E = {n: errs(g) for n, g in G.items()}
     out["new"] = {s: {"level_err": float(np.median([E[n][s][0] for n in new])),
                       "bias2": float(np.median([E[n][s][1] for n in new]))} for s in SUBSETS}
