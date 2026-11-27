@@ -30502,6 +30502,12 @@ entries:
   - at: '2026-11-27T15:44:23+00:00'
     text: 'Step 36 closed: the two retried trials (hp1441 2.65e-4, hp0886 2.71e-4 val mu-MSE, both fail the curve check) do
       not beat hp1289 (1.97e-4); search 16/16, 9 good; verdict stands: no uugg family beats SCR-A2.'
+  - at: '2026-11-27T15:46:00+00:00'
+    text: 'Step 34b: the uug held-out FT search driver had stalled since 15:04 CET after wave 1 (3 observed: val 3.09e-5 hp0353,
+      5.85e-5 hp1289, 2.68e-4 hp1273; trials 0 and 2 ''lost'' on the missing EOS results dir, 3 failed on the hydra EOS I/O
+      error, both fixed @97e5a4836/@bea2d312d). drive.py holds the next wave until a lost trial is retried, so ''requeue at
+      its end'' would never come: driver stopped and relaunched with --retry-lost --retry-failed FA-lxplus-0d74eb88 (detach
+      kit_hpo_uug_ft_heldoutqqg_r2, 16:45 CET).'
   step_why:
     32:
       feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
