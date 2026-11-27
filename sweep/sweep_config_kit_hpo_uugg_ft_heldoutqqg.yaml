@@ -3,8 +3,9 @@
 # process held out (dsave_parent_finale_kit_heldoutqqg_a2) beats A2 from scratch (SCR-A2, FA-ccin2p3-ff4af2bc) on any
 # hard family. The fine-tune search of kit_hpo_tt_ft_r5 (16 trials, waves 6/5/5, 1831 WSD steps, batch 16384) on the
 # A_ft setup of scripts/job_kit.sh (the parent's config as base, its best weights as start, target and off-shellness
-# stats fitted on the target): training.lr fixed at SCR-A2's 0.01152379 (the step-34 arms' lr), fine_tune.lr_scale in
-# [0.1, 10] and layer_decay in [0.75, 1.0] (HPO rule 4), the rest of the template's space as it is.
+# stats fitted on the target): training.lr fixed at the parent's own 0.00189 (HPO rule 4: lr_scale 1 = the pretrain
+# lr; design-review FIX 2026-11-27), so the step-34 arms (lr 0.01152 and 0.001152) sit at lr_scale 6.1 and 0.61, inside
+# fine_tune.lr_scale [0.1, 10]; layer_decay in [0.75, 1.0], the rest of the template's space as it is.
 cluster:
   scheduler: slurm
   auto_submit: false
@@ -42,7 +43,7 @@ fixed_params:
   fine_tune.pretrained_path: ${PROJECT_DIR}/runs/data_saving/dsave_parent_finale_kit_heldoutqqg_a2/models/model_run0_best.pt.gz
   fine_tune.target_stats: own
   fine_tune.offshell_stats: own
-  training.lr: 0.01152379
+  training.lr: 0.00189
   training.optimizer: MuonAdamW
   training.scheduler: WSD
   training.wsd_cooldown_frac: 0.125
