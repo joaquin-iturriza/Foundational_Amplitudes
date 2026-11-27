@@ -50467,8 +50467,6 @@ entries:
     3: 'plan done lab_llm_trial --writeup a3bcab715 (write-up par:labllm1, par:labllm2 committed a3bcab715 and ac845711e,
       figures committed, worktree folded) once the notes-editor backlog passes (its blocks are in other entries'' sections:
       sec:noisescale and fig:llmcmp_heldout) and the repo-reviewer advances over the merge d75c664b9'
-    5: 'Lab trial (DeepSeek, Qwen) on real instances of the largest routable kinds, under a reviewed design: correct rate
-      against our own output and tokens saved per instance; proposal of what to route'
     6: 'Read the design-review replay (159 rounds, two arms, Qwen and DeepSeek; detach review_replay): lab_wake_trial.py reviews-report,
       agreement split by full design read and slice, every FIX missed read by hand; proposal or no route'
     7: Commit the 429/500 retry of tools/lab_wake_trial.py on branch labwake (worktrees/wt-labwake, where the replays run),
@@ -51025,7 +51023,6 @@ entries:
   step_waits:
     '3': the D551 replays' write-up (detach wake_replay4, detach review_replay4); plan done closes the entry, so it follows
       steps 5 and 6
-    '5': detach wake_replay6
     '6': detach review_replay4
     '7': the next repo-reviewer pass on trunk (a301e680efb448582 passed labwake 089b53ffb on its branch, but the merge guard
       needs it inside trunk's passed backlog, watermark 5d7d59aa19)
@@ -51293,11 +51290,6 @@ entries:
       if:
       - 'both reviewers passed: plan done'
       - 'a reviewer blocks on lab_llm_trial text or code: fix it, re-check with the same reviewer'
-    5:
-      feeds: which larger shares of our token use the lab LLMs could take (D551)
-      if:
-      - 'a kind passes at our check''s level with a cheap check: propose routing it, tokens saved and error rate'
-      - 'none passes: report which failed and how, no route'
     6:
       feeds: whether the lab LLMs can give the design reviewer's verdict (D551)
       if:
