@@ -30287,6 +30287,17 @@ entries:
       tested: target_stats=own with fine_tune.map_head=false (output std stays the parent''s), an L-GATr asym model (no such
       flag there). Every earlier A_ft run with the factor under target_stats=own is affected (fair one-loop FT threshold exponent
       -0.21..-0.24 vs truth -1.02 suggests so): survey of runs/kit/kit_A_ft_* asym_sd vs own std running (ccj_d0485fb1ba2c).'
+  - at: '2026-11-27T10:38:16+00:00'
+    text: '2026-11-27 ~13:10 @ff4f2e0cf. The asym_sd bug also voids the fair one-loop fine-tunes (step 29''s slide-10 fair
+      NLO metrics, deck slides 22-24). Survey of every runs/kit/kit_A_ft_* checkpoint on CC (ccj_d0485fb1ba2c): the model.input_asym_factor
+      fine-tunes, and only they, carry the parent''s asym_sd: fairnlo_ft_d100/d316/d1000/d1000_lsmed/d3162 (parent dsave_parent_finale_kit_fairnlo_a2)
+      asym_sd 3.11831 vs own std 0.677-0.722; heldoutqqg_ft/ft01 (uug, uugg) and the two smokes 3.03647 vs 1.478/1.454. Non-asym
+      fine-tunes (kit_pretrain_heldout, trial_1262 parents) have no such buffer and are unaffected. Fair FT Coulomb slope
+      scale s_o/s_p = 0.722/3.118 = 0.232: the threshold exponents read -0.21..-0.24 against truth -1.02 = 0.232 x truth,
+      i.e. the ''fine-tune under-predicts the Coulomb rise by ~2 decades'' finding (2026-11-27T03:33) is this bug, not a transfer
+      result. Their per-D HPs came from stage-2 fine-tune searches run under the same bug, so the redo is the fair FT stage-2
+      search per D plus its finals, best against best (FT only; SCR-A2 and VB are from scratch, asym_sd = own, valid). The
+      fair_nlo_ft_d10000 checkpoint was not in the listing (not checked where it lives).'
   step_why:
     32:
       feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
