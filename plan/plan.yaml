@@ -28454,6 +28454,11 @@ entries:
       mg5_pipeline_final (fa-generation: probe, then the batch); (3) three runs (factor, emission scales, plain) at one searched
       HP point (a 16-trial template search on the plain arm as for uug, ~9 GPU-h, or the uug factor HPs if Joaquin prefers
       quick: ask), scored; (4) kit_zoom over it. Design and review before any job; budget stated in the design.'
+    40: 'D600 (c): tools/kit_zoom.py over every relevant limit, not only Bakar''s: in the deepest decade of each family, both
+      measures against the other divergence variable (soft-collinear corner: soft strata against the angle y/x; collinear
+      strata against x / z / x_g); MSE(log10|M|^2) beside the relative measure on every error figure; the stability table
+      (largest validation jump max_t val/min_{s<=t} val from kit_curves*.json mu-MSE curves, per arm) as a committed subcommand.
+      Redraw once step 37''s scorings and D600 (a)''s matched runs are in.'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -30444,6 +30449,11 @@ entries:
       if:
       - 'factor helps in the soft limit and the bulk: report with numbers'
       - 'no difference (mass regulates collinear): say so with numbers'
+    40:
+      feeds: 'D598/D600: every limit, relative measure, stability'
+      if:
+      - 'drawn: hand back with captions'
+      - 'a limit shows nothing new: say so with its numbers'
   step_waits:
     '32': FA-ccin2p3-a8d68ffe
     '33': FA-ccin2p3-ddd2e7a7
