@@ -33,7 +33,7 @@ A command is refused (exit 2, every reason found) when
 Each check's verdict is the old guard's on the same command (tests/test_hooks_real.py replays the night's submissions
 through both). It fails closed on a submission like design_guard did; a command that submits nothing is never refused.
 Env for tests: the PLAN_* variables of tools/plan.py; SUBMIT_RUNS_DB (default the site registry); HOME (placement)."""
-import hashlib, json, os, re, shlex, sqlite3, sys, time
+import contextlib, fcntl, hashlib, json, os, re, shlex, sqlite3, sys, time
 
 HOOKS = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HOOKS)
@@ -120,7 +120,46 @@ def placement(cmd, scan):
     return []
 
 
+_LOCK = [0]
+
+
+@contextlib.contextmanager
+def _placement_lock():
+    """one lock over the placement files (the plan's quota, the reservations, the spent log), so concurrent hooks of
+    several agents never lose each other's write; re-entrant within one process."""
+    if _LOCK[0]:
+        _LOCK[0] += 1
+        try:
+            yield
+        finally:
+            _LOCK[0] -= 1
+        return
+    d = os.path.expanduser("~/.local/share/ccorch/placement")
+    os.makedirs(d, exist_ok=True)
+    fh = open(os.path.join(d, ".lock"), "a")
+    fcntl.flock(fh, fcntl.LOCK_EX)
+    _LOCK[0] = 1
+    try:
+        yield
+    finally:
+        _LOCK[0] = 0
+        fcntl.flock(fh, fcntl.LOCK_UN)
+        fh.close()
+
+
+def _locked(fn):
+    def run(*a, **k):
+        with _placement_lock():
+            return fn(*a, **k)
+    return run
+
+
 def spend_unit(project, site, dry=False):
+    with _placement_lock():
+        return _spend_unit(project, site, dry)
+
+
+def _spend_unit(project, site, dry=False):
     f = os.path.join(os.path.expanduser("~/.local/share/ccorch/placement"), "%s.json" % project)
     if not os.path.exists(f):
         return "no placement recorded for this project"
@@ -1069,7 +1108,10 @@ def problems(inp):
         try:
             for site, project in named_submissions(scan):
                 if site != "auto" and not site.startswith("-"):
-                    _reserve(inp, project, site)
+                    v = _reserve(inp, project, site)
+                    if v != "ok":       # another agent took the last unit since the dry check
+                        out.append("placement: submission to '%s' for '%s' — %s; run `site pick %s` again"
+                                   % (site, project, v, project))
         except Exception:
             pass
     elif not out and (not only or "placement" in only):
@@ -1112,26 +1154,32 @@ def _use_key(inp):
 
 
 def _reserve(inp, project, site):
-    d = _reservations() + [{"key": _use_key(inp), "project": project, "site": site, "ts": time.time()}]
-    f = _reserved_file()
-    json.dump(d, open(f + ".tmp", "w"))
-    os.replace(f + ".tmp", f)
+    """hold one unit for this call: checked and written under the lock, so two calls never take the last unit."""
+    with _placement_lock():
+        v = _spend_unit(project, site, dry=True)
+        if v != "ok":
+            return v
+        d = _reservations() + [{"key": _use_key(inp), "project": project, "site": site, "ts": time.time()}]
+        f = _reserved_file()
+        json.dump(d, open(f + ".tmp", "w"))
+        os.replace(f + ".tmp", f)
+        return "ok"
 
 
 def spend(inp):
     """PostToolUse and PostToolUseFailure (registered with `reserve`): the units this call reserved are spent, or just
     released when a failure submitted nothing (one `site` step refused with a `site:` line, as refund reads it)."""
-    key, d = _use_key(inp), _reservations()
-    mine = [x for x in d if x["key"] == key]
-    if not mine:
-        return 0
-    f = _reserved_file()
-    json.dump([x for x in d if x["key"] != key], open(f + ".tmp", "w"))
-    os.replace(f + ".tmp", f)
-    if inp.get("hook_event_name") == "PostToolUseFailure" and _nothing_submitted(inp):
-        return 0
-    for x in mine:
-        spend_unit(x["project"], x["site"])
+    gone = not (inp.get("hook_event_name") == "PostToolUseFailure" and _nothing_submitted(inp))
+    with _placement_lock():
+        key, d = _use_key(inp), _reservations()
+        mine = [x for x in d if x["key"] == key]
+        if not mine:
+            return 0
+        f = _reserved_file()
+        json.dump([x for x in d if x["key"] != key], open(f + ".tmp", "w"))
+        os.replace(f + ".tmp", f)
+        for x in mine if gone else []:
+            _spend_unit(x["project"], x["site"])
     return 0
 
 
@@ -1143,6 +1191,7 @@ def _cmd_key(inp):
     return hashlib.sha1(((inp.get("tool_input") or {}).get("command", "") or "").encode()).hexdigest()
 
 
+@_locked
 def _log_spent(inp, project, site):
     """the unit just spent, kept so the failure hook can return it if `site submit` itself refuses the command."""
     f = _spent_file()
@@ -1173,6 +1222,7 @@ def _nothing_submitted(inp):
     return True
 
 
+@_locked
 def refund(inp):
     """PostToolUseFailure: a command that failed with a `site:` refusal (dirty working copy, ...) submitted nothing, so
     the units it spent in problems() go back to the plan (2026-10-31: a refused `site submit` cost a `site pick` slot)."""

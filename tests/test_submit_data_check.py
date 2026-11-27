@@ -183,8 +183,31 @@ def test_reserve_then_spend():
             os.environ["SUBMIT_TEST"] = old_test
 
 
+def test_reserve_concurrent():
+    """two processes reserving 50 units each on one site keep all 100 reservations (the placement lock), and a third
+    at quota 100 is refused."""
+    import json, subprocess, time
+    home = tempfile.mkdtemp()
+    pl = os.path.join(home, ".local", "share", "ccorch", "placement")
+    os.makedirs(pl)
+    json.dump({"ts": int(time.time()), "quota": {"ccin2p3": 100}}, open(os.path.join(pl, "FA.json"), "w"))
+    code = ("import sys; sys.path.insert(0, %r); import submit_guard as g\n"
+            "for i in range(50):\n    assert g._reserve({'tool_use_id': sys.argv[1] + str(i)}, 'FA', 'ccin2p3') == 'ok'\n"
+            % os.path.join(ROOT, ".claude", "hooks"))
+    env = dict(os.environ, HOME=home)
+    ps = [subprocess.Popen([sys.executable, "-c", code, t], env=env) for t in ("a", "b")]
+    assert [p.wait() for p in ps] == [0, 0]
+    old = os.environ.get("HOME")
+    os.environ["HOME"] = home
+    try:
+        assert len(g._reservations()) == 100
+        assert g._reserve({"tool_use_id": "c"}, "FA", "ccin2p3") != "ok"
+    finally:
+        os.environ["HOME"] = old or ""
+
+
 if __name__ == "__main__":
     test_arm_recipe(); test_chained_on_prebuild_passes_without_read(); test_refused_command_keeps_its_pick_unit()
-    test_refused_submit_returns_its_pick_unit(); test_reserve_then_spend()
+    test_refused_submit_returns_its_pick_unit(); test_reserve_then_spend(); test_reserve_concurrent()
     print("ok")
 
