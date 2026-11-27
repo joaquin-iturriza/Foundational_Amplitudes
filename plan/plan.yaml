@@ -30334,6 +30334,28 @@ entries:
       default MinTmpDisk 50 GB (the ~01:25 stall). Cancelled it and combine c5a3365b, resubmitted unchanged but --tmp=10G:
       array FA-ccin2p3-83662553 (slurm 64967939), combine FA-ccin2p3-ddd2e7a7 (afterok); step 33 now waits on ddd2e7a7. Not
       checked: whether 10G covers the uugg MadEvent work dir (uug''s ran in node /tmp; size not read).'
+  - at: '2026-11-27T11:46:53+00:00'
+    text: '2026-11-27 ~13:45 @c067a33a1. Steps 34/35 read (fine-tunes rerun after the asym_sd head-map fix ff4f2e0cf). Fix
+      active in all nine: head-map log line ''asym output shift <m_p-m_o> std <own>'' (held-out uug +4.517/1.478, uugg +6.113/1.454;
+      fair D=100..1e4 std 0.677/0.7054/0.722/0.7184/0.7197 = own prepd_std), exponents no longer scaled (uug FT1 soft -2.00
+      collinear -1.00, truth -2.00/-1.00; fair threshold -0.91..-0.96 at D=100/316/3162/1e4, truth -1.02; bug runs had 0.487x
+      and 0.232x). KIT scores via kit_figures collect (CC job ccj_176c0115f6fb) into kit_fig_heldoutqqg.json / kit_fig_fairnlo.json;
+      R = median over family strata of log10(arm/control log-MSE), bar +-0.845. STEP 34 (held-out qqg, FT vs SCR-A2): uug
+      FT lr1 collinear -1.72 BEATS (deepest log-MSE 9.0e-5 vs 7.4e-3), soft +0.11 LEVEL (2.1e-5 vs 6.8e-5), bulk +0.98 (2.7e-5
+      vs 2.8e-6); but its validation jumped 26x at eval 33/50 (0.004 -> 0.11, recovered to 6.3e-5): listed apart, half-lr
+      rerun (lr_scale 0.5) FA-ccin2p3-5b8a7e13 per the design. uug FT lr0.1: collinear +0.40 LEVEL, soft +2.87 LOSES (exp
+      -2.22, bias +0.86). uugg FT lr1: LOSES on all four families (soft +2.24, g->gg +2.05, q->qg +1.40, azimuth +2.08; exponents
+      -1.87/-0.74/-0.73 vs truth -2.00/-0.99/-0.97); uugg FT lr0.1: LEVEL g->gg +0.57, q->qg +0.18, azimuth +0.57, soft +0.88
+      LOSES (exp -2.21/-1.03/-1.01). Bulk FT vs SCR uugg +0.14/+0.11. uugg: neither FT arm BEATS on any family -> the design''s
+      next attempt, the FT DyHPO search (kit_hpo_tt_ft_r5 template) for uugg. STEP 35 (fair one-loop t t~ V, FT vs V/B / vs
+      SCR-A2): threshold D=100 -1.23/-0.51, 316 -2.11/-1.90, 3162 -1.73/-0.57, 1e4 -1.82/-1.64 (FT BEATS V/B at all four;
+      BEATS SCR-A2 at 316 and 1e4, LEVEL at 100/3162); Sudakov FT LOSES to V/B at every D (+1.07, +1.18, +2.51, +4.03, +1.45)
+      and to SCR-A2 (+2.79, +1.32, +1.23, +0.85, +1.01); bulk vs V/B -0.13, -0.22, +1.29, +0.54, -1.33 (BEATS at 1e4: 2.8e-8
+      vs 6.0e-7). Deepest threshold log-MSE FT 0.142/0.0199/0.0472/0.0424 vs V/B 8.3/7.8/8.2/8.2 vs SCR 0.46/1.61/0.19/2.62;
+      Sudakov FT 3.45/3.34/3.73/2.68 vs V/B 0.12-0.29. D=1e3 at lr_scale 7.41 blew up again (val jump 11.5x, ends 7x above
+      its best, threshold exp +0.03): listed apart, rerun at 0.126 FA-ccin2p3-600dce4c per the design. Branch (a): FT BEATS
+      V/B on the Coulomb threshold; vs SCR-A2 pretraining adds 0.5-1.9 decades there. Sudakov: FT worst of the three (bias
+      +1.5..+1.9 decades). Deck talks/kit_reply_nov2026 frames back (25 pages, 0 errors, 0 overfull) @72d5709e9.'
   step_why:
     32:
       feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
