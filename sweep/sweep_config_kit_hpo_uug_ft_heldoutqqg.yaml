@@ -1,0 +1,60 @@
+# kit_benchmark step 34 (b), u u~ g (D575 part ii; the passed held-out qqg design's 'neither' branch): no clean fine-tune
+# from the A2 pretraining with every q q~ g process held out (dsave_parent_finale_kit_heldoutqqg_a2) beats A2 from
+# scratch (SCR-A2) on u u~ g: lr_scale 1 (lr 0.01251, SCR-A2's) blew up (26x val jump), its half-lr rerun too (95x at
+# eval 13/50, recovered only in the cooldown); read as is, collinear LEVEL +0.23, soft LOSES +1.78. The same fine-tune
+# search as step 36's u u~ g g one (sweep_config_kit_hpo_uugg_ft_heldoutqqg.yaml, design PASS 2026-11-27), on the u u~ g
+# pool: training.lr fixed at the parent's 0.00189 (HPO rule 4), so the step-34 arms sit at lr_scale 6.6 and 3.3, inside
+# fine_tune.lr_scale [0.1, 10]; layer_decay [0.75, 1.0], the rest of the template's space as it is.
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  request_gpus: 1
+  mem: 11G
+  cpus_per_task: 4
+  time: "01:00:00"
+paths: null
+sweep_name: kit_hpo_uug_ft_heldoutqqg
+base_config: ${PROJECT_DIR}/runs/data_saving/dsave_parent_finale_kit_heldoutqqg_a2
+n_trials: 16
+dyhpo:
+  surrogate: gp
+  n_candidates: 2000
+  objective_scale: auto
+  seed: 42
+  n_startup: 6
+  total_budget: 10000
+  waves: [6, 5, 5]
+fidelity_schedule:
+  t_steps: [1831]
+fixed_params:
+  data.source: recipes
+  data.processes_file: ${PROJECT_DIR}/sweep/kit_base/kit_A_ee_uug_me2_n100000_t8000_softpair.recipe.yaml
+  data.train_subsample: 'null'
+  data.eval_subsample: 'null'
+  data.memmap: 'false'
+  training.dtype: float64
+  training.heterosc_select: mu_mse
+  training.increment_steps: 'null'
+  evaluation.train_subsample: 2000
+  seed: 42
+  plot: 'true'
+  warm_start_idx: 'null'
+  fine_tune.pretrained_path: ${PROJECT_DIR}/runs/data_saving/dsave_parent_finale_kit_heldoutqqg_a2/models/model_run0_best.pt.gz
+  fine_tune.target_stats: own
+  fine_tune.offshell_stats: own
+  training.lr: 0.00189
+  training.optimizer: MuonAdamW
+  training.scheduler: WSD
+  training.wsd_cooldown_frac: 0.125
+  training.batchsize: 16384
+range_extension:
+  enabled: false
+search_space:
+- {name: fine_tune.lr_scale, type: float_log, low: 0.1, high: 10.0}
+- {name: fine_tune.layer_decay, type: float_uniform, low: 0.75, high: 1.0}
+- {name: training.muon_weight_decay, type: float_log, low: 1.0e-03, high: 0.3}
+- {name: training.regularization_lambda, type: float_log, low: 1.0e-10, high: 1.0e-06}
+- {name: training.cosanneal_warmup_frac, type: float_uniform, low: 0.05, high: 0.2}
+- {name: training.cosanneal_eta_min, type: float_log, low: 1.0e-10, high: 1.0e-07}
+- {name: ema, type: categorical, choices: ["false", "true"]}
+- {name: training.ema_decay, type: float_uniform, low: 0.9, high: 0.999}
