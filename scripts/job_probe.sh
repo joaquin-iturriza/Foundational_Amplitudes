@@ -13,6 +13,7 @@ cd "$PROJECT_DIR"
 echo "site=$CCORCH_SITE host=$(hostname) project=$PROJECT_DIR data=$DATA_DIR"
 python -c "import sys,torch;print(f\"python={sys.version.split()[0]} torch={torch.__version__} cuda={torch.cuda.is_available()} gpu={torch.cuda.get_device_name(0) if torch.cuda.is_available() else None}\")"
 # the attention kernel the model uses (xformers, CUDA only): a GPU it has no kernels for fails here, not in a trial
-python -c "import torch,xformers,xformers.ops as xo;q=torch.randn(1,64,8,16,device='cuda');print('xformers',xformers.__version__,'attention ok',tuple(xo.memory_efficient_attention(q,q,q).shape))" 2>&1 | tail -1
-# end marker (projects.toml end_markers): the supervisor sorts a COMPLETED run without one as broken
-echo RUN_DONE
+# RUN_DONE (projects.toml end_markers) only when it passed: printing it holds this script to it (marker_producers);
+# pipefail and the last 20 lines keep a failure's exit status and Traceback
+set -o pipefail
+python -c "import torch,xformers,xformers.ops as xo;q=torch.randn(1,64,8,16,device='cuda');print('xformers',xformers.__version__,'attention ok',tuple(xo.memory_efficient_attention(q,q,q).shape))" 2>&1 | tail -n 20 && echo RUN_DONE
