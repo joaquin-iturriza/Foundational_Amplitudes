@@ -35716,6 +35716,29 @@ entries:
       HPs that vanishes against the searched arm is reported as HP-dependent.'
     sources: 1/30 and 30 <- single-process from-scratch seed spread 1.1x-30x at fixed HPs (results.tex ~l.14493, quoted under
       D315), the passed step-37 design's bar; 7 <- t t~ V same-HP rerun spread 0.78-6.96 (sec:datasaving)
+    fix_at: '2026-11-27T13:32:38+00:00'
+    fix: 'Check 5 (not a repeat): the prior field says emission-scale transformers exist only as the kit_hpo_uug_T/uugg_T
+      searched trials and ''no emission-scale run at the factor''s inputs and HPs exists'', but omits the 8000-step protocol-A
+      pairs on the same question at shared base HPs (cosine, lr 0.0118605, 1e5, seed 42): emission-scale target without the
+      factor kit_A_ee_uug_me2_n100000_t8000 (FA-ccin2p3-f6b2ece9, dimensionless inputs, uncapped frames) bulk log-MSE 8.24e-4,
+      _t8000_softpair 1.09e-4, _t8000_softpair_gmax4 4.28e-4; uugg _t8000 2.27e-3, _softpair 1.97e-3, _softpair_gmax4 2.62e-3
+      (kit_fig_A.json, kit_fig_A_gmax4_*.json); against the factor at 8000 steps kit_A_ee_<p>_n100000_t8000_asym_cont 9.85e-7
+      (uug) and 6.58e-5 (uugg) (kit_fig_A_asym.json), i.e. factor/emission about 1/100 to 1/840 on uug and 1/30 to 1/40 on
+      uugg already, confounded by the frame cap (gmax4) or the softpair inputs. This is also the direct answer to Joaquin''s
+      D598 question ''Did we use emission scales for the kit transformer without asymptotic factors?'' and to the ''if they
+      are not there'' of D600. Fix: name these runs and numbers in prior, state what the new pair changes (frames_gamma_max=4
+      and dimensionless inputs on both arms, the factor''s searched HPs, 1831-step WSD) and why that matters (the 8000-step
+      emission runs'' bulk/limit losses were attributed to frame boosts that gmax4 caps, finding 2026-11-10 and step 18),
+      and use the 8000-step ratios as the expected effect in check. Minor, to state while redesigning: (a) the matched arm
+      sets target_physics_orders=false while the decided emission-scale target (results.tex l.4052) and the searched T arms
+      carry coupling orders; on one process at fixed alpha_s 0.118 the orders factor is a constant removed by standardization:
+      say so. (b) Outcome: say what an emission win (R>30) or a band result changes for the entry (e.g. whether the KIT package
+      keeps the factor models, or the same sweep for the factor per the feature rule), not only ''say so''. (c) The uugg factor
+      control fails the curve check (separation 4.1 nats in the last ~150 cooldown steps, kit_curves_hpo_uugg.json, finding
+      2026-11-14): state how its read is taken given that. Everything else checked holds: the pair differs only in target_physics_factor
+      true and no model.input_asym_factor (factor config.yaml on CC read: dimensionless_inputs true, gmax4, WSD, HPs equal
+      to hp1918/hp0798, HETEROSC, float64, seed 42); seeds per D315 with the 1.1x-30x spread at results.tex l.14545; bars
+      30 and 7 sourced (l.14545, l.9868); time 22 min per 1831 steps from the factor runs themselves; disk ~50 MB.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
