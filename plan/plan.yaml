@@ -50453,6 +50453,17 @@ entries:
       his test metrics (data/suprio_cond), D525''s question; 2 bootstrap sd <- measured, level_subsets.py (step 27''s rule);
       16 h <- measured: c_best''s V100 0.90 s/step x 60,840 (config header); 100 GPU-h <- CLAUDE.md budget, D566 names the
       work'
+    passed_at: '2026-11-27T19:14:30+00:00'
+    reviewer: 'Re-review after FIX: (1) data.level_file_sigma=shared at 264f7c8cf (experiment.py l.2451-2455, arm config l.60-61)
+      keeps c_best''s pooled sigma 3.786, so the per-process means are the one change, checked in the smoke log; (2) tools/cfg_diff.py
+      diff against trial_1860''s config.yaml lists 24 keys: the level_file/level_file_sigma change, runtime-filled keys, and
+      keys added since at their off values; (3) c_best eval-only re-score added for level_subsets; (4) CC 6.2 GB free, 2.1x
+      margin, runs placed on lxplus by site pick and lxplus disk read at submission. Measure: part (a) new-43 median bias^2
+      went 0.859 -> 0.300/0.159 with the 30-seed level file (step27_level_read.json); c_best 0.314, bias^2 share 0.87, level
+      network alone 0.096 (step26_tprop_read.json). Spread: same-seed retrain (part (a) ratio 1.88, rerun_spread_level.json),
+      plus an UNRESOLVED branch for the control''s spread. Searched: docs/results.tex level_file / level file / per-process
+      level / emission-scale with level / c_level, dead ends A-F, D564/D566. Minor: the fixed field still says the config
+      differs only in level_file; the measure field and the config also add level_file_sigma.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
