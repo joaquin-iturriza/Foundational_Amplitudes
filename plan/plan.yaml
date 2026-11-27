@@ -30091,7 +30091,7 @@ entries:
       - 'fails: exact-path comparison on CC'
   step_waits:
     '24': FA-ccin2p3-5819e2fe FA-ccin2p3-e5c41742 FA-ccin2p3-27013dea FA-ccin2p3-aca0bcaa FA-ccin2p3-2128f5f5
-    '32': FA-ccin2p3-b9d55720 FA-ccin2p3-96ce4464
+    '32': FA-ccin2p3-96ce4464
     '30': FA-ccin2p3-69541363 FA-ccin2p3-6f1a5dad FA-ccin2p3-ff4af2bc
   handoff:
     state: '2026-11-27 ~02:20 @e8ff91661. Step 20: SCR-A2 + V/B at all five D done on CC (10 runs, full steps, scored; finding
