@@ -30477,6 +30477,15 @@ entries:
       kit_curves jumps vs kit_zoom stability; kit_ttg work dir under DATA_DIR when TMPDIR unset, pipe exit not in finally,
       soft-check comment). D604 kit_zoom, kit_ttg, kit_hardps fa_ branch, job_kit ttg sqrts and kit_zoom.json committed @2262e99c3:
       redraw ''kit_zoom.py plot'' at this commit before captions.'
+  - at: '2026-11-27T14:41:12+00:00'
+    text: '2026-11-27 ~18:00 UTC. D604 redraw sent: tools/kit_zoom.py @0cf9efef0 adds kitzoom_paper_relmed, the draft''s KIT
+      median figure (kitvm_paper_median layout: u u~ g collinear, soft; t t~ one loop high energy in TeV, threshold; whole
+      hard_test strata, 5 bins a decade) with median |Delta| (Delta = pred/true - 1) in place of median log|M|^2; all 28 kitzoom
+      figures redrawn at that commit, captions check_caption OK (scratchpad kb16/caps.json). Deepest bin median |Delta|: u
+      u~ g collinear y 1.3e-7 factor 0.047, transformer 0.98, MLP log 0.40, MLP raw 1.0; soft x 1.3e-7 factor 0.12, transformer
+      1.0, MLP log 0.26, MLP raw 1.0; t t~ threshold beta 1.3e-4 factor 0.30, transformer 1.0, MLP log+thr 0.92, MLP raw 1.0;
+      t t~ 45 TeV factor 0.45, transformer 0.87, MLP log+thr 0.46, MLP raw 1.7e263 (off scale). ''Scaling plot'' read as the
+      draft''s median figure (its error-against-distance-to-singularity figure; the draft has no KIT training-size figure).'
   step_why:
     32:
       feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
