@@ -28741,7 +28741,7 @@ entries:
     withdrawn_why: 'D574: no more trainings for today''s reply; a pretrained held-out uug/uugg run is training'
   owner:
     agent: aaa71f1f2ab069880
-    state: working
+    state: closed
     since: '2026-11-27T14:31:56+00:00'
     state_at: '2026-11-27T14:52:37.222000+00:00'
     context: 121083
@@ -30534,40 +30534,46 @@ entries:
     '39': 'ccj_3a07615b7f4f (CC slurm 65001699, kit_ttg build; read by rerunning: site --timeout 14400 run --job --item kit_benchmark
       ccin2p3 FA -- python tools/kit_ttg.py build)'
   handoff:
-    state: '2026-11-27 ~17:30 UTC. D604 (Joaquin: kit_zoom figures with the draft''s models, curves and names; scaling plot
-      with median delta): tools/kit_zoom.py edited and collected (CC), 27 figures drawn in analysis/kit_benchmark/figs/zoom
-      and looked at, but the code is UNCOMMITTED: commits are blocked by the overdue repo-reviewer pillar; a repo-reviewer
-      was launched on the backlog (kit_zoom.py, kit_ttg.py, kit_hardps.py fa_ branch, job_kit.sh ttg sqrts). On its PASS:
-      commit those four by name, rerun ''kit_zoom.py plot'' (figures need committed code), write captions (template: scratchpad
-      kb15/caps.py of the previous owner, update arms to the draft''s: no emission arm, MLP raw added, ln, median |Delta|;
-      for relmed figures say ''median |Delta|, Delta = pred/true - 1''; off-scale entry defined), check_caption each, send
-      fam_relmed (the ''scaling plot'') first, then core/median/bulk/scan. Numbers in finding ~17:30. Step 38 matched emission
-      runs FA-ccin2p3-3f44d631 (uug), FA-ccin2p3-dfec7e79 (uugg) running (design PASS); on end: kit_zoom collect (emis_m arm;
-      not drawn in D604 figures: give it its own factor-vs-emission figure). Step 32: hung part 18 rerun FA-ccin2p3-7b95f8b0,
-      combine FA-ccin2p3-a8d68ffe repointed (afterok), wait on a8d68ffe. Step 39 (coordinator: run the 16-trial plain-arm
-      search, then the three arms at its best HPs): massive eikonal in wrappers._asym_terms committed @b0c667b8c with test;
-      tools/kit_ttg.py generator written (selftest OK); before building align with KIT: stratum names like KIT''s (str(float):
-      ''soft_x_1e-07_1e-06'', ''soft_x_0.0001_0.001''), hard strata 1e5 events (KIT''s size), full particle property dicts
-      as KIT metadata (Q, spin, T3, B, L, color, C2, mass), particle_names, singular_var text; then a CPU build job on CC
-      (MadGraph standalone), a probe of its time, then design + review (generation, the plain search config copied from the
-      uug plain search, three arms), kit_zoom FAMS/variables for fa_ee_ttg, DIAGRAMS_OF entry (''ee_ttbarg'' catalog sidecar)
-      if the base config uses diagrams. Steps 34/36 FT searches driving (pids 2752905 uug, 2497598 uugg); at their end requeue
-      failed trials with drive.py --retry-failed (EOS errors, run_trial fix @bea2d312d synced to lxplus). CC free disk was
-      9 GB at 16:00.'
-    decisions: 'Joaquin''s: D598, D600, D602, D604, D315, D575. Coordinator''s (not Joaquin''s): t t~ g HPs by a 16-trial
-      plain-arm search. Mine: massive eikonal instead of CDST''s spin-averaged massive dipole (negative on 3.2% of random
-      t t~ g phase space, 0.3% for the pair sum; a factor must be positive); D604 figures draw only the draft''s arms (tt
-      transformer = hp0131 as the draft), emission arms collected not drawn; |Delta| above 1e6 put on the axis edge hollow
-      (draft''s off-scale convention); ''scaling plot'' read as the family figures in median |Delta| since the draft has no
-      KIT training-size figure; the step-32 hung part rerun at the same seed (not a new seed); combine repointed by scontrol
-      update keeping its run id; ttg bulk = flat 3-body with KIT''s s_ij/s > 0.01 on the singular (t g, t~ g) pairs.'
+    state: '2026-11-27 ~16:50 UTC (owner aaa71f1f2ab069880). D604 done and sent: kit_zoom @0cf9efef0 (kitzoom_paper_relmed
+      = the draft''s median figure in median |Delta|; 28 kitzoom figures; captions scratchpad kb16/caps.json). Events E9800
+      (lxplus FT trials: hydra writing outputs/ on EOS for base-config trials; fixed sweep/run_trial.py @97e5a4836 + @dc2cb125e,
+      synced lxplus/CC) and E9801 (htc queue load, not the request) acked. E9802 uugg FT search: 16 trials, best hp1289 val
+      1.97e-4, curve good (sep 2.43, largest jump 2.4x; kit_hpo_uugg_ft_heldoutqqg.json @aa5d1f881); failed trials 8/12 requeued
+      (detach kit_hpo_uugg_ft_heldoutqqg_retry); trial_1289 copied lxplus->CC and KIT-scored FA-ccin2p3-a10cf427 RUN_DONE
+      (bulk log-MSE 8.11e-5 in its log); its kit_figures collect CPU job ccj_43e0754ef0a0 submitted: re-run the same command
+      to read the KITFIG json, merge into analysis/kit_benchmark/data/kit_fig_heldoutqqg.json, kit_readout --vs SCR-A2 (FA-ccin2p3-ff4af2bc)
+      uugg --slide10, R per family bar 1/7..7 (passed design 2026-11-27T11:56); a BEATS -> A2 scratch 16-trial search. If
+      a retried trial beats 1.97e-4 score it too. Step 38 DONE (finding ~16:40): factor beats matched emission everywhere
+      (R 1/37..1/2500), matched emission runs overfit (sep 34/59); figures kitzoom_emis_{relmed,mse}_ee_uug{,g}_me2 drawn
+      @d9f728fef, captions OK in scratchpad kb16/caps_emis.json, NOT yet sent to Joaquin (send them: answers D598/D600 ''asymptotic
+      factors vs emission scales''). Step 40 dropped (redraw done). Step 39 design PASS (reviewer, 2026-11-27 ~16:35; script
+      scratchpad kb16/design39.py): build CPU job ccj_3a07615b7f4f (CC 65001699, limit 4 h, target 1 h) of tools/kit_ttg.py
+      @52391359c -> $DATA_DIR/kit_like/fa_ee_ttg.h5; read by rerunning ''site --timeout 14400 run --job --item kit_benchmark
+      ccin2p3 FA -- python tools/kit_ttg.py build'' (check the bulk_train group time: >20 min -> cancel and split); then site
+      copy to lxplus (DATA_DIR kit_like/fa_ee_ttg.h5); smoke the factor arm 50 steps (job_kit.sh kit_fa_ee_ttg__me2 100000
+      50 A data.target_physics_factor=false data.target_physics_orders=false ++model.input_asym_factor=true ++model.net.frames_gamma_max=4
+      training.scheduler=WSD ++training.wsd_cooldown_frac=0.125 training.batchsize=16384 tag=smoke); then drive sweep/sweep_config_kit_hpo_ttg_plain.yaml
+      (--item kit_benchmark --disk-gb 0.1 --hours 0.55, target 16 x 0.55 h); then factor and emission arms at the best HPs
+      (limit 1:30, target 0.6 h) and the best trial scored (KIT_SCORE_DIR); then add RUNS[''fa_ee_ttg_me2''] + PROCS in tools/kit_zoom.py
+      (variables/FAMS/BULKV for fa_ee_ttg already @fd3d114ba) and draw. Note: submit_guard consumes the site pick quota on
+      a refused submit (site submit refusals for --disk-gb/dirty tree each cost a pick): use --allow-dirty (others'' untracked
+      analysis/transfer/data/*.npz) and --disk-gb on the first try; possibly a hook incident to raise.'
+    decisions: 'Joaquin''s: D598, D600, D602, D604, D315, D575, D428. Mine: ''scaling plot'' (D604) = the draft''s median
+      figure layout (kitvm_paper_median) with median |Delta|, whole strata (the draft has no KIT training-size figure); ttg
+      plain search in the factor runs'' setup (base = uug matched run config with dataset swapped) so each arm differs by
+      one switch, plain arm = the search''s best; ttg hard_train 5000 / hard_test 1e5 / bulk 2e5+2e5 as KIT (bulk_train 2e5
+      not KIT''s 1e6: 1e5 train + 1e5 val suffice); hydra output fix by overrides in run_trial (not a base-config edit); best
+      FT trial scored on CC (data there) after site copy.'
     ruled_out: CDST spin-averaged massive dipole as the ttg factor term (not positive).
-    running: FA-ccin2p3-3f44d631, FA-ccin2p3-dfec7e79 (step 38); FA-ccin2p3-7b95f8b0 -> FA-ccin2p3-a8d68ffe (step 32); FA-ccin2p3-ddd2e7a7
-      (step 33 combine); FT search drives pids 2752905, 2497598; repo-reviewer on the backlog.
-    files: tools/kit_zoom.py (uncommitted), tools/kit_ttg.py (uncommitted, new), tools/kit_hardps.py (uncommitted), scripts/job_kit.sh
-      (uncommitted), wrappers.py, tests/test_input_reps.py, sweep/run_trial.py, analysis/kit_benchmark/data/kit_zoom.json
-      (recollected, uncommitted), analysis/kit_benchmark/figs/zoom/
-    written: '2026-11-27T14:20:24+00:00'
+    running: 'ccj_3a07615b7f4f (ttg build, CC); ccj_43e0754ef0a0 (collect trial_1289); FA-lxplus-d5b580a2, FA-lxplus-3e5b78e2
+      (uugg FT retries via detach kit_hpo_uugg_ft_heldoutqqg_retry); uug FT drive (pid 2752905: trials 0,2,3 failed on EOS,
+      requeue with drive.py --config sweep/sweep_config_kit_hpo_uug_ft_heldoutqqg.yaml --item kit_benchmark --disk-gb 0.1
+      --hours 0.55 --retry-failed ''FA-lxplus-(1687de6e|6122eaa7|0d74eb88)'' at its end); FA-ccin2p3-7b95f8b0 -> a8d68ffe
+      (step 32); step 33 combine ddd2e7a7.'
+    files: tools/kit_zoom.py, tools/kit_ttg.py, tools/kit_hardps.py, sweep/run_trial.py, sweep/sweep_config_kit_hpo_ttg_plain.yaml,
+      sweep/kit_base/kit_A_fa_ee_ttg_me2_n100000_t1831_plain/, analysis/kit_benchmark/data/{kit_zoom.json,kit_curves_emis_matched.json,kit_hpo_uugg_ft_heldoutqqg.json},
+      analysis/kit_benchmark/figs/zoom/, scratchpad kb16/ (caps.json, caps_emis.json, design39.py)
+    written: '2026-11-27T15:24:41+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
