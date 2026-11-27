@@ -43647,6 +43647,15 @@ entries:
       trial_1860 HPs, 60,840 steps, 22 h limit, wall target 16 h) submitted in parallel: its training does not read the smoke
       read''s output; step 27''s failure branch cancels it. Attempt E FA-ccin2p3-d34fae85 still RUNNING (log only the Slurm
       header at 02:10, started 23:58, 4 h limit).'
+  - at: '2026-11-27T01:31:50+00:00'
+    text: '2026-11-27 02:30 step 27 (D395 smoke read) PASSED: held-out score of the tprop smoke FA-ccin2p3-583cc541 (pooled
+      RMSE of log|M|^2 2.69 after 50 steps, plumbing only). Same 5000 test events per process as c_best''s CSV (true_logm2
+      max diff 1e-5); log_factor(smoke) - log_factor(c_best) on g g > t b~ w- / g g > b t~ w+: mean -7.89/-7.96, min -9.479/-9.479
+      (= 2 log(Gamma_t/M_t) = -9.48, the Breit-Wigner floor at the pole), near-pole fifth -9.32/-9.33 vs rest -7.54/-7.62;
+      g g > t t~ h 0 (no internal top factor, as the tp meta gate showed). factor_split.py --pole-run on the smoke dir reads
+      the CSV (CPU job ccj_cd451a6943d0, exit 0). The run FA-ccin2p3-4ba88991 stands (RUNNING, iteration 1 at 02:24). Smoke
+      dir runs/zz_smoke/zz_smoke_sweep_config_llmcmp_c_tprop_64943393 left in place (its rm was refused by the permission
+      classifier; not in the way: 13 GB free).'
   step_waits:
     '25': FA-ccin2p3-d34fae85
     '26': FA-ccin2p3-4ba88991
