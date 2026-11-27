@@ -396,6 +396,47 @@ def test_asym_factor():
     assert np.allclose(got1, sorted(want + [3 * np.log(s / m2)] * 2), rtol=1e-6), got1
     assert sorted(mem1[on1[0]][-2:, 0].tolist()) == [2, 3] and int(_asym_terms(
         p1, tp, len(ev), Gt[tok_tt, 7], Gt[tok_tt, 2] >= 0, torch.tensor([0.0]), kap)[1].sum()) == 0
+    # e+ e- > t t~ g at tree: one massive-eikonal term (t, g, t~), positive on random phase space, equal to
+    # C_F s/2 (2 p_t.p_tb/(p_t.k p_tb.k) - m^2/(p_t.k)^2 - m^2/(p_tb.k)^2), growing as x^-2 when the gluon goes soft
+    # (the dead-cone bound in the collinear limit is not tested here)
+    tok_ttg = torch.tensor(global_encode(np.array([-11, 11, 6, -6, 21])))
+    m, rs = 0.1725, 1.0
+
+    def ttg(x1, x2, phi=0.3):
+        E = rs / 2
+        Et, Eb = x1 * E, x2 * E
+        Eg = rs - Et - Eb
+        pt, pb = np.sqrt(Et ** 2 - m * m), np.sqrt(Eb ** 2 - m * m)
+        c = (Eg ** 2 - pt ** 2 - pb ** 2) / (2 * pt * pb)
+        sn = np.sqrt(max(1 - c * c, 0.0))
+        R = np.eye(4)
+        R[1:, 1:] = [[np.cos(phi), 0, np.sin(phi)], [0, 1, 0], [-np.sin(phi), 0, np.cos(phi)]]
+        q = [np.array([Et, pt, 0, 0]), np.array([Eb, pb * c, pb * sn, 0]), np.array([Eg, -(pt + pb * c), -pb * sn, 0])]
+        return np.array([[E, 0, 0, E], [E, 0, 0, -E]] + [R @ v for v in q])
+
+    def eik(ev):
+        d = lambda a, b: a[0] * b[0] - a[1:] @ b[1:]
+        t, b, k = ev[2], ev[3], ev[4]
+        return 4 / 3 * rs ** 2 / 2 * (2 * d(t, b) / (d(t, k) * d(b, k)) - m * m / d(t, k) ** 2 - m * m / d(b, k) ** 2)
+
+    rng = np.random.default_rng(1)
+    n_ok = 0
+    for _ in range(400):
+        x1, x2 = rng.uniform(2 * m / rs, 1, 2)
+        ev = ttg(x1, x2)
+        if not np.isfinite(ev).all() or ev[4, 0] <= 0 or abs(np.linalg.norm(ev[4, 1:]) - ev[4, 0]) > 1e-9:
+            continue
+        ld, on, mem = terms(ev, tok_ttg, 0)
+        assert int(on.sum()) == 1 and tuple(mem[on[0]][0].tolist()) == (2, 4, 3), mem[on[0]]
+        assert np.isclose(float(ld[0, on[0]].exp()), eik(ev), rtol=1e-8)
+        n_ok += 1
+    assert n_ok > 50, n_ok
+    # soft: x_g = 2 - x1 - x2 -> 0 at fixed angle share; D x_g^2 -> constant
+    soft = [float(terms(ev, tok_ttg, 0)[0][0, terms(ev, tok_ttg, 0)[1][0]].exp()) * xg ** 2
+            for xg in (1e-2, 1e-4, 1e-6) for ev in [ttg(1 - 0.4 * xg, 1 - 0.6 * xg)]]
+    assert abs(soft[2] / soft[1] - 1) < 1e-3 and soft[2] > 0, soft
+    # no u u~ g dipole is changed, and no term on the one-loop t t~ beyond Coulomb and Sudakov (checked above)
+    assert int(terms(_uug(0.9, 0.8), tok_uug, 0)[1].sum()) == 2
     # a colourless heavy pair (Z Z) at one QCD loop: no Coulomb, no Sudakov
     assert int(terms(_tt(b, m=91.19), torch.tensor(global_encode(np.array([-11, 11, 23, 23]))), 1)[1].sum()) == 0
 

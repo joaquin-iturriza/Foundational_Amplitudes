@@ -197,8 +197,11 @@ def _asym_terms(p, ptr, n, cas, heavy, loops, sud_single=None):
     (a colourless heavy leg, W, Z, H, tau, has no QCD Coulomb or Sudakov factor: the target's loop count is L_QCD)
     Returns log D (B, T) in float64, on (B, T) (the term exists in that event) and members (T, 3): the legs whose
     coefficients set the term's coefficient, -1 padded. Every D is positive and Lorentz invariant.
-    shortcut: no heavy emitter (CDST's massive Q -> Q g dipole) and no initial-state coloured leg; no KIT target has
-    either (uug, uugg, tt virtual), add them when a t t~ g or a pp target is fit with the factor."""
+      massive  per gluon j and coloured final pair i < k with a heavy leg (t t~ g): the massive eikonal (soft limit; the
+               heavy emitter's collinear limit is mass-regulated), C_F s/2 (2 p_i.p_k/(p_i.p_j p_k.p_j) - m_i^2/(p_i.p_j)^2
+               - m_k^2/(p_k.p_j)^2), positive everywhere
+    shortcut: no initial-state coloured leg, and a light emitter with a heavy spectator gets only the massive eikonal (no
+    hard-collinear dipole); add them when a pp or a mixed light-heavy target (t b) is fit with the factor."""
     cnt = ptr[1:] - ptr[:-1]
     ar = torch.arange(n, device=p.device)
     valid = ar[None, :] < cnt[:, None]
@@ -222,10 +225,19 @@ def _asym_terms(p, ptr, n, cas, heavy, loops, sud_single=None):
     qg, gg = qrk[:, i] & glu[:, j], glu[:, i] & glu[:, j] & (i < j)
     V = torch.where(qg, _CF * (2 / wi - (1 + z)), _CA * (1 / wi + 1 / wj - 2 + z * (1 - z)))
     dip = (lg(V) + lg(s[:, None] / a), (qg | gg) & light[:, k], tri)
+    # massive emitter: per gluon j and coloured pair i < k with a heavy leg, the massive eikonal
+    # C_F s/2 (2 p_i.p_k/(p_i.p_j p_k.p_j) - m_i^2/(p_i.p_j)^2 - m_k^2/(p_k.p_j)^2) = -C_F s/2 (p_i/p_i.p_j - p_k/p_k.p_j)^2 >= 0
+    # (the difference is orthogonal to the null p_j, so spacelike); its collinear limit is mass-regulated (dead cone),
+    # so it carries the one divergence a heavy emitter has. CDST's spin-averaged Q -> Q g dipole is not used: it turns
+    # negative on ~3% of e+e- -> t t~ g phase space (0.3% for the pair's sum), and a factor must be positive
+    m2 = dots.diagonal(dim1=1, dim2=2).abs()
+    pij, pkj = dots[:, i, j].abs().clamp(min=1e-300), dots[:, k, j].abs().clamp(min=1e-300)
+    meik = _CF * s[:, None] / 2 * (2 * dots[:, i, k] / (pij * pkj) - m2[:, i] / pij ** 2 - m2[:, k] / pkj ** 2)
+    hpair = (c[:, i] > 0) & (c[:, k] > 0) & (hv[:, i] | hv[:, k]) & (i < k)
+    mem_ = (lg(meik), hpair & ((c[:, j] - _CA).abs() < 1e-3) & ~hv[:, j] & (meik > 0), tri)
     pr = torch.triu_indices(n, n, 1, device=dev)
     pr = pr[:, pr[0] >= 2]
     a, b = pr[0], pr[1]
-    m2 = dots.diagonal(dim1=1, dim2=2).abs()
     m = m2.sqrt()
     M2 = m2[:, a] + m2[:, b] + 2 * dots[:, a, b]
     beta = (((M2 - (m[:, a] + m[:, b]) ** 2) * (M2 - (m[:, a] - m[:, b]) ** 2)).abs().sqrt()
@@ -236,7 +248,7 @@ def _asym_terms(p, ptr, n, cas, heavy, loops, sud_single=None):
     leg = torch.arange(2, n, device=dev)
     sud = (2 * lg(lg(s[:, None] / m2[:, leg].clamp(min=1e-300))), hq[:, leg] & loop,
            torch.stack([leg, torch.full_like(leg, -1), torch.full_like(leg, -1)], 1))
-    parts = (dip, cou, sud)
+    parts = (dip, mem_, cou, sud)
     if sud_single is not None:
         parts += ((lg(lg(s[:, None] / m2[:, leg].clamp(min=1e-300))) + sud_single.to(P.dtype).reshape(()),) + sud[1:],)
     return tuple(torch.cat(x, dim=d) for x, d in zip(zip(*parts), (1, 1, 0)))
