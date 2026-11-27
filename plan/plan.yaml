@@ -30255,7 +30255,7 @@ entries:
       - 'beyond: KITSURR path fault, fix and rerun'
   step_waits:
     '30': FA-ccin2p3-69de38db,FA-ccin2p3-48701a30,FA-ccin2p3-1a1c9a47,FA-ccin2p3-b6abfc18
-    '29': FA-ccin2p3-69541363
+    '29': step 30's fine-tunes FA-ccin2p3-69de38db 48701a30 1a1c9a47 b6abfc18 (read with step 30)
     '32': FA-ccin2p3-ca8ba529
   handoff:
     state: '2026-11-27 ~08:55 @c39c066ff (synced; CC at 2081e2f87). Step 32 (slide 11 exact): MadEvent''s vector mode (any
