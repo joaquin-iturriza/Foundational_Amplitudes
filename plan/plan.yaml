@@ -45436,6 +45436,12 @@ entries:
       ends of the input, figs/c_tprop_factor_split_offshell_6_tbw.png). Costs: seen pooled RMSE 1.85x c_best''s, new-43 median
       MSE 1.163 vs 0.979, H+tau processes up. Next per the design''s feature rule: the factor is not judged at trial_1860''s
       HPs alone; the 8-trial DyHPO search for this arm, best against part (c)''s best, ~128 GPU-h > 100: Joaquin''s go.'
+  - at: '2026-11-27T19:07:47+00:00'
+    text: '2026-11-27 step 27 pending read closed: level_subsets.py --check-factor level_events_E_kin_s30.json on the full
+      arm CSV (runs/llmcmp_level_events_s30/trial_7201/llm_events_heldout.csv; CC CPU job ccj_76132d8ad315) exit 0: its assert
+      p99 |log_factor + b.(x-x0)/sx| < 1e-2 holds on every held-out event; subset numbers equal the local read (arm all/s_lo/s_hi
+      0.183/0.094/0.128). The output line with the p99 value was cut in the read (tail) and the re-read resubmitted the job
+      (65022645, unread, harmless).'
   step_waits: {}
   handoff:
     state: 'Steps 26 and 27 read and recorded (findings 2026-11-27). Step 27 (per-event level, D566): level YES (new-43 median
