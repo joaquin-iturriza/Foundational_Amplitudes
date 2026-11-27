@@ -30474,6 +30474,11 @@ entries:
       coll_tg (1-cos) 1e-7..1e-1 at x 0.2-0.4, threshold_beta 1e-4..1e-1; to align with KIT: stratum names as KIT''s (str
       of float: soft_x_1e-07_1e-06, soft_x_0.0001_0.001), N per hard stratum 1e5 (KIT), bulk_train 2e5, full particle property
       dicts (Q, spin, T3, B, L, color, C2) as KIT''s metadata.'
+  - at: '2026-11-27T14:21:50+00:00'
+    text: 'repo-reviewer PASS on the backlog (nits: wrappers hpair gives a gluon-top pair C_F in t t~ g g; two stability definitions,
+      kit_curves jumps vs kit_zoom stability; kit_ttg work dir under DATA_DIR when TMPDIR unset, pipe exit not in finally,
+      soft-check comment). D604 kit_zoom, kit_ttg, kit_hardps fa_ branch, job_kit ttg sqrts and kit_zoom.json committed @2262e99c3:
+      redraw ''kit_zoom.py plot'' at this commit before captions.'
   step_why:
     32:
       feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
