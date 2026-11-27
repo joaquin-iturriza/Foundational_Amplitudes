@@ -17,6 +17,7 @@ of level / zero), the axis' mean offset and its spread over probes, and every ex
 Also the loop-induced pools' offsets (names ending in _loop), against log((16 pi^2)^2) = 10.1, the factor a squared
 one-loop amplitude carries and no tree does (par. What a few labelled events fix, on Daniel's catalog).
     python3 analysis/catalog_v4/kshot_level.py   -> data/kshot_level.json, figs/kshot_level.{png,pdf}
+    python3 analysis/catalog_v4/kshot_level.py --paper   -> figs/paper_kshot_level (the draft's Sec. 5, from the JSON)
 The last line printed is the JSON of the numbers docs/results.tex quotes.
 """
 import glob, json, os, sys
@@ -133,5 +134,29 @@ def plot(res):
     ps.save(fig, os.path.join(HERE, "figs", "kshot_level"))
 
 
+def paper():
+    """The paper draft's version (Sec. 5, D591), from data/kshot_level.json: one row per held-out axis, ordered by the
+    zero-shot error, the error on the x axis, both pretraining seeds (circles, squares); rows as Fig. 14 right."""
+    import plot_style as ps
+    S = json.load(open(os.path.join(HERE, "data", "kshot_level.json")))["summary"]
+    names = {"H1": "new combinations", "H2": r"$2\to4$ families", "H2p5": r"$2\to5$", "H3": "physical top",
+             "H5": "one loop", "H6": r"$\alpha_s(M_Z)=0.13$", "H7E": r"$6$ to $20$ TeV", "H7c": r"$p_T>30$ GeV"}
+    order = sorted(AXES, key=lambda a: np.mean([S[r][a]["zero"] for r in RUNS]))
+    y = np.arange(len(order))
+    fig, ax = ps.figure()
+    series = (("zero", ps.C.blue, "zero-shot"), ("shr1", ps.C.green, "shrunk offset from 1 event"),
+              ("off16", ps.C.vermillion, "offset from 16 events"), ("floor", ps.C.grey, "floor: best offset per process"))
+    for run, mk, off in zip(RUNS, ("o", "s"), (-0.15, 0.15)):
+        first = run == RUNS[0]
+        for k, c, lab in series:
+            kw = dict(facecolors="none", edgecolors=c) if k == "floor" else dict(color=c)
+            ax.scatter([S[run][a][k] for a in order], y + off, marker=mk, label=lab if first else None, **kw)
+    ax.set_yticks(y); ax.set_yticklabels([names[a] for a in order])
+    ax.set_ylim(len(order) - 0.5, -0.5); ax.set_xscale("log")
+    ax.set_xlabel(r"MSE$(\log|\mathcal{M}|^2)$")
+    ps.legend(ax, "lower left")   # the lower rows sit at large errors: the lower left corner is clear
+    ps.save(fig, os.path.join(HERE, "figs", "paper_kshot_level"))
+
+
 if __name__ == "__main__":
-    main()
+    paper() if "--paper" in sys.argv else main()
