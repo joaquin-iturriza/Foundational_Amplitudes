@@ -30524,9 +30524,7 @@ entries:
       - 'no difference (mass regulates collinear): say so with numbers'
   step_waits:
     '32': FA-ccin2p3-a8d68ffe
-    '36': 'ccj_43e0754ef0a0 (kit_figures collect of trial_1289 as kit_A_ft_ee_uugg_me2_n100000_t1831_heldoutqqg_ftbest; re-read:
-      site --timeout 1800 run --job --allow-stale --item kit_benchmark ccin2p3 FA -- python tools/kit_figures.py collect runs/kit_hpo_uugg_ft_heldoutqqg/trial_1289=kit_A_ft_ee_uugg_me2_n100000_t1831_heldoutqqg_ftbest);
-      retry drive detach kit_hpo_uugg_ft_heldoutqqg_retry (FA-lxplus-d5b580a2, 3e5b78e2)'
+    '36': FA-lxplus-d5b580a2 FA-lxplus-3e5b78e2
     '34': detached drive.py kit_hpo_uug_ft_heldoutqqg (pid 2752905, DONE event)
     '39': 'ccj_3a07615b7f4f (CC slurm 65001699, kit_ttg build; read by rerunning: site --timeout 14400 run --job --item kit_benchmark
       ccin2p3 FA -- python tools/kit_ttg.py build)'
