@@ -28426,6 +28426,10 @@ entries:
       0.12200+-0.00100 pb at 2000 events vs exact 0.121861). 1e5-event surrogate jobs at KIT_MC_VEC=32 FA-ccin2p3-b45a89e1
       (uug, 6 h) 6360f286 (uugg, 12 h); on their end: wiring check sigma_hat/sigma vs E_exact[u], numbers, figure_exact with
       the tt part (12d32b55), differences from slide 11 first (vector_size 32 noted as a repair: it only batches the calls)'
+    33: 'Slide 11 exact, uugg (split from step 32, its own readout): 50 parts x 2000 events FA-ccin2p3-5e977b39''s sibling
+      array FA-ccin2p3-66fc3d1c (seeds 1001-1050, default card, 8 CPUs, target 1.5 h) -> surr_combine FA-ccin2p3-c5a3365b
+      into runs/kit/mc_madgraph; on its end: wiring check sigma_hat/sigma vs E_exact[u], eps2, numbers into the reply deck;
+      read the first parts'' serve stats against the 1.5 h estimate'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -30253,6 +30257,11 @@ entries:
       if:
       - 'wiring within 3 MC errors: numbers to Joaquin in the deck'
       - 'beyond: KITSURR path fault, fix and rerun'
+    33:
+      feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
+      if:
+      - 'wiring within 3 MC errors: numbers to Joaquin in the deck'
+      - 'beyond: KITSURR or combine fault, fix and rerun'
   step_waits:
     '30': FA-ccin2p3-69de38db,FA-ccin2p3-48701a30,FA-ccin2p3-1a1c9a47,FA-ccin2p3-b6abfc18
     '29': step 30's fine-tunes FA-ccin2p3-69de38db 48701a30 1a1c9a47 b6abfc18 (read with step 30)
