@@ -30029,6 +30029,15 @@ entries:
       --tmp=0 and KIT_MC_WORK_IN_DIR=1 (MadEvent work dir under runs/kit/mc_madgraph on /sps), both RUNNING; pending twins
       aacf91cc/706a0f6f cancelled. Disk: the exact runs 64915673/64915674 (same process, 1e5 events) MaxDiskWrite 1.52/1.54
       GB, an upper bound on the work dir''s peak; 3.1 GB for both vs 14 GB free on /sps/lpnhe.'
+  - at: '2026-11-27T01:03:05+00:00'
+    text: '2026-11-27 step-20 arms done (SCR-A2 and V/B at D=100..1e4, CC): all reached their step counts (5950 at D=100,
+      8500 else), KIT-scored. val mu-MSE (result.json val_mse_curve, 50 points) best / at point: SCR-A2 D100 6.26e-4/6, D316
+      2.64e-4/43, D1e3 5.84e-5/38, D3162 3.77e-5/29, D1e4 1.24e-5/46; V/B D100 3.03e-3/4, D316 1.50e-3/18, D1e3 2.25e-4/40,
+      D3162 7.05e-5/49, D1e4 5.40e-5/49. Largest one-point val jump (ratio): SCR-A2 4.2, 4.0, 25, 16, 13; V/B 2.0, 1.7, 77,
+      16, 15 (D order), each recovering to its best later: to be shown with the curves in the step-24 readout (5x blow-up
+      rule of the 02:27 design: decide there whether a rerun at half lr applies). Wall 6-14 min each: the 34 h estimate was
+      queue, the 2.4 h limits ~10x the need. Step 30: held-out smoke a3f7a776 clean; real parent FA-ccin2p3-69541363 submitted
+      (14 h); uug FT/SCR-A2 smokes ca04dd15/8c576040 from the smoke parent.'
   step_why:
     20:
       feeds: 'D570: FT vs SCR-A2 vs V/B on the KIT hard bins'
