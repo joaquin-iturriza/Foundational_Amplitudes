@@ -28417,8 +28417,6 @@ entries:
   - D572
   - D573
   next:
-    29: 'Slide-10 metrics: A2 and protocol B done (finding 2026-11-27 ~03:30, kit_readout --slide10); add the fine-tunes,
-      tt FT per D (step 24) and uug/uugg FT1/FT0.1 (step 30), when they end'
     30: 'Held-out qqg A2 (D575): smokes clean (1daf7f8f FT, 2f27a757 SCR-A2); SCR-A2 real arms FA-ccin2p3-6f1a5dad (uug) ff4af2bc
       (uugg) out 2026-11-27 ~03:00; at the parent FA-ccin2p3-69541363''s end FT1/FT0.1 per process (A_ft, KIT_LR_SCALE 1 /
       0.1, tags heldoutqqg_ft / heldoutqqg_ft01), then FT vs SCR-A2'
@@ -30272,11 +30270,6 @@ entries:
       and the fair one-loop slide-10 metrics against D_train kit_slide10_fairnlo_{bulk,threshold,sudakov}.png (step 29); KIT
       reply deck talks/kit_reply_nov2026/main.pdf slides 20 and 22-24.'
   step_why:
-    29:
-      feeds: Bakar's slide-10 metrics reported
-      if:
-      - 'metrics present for every fine-tune: table completed'
-      - 'a run lacks them: rescore it (REREAD)'
     30:
       feeds: 'Bakar: does the model get the limits without hard data when pretrained with the target family held out'
       if:
@@ -30294,7 +30287,6 @@ entries:
       - 'beyond: KITSURR or combine fault, fix and rerun'
   step_waits:
     '30': FA-ccin2p3-69de38db,FA-ccin2p3-48701a30,FA-ccin2p3-1a1c9a47,FA-ccin2p3-b6abfc18
-    '29': step 30's fine-tunes FA-ccin2p3-69de38db 48701a30 1a1c9a47 b6abfc18 (read with step 30)
     '32': FA-ccin2p3-a8d68ffe
     '33': FA-ccin2p3-c5a3365b
   handoff:
