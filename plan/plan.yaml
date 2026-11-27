@@ -45463,6 +45463,16 @@ entries:
       ONLY=heldout EVENTS=1, interactive V100). Next on the writer: read its check, fetch and commit level_file_B_diag_s30_phys.json,
       sync, D395 smoke of sweep/sweep_config_llmcmp_c_level.yaml, then on SMOKE_EXIT 0 the arm (trial 2860) + same-seed retrain
       (2861) at trial_1860''s HPs where site pick places them (lxplus at pick time), wall target 16 h.'
+  - at: '2026-11-27T19:37:19+00:00'
+    text: '2026-11-27 ~20:40 step 28: c_best re-score FA-ccin2p3-825c02e8 COMPLETED (held-out pooled RMSE 1.1782 over 1,390,000
+      events = c_best''s 1.178), E9881 acked; but its CSV again has no log_shat/q: tools/llm_score.py l.75 writes the x columns
+      only when data.dimensionless_inputs is off (XS), because the loader''s momenta are then per-event scaled and log s_hat
+      cannot be read back. Part (c) (and so the step 28 arm and retrain) has dimensionless_inputs on, so the design''s subset
+      read (level_subsets.py) has no input for any of the three runs. Gap to fix before the read (does not hold the writer,
+      smoke or runs, which do not read it): compute x in llm_score from the test pools'' raw momenta (memmap base cache mom/rs
+      at the test rows: q = Lmin - log s_hat is scale-free, log s_hat from rs), test it against the in-memory x on a dimensionful
+      run, then re-score c_best (REREAD=FA-ccin2p3-29ce8950) with it. The 0.5 GPU-h of 825c02e8 gave no new column (pooled
+      numbers only).'
   step_waits:
     '28': FA-ccin2p3-b07e2464 FA-ccin2p3-825c02e8
   handoff:
