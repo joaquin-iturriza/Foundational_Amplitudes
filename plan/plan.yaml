@@ -44265,7 +44265,20 @@ entries:
       is the paper draft''s LaTeX source he pasted (describes the input, chooses no encoding); 2026-11-10T02:08 is an uploaded
       file reference, no instruction on the input'
     blocks: nothing
-    blocks_steps: &id004 []
+    blocks_steps: []
+  - ask: 'GPU budget: ~128 GPU-h above 30 with no decision covering it. The Breit-Wigner factor in the target fixes the g
+      g > t b W pair (MSE 36.9 -> 1.16, held-out pooled RMSE 1.178 -> 0.824) but costs the trained processes (seen pooled
+      RMSE 1.85x) at part (c)''s HPs. Per the feature rule, its own 8-trial DyHPO search, best against best: go?'
+    at: '2026-11-27T18:46:39+00:00'
+    searched: 'CLAUDE.md GPU budget; site decisions --project FA: D564 names the extrapolation question, none approves a 128
+      GPU-h search; D576 (2026-11-26T15:25 ''widening is not doing much, so I wouldn''t spend the compute'') concerns width,
+      not this factor. Joaquin''s messages flagged by term: 2026-11-14T04:31 (a pasted paper template), 2026-11-13T06:45 (resampling
+      in a section), 2026-11-10T02:08 (an upload), 2026-10-27T02:14 and 2026-11-03T09:01 (slide corrections), 2026-11-04T18:44
+      (preprocessing exploration on catalog 4), 2026-10-21T22:53 (heteroscedastic loss wording), 2026-10-09T00:15 (synthetic-data
+      conventions): none is about this search or its cost'
+    blocks: step 29 only
+    blocks_steps: &id004
+    - 29
   owner:
     agent: a854c89e3ac6e6139
     state: closed
@@ -50481,12 +50494,17 @@ entries:
       diverges shouldn't wake you and it's owning agent up.
     said_at: '2026-11-24T10:33:58.174000+00:00'
     at: '2026-11-24T11:23:35+00:00'
-  ask: 'Scope: the off-shellness input of our latest setup: try another encoding of it, or keep it as is?'
-  waiting_since: '2026-11-27T01:10:50+00:00'
-  searched: 'CLAUDE.md (a repair never changes the inputs) and site decisions D564/D567: none chooses this encoding. 2026-11-14T04:31
-    is the paper draft''s LaTeX source he pasted (describes the input, chooses no encoding); 2026-11-10T02:08 is an uploaded
-    file reference, no instruction on the input'
-  blocks: nothing
+  ask: 'GPU budget: ~128 GPU-h above 30 with no decision covering it. The Breit-Wigner factor in the target fixes the g g
+    > t b W pair (MSE 36.9 -> 1.16, held-out pooled RMSE 1.178 -> 0.824) but costs the trained processes (seen pooled RMSE
+    1.85x) at part (c)''s HPs. Per the feature rule, its own 8-trial DyHPO search, best against best: go?'
+  waiting_since: '2026-11-27T18:46:39+00:00'
+  searched: 'CLAUDE.md GPU budget; site decisions --project FA: D564 names the extrapolation question, none approves a 128
+    GPU-h search; D576 (2026-11-26T15:25 ''widening is not doing much, so I wouldn''t spend the compute'') concerns width,
+    not this factor. Joaquin''s messages flagged by term: 2026-11-14T04:31 (a pasted paper template), 2026-11-13T06:45 (resampling
+    in a section), 2026-11-10T02:08 (an upload), 2026-10-27T02:14 and 2026-11-03T09:01 (slide corrections), 2026-11-04T18:44
+    (preprocessing exploration on catalog 4), 2026-10-21T22:53 (heteroscedastic loss wording), 2026-10-09T00:15 (synthetic-data
+    conventions): none is about this search or its cost'
+  blocks: step 29 only
   blocks_steps: *id004
 - id: lab_llm_trial
   title: Lab LLMs in place of some subagents
