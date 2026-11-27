@@ -30359,6 +30359,17 @@ entries:
       its best, threshold exp +0.03): listed apart, rerun at 0.126 FA-ccin2p3-600dce4c per the design. Branch (a): FT BEATS
       V/B on the Coulomb threshold; vs SCR-A2 pretraining adds 0.5-1.9 decades there. Sudakov: FT worst of the three (bias
       +1.5..+1.9 decades). Deck talks/kit_reply_nov2026 frames back (25 pages, 0 errors, 0 overfull) @72d5709e9.'
+  - at: '2026-11-27T11:59:59+00:00'
+    text: '2026-11-27 ~14:30. Step 35 complete. The D=1e3 fair one-loop fine-tune rerun at lr_scale 0.126 after the asym_sd
+      fix (FA-ccin2p3-600dce4c, tag fairnlo_ftfix_d1000_lsmed; head-map line shift -1.884 std 0.722) is clean (largest val
+      jump 1.6x, best 1.72e-5 at eval 48/50). vs V/B: threshold -2.05 BEATS, Sudakov +2.30 LOSES, bulk -0.33 LEVEL; vs SCR-A2:
+      threshold -0.89 BEATS, Sudakov +0.74 LEVEL, bulk -0.74 LEVEL. Deepest threshold log-MSE 0.0213 (exp -0.96, truth -1.02),
+      Sudakov 2.95 (bias +1.67), bulk 1.25e-6. So with the fixed fine-tunes the fair one-loop answer is: FT BEATS V/B on the
+      Coulomb threshold at every D (100, 316, 1e3 rerun, 3162, 1e4: -1.23, -2.11, -2.05, -1.73, -1.82) and BEATS SCR-A2 there
+      at 316, 1e3, 1e4 (LEVEL at 100, 3162); FT LOSES to V/B in the Sudakov stratum at every D. Figures kit_fairnlo, kit_slide10_fairnlo_*,
+      kit_curves_fairnlo redrawn with the rerun (hollow / dotted), deck talks/kit_reply_nov2026 rebuilt 25 pages 0 errors
+      0 overfull. Step 36 (uugg FT search, design PASS 2026-11-27 after one FIX: lr centre at the parent''s 0.00189, control
+      corrected to hp0798 of the plain search, A2 scratch search on a BEATS) driven by sweep/drive.py detached (pid 2497598).'
   step_why:
     32:
       feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
