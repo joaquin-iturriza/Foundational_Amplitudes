@@ -30198,6 +30198,17 @@ entries:
       rerun the 1e5 surr jobs at KIT_MC_VEC=0 (time from the serve''s per-call cost at the default batch, measured in 65066301''s
       serve stats). If the exact control also fails: the CC MadEvent install changed since 2026-11-26, read its Source/vector.inc
       and make_opts.'
+  - at: '2026-11-27T04:28:37+00:00'
+    text: '2026-11-27 ~05:45 @bf76c6ca1. Slide-11 diagnosis 2 (E9726/E9728 acked). Exact uug at MadEvent''s default card (nothing
+      appended to the run_card) FA-ccin2p3-df8e8413: passes the sqrt-s guard, sigma 0.122999 +- 0.00088 pb at 2000 events
+      vs 0.121861 (1e5 run), E[u]-1 -1.68e-3 +- 3.6e-5: the default card is sound on CC. The surrogate at the default card
+      65066301 died in the survey: MadEvent''s scalar DSIG sends one event per call, Predictor''s 1-event pool gave init_dataloader
+      a train batch size int(1/2)=0; fixed (a one-event call scored as two copies), rerun FA-ccin2p3-de4314f4 (2000 events,
+      KIT_MC_VEC=0, KIT_MC_KEEP=1). Vector-mode fault read in the kept exact vec-32 work dir (MG5_aMC 3.7.0): Source/vector.inc
+      WARP 32 VECSIZE_MEMMAX 32, run_card.inc EBEAM 500/500, G1 log ''Set CM energy to 1000.00'', yet the integral is 7.4e4
+      pb and events at 1.1035 GeV (as if sqrt(x1 x2 s) with x1 x2 ~ 1.22e-6, not checked in the code): MadEvent''s vector
+      path generates the points wrong for lpp=0 here; not our code. Bench of the one-event call cost (ccj_fc59b9eb5e95) submitted:
+      the 1e5 jobs'' time comes from it and de4314f4''s serve stats (one call per phase-space point at the default card).'
   step_why:
     29:
       feeds: Bakar's slide-10 metrics reported
