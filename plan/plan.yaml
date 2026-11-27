@@ -17469,6 +17469,20 @@ entries:
     outcome: 'yes: registry row with a numeric slurm id, poll reaches COMPLETED, logs show cuda=True on a V100 -> document
       the verb, short evaluations default to it via site pick. no: whichever step fails is fixed and the probe rerun.'
     sources: no thresholds
+    fix_at: '2026-11-27T00:01:43+00:00'
+    fix: 'Check 4 (outcome for yes and no) and check 6 (answers the question): the question asks whether the interactive run
+      is registered, gated and read by poll, logs AND the supervisor like a batch run, and the measure lists the gate''s CCORCH_GPU
+      record, but the yes outcome only names the registry row, poll reaching COMPLETED and cuda=True in the log. A yes could
+      be declared with the gate and the supervisor never checked, which is the ''done claimed from intent, not the live path''
+      failure this entry diagnosed (finding 2026-11-24, R5). Fix: make yes also require (a) the gate''s record of this run
+      in the ledger gpu_window, charged its own limit (10 min x 1 GPU), and (b) the running supervisor''s sort of its end
+      as finished clean (its ack note naming the run and the deciding log line, no RUN event), within one supervisor pass
+      (20 min) after COMPLETED; and make no name what happens if only the gate or the supervisor misses (fix that step, rerun
+      the probe). Also the yes consequence ''short evaluations default to it via site pick'' is already coded (~/.local/bin/site
+      interactive_pick, INTERACTIVE_MAX_GPUH, lines 2225-2292): say it is already in place and that the probe is what makes
+      it usable, rather than listing it as work a yes unlocks. Everything else passes: one 10-min job_probe.sh on one V100
+      is the smallest test of a new launch path (D395 smoke; CLAUDE.md infrastructure rule), no control or seeds needed for
+      a pass/fail check, no thresholds, no prior interactive run in site runs and none in results.tex.'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
