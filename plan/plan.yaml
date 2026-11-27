@@ -17492,6 +17492,32 @@ entries:
       it usable, rather than listing it as work a yes unlocks. Everything else passes: one 10-min job_probe.sh on one V100
       is the smallest test of a new launch path (D395 smoke; CLAUDE.md infrastructure rule), no control or seeds needed for
       a pass/fail check, no thresholds, no prior interactive run in site runs and none in results.tex.'
+  - at: '2026-11-27T00:02:34+00:00'
+    question: Does 'site submit ccin2p3 FA <job> --interactive' (detached srun on gpu_v100_interactive through the site gate)
+      register a run that the gate charges and that poll, logs and the supervisor read like a batch run? (D589; Joaquin 2026-11-26
+      'Can't you use an interactive gpu session to do the evaluations?')
+    prior: 'scripts/submit_interactive.sh (removed a0367ad38): two 2-minute evaluations ran on gpu_v100_interactive via nohup
+      srun after 2 h in the batch queue, outside the registry, item and gate. No prior interactive mode of the site tool (grep
+      interactive in ~/.local/bin/site: only ''site shell --gpu'' tty). results.tex: none found (searched interactive, srun).
+      site pick''s interactive default (interactive_pick, INTERACTIVE_MAX_GPUH in ~/.local/bin/site) is already coded and
+      printed ''pick: ccin2p3 (interactive)'' for --jobs 1 --hours 0.2 on 2026-11-27 (8 free GPUs, batch wait ~9.3 h); this
+      probe is what makes it usable.'
+    measure: Registry row for the run (site runs --id) with a numeric sched_id; site poll states from SUBMITTED to RUNNING/COMPLETED;
+      site logs prints the probe's site= and torch/cuda lines; the gate's CCORCH_GPU record of this submission in the ledger
+      gpu_window; the supervisor's sorting of the run's end (ack note or event).
+    check: 'Infrastructure test, no training: scripts/job_probe.sh is the repo''s infrastructure probe (CLAUDE.md: test infrastructure
+      with job_probe.sh); its log lines (site=, cuda=True gpu=Tesla V100) are what a batch probe prints, so the same lines
+      in the interactive log show the job ran on a GPU node.'
+    fixed: scripts/job_probe.sh at trunk HEAD, its own header (10 min, 1 CPU, 1 GPU), CC's site flags (--gpus=1, --mem=32G,
+      qos gpu, account lpnhe), only the partition replaced by gpu_v100_interactive.
+    control: 'none needed: pass/fail infrastructure check; the batch route is the same code path minus the srun launch'
+    seeds: one probe
+    outcome: 'yes, all of: registry row with a numeric slurm id; the gate''s record of this submission in gpu_window charged
+      its own limit (10 min x 1 GPU = 0.17 GPU-h); poll reaches COMPLETED; logs show cuda=True on a V100; the running supervisor
+      sorts the end as finished clean within one pass (20 min) after COMPLETED, with no RUN event -> the verb is documented
+      and reported usable. no: whichever of these misses (registration, gate record, poll, log, supervisor sorting) is fixed
+      in the site tool or gate and the probe rerun.'
+    sources: 0.17 GPU-h <- job_probe.sh's own --time=00:10:00 x 1 GPU; 20 min <- the supervisor's pass interval
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
