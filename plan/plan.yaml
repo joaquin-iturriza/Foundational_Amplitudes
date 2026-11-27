@@ -30004,6 +30004,25 @@ entries:
       (25 processes incl. kit_ee_tt__born__hard), git 4c14bc47. Fix: run the prebuild job for that recipe on CC-IN2P3 (prebuild_recipes.sh
       with the recipe spec) so all 25 train/val caches exist, then resubmit the smoke. DeepSeek triage did not answer; cause
       read by hand from the whole log (66 lines).'
+  - at: '2026-11-27T00:25:05+00:00'
+    text: '2026-11-27 ~01:25 @658004570. (1) E9620: CC lacked the heldout-qqg recipe''s pools (27 of 75 to build; e.g. ee_uu
+      train had a 1000-event pool). Prebuild on CC: first two attempts refused by prebuild_recipes.py''s disk floors (min-free
+      20 GB, DISK_LOW 16.5 GB; /sps 15.1 GB free, 0.4 GB to write): rerun FA-ccin2p3-bd423f39 with --min-free-gb 5 --disk-low-gb
+      5 --disk-low-frac 0.001, RUNNING; smoke FA-ccin2p3-a3f7a776 (tag kit_heldoutqqg_a2_smoke2) chained afterok. CC CPU stall
+      found: idle htc nodes (47, 112+ CPUs) report TMP_DISK 0 and CC''s default job asks MinTmpDisk 50 GB, so 32-48 CPU htc
+      jobs sit on Resources for hours; with --hdr=--tmp=0 the prebuild started at once. The slide-11 tree jobs FA-ccin2p3-aacf91cc/706a0f6f
+      (MadEvent work dir in TMPDIR, so not moved) still PENDING on that. (2) Protocol-B smoke FA-ccin2p3-58bc2125 refused
+      at init_data by datagen.mixed_generation (train/val pipeline versions differ, z 22.8): a wrong refusal, KIT pools are
+      slices of KIT''s fixed file and the __hard roles mix bulk and hard rows in different shares by design. Fix 658004570
+      (skip KIT pools; tests/test_mixed_generation.py). Resmoke FA-ccin2p3-e3998315 clean through training, sigma stage and
+      kit_predict scoring (50 steps: bulk log-MSE 3.6e-5, threshold exponent pred -0.995 vs truth -1.016). Six protocol-B
+      runs submitted (step 31): B/B_bulk for uug 20f0e184/5a47d217, uugg 6ce1e90c/7bb05caf, tt 77c0851e/c72af479, 3000 steps,
+      tag a2B, limit 1:30. (3) Step 20: SCR-A2 and V/B at D=100,316,1e3,3162,1e4 on CC (10 runs: scra2 09f0affd, 6bb1ca05,
+      f8e9445b, 49baf8df, e7e95e15; vb 89c9bf31, ec020447, 58dc86ef, 0db338e9, 9478d077), base config the smoke parent runs/data_saving/dsave_parent_finale_kit_fairnlo_a2s_smoke
+      (the real parent is on lxplus, down); it differs from the real parent''s only in training.iterations (overridden by
+      the arm''s steps) and save_model_at_steps, set to the real parent''s [56000] (wsd_cooldown_start(64000, 1/8)); commands
+      = fairnlo_arms.py lines 2-3 + that override, limits 3:00 / 1:15. site pick: CC 1 at once, ~34 h for the batch. Item
+      estimate recorded 85 GPU-h (D575 names all of it, under 100).'
   step_why:
     20:
       feeds: 'D570: FT vs SCR-A2 vs V/B on the KIT hard bins'
