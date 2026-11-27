@@ -16,10 +16,12 @@ mean relative error <|10^D - 1|> = <|pred - true| / true>, unweighted (the large
     energy share z in [0.33, 0.37], q->qg collinear at the collinear gluon's x in [0.25, 0.35], soft at the softest
     gluon's min_i s_ig/(s x) in [0.14, 0.17]. t t~ has no second divergence variable (at fixed beta sqrt s is fixed,
     at high sqrt s beta = 1): its families keep every event.
-(c) Every error drawn is the mean relative error.
-Arms: the asymptotic factor, the transformer on the emission-scale target (target_physics_factor, dim_ref qperp), the
-deck's transformer (plain target; on t t~ the deck's transformer is the emission-scale one), the MLP on log invariants
-(our reruns, seeds 0-2: median over seeds of each per-seed number).
+(c) Every error is drawn as the median and the mean of |Delta|, Delta = pred/true - 1, and as MSE(ln), the draft's
+    natural log (MSE(ln) = ln(10)^2 MSE(D)); medians of log|M|^2 in ln too.
+Drawn arms (D604): the draft's KIT figures' (kit_vs_mlp paper figures, names and styles from kit_figures.MODELS):
+transformer + asymptotic factor, transformer (uug hp1918, uugg hp0798, t t~ hp0131), the MLP on log invariants (t t~:
+plus log(s_tt - 4 m_t^2)) and on raw invariants (our reruns, seeds 0-2: median over seeds of each per-seed number).
+Collected, not drawn: the emission-scale transformers (searched, and at the factor's HPs: steps 37/38).
 """
 import argparse
 import json
@@ -35,19 +37,23 @@ DATA = os.path.join(ROOT, "analysis/kit_benchmark/data")
 OUT = os.path.join(DATA, "kit_zoom.json")
 PROCS = ["ee_uug_me2", "ee_uugg_me2", "ee_tt_virt_finite"]
 MLP = "runs/kit_mlp/kit_A_{p}_n100000_t14400_mlpmlp_s{s}"
+MLPR = "runs/kit_mlp/kit_A_{p}_n100000_t14400_mlpraw_s{s}"
 RUNS = {"ee_uug_me2": {"factor": ["runs/kit/kit_A_ee_uug_me2_n100000_t1831_hpo_asym_cont"],
                        "emission": ["runs/kit_hpo_uug_T/trial_1493"],
                        "emis_m": ["runs/kit/kit_A_ee_uug_me2_n100000_t1831_hpo_emis_matched"],
                        "scratch": ["runs/kit_hpo_uug_plain/trial_1918"],
-                       "MLP log": [MLP.format(p="ee_uug_me2", s=s) for s in range(3)]},
+                       "MLP log": [MLP.format(p="ee_uug_me2", s=s) for s in range(3)],
+                       "MLP raw": [MLPR.format(p="ee_uug_me2", s=s) for s in range(3)]},
         "ee_uugg_me2": {"factor": ["runs/kit/kit_A_ee_uugg_me2_n100000_t1831_hpo_asym_cont"],
                         "emission": ["runs/kit_hpo_uugg_T/trial_1196"],
                         "emis_m": ["runs/kit/kit_A_ee_uugg_me2_n100000_t1831_hpo_emis_matched"],
                         "scratch": ["runs/kit_hpo_uugg_plain/trial_0798"],
-                        "MLP log": [MLP.format(p="ee_uugg_me2", s=s) for s in range(3)]},
+                        "MLP log": [MLP.format(p="ee_uugg_me2", s=s) for s in range(3)],
+                        "MLP raw": [MLPR.format(p="ee_uugg_me2", s=s) for s in range(3)]},
         "ee_tt_virt_finite": {"factor": ["runs/kit/kit_A_ee_tt_virt_finite_n100000_t1831_hpo_asym_cont"],
-                              "emission": ["runs/kit_hpo_ttvirt_thr/trial_0131"],
-                              "MLP thr": [MLP.format(p="ee_tt_virt_finite", s=s) for s in range(3)]}}
+                              "scratch": ["runs/kit_hpo_ttvirt_thr/trial_0131"],
+                              "MLP thr": [MLP.format(p="ee_tt_virt_finite", s=s) for s in range(3)],
+                              "MLP raw": [MLPR.format(p="ee_tt_virt_finite", s=s) for s in range(3)]}}
 # family -> (singular variable, other variable, its band)
 FAMS = {"ee_uug": {"coll_y": ("y", "x", (0.45, 0.55)), "soft_x": ("x", "a", (0.28, 0.32))},
         "ee_uugg": {"coll_gg_y": ("ygg", "z", (0.33, 0.37)), "coll_qg_y": ("yqg", "xg", (0.25, 0.35)),
@@ -94,7 +100,7 @@ def binned(v, t, preds, lo=None):
     lv = np.log10(v)
     e = np.arange(np.floor(lv.min() * PD) / PD, lv.max() + 1.0 / PD, 1.0 / PD)
     i = np.digitize(lv, e) - 1
-    r = {"lo": [], "hi": [], "x": [], "truth": [], "arms": {a: [{"pred": [], "mse": [], "rel": [], "n": []} for _ in P]
+    r = {"lo": [], "hi": [], "x": [], "truth": [], "arms": {a: [{"pred": [], "mse": [], "rel": [], "relmed": [], "n": []} for _ in P]
                                                              for a, P in preds.items()}}
     for b in range(len(e) - 1):
         m = i == b
@@ -107,7 +113,7 @@ def binned(v, t, preds, lo=None):
                 M = measures(q[m] - t[m])
                 o = r["arms"][a][j]
                 o["pred"].append(float(np.median(q[m]))); o["mse"].append(M["mse"]); o["rel"].append(M["rel"])
-                o["n"].append(M["n"])
+                o["relmed"].append(M["relmed"]); o["n"].append(M["n"])
     return r
 out = {}
 for proc, arms in RUNS.items():
@@ -170,7 +176,7 @@ for proc, arms in RUNS.items():
                 e = np.linspace(*np.quantile(w, [0.01, 0.99]), 9)
                 i = np.clip(np.digitize(w, e) - 1, 0, 7)
                 sc = o["fams"][fam]["scan"] = {"var": ov, "deep": [float(x[d].min()), float(x[d].max())], "x": [], "n": [],
-                                               "arms": {a: [{"mse": [], "rel": []} for _ in P] for a, P in ph.items()}}
+                                               "arms": {a: [{"mse": [], "rel": [], "relmed": []} for _ in P] for a, P in ph.items()}}
                 for b in range(8):
                     mb = i == b
                     if mb.sum() < NMIN:
@@ -179,7 +185,7 @@ for proc, arms in RUNS.items():
                     for a, P in ph.items():
                         for j, q in enumerate(P):
                             M = measures(q[d][mb] - th[d][mb])
-                            sc["arms"][a][j]["mse"].append(M["mse"]); sc["arms"][a][j]["rel"].append(M["rel"])
+                            sc["arms"][a][j]["mse"].append(M["mse"]); sc["arms"][a][j]["rel"].append(M["rel"]); sc["arms"][a][j]["relmed"].append(M["relmed"])
 print("KITZOOM " + json.dumps(out))
 '''
 
@@ -204,11 +210,17 @@ VLAB = {"x": r"soft gluon $x=2E_g/\sqrt{s}$", "y": r"collinear $y=s_{qg}/s$",
         "a": r"gluon angle $\min_i s_{ig}/(s\,x)$", "z": r"gluon energy share $z=E_{\rm soft}/(E_{\rm soft}+E_{\rm hard})$",
         "xg": r"collinear gluon $x_g=2E_g/\sqrt{s}$"}
 VLAB_UUG = dict(VLAB, a=r"gluon angle $y/x$, $y=\min s_{qg}/s$", x=r"gluon energy $x=2E_g/\sqrt{s}$")
-MEAS = {"rel": r"mean $|\mathcal{M}^2_{\rm pred}-\mathcal{M}^2_{\rm true}|/\mathcal{M}^2_{\rm true}$",
-        "mse": r"MSE$(\log_{10}|\mathcal{M}|^2)$"}
-MEAS_TT = {"rel": r"mean $|V_{\rm pred}-V_{\rm true}|/|V_{\rm true}|$", "mse": r"MSE$(\log_{10}|V|)$"}
+# the draft's natural log (Sec. 7, kit_vs_mlp paper figures): MSE(ln) = ln(10)^2 MSE(log10), medians ln(10) log10
+LN = float(np.log(10))
+SCALE = {"rel": 1.0, "relmed": 1.0, "mse": LN ** 2}
+MEAS = {"relmed": r"median $|\Delta|$, $\Delta=|\mathcal{M}|^2_{\rm pred}/|\mathcal{M}|^2_{\rm true}-1$",
+        "rel": r"mean $|\Delta|$, $\Delta=|\mathcal{M}|^2_{\rm pred}/|\mathcal{M}|^2_{\rm true}-1$",
+        "mse": r"MSE$(\log|\mathcal{M}|^2)$"}
+MEAS_TT = {"relmed": r"median $|\Delta|$, $\Delta=V_{\rm pred}/V_{\rm true}-1$",
+           "rel": r"mean $|\Delta|$, $\Delta=V_{\rm pred}/V_{\rm true}-1$", "mse": r"MSE$(\log|V|)$"}
 CUT = "divergence-free cut"
-ORDER = ["factor", "emis_m", "emission", "scratch", "MLP log", "MLP thr"]
+# the draft's arms in its legend order (kit_vs_mlp.PAPER_ORDER), D604: the emission-scale arms are collected, not drawn
+ORDER = ["factor", "scratch", "MLP log", "MLP thr", "MLP raw"]
 
 
 def _arms(p):
@@ -236,7 +248,7 @@ def plot(figs):
     import plot_style as ps
     from matplotlib.ticker import NullFormatter
     from tools.kit_figures import XLAB, model_style
-    from tools.kit_vs_mlp import MED_LAB, PROCESS, _grid, _legend
+    from tools.kit_vs_mlp import PROCESS, _grid, _legend
     os.makedirs(figs, exist_ok=True)
     d = json.load(open(OUT))
     written = []
@@ -261,7 +273,7 @@ def plot(figs):
             for v in vs:
                 b = o["bulk_bins"][v]
                 cut = o["cuts"][v][1]
-                rows.append((b["x"], {"sty": sty, "y": {a: _seedmed(r, m) for a, r in b["arms"].items()}},
+                rows.append((b["x"], {"sty": sty, "y": {a: SCALE[m] * _seedmed(r, m) for a, r in b["arms"].items()}},
                              lambda ax, cut=cut: ax.axvline(cut, color="0.5", ls=":", label=CUT)))
             _panels(ps, axs, rows, lambda ax, it=iter(vs): vl[next(it)], ylab, PROCESS[p])
             _legend(axs, spare, PROCESS[p], (0, "upper left"))
@@ -271,7 +283,7 @@ def plot(figs):
             rows = []
             for f in fams:
                 b = o["fams"][f][key(f)]
-                ys = {a: _seedmed(r, m) for a, r in b["arms"].items()}
+                ys = {a: SCALE[m] * _seedmed(r, m) for a, r in b["arms"].items()}
                 rows.append((b["x"], {"sty": sty, "y": ys}, None))
                 for a, y in ys.items():
                     print(f"  {m.upper()} {p} {f} {key(f)} {a}: " + " ".join(f"{x:.2g}:{v:.3g}" for x, v in zip(b["x"], y)))
@@ -285,7 +297,7 @@ def plot(figs):
                 rows = []
                 for f in sf:
                     sc = o["fams"][f]["scan"]
-                    ys = {a: _seedmed(r, m) for a, r in sc["arms"].items()}
+                    ys = {a: SCALE[m] * _seedmed(r, m) for a, r in sc["arms"].items()}
                     rows.append((sc["x"], {"sty": sty, "y": ys}, None))
                     for a, y in ys.items():
                         print(f"  SCAN {m} {p} {f} deepest {sc['deep'][0]:.1e}-{sc['deep'][1]:.1e} vs {sc['var']} {a}: "
@@ -300,12 +312,12 @@ def plot(figs):
             for ax, f in zip(axs, fams):
                 b = o["fams"][f][key(f)]
                 name, c, _, ls = model_style("truth")
-                ax.plot(b["x"], b["truth"], color=c, ls=ls, label=name)
+                ax.plot(b["x"], LN * np.asarray(b["truth"]), color=c, ls=ls, label=name)
                 for a, (name, c, mk, ls) in sty.items():
                     if a in b["arms"]:
-                        ax.plot(b["x"], _seedmed(b["arms"][a], "pred"), color=c, marker=mk, ls=ls, label=name)
+                        ax.plot(b["x"], LN * _seedmed(b["arms"][a], "pred"), color=c, marker=mk, ls=ls, label=name)
                 ax.set_xscale("log"); ax.xaxis.set_minor_formatter(NullFormatter())
-                ax.set_xlabel(XLAB.get(f, f)); ax.set_ylabel(MED_LAB)
+                ax.set_xlabel(XLAB.get(f, f)); ax.set_ylabel(r"median $\log|\mathcal{M}|^2$")
                 ps.process_label(ax, PROCESS[p], loc="upper right")
             _legend(axs, spare, PROCESS[p], (0, "lower left"))
             written.append(ps.save(fig, os.path.join(figs, f"kitzoom_median_{p}")))
@@ -313,11 +325,11 @@ def plot(figs):
     fig, (a1, a2) = ps.figure(ncols=2)
     for k in ORDER:
         name, c, mk, _ = model_style(k)
-        for ax, m in ((a1, "rel"), (a2, "mse")):
-            pts = [(i, _seedmed(d[p]["core"]["arms"][k], m)) for i, p in enumerate(PROCS) if k in d[p]["core"]["arms"]]
+        for ax, m in ((a1, "relmed"), (a2, "mse")):
+            pts = [(i, SCALE[m] * _seedmed(d[p]["core"]["arms"][k], m)) for i, p in enumerate(PROCS) if k in d[p]["core"]["arms"]]
             if pts:
                 ax.plot(*zip(*pts), ls="", color=c, marker=mk, label=name)
-    for ax, lab in ((a1, "mean relative error"), (a2, r"MSE$(\log_{10}|\mathcal{M}|^2)$")):
+    for ax, lab in ((a1, MEAS["relmed"]), (a2, MEAS["mse"])):
         ax.set_yscale("log"); ax.set_xticks(range(len(PROCS)))
         ax.set_xticklabels([r"$u\bar ug$", r"$u\bar ugg$", r"$t\bar t$ 1L"]); ax.set_xlim(-0.5, len(PROCS) - 0.5)
         ax.set_ylabel(lab)
