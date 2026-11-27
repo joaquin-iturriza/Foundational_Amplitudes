@@ -30390,7 +30390,7 @@ entries:
     '33': FA-ccin2p3-ddd2e7a7
     '34': FA-ccin2p3-5b8a7e13
     '35': FA-ccin2p3-600dce4c
-    '36': a design-reviewer (aae39678ae51e5674) on the uugg FT search design
+    '36': detached drive.py kit_hpo_uugg_ft_heldoutqqg (pid 2497598, DONE event)
   handoff:
     state: '2026-11-27 ~14:55 @0553d1e06. Step 34''s open check settled: a bug, not transfer. model.input_asym_factor''s asym_sd
       (readout unit AND output divisor) was overwritten by the parent''s at the fine-tune load, and the target_stats=own map
