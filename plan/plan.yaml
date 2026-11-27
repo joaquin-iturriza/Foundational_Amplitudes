@@ -54493,7 +54493,7 @@ entries:
   question: On the ladder study's one-loop probes e+e- -> d d~ (ee_dd_nlo) and e+e- -> b b~ (ee_bb_nlo), how do the predicted
     distributions of |M|^2 and of the phase-space variables compare with the true ones, and does a relative error measure
     tell the same story as MSE(log|M|^2)?
-  status: running
+  status: done
   quotes:
   - said_at: '2026-11-27T12:55:21.528000+00:00'
     text: "I need you to do a bunch of things. \n\nPlease tell me how what we are doing is different or new for maitre's stuff\
@@ -54549,3 +54549,4 @@ entries:
   step_waits:
     '1': a reviewer
     '2': a reviewer
+  writeup: bdfa6fcf9
