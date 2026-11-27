@@ -35455,6 +35455,83 @@ entries:
       (trial_1493 and trial_1196 have no KIT predictions; both dirs on CC, with config/models/sigma_stage); CC /sps/lpnhe
       has 8.76 GB free, the score-only outputs are tens of MB (trial_0798 is 48 MB whole); test events are KIT bulk_test/hard_test
       as asked; HETEROSC in both arms.'
+  - at: '2026-11-27T13:15:54+00:00'
+    question: 'Step 37 (D598, Joaquin 2026-11-27: ''For the kit comparison can we zoom in the bulk region to the part where
+      the divergence doesn''t appear, and see if asymptotic factors wins over emission scales?''; ''Could you hold constant
+      the other divergence parameter instead of taking the mean for the extrapolation plots?''; ''Can you use a relative measure
+      for all the relevant plots I just talked about instead of mse log M?''). (a) On the KIT bulk_test events away from every
+      singular limit (u u~ g, u u~ g g, t t~ one loop), is the transformer with the asymptotic factor more accurate than the
+      transformer trained on the emission-scale target (target_physics_factor, dim_ref qperp)? (b) the extrapolation figures
+      (median log10|M|^2 and error per bin of the family''s singular variable) redrawn with the other divergence variable
+      held in a narrow band; (c) a relative error measure in place of MSE(log10|M|^2) on them. Jobs: two eval-only KIT scorings
+      (kit_predict, KIT_SCORE_ONLY) of existing emission-scale checkpoints that have no KIT predictions; everything else is
+      CPU reads of existing predictions.'
+    prior: 'Searched plan kit_benchmark (findings 2026-11-10..27, dead ends), results.tex (emission scale, kit, bulk, relative
+      error, held fixed, fixed band), site decisions D597/D598. Found: (1) bulk_test log-MSE factor / deck transformer (plain
+      target, no emission scales): u u~ g 1.98e-6 / 1.75e-5, u u~ g g 6.29e-5 / 1.07e-4; t t~ one loop factor 1.36e-7 vs the
+      emission-scale transformer hp0131 6.08e-8 (kit_fig_A_hpo.json): on t t~ emission scales already beat the factor over
+      the whole bulk (2.2x); on u u~ g / u u~ g g no emission-scale transformer at the searched setup was ever KIT-scored.
+      (2) Older emission-scale runs at 8000 steps and unsearched HPs (kit_A_*_t8000_softpair): u u~ g bulk 1.09e-4, u u~ g
+      g 1.97e-3; not matched to the factor (steps, HPs), not used. (3) The emission-scale searches kit_hpo_uug_T / kit_hpo_uugg_T
+      (16 trials, 1831 steps, step 16) were pruned; kept checkpoints are the best-validation trials hp1493 (u u~ g, lr 7.7e-3)
+      and hp1196 (u u~ g g, lr 2.0e-3); the curve-test choice hp1677 was pruned, and no u u~ g g trial passed the curve test.
+      (4) Seed noise of single-process from-scratch transformers at fixed HPs: 1.1x-30x in loss (results.tex ~l.14493, dead
+      end 2026-11-12 09:06). (4b) Dead end 2026-11-12: the emission-scale factor makes the u u~ g target flat into both limits
+      (slope +0.000 soft, -0.029 collinear). (5) Every KIT figure so far bins one singular variable and averages over the
+      others, and reports MSE(log10|M|^2) (and an |M|^2-weighted relative error, dominated by the largest amplitudes): none
+      at fixed other variable, none with an unweighted relative error.'
+    measure: 'Per event D = log10 pred - log10 truth (|M|^2; t t~: |V|). Measures per set of events: MSE(D), the median relative
+      error, and the mean relative error <|10^D - 1|> = <|pred-true|/true> (unweighted, so the largest amplitudes do not dominate).
+      (a) Bulk core: bulk_test events with every singular variable above its cut (u u~ g: gluon energy fraction x=2E_g/sqrt
+      s and y=min s_qg/s; u u~ g g: x of the softer gluon, s_gg/s, min s_qg/s; t t~: beta, and sqrt s below the first Sudakov
+      stratum''s 1739 GeV); the cut of a variable is where the truth''s bulk median log10|M|^2 against log10 of it has local
+      slope above half the limit exponent (soft -2 -> -1, collinear -1 -> -0.5, threshold -1 -> -0.5), printed; also both
+      measures in bins of each variable across the whole bulk. R = factor / emission-scale per measure. (b,c) per family,
+      bins of 5 per decade of the singular variable, the other variable in a band: u u~ g collinear at x in [0.45,0.55], soft
+      at angle y/x in [0.28,0.32]; u u~ g g g->gg collinear at energy share z in [0.33,0.37], q->qg at the collinear gluon''s
+      x in [0.25,0.35], soft at the softest gluon''s min s_ig/(s x) in [0.14,0.17]; the median log10|M|^2 of truth and arms
+      and the mean relative error per bin (bins with >=20 events in band). t t~: no second divergence variable (at fixed beta,
+      sqrt s is fixed; at high sqrt s beta=1), so only (c). Tool: tools/kit_zoom.py (new), CPU job on CC.'
+    check: 'The bulk measure moves with the arm: bulk log-MSE factor vs deck transformer 8.8x apart on u u~ g (1.98e-6 vs
+      1.75e-5), 1.7x on u u~ g g; factor vs emission-scale transformer 2.2x on t t~ (kit_fig_A_hpo.json). The relative and
+      log measures are not the same number: <|10^D-1|> ~ ln10 <|D|> for small D (bulk) but grows exponentially where D ~ 1
+      (deep bins: the deck transformer''s u u~ g deepest collinear median overshoot +1.9 decades in slide 6 is a relative
+      error ~80 against a log error 1.9), so (c) can reorder arms in the deep bins. The bands hold events: per hard_test stratum
+      the other variable spans x 0.11-0.89 (u u~ g collinear, 1%-99%), y/x 0.10-0.50 (soft), z 0.20-0.50 (gg), x_g 0.05-0.67
+      (qg), read on lxplus 2026-11-27 (probe of the KIT files).'
+    fixed: 'The KIT files (bulk_test 2e5, hard_test strata), the existing checkpoints, no training. Scoring: tools/kit_predict.py
+      float64 through scripts/job_kit.sh KIT_SCORE_ONLY=1 KIT_SCORE_DIR=<trial dir> (as trial_0798, FA-ccin2p3-e281e8b1),
+      on runs/kit_hpo_uug_T/trial_1493 (copied lxplus -> CC 2026-11-27) and runs/kit_hpo_uugg_T/trial_1196 (CC); the dataset/n/steps
+      args only name the recipe (kit_ee_uug__me2 / kit_ee_uugg__me2 100000 1831 A). Arms in the figures: factor (runs/kit/kit_A_<p>_n100000_t1831_hpo_asym_cont),
+      emission scales (u u~ g trial_1493, u u~ g g trial_1196, t t~ runs/kit_hpo_ttvirt_thr/trial_0131 = the deck''s transformer
+      there), the deck''s transformer (plain target: kit_hpo_uug_plain/trial_1918, kit_hpo_uugg_plain/trial_0798), MLP log
+      invariants (our reruns, seeds 0-2, median of the per-seed measure; t t~ with the threshold column). MLP raw invariants
+      left out (flat, far from the truth everywhere, already in the deck). Wall: kit_predict ~10 min per run (earlier score-only
+      jobs), limit 1 h, 2 jobs x 1 GPU, at most 2 GPU-h at the limit; interactive partition when site pick offers it.'
+    control: 'The emission-scale transformer is the control of the factor: same pool (1e5 bulk_train), steps 1831, batch 16384,
+      seed 42, HETEROSC + sigma stage, mu-MSE selection, float64, each the best-validation trial of a 16-trial template search
+      on its own target (u u~ g hp1493, u u~ g g hp1196; t t~ hp0131, the chosen of its search). Asymmetry stated: the factor
+      runs use the plain-target search''s chosen HPs (hp1918 / hp0798 / hp0131), not a search of their own; u u~ g g''s emission-scale
+      search had no trial passing the curve test, so hp1196 is its lowest validation, not a clean pick.'
+    seeds: 'One seed (42) per arm (D315). Two measured spreads: the t t~ V fine-tune same-HP reruns 0.78-6.96 in test loss
+      (results.tex sec:datasaving) and the single-process from-scratch transformers at fixed HPs across seeds, 1.1x-30x in
+      loss (results.tex ''Seed noise and the best-of-trials bias'', ~l.14493; this entry''s dead end 2026-11-12 09:06 under
+      D315). The step-37 arms are single-process from-scratch runs, so the second applies: bar 30x.'
+    outcome: 'Per process and measure, R = factor / emission-scale on the bulk core (mean and median relative error, MSE(D)).
+      R < 1/30: the factor wins; R > 30: emission scales win; between: inside the from-scratch seed spread (1/30..1/7 and
+      7..30 reported as such, not as a win). t t~ is a clean comparison: the factor there runs at hp0131, the emission-scale
+      search''s own pick. On u u~ g / u u~ g g the factor runs at the plain-target search''s HPs (hp1918 lr 0.0125, hp0798)
+      against the emission-scale search''s best (hp1493, hp1196): a factor win counts (won at a disadvantage); a level or
+      emission-scale result there is no verdict, and the next attempt is the factor''s own search on the same template (kit_hpo_uug_T
+      / uugg_T layout: 16 trials, waves 6/5/5, 1831 steps, batch 16384, ~0.55 h each, ~9 GPU-h per process, ~18 GPU-h both),
+      best against best. (b,c) are figures: per family whether the fixed-band medians and the relative error reorder the arms
+      against the averaged log-MSE figures (slide 6, kitvm_mse), said with numbers per deepest bin; where the factor''s whole-bulk
+      gain sits is read off the binned bulk curves.'
+    sources: '1/30 and 30 <- the single-process from-scratch seed spread 1.1x-30x at fixed HPs (results.tex ''Seed noise and
+      the best-of-trials bias'', ~l.14493, quoted under D315); 7 <- t t~ V same-HP rerun spread 0.78-6.96 (results.tex sec:datasaving),
+      named for the 7..30 band; core cut at half the limit exponent <- Joaquin''s words ''the part where the divergence doesn''t
+      appear'' (2026-11-27, D598), read as: the truth''s local slope has fallen to half its limit value, shown on the binned
+      figure so the cut can be read'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
