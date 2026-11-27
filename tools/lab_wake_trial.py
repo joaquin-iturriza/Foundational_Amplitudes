@@ -233,6 +233,42 @@ def report(a):
         k, v["correct"], v["n"], v["per_field"], v["seconds_median"] or 0) for k, v in rep.items()))
     json.dump(rep, open(os.path.join(DATA, "wake_summary.json"), "w"), indent=1)
     print(json.dumps({k: {f: x for f, x in v.items() if f != "wrong"} for k, v in rep.items()}))  # one line for % claim:
+    if a.fig:
+        wake_fig(rep)
+
+
+def wake_fig(rep):
+    """(a) wakes right of 100 per model against doing nothing, Wilson 95%; (b) misses and extras by field."""
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    import plot_style as ps
+    fig, (ax, bx) = ps.figure(2, 1)
+    names = {"deepseek": "DeepSeek", "qwen": "Qwen"}
+    one = next(iter(rep.values()))
+    arms = [("do nothing", one["do_nothing_baseline"], one["do_nothing_no_plan"], ps.C.grey, "s")] + [
+        (names[m], r["correct"], r["correct_no_plan"], c, "o") for (m, r), c in zip(sorted(rep.items()),
+                                                                                     (ps.C.blue, ps.C.vermillion))]
+    for j, (lab, k5, k4, c, mk) in enumerate(arms):
+        xs = [0 + (j - 1) * 0.2, 1 + (j - 1) * 0.2]
+        ks = [k5, k4]
+        lo = [k - 100 * wilson(k, 100)[0] for k in ks]
+        hi = [100 * wilson(k, 100)[1] - k for k in ks]
+        ax.errorbar(xs, ks, yerr=[lo, hi], fmt=mk, color=c, label=lab, linestyle="none")
+    ax.set_xticks([0, 1], ["all 5 fields", "without plan"])
+    ax.set_xlim(-0.6, 1.6)
+    ax.set_ylabel("wakes graded right, of 100")
+    ax.set_xlabel("fields graded")
+    ps.legend(ax, "upper left")
+    fields = [("send", "message"), ("launch", "launch"), ("ack", "ack"), ("tell_joaquin", "tell")]
+    for j, ((m, r), c) in enumerate(zip(sorted(rep.items()), (ps.C.blue, ps.C.vermillion))):
+        xs = [i + (j - 0.5) * 0.3 for i in range(len(fields))]
+        bx.plot(xs, [r["missed"][f] for f, _ in fields], "o", color=c, linestyle="none", label=names[m] + ", missed")
+        bx.plot(xs, [r["extra"][f] for f, _ in fields], "^", color=c, mfc="none", linestyle="none",
+                label=names[m] + ", extra")
+    bx.set_xticks(range(len(fields)), [t for _, t in fields])
+    bx.set_ylabel("wakes, of 100")
+    bx.set_xlabel("action against Opus's")
+    ps.legend(bx, "upper left")
+    ps.save(fig, "analysis/lab_llm_trial/figs/wake_dispatch")
 
 
 REVIEWER = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".claude", "agents",
@@ -374,6 +410,7 @@ def main():
     p.add_argument("--models", default="deepseek,qwen")
     p = sp.add_parser("report")
     p.add_argument("--json", action="store_true")
+    p.add_argument("--fig", action="store_true", help="draw analysis/lab_llm_trial/figs/wake_dispatch")
     for n in ("reviews-extract", "reviews-run", "reviews-report"):
         p = sp.add_parser(n)
         p.add_argument("--since", default="2026-11-09T00:00")
