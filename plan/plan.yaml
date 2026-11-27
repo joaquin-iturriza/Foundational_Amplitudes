@@ -28738,7 +28738,7 @@ entries:
     agent: a03669eda3075b32e
     state: working
     since: '2026-11-27T12:59:46+00:00'
-    state_at: '2026-11-27T12:59:46+00:00'
+    state_at: '2026-11-27T13:21:28.960000+00:00'
     context: 236698
     context_at: '2026-11-27T13:21:48+00:00'
   findings:
@@ -36704,9 +36704,9 @@ entries:
     - 4
   owner:
     agent: a78c473fc9aa32d21
-    state: stopped
+    state: working
     since: '2026-11-27T02:18:45+00:00'
-    state_at: '2026-11-27T02:35:25.362000+00:00'
+    state_at: '2026-11-27T13:21:35.517000+00:00'
     context: 163617
     context_at: '2026-11-27T02:32:59+00:00'
   step_waits:
