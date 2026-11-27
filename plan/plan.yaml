@@ -43690,7 +43690,6 @@ entries:
       dir runs/zz_smoke/zz_smoke_sweep_config_llmcmp_c_tprop_64943393 left in place (its rm was refused by the permission
       classifier; not in the way: 13 GB free).'
   step_waits:
-    '25': FA-ccin2p3-d34fae85
     '26': FA-ccin2p3-4ba88991
   handoff:
     state: 'Step 26 (target_propagators arm, design PASSED 2026-11-26T23:40, config sweep/sweep_config_llmcmp_c_tprop.yaml
