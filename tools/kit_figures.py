@@ -49,6 +49,8 @@ MODELS = {"truth": ("truth", "k", None, "-"),
           # the fair one-loop protocol (kit_benchmark step 24): the A2 model fine-tuned from the fair pretraining, the
           # same model from scratch, and Bakar's baseline (the transformer without the factor on V/B, exact Born)
           "FT": ("fine-tuned", "sky", "v", "-"),
+          "FTlr": (r"fine-tuned, lr scale $0.126$", "sky", "*", "none"),  # fair one-loop D=1e3 rerun
+          "FT01": (r"fine-tuned, lr scale $0.1$", "purple", "v", "--"),   # the same fine-tune at a tenth of the lr
           "SCR": ("from scratch", "blue", "o", "-"),
           "VB": ("from scratch on $V/B$,\nexact Born", "vermillion", "s", "--")}
 
@@ -508,21 +510,73 @@ def fairnlo_fig(path, out):
     print("saved", ps.save(fig, out + "_d10000"))
 
 
+def fairnlo_slide10_fig(path, out):
+    """Bakar's slide-10 metrics of the fair one-loop protocol on e+e- -> t t~ virtual (step 24's runs, as fairnlo_fig):
+    <out>_<stratum> for bulk_test and the deepest threshold and Sudakov strata, one panel per metric (log-MSE, |bias|,
+    99th percentile of |pred - truth|, |M|^2-weighted relative error) against D_train, fine-tuned, from scratch and V/B;
+    the fine-tune rerun at lr scale 0.126 its own marker; a negative bias hollow at |bias|."""
+    import plot_style as ps
+    from tools.kit_readout import deepest
+    runs = {}
+    for r in d_runs(path):
+        m = re.fullmatch(r"fairnlo_(ft|scra2|vb)_d(\d+)(_lsmed)?", r["tag"])
+        if m:
+            runs[({"ft": "FT", "scra2": "SCR", "vb": "VB"}[m[1]] if not m[3] else "FTlr", int(m[2]))] = r
+    key = {"bulk": lambda r: next(k for k in r["strata"] if k.startswith("bulk_test/")),
+           "threshold": lambda r: next(k for k in r["strata"] if k.startswith(f"hard_test/{deepest(r['strata'])['threshold_beta'][0]}/")),
+           "sudakov": lambda r: next(k for k in r["strata"] if k.startswith(f"hard_test/{deepest(r['strata'])['sudakov_sqrts'][0]}/"))}
+    metrics = (("logmse", r"MSE$(\log_{10}|\mathcal{M}|^2)$"), ("bias", r"$|$bias$|$ of $\log_{10}|\mathcal{M}|^2$"),
+               ("p99_abs", r"99th percentile of $|\Delta\log_{10}|\mathcal{M}|^2|$"),
+               ("me2_weighted_rel_err", r"$|\mathcal{M}|^2$-weighted relative error"))
+    for st, kf in key.items():
+        fig, axs = ps.figure(2, 2, sharex=True)
+        for ax, (m, lab) in zip(axs.flat, metrics):
+            for arm in ("FT", "SCR", "VB", "FTlr"):
+                name, c, mk, ls = model_style(arm)
+                ds = sorted(d for a, d in runs if a == arm)
+                v = np.array([runs[(arm, d)]["strata"][kf(runs[(arm, d)])][m] for d in ds])
+                ax.plot(ds, np.abs(v), color=c, ls=ls, label=name, marker=mk if arm == "FTlr" else None)
+                neg = v < 0
+                ax.scatter(np.array(ds)[~neg], np.abs(v[~neg]), color=c, marker=mk, zorder=3)
+                if neg.any():
+                    ax.scatter(np.array(ds)[neg], np.abs(v[neg]), facecolors="none", edgecolors=c, marker=mk, zorder=3)
+            ax.set_xscale("log"); ax.set_yscale("log"); ax.set_ylabel(lab)
+            ps.process_label(ax, PROC[("ee_tt", "virt_finite")])
+        for ax in axs[-1]:
+            ax.set_xlabel(r"training events $D_{\rm train}$")
+        ps.legend(axs.flat[0], "lower left"); ps.make_room(axs.flat[0])
+        print("saved", ps.save(fig, f"{out}_{st}"))
+
+
 FAMNAME = {"soft_x": "soft", "coll_y": "collinear", "coll_qg_y": r"$q\to qg$", "coll_gg_y": r"$g\to gg$",
            "azimuth_gg_y": "azimuth", "threshold_beta": "threshold", "sudakov_sqrts": "Sudakov"}
 
 
-def slide10_fig(path, out):
+# slide10 arm sets: (MODELS key, run key) per arm, the run key (mode, tag or None for any tag)
+SLIDE10 = {"a2": ((("factor", ("A", None)), ("B_bulk", ("B_bulk", None)), ("B", ("B", None))),
+                  ("ee_uug", "ee_uugg", "ee_tt")),
+           # the held-out qqg protocol (step 30): from scratch on the held-out parent's config vs fine-tuned from it
+           "heldout": ((("SCR", ("A", "heldoutqqg_scra2")), ("FT", ("A_ft", "heldoutqqg_ft")),
+                        ("FT01", ("A_ft", "heldoutqqg_ft01"))), ("ee_uug", "ee_uugg"))}
+
+
+def slide10_fig(path, out, arms="a2"):
     """Bakar's slide-10 metrics (KIT evaluate.py: log-MSE, bias, 99th percentile of |pred - truth|, |M|^2-weighted
-    relative error) on bulk_test and the deepest stratum of each hard family, for the A2 model (mode A, tag
-    hpo_asym_cont) and its protocol-B continuations (B_bulk, B): one panel per metric, the bins on the y axis; a negative
-    bias is drawn hollow at |bias|."""
+    relative error) on bulk_test and the deepest stratum of each hard family, per arm of SLIDE10[arms] (a2: the A2
+    model, mode A, and its protocol-B continuations B_bulk, B; heldout: SCR-A2 and its fine-tunes at lr scale 1 and
+    0.1): one panel per metric, the bins on the y axis; a negative bias is drawn hollow at |bias|."""
     import plot_style as ps
     from tools.kit_readout import deepest
-    runs = {(r["file"], r["mode"]): r for r in d_runs(path) if r["mode"] in ("A", "B", "B_bulk")}
+    arms, stems = SLIDE10[arms]
+    runs = {}
+    for r in d_runs(path):
+        for _, (mode, tag) in arms:
+            if r["mode"] == mode and (tag is None or r.get("tag") == tag):
+                runs[(r["file"], (mode, tag))] = r
+    first = arms[0][1]
     rows = []
-    for stem in ("ee_uug", "ee_uugg", "ee_tt"):
-        r = runs[(stem, "A")]
+    for stem in stems:
+        r = runs[(stem, first)]
         pl = PROC[(stem, "virt_finite" if stem == "ee_tt" else "me2")]
         rows.append((stem, next(k for k in r["strata"] if k.startswith("bulk_test/")), pl + " bulk"))
         for fam, (st, _, _) in sorted(deepest(r["strata"]).items()):
@@ -534,9 +588,9 @@ def slide10_fig(path, out):
     fig, axs = ps.figure(2, 2, sharey=True)
     y = np.arange(len(rows))[::-1]
     for ax, (m, lab) in zip(axs.flat, metrics):
-        for i, (key, mode) in enumerate((("factor", "A"), ("B_bulk", "B_bulk"), ("B", "B"))):
+        for i, (key, rk) in enumerate(arms):
             name, c, mk, _ = model_style(key)
-            v = np.array([runs[(stem, mode)]["strata"][k][m] for stem, k, _ in rows])
+            v = np.array([runs[(stem, rk)]["strata"][k][m] for stem, k, _ in rows])
             neg = v < 0
             yy = y + (i - 1) * 0.22
             ax.scatter(np.abs(v[~neg]), yy[~neg], color=c, marker=mk, label=name, zorder=3)
@@ -570,13 +624,15 @@ def main():
     b.add_argument("data"); b.add_argument("--out", required=True)
     t = sub.add_parser("slide10", help="slide-10 metrics of the A2 models and their protocol-B continuations")
     t.add_argument("data"); t.add_argument("--out", required=True)
+    t.add_argument("--arms", default="a2", choices=sorted(SLIDE10))
     f = sub.add_parser("fairnlo", help="the fair one-loop protocol on t t~ virtual: FT vs from scratch vs V/B per D")
     f.add_argument("data"); f.add_argument("--out", required=True)
+    f.add_argument("--slide10", action="store_true", help="the slide-10 metrics against D_train, one figure per stratum")
     a = ap.parse_args()
     if a.cmd == "fairnlo":
-        fairnlo_fig(a.data, a.out)
+        (fairnlo_slide10_fig if a.slide10 else fairnlo_fig)(a.data, a.out)
     elif a.cmd == "slide10":
-        slide10_fig(a.data, a.out)
+        slide10_fig(a.data, a.out, a.arms)
     elif a.cmd == "protocolB":
         protocol_b(a.data, a.out)
     elif a.cmd == "collect":
