@@ -232,6 +232,7 @@ def report(a):
     print(json.dumps(rep, indent=1) if a.json else "\n".join("%s: %d/%d correct %s, %.0f s median" % (
         k, v["correct"], v["n"], v["per_field"], v["seconds_median"] or 0) for k, v in rep.items()))
     json.dump(rep, open(os.path.join(DATA, "wake_summary.json"), "w"), indent=1)
+    print(json.dumps({k: {f: x for f, x in v.items() if f != "wrong"} for k, v in rep.items()}))  # one line for % claim:
 
 
 REVIEWER = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".claude", "agents",
