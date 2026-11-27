@@ -45,7 +45,12 @@ MODELS = {"truth": ("truth", "k", None, "-"),
           "MLP log": ("MLP, log invariants", "green", "^", "--"),
           "MLP raw": ("MLP, raw invariants", "grey", "x", ":"),
           "B": ("hard points added", "green", "D", "-"),        # protocol B (KIT_FROM = an A2 run, hard_train added)
-          "B_bulk": ("bulk only", "orange", "o", "--")}       # its control: the same continuation, bulk only
+          "B_bulk": ("bulk only", "orange", "o", "--"),       # its control: the same continuation, bulk only
+          # the fair one-loop protocol (kit_benchmark step 24): the A2 model fine-tuned from the fair pretraining, the
+          # same model from scratch, and Bakar's baseline (the transformer without the factor on V/B, exact Born)
+          "FT": ("fine-tuned", "sky", "v", "-"),
+          "SCR": ("from scratch", "blue", "o", "-"),
+          "VB": ("from scratch on $V/B$,\nexact Born", "vermillion", "s", "--")}       # its control: the same continuation, bulk only
 
 
 def model_style(key):
@@ -456,6 +461,53 @@ def protocol_b(path, out):
         print("saved", ps.save(fig, f"{out}_{stem}"))
 
 
+def fairnlo_fig(path, out):
+    """The fair one-loop protocol on e+e- -> t t~ virtual (kit_benchmark step 24, design 2026-11-26 02:27): <out>, KIT
+    log-MSE against D_train on bulk_test and the deepest threshold and Sudakov strata, fine-tuned (tag fairnlo_ft_d<D>),
+    from scratch (fairnlo_scra2_d<D>) and V/B with exact Born (fairnlo_vb_d<D>); a fine-tune rerun at another lr scale
+    (tag fairnlo_ft_d<D>_<x>) hollow beside its D. <out>_d10000: per stratum against the singular variable at 1e4."""
+    import re
+    import plot_style as ps
+    from matplotlib.ticker import NullFormatter
+    from tools.kit_readout import deepest
+    runs = {}
+    for r in d_runs(path):
+        m = re.fullmatch(r"fairnlo_(ft|scra2|vb)_d(\d+)(_\w+)?", r["tag"])
+        if m:
+            runs[({"ft": "FT", "scra2": "SCR", "vb": "VB"}[m[1]], int(m[2]), bool(m[3]))] = r
+    bulk = lambda r: next(v["logmse"] for k, v in r["strata"].items() if k.startswith("bulk_test/"))
+    cells = (("bulk", r"bulk test", bulk),
+             ("threshold_beta", r"threshold, $10^{-4}<\beta<10^{-3}$", lambda r: deepest(r["strata"])["threshold_beta"][2]),
+             ("sudakov_sqrts", r"Sudakov, $15<\sqrt{s}<50$ TeV", lambda r: deepest(r["strata"])["sudakov_sqrts"][2]))
+    fig, axs = ps.figure(2, 2)
+    for ax, (fam, lab, val) in zip(axs.flat, cells):
+        for key in ("FT", "SCR", "VB"):
+            name, c, mk, ls = model_style(key)
+            ds = sorted(d for k, d, x in runs if k == key and not x)
+            ax.plot(ds, [val(runs[(key, d, False)]) for d in ds], color=c, marker=mk, ls=ls, label=name)
+            for d in sorted(d for k, d, x in runs if k == key and x):
+                ax.plot([d], [val(runs[(key, d, True)])], color=c, marker=mk, ls="none", mfc="none",
+                        label=name + r", lr scale $0.126$" if fam == "bulk" else None)
+        ax.set_xscale("log"); ax.set_yscale("log")
+        ax.set_xlabel(r"training events $D_{\rm train}$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
+        ps.process_label(ax, PROC[("ee_tt", "virt_finite")])   # the panel's stratum (lab) goes in the caption
+    ps.legend_cell(axs.flat[3], [axs.flat[0]])
+    print("saved", ps.save(fig, out))
+    fig, axs = ps.figure(2, 1, squeeze=False)
+    for ax, fam in zip(axs.flat, ("threshold_beta", "sudakov_sqrts")):
+        for key in ("FT", "SCR", "VB"):
+            name, c, mk, ls = model_style(key)
+            r = runs[(key, 10000, False)]
+            st = sorted((v["x"], v["logmse"]) for k, v in r["strata"].items()
+                        if k.startswith("hard_test/") and family(k.split("/")[1]) == fam)
+            ax.plot([x for x, _ in st], [y for _, y in st], color=c, marker=mk, ls=ls, label=name)
+        ax.set_xscale("log"); ax.set_yscale("log"); ax.xaxis.set_minor_formatter(NullFormatter())
+        ax.set_xlabel(XLAB[fam]); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
+        ps.process_label(ax, PROC[("ee_tt", "virt_finite")])
+    ps.legend(axs.flat[0], "upper left"); ps.make_room(axs.flat[0])
+    print("saved", ps.save(fig, out + "_d10000"))
+
+
 FAMNAME = {"soft_x": "soft", "coll_y": "collinear", "coll_qg_y": r"$q\to qg$", "coll_gg_y": r"$g\to gg$",
            "azimuth_gg_y": "azimuth", "threshold_beta": "threshold", "sudakov_sqrts": "Sudakov"}
 
@@ -518,8 +570,12 @@ def main():
     b.add_argument("data"); b.add_argument("--out", required=True)
     t = sub.add_parser("slide10", help="slide-10 metrics of the A2 models and their protocol-B continuations")
     t.add_argument("data"); t.add_argument("--out", required=True)
+    f = sub.add_parser("fairnlo", help="the fair one-loop protocol on t t~ virtual: FT vs from scratch vs V/B per D")
+    f.add_argument("data"); f.add_argument("--out", required=True)
     a = ap.parse_args()
-    if a.cmd == "slide10":
+    if a.cmd == "fairnlo":
+        fairnlo_fig(a.data, a.out)
+    elif a.cmd == "slide10":
         slide10_fig(a.data, a.out)
     elif a.cmd == "protocolB":
         protocol_b(a.data, a.out)

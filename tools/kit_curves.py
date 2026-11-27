@@ -397,6 +397,30 @@ def runs_fig(data, runs, base):
     print(ps.save(fig, base))
 
 
+def fairnlo_fig(data, base):
+    """The fair one-loop arms' curves (kit_benchmark step 24; `runs` output): one panel per D_train, validation mu-MSE
+    against step of fine-tuned, from scratch and V/B (kit_figures' MODELS FT/SCR/VB), running median of 3; the legend
+    in the sixth cell."""
+    import plot_style as ps
+    from tools.kit_figures import model_style
+    d = json.load(open(data))
+    arms = {"ft": "FT", "scra2": "SCR", "vb": "VB"}
+    Ds = sorted({int(re.search(r"_d(\d+)$", k).group(1)) for k in d if re.search(r"fairnlo_\w+_d\d+$", k)})
+    fig, axes = ps.figure(2, 3)
+    for ax, D in zip(axes.flat, Ds):
+        for tag, key in arms.items():
+            run = next(k for k in d if k.endswith(f"fairnlo_{tag}_d{D}"))
+            v = d[run]["val"]
+            steps = int(re.search(r"_t(\d+)", run).group(1))
+            x = np.arange(1, len(v) + 1) * steps / len(v)     # evaluations spread evenly over the run's steps
+            name, c, _, ls = model_style(key)
+            ax.plot(x, smooth(v), color=c, ls=ls, label=name)
+        ax.set_yscale("log"); ax.set_xlabel("training step"); ax.set_ylabel(r"validation MSE$(\mu)$")
+        ps.process_label(ax, r"$t\bar t$ virtual")   # the panel's D_train goes in the caption
+    ps.legend_cell(axes.flat[len(Ds)], [axes.flat[0]])
+    print(ps.save(fig, base))
+
+
 def main():  # dup-ok: argparse boilerplate (collect/read), no shared logic
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -409,8 +433,11 @@ def main():  # dup-ok: argparse boilerplate (collect/read), no shared logic
     u.add_argument("--out", required=True); u.add_argument("--site", default="ccin2p3")
     v = sub.add_parser("runsfig"); v.add_argument("data"); v.add_argument("runs", nargs="+"); v.add_argument("--out", required=True)
     g = sub.add_parser("ftfig"); g.add_argument("search"); g.add_argument("arms"); g.add_argument("--out", required=True)
+    q = sub.add_parser("fairnlofig"); q.add_argument("data"); q.add_argument("--out", required=True)
     a = ap.parse_args()
-    if a.cmd == "ftfig":
+    if a.cmd == "fairnlofig":
+        fairnlo_fig(a.data, a.out)
+    elif a.cmd == "ftfig":
         ft_fig(a.search, a.arms, a.out)
     elif a.cmd == "collect":
         from analysis.common.readers import site_python
