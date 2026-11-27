@@ -28720,7 +28720,7 @@ entries:
     agent: a083210ef0f4bef83
     state: working
     since: '2026-11-27T02:35:54+00:00'
-    state_at: '2026-11-27T02:35:54+00:00'
+    state_at: '2026-11-27T03:07:44.105000+00:00'
     context: 222780
     context_at: '2026-11-27T03:07:53+00:00'
   findings:
@@ -42755,9 +42755,9 @@ entries:
     blocks_steps: &id004 []
   owner:
     agent: a49915a0b9c865804
-    state: working
+    state: stopped
     since: '2026-11-27T02:33:15+00:00'
-    state_at: '2026-11-27T02:33:15+00:00'
+    state_at: '2026-11-27T02:57:37.055000+00:00'
     context: 237585
     context_at: '2026-11-27T03:08:02+00:00'
   step_why:
