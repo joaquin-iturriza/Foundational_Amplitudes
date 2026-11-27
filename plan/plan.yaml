@@ -30556,6 +30556,23 @@ entries:
       three on CC; kit_zoom collect (RUNS[''fa_ee_ttg_me2''] added @b63615075) then plot the t t~ g figures (add ''fa_ee_ttg_me2''
       to the plotting: PROCS tick labels are hard-coded for three processes); R = factor/emission and factor/plain per region,
       bar 1/30..30 per the passed design; curve check of the two arms (kit_curves runs).'
+  - at: '2026-11-27T23:45:27+00:00'
+    text: 'Step 39 read (E9910, D600 (b)): e+e- -> t t~ g, three arms at the plain search''s best clean trial hp1668, one
+      seed. Curves: factor val mu-MSE 5.25e-6 (sep 1.84, largest jump 1.84x), emission 1.65e-3 on its own target (sep 1.26,
+      jump 1.09x), plain trial 4.46e-5 (jump 2.15x): all clean. kit_zoom (@3b2efd1a9, MSE(ln) per bin, other variable fixed):
+      deepest soft x 1.3e-7 at 1-cos in [0.8,1.2]: factor 1.19, emission 21.5, plain 402 (factor/plain 1/340 WIN, factor/emission
+      1/18 not separated); quasi-collinear 1-cos 1e-7 at x 0.25-0.35 (dead cone, truth flat): factor 0.00275, emission 0.533,
+      plain 0.166 (1/194 and 1/60: factor wins where the design expected a tie; plain and emission sit +0.35 and +0.55 ln
+      above the flat truth); pair threshold beta 1e-4: factor 5.35e-5, emission 5.29e-3, plain 6.93e-5 (1/99 win vs emission,
+      1/1.3 tie vs plain); bulk core (x>=0.631, 41%): 1.35e-5 / 1.99e-3 / 2.16e-5 (1/147 win vs emission, 1/1.6 tie vs plain);
+      whole bulk 1.29e-5 / 2.02e-3 / 1.12e-4 (1/157, 1/8.7 tie). Median |Delta|: soft deepest factor 1.25 (overshoot ~+0.8
+      in ln, slope right) vs 0.99/1.0 (undershoot saturates the measure); collinear 0.043/0.77/0.33; threshold 0.0024/0.073/0.0065;
+      core 0.0013/0.011/0.0013. Medians: plain flat in the soft limit (divergence not learnt, as on uug); emission has the
+      x^-2 slope but ~5 ln units low. KIT evaluate.py log-MSE (kit_fig_ttg.json), median log10 ratio per family factor/plain:
+      bulk -0.94, coll -1.59, soft -1.93, threshold -0.11; factor/emission: bulk -2.20, coll -1.95, soft -1.31, threshold
+      -2.04. Verdict per the passed design: the factor wins the soft family against plain and the bulk against emission scales;
+      emission scales beat the factor nowhere; the factor''s massive eikonal also gives the dead-cone region (unexpected),
+      the pair threshold is a tie with plain. KIT package keeps the factor for massive emitters. Figures analysis/kit_benchmark/figs/zoom/kitzoom_ttg_{mse,relmed,median}.'
   step_why:
     32:
       feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
