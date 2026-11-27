@@ -28711,7 +28711,7 @@ entries:
     withdrawn_why: 'D574: no more trainings for today''s reply; a pretrained held-out uug/uugg run is training'
   owner:
     agent: a13474af29f05ca9b
-    state: working
+    state: closed
     since: '2026-11-27T03:24:06+00:00'
     state_at: '2026-11-27T04:01:27+00:00'
     context: 217468
@@ -30210,32 +30210,32 @@ entries:
     '30': FA-ccin2p3-69541363 FA-ccin2p3-6f1a5dad FA-ccin2p3-ff4af2bc
     '29': FA-ccin2p3-69541363
   handoff:
-    state: '2026-11-27 ~05:50 @22f7fe70b. Step 24 (fair one-loop FT vs SCR-A2 vs V/B per D on tt virtual): read for 4 of 5
-      D, finding ~05:00: branch (c) at every D, FT beats neither control on any hard family; FT threshold exponent -0.21..-0.24
-      (truth -1.02); bulk FT best at 1e4 (8.2e-8). FT D=1e3 rerun at lr_scale 0.126 (design''s named rerun, 21x val jump)
-      FA-ccin2p3-65e6c701 running: on its end collect it (kit_figures.py collect via site run --job, add to kit_fig_fairnlo.json),
-      redraw kit_figures.py fairnlo (hollow marker) and kit_curves.py fairnlofig, then put the fair-protocol slides into talks/kit_reply_nov2026
-      (kit_fairnlo, kit_fairnlo_d10000, curves) and report. Step 33 (slide-11 serve cost): vector_size 256/512/1024 all give
-      MadEvent survey zero, only 32 passes; serve fixed at the root @8f6582246/22f7fe70b (Predictor reads the run''s frozen
-      data_stats after its rebuild, every role routed to the scored batch): bench 4.71 ms/event at 32 (was 37; design 2.6,
-      1.8x). Re-run bench (command in step 33''s wait) to get its kit_predict equality check (<1e-9); then restart the slide-11
-      1e5 jobs b45a89e1 (uug) / 6360f286 (uugg) on the fixed code (same args as their submission: --disk-gb 2 --hdr=--cpus-per-task=32
-      --hdr=--mem=64G --hdr=--tmp=0 --env KIT_MC_WORK_IN_DIR=1 --env KIT_MC_VEC=32 -- surr <proc> runs/kit/mc_madgraph 100000
-      runs/kit/kit_A_ee_<proc>_n100000_t1831_hpo_asym_cont; check the dir the old ones write first, use a fresh dir) and cancel
-      the old ones once the new run. Step 32 reads them (wiring check, numbers, figure_exact). Step 30: held-out parent 69541363
-      running; at its end FT1/FT0.1 per process (A_ft, KIT_LR_SCALE 1 / 0.1). Step 29 slide-10 adds fine-tunes after 24/30.'
-    decisions: 'Joaquin''s: D570, D571, D572, D574, D575, D315. Mine: FT D=1e3 rerun at lr_scale 0.126 per the 02:27 design''s
-      rule (its run jumped 21x); fair-protocol arm styles in kit_figures MODELS FT sky/SCR blue/VB vermillion; vector-size
-      search abandoned for the serve fix (256/512/1024 all fail in MadEvent); serve frozen stats via the warm-start path,
-      guarded by check_vs_kit_predict before every surrogate gen.'
-    ruled_out: vector_size 1024, 512, 256 for the surrogate MadEvent (survey zero); FIFOs on /sps; work-dir path length; MG5
-      version.
-    running: FA-ccin2p3-65e6c701 (FT D=1e3 rerun), FA-ccin2p3-69541363 (held-out parent), FA-ccin2p3-b45a89e1 / 6360f286 (slide-11
-      1e5 at vec32 on the old slow serve), CPU bench job on CC (site run --job, step 33)
-    files: tools/kit_mc_madgraph.py (serve Predictor, bench, check_vs_kit_predict), tools/kit_figures.py (fairnlo), tools/kit_curves.py
-      (fairnlofig, plot_runs), analysis/kit_benchmark/data/kit_fig_fairnlo.json, kit_curves_fairnlo.json, analysis/kit_benchmark/figs/kit_fairnlo*.png,
-      kit_curves_fairnlo.png, talks/kit_reply_nov2026/main.tex
-    written: '2026-11-27T03:12:30+00:00'
+    state: '2026-11-27 ~07:15 @3326ed72b. Step 24 DONE (fair one-loop FT vs SCR-A2 vs V/B, all 5 D + D=1e3 lr 0.126 rerun:
+      branch (c) everywhere; figures kit_fairnlo*, kit_curves_fairnlo; deck talks/kit_reply_nov2026 slides 19-21). Step 33
+      DONE (serve 4.41 ms/event, = kit_predict to 0). Step 29: tt FT slide-10 numbers recorded; figure redraw waits on step
+      30''s FTs. Step 30: SCR-A2 heldoutqqg controls collected (kit_fig_heldoutqqg.json); FT1/FT0.1 wait on parent FA-ccin2p3-69541363
+      (A_ft, KIT_LR_SCALE 1 / 0.1, tags heldoutqqg_ft / heldoutqqg_ft01), then FT vs SCR-A2. Step 32 (slide 11 exact) BLOCKED
+      on a MadEvent fault: with vector_size appended to the run_card on CC (32; 1024 gave survey zero, likely the same fault)
+      MadEvent integrates and writes events at sqrt s 1.1035 GeV (LHE: beams +-0.5518, mass column 1.2177, init xsec 7.1e4
+      pb) though the card says ebeam 500: shown for the surrogate AND for the exact integrand without KITSURR (diag 1: e07631e9,
+      74c1767f). The 1e5 runs b45a89e1/6360f286 are void (wrong energy). gen now asserts events at sqrt s; KIT_MC_VEC=0 keeps
+      the default card; KIT_MC_KEEP=1 keeps the LHE. Diag 2 running at the default card: surrogate 65066301 (runs/kit/mc_madgraph_diag_surrdef),
+      exact control df8e8413 (..._diag_exactdef). Next: if both pass the guard, rerun the two 1e5 surr jobs (same args as
+      before but --env KIT_MC_VEC=0, fresh dir or the old runs/kit/mc_madgraph after removing nothing: the surr tag overwrites
+      mg_<tag>_surr and <proc>_surr.h5 only), time limit from 65066301''s serve stats (per-call cost at the default batch);
+      then step 32''s readout (wiring check sigma_hat/sigma vs E_exact[u], numbers, figure_exact). If the exact control fails
+      too: the CC MG install changed since 2026-11-26 (read Source/vector.inc, make_opts in the kept work dir).'
+    decisions: 'Joaquin''s: D570, D571, D572, D574, D575, D315. Mine: did not restart the vec-32 1e5 jobs for the serve fix
+      (serves re-import the fixed code; equality 0.00) - moot now, the runs are void; did not resubmit the 1e5 jobs after
+      E9716/E9717 because the samples were at the wrong energy, diagnosed first; metrics takes the exact sigma from the banner
+      (log has 4 digits); kit_curves fairnlofig draws the lr rerun dotted, legend from all panels.'
+    ruled_out: KITSURR/serve as the cause of the 1.1035 GeV events (the exact integrand at vec 32 shows it too); vector_size
+      1024, 512, 256 (survey zero); FIFOs on /sps; work-dir path length; MG5 version.
+    running: FA-ccin2p3-65066301, FA-ccin2p3-df8e8413 (step 32 diag 2), FA-ccin2p3-69541363 (held-out parent, step 30)
+    files: tools/kit_mc_madgraph.py (gen guard, KIT_MC_VEC/KEEP), tools/kit_curves.py, tools/kit_figures.py, tools/kit_readout.py,
+      analysis/kit_benchmark/data/kit_fig_fairnlo.json, kit_curves_fairnlo.json, kit_fig_heldoutqqg.json, talks/kit_reply_nov2026/main.tex,
+      scripts/job_kit_mc_madgraph.sh
+    written: '2026-11-27T04:05:57+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
