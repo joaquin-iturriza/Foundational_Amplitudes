@@ -30152,7 +30152,9 @@ entries:
     '32': FA-ccin2p3-b45a89e1 FA-ccin2p3-6360f286
     '30': FA-ccin2p3-69541363 FA-ccin2p3-6f1a5dad FA-ccin2p3-ff4af2bc
     '29': FA-ccin2p3-65e6c701 FA-ccin2p3-69541363
-    '33': FA-ccin2p3-f73b637b FA-ccin2p3-c730c4cf
+    '33': 'CPU bench job ccj_cd15ca9d4d4a on CC (read: site --timeout 900 run --job --item kit_benchmark ccin2p3 FA -- env
+      KIT_THREADS=1 python tools/kit_mc_madgraph.py bench ee_uug runs/kit/kit_A_ee_uug_me2_n100000_t1831_hpo_asym_cont --batch
+      32 --calls 40)'
   handoff:
     state: '2026-11-27 ~04:30 @09f1c69e1. Step 31 done (protocol B on A2: B beats B_bulk on every family; finding ~03:10;
       deck slides 15-17). Step 29: slide-10 metrics for A2 and B done (kit_readout --slide10, deck slide 18 kit_figures.py
