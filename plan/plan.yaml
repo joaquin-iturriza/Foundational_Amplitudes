@@ -48253,6 +48253,21 @@ entries:
       ten-ensemble max (data/perevent_anchored_E.json); 2 bootstrap sd <- measured: 30 event resamples per subset (level_subsets.py,
       attempt E''s rule); 13 h <- measured: step 16''s own V100 rate ~0.75 s/step x 60,840; 30 GPU-h <- CLAUDE.md budget,
       D566 names the work; +26 GPU-h <- 2 x 13 h, the cost of a second seed'
+    fix_at: '2026-11-27T02:51:12+00:00'
+    fix: 'Re-check of the 02:49 design. Last FIX points (1) and (2) are addressed. The training-noise bar R_b is now the ratio
+      of the new-43 median bias^2 between a run and its retrain, from re-scoring FA-lxplus-cb9273f1 (COMPLETED, on lxplus,
+      lxplus up) and rerun_spread.py @3500ab2da (median_bias2_ratio, lines 46-47). The no-level assumption is stated. The
+      paired |bias - given level| is read. The cross-run subset bar is dropped. The control goes out on the gate, and the
+      reread runs in parallel because only the verdict reads it. One point fails. Outcome (check 4): the level outcome contradicts
+      itself. As written, YES is ''arm <= control x R_b and below 0.859 by more than R_b'', NO is ''arm > control x R_b'',
+      and ''inside R_b of each other either way'' is UNRESOLVED, which sends Joaquin the +26 GPU-h second-seed question. Every
+      arm between control/R_b and control x R_b is both YES and UNRESOLVED, which is nearly every YES. So the same number
+      both answers the question and sends him the second-seed question. Fix: one partition with no overlap. The question asks
+      whether the per-event level keeps the per-process level''s gain, so this is a non-inferiority read. Suggested: YES =
+      arm <= control x R_b and arm < 0.859 / R_b (kept, and separated from the no-level run). NO = arm > control x R_b. UNRESOLVED
+      = arm <= control x R_b but not below 0.859 / R_b (indistinguishable from both runs), the only case that goes to Joaquin
+      as the second-seed question. Also write ''below 0.859 by more than R_b'' as the ratio 0.859 / arm > R_b, since R_b is
+      a ratio, not a difference. Everything else passes as in the last review.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
