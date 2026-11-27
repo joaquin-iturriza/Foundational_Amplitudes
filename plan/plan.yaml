@@ -50247,6 +50247,35 @@ entries:
       his test metrics (data/suprio_cond), D525''s question; 2 bootstrap sd <- measured, level_subsets.py (step 27''s rule);
       16 h <- measured: c_best''s V100 0.90 s/step x 60,840 (config header); 100 GPU-h <- CLAUDE.md budget, D566 names the
       work'
+    fix_at: '2026-11-27T19:09:36+00:00'
+    fix: '(1) One change at a time / only the asked axis moves: with data.level_file set, experiment.py (level_file block,
+      l.2425-2441) replaces BOTH the per-process means AND the shared sigma: sd = fit_affine_multiplicity(...)[2] (the residual
+      sigma about mu_N = a + bN), while c_best (affine_multiplicity_std false) standardizes with the pooled shared sd that
+      includes the between-process spread (l.2419-2421). In steps 16/27 the control ran with affine_multiplicity_std, so only
+      the means moved there; here the target scale moves too, under HETEROSC at c_best''s tuned lr, and the ''fixed'' field
+      says only the means change. Fix: either keep c_best''s pooled shared sigma for this arm (a small option in the level_file
+      block when affine_multiplicity_std is off, tested) so the means are the one change, or state the sigma change as part
+      of the question with both sigma values (c_best''s log line ''shared_standardization: one (mu, sigma)'' and the arm''s
+      ''level_file: ... sigma ='') and why it cannot be separated. (2) Setup named after a run: the design diffs sweep_config_llmcmp_c_level.yaml
+      against sweep_config_llmcmp_c_latest.yaml, not against FA-ccin2p3-29ce8950''s config.yaml; trunk code and config/ defaults
+      moved since that run''s deployed commit. Fix: resolve the arm''s job config at the step''s commit (Hydra --cfg job,
+      CPU) and diff it against runs/llmcmp_c_qperp/trial_1860/config.yaml on CC; list every differing key with its reason
+      (expected: data.level_file only, plus the sigma of point 1). (3) The readout is not shown written for the control: the
+      owner read on CC that c_best''s held-out CSV (runs/llmcmp_c_qperp/trial_1860/llm_events_heldout.csv) has no log_shat/q
+      columns, so level_subsets.py cannot read it. Fix: add to the design the eval-only re-score of c_best (job_llm_score.sh
+      RUN=runs/llmcmp_c_qperp/trial_1860 ONLY=heldout EVENTS=1, REREAD=FA-ccin2p3-29ce8950, ~0.5 GPU-h), sent out together
+      with the smoke (it reads nothing of the arm), and the GPU-h total updated. (4) Disk: the design gives disk per job but
+      not the site''s free disk; the owner read 6.2 GB free on CC /sps/lpnhe against ~3.2 GB (two run dirs 2.8 + smoke 0.3
+      + CSVs 0.1, plus the re-score''s CSV). Record the free-disk read with its time in the design, name which site(s) site
+      pick may place the two runs on and their free disk, and the margin; if the runs go to CC at 1.9x margin, say what else
+      writes there meanwhile. Checks that held: question/control match D566 and the step; measure moves (step27_level_read.json:
+      part (a) new-43 median bias^2 0.859 -> 0.300/0.159 with the 30-seed level file; step26_tprop_read.json: c_best new-43
+      median bias^2 0.314, pooled bias^2 share 0.87, level network alone 0.096); spread from the arm''s same-seed retrain
+      with an UNRESOLVED branch for the control''s spread (part (a) R_b 1.88 in rerun_spread_level.json); outcome YES/NO/UNRESOLVED
+      with sourced thresholds; HETEROSC, part (c)''s target per D523; no sweep, no lr change; 16 h wall from c_best''s own
+      0.90 s/step at the same batch; held-out test events = his test pools. Searched for prior work: docs/results.tex ''level_file'',
+      ''level file'', ''per-process level'', ''emission-scale'' + level, ''c_level''; the entry''s dead ends A-F; site decisions
+      (D564, D566): no level file on the emission-scale target before.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
