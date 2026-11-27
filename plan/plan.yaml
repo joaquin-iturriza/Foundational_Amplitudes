@@ -30174,6 +30174,21 @@ entries:
       s (rtol 1e-9) before anything is written. Diagnosis jobs (2000 uug events, vector_size 32, LHE kept): surrogate FA-ccin2p3-e07631e9
       (runs/kit/mc_madgraph_diag_surr32) and the EXACT integrand at vector_size 32 without KITSURR 74c1767f (runs/kit/mc_madgraph_diag_exact32):
       separates MadEvent''s vector mode at 32 on CC from the KITSURR path.'
+  - at: '2026-11-27T04:05:17+00:00'
+    text: '2026-11-27 ~07:10 @3326ed72b. Slide-11 diagnosis 1 (E9722/E9723): both 2000-event uug jobs at vector_size 32 stopped
+      on the new sqrt-s guard, events at 1.10350160162 GeV: the surrogate FA-ccin2p3-e07631e9 AND the exact integrand without
+      KITSURR 74c1767f. So the fault is MadEvent at an appended vector_size on CC, not our surrogate path. Kept LHE (runs/kit/mc_madgraph_diag_exact32/ee_uug_unweighted_events.lhe.gz):
+      run_card ebeam1/2 500, lpp 0, ''32 = vector_size'', ''1 = nb_warp'' appended; <init> beams 500/500 but cross section
+      7.1024e4 pb (exact 0.1219 at 1 TeV: x(1000/1.1035)^2-ish); every event: beams +-0.5518 GeV along z, the mass column
+      holds 1.2177 = (1.1035)^2 on every particle. MadEvent integrated and wrote events at sqrt s 1.1035 GeV while its card
+      says 500 per beam; the exact runs of 2026-11-26 (default card, no vector_size line) are at 1000. The local design-check
+      run (vec 1024 appended) was at 1000: a CC-only fault of the vector_size edit (suspect: objects built at different VECSIZE_MEMMAX
+      overwriting the beam common, not checked). The earlier 1e5 surrogate numbers (uug 0.12158 pb) are at the wrong energy
+      and void. Diagnosis 2 at MadEvent''s default card (KIT_MC_VEC=0: nothing appended, LHE kept): surrogate FA-ccin2p3-65066301
+      (runs/kit/mc_madgraph_diag_surrdef), exact control df8e8413 (runs/kit/mc_madgraph_diag_exactdef). If both pass the guard:
+      rerun the 1e5 surr jobs at KIT_MC_VEC=0 (time from the serve''s per-call cost at the default batch, measured in 65066301''s
+      serve stats). If the exact control also fails: the CC MadEvent install changed since 2026-11-26, read its Source/vector.inc
+      and make_opts.'
   step_why:
     29:
       feeds: Bakar's slide-10 metrics reported
