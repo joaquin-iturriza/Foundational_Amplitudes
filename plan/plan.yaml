@@ -43976,6 +43976,13 @@ entries:
       warmup 0.1634867, ema True 0.9989315; 60,840 steps, 32G, 4 CPUs, 18 h limit, wall target 13 h of batch level_s30_runs),
       in parallel with the read: its training does not read it; the read''s fail branch cancels it. Step 27 waits on the arm
       and both controls.'
+  - at: '2026-11-27T05:51:47+00:00'
+    text: '2026-11-27 step 28 PASS (D395 smoke read of the per-event level arm): level_subsets.py --check-factor level_events_E_kin_s30.json
+      on the arm smoke''s held-out CSV (FA-ccin2p3-8ed14b18, CPU job ccj_b3ba560a4a90, exit 0): |log_factor + b.(x-x0)/sx|
+      p99 9.2e-5, max 3.6e-3 (< 1e-2), so the x columns (log s_hat, q, E) are aligned and scaled as the training factor. Smoke
+      numbers after 50 steps (plumbing only): new-43 median level error 0.174 (all), 0.395/0.170/0.246/0.158 on s_lo/s_hi/q_hard/q_soft.
+      Arm FA-ccin2p3-0d409c4e stands. Output runs/zz_smoke/zz_smoke_sweep_config_llmcmp_level_events_64949743/level_subsets_smoke.json
+      on CC.'
   step_waits:
     '26': FA-ccin2p3-4ba88991
     '27': FA-ccin2p3-220f71a8 FA-ccin2p3-540fc068 FA-ccin2p3-0d409c4e
