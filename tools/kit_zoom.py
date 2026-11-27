@@ -222,6 +222,7 @@ MEAS_TT = {"relmed": r"median $|\Delta|$, $\Delta=V_{\rm pred}/V_{\rm true}-1$",
 CUT = "divergence-free cut"
 # the draft's arms in its legend order (kit_vs_mlp.PAPER_ORDER), D604: the emission-scale arms are collected, not drawn
 ORDER = ["factor", "scratch", "MLP log", "MLP thr", "MLP raw"]
+ORDER_EMIS = ["factor", "emis_m", "emission", "scratch"]   # the factor-vs-emission-scale figures (steps 37/38)
 
 
 def _arms(p):
@@ -355,6 +356,24 @@ def plot(figs):
             hl[PAPER_OFF] = hl.pop(PAPER_OFF)
         ps.legend(axs[i], "lower left", handles=list(hl.values()), labels=list(hl), fontsize=LEG_PT)
     written.append(ps.save(fig, os.path.join(figs, "kitzoom_paper_relmed")))
+    # D598/D600: factor vs emission scales, at the factor's HPs (step 38) and at their own search's (step 37), the plain
+    # transformer beside; every family at fixed other variable, median |Delta| and MSE(ln)
+    from tools.kit_figures import model_style as _ms
+    for p in ("ee_uug_me2", "ee_uugg_me2"):
+        o = d[p]
+        sty = {a: _ms(a) for a in ORDER_EMIS if a in RUNS[p]}
+        fams = list(o["fams"])
+        for m in ("relmed", "mse"):
+            fig, axs, spare = _grid(len(fams))
+            rows = [(o["fams"][f]["band"]["x"], {"sty": sty, "y": {a: SCALE[m] * _seedmed(r, m) for a, r in
+                     o["fams"][f]["band"]["arms"].items() if a in sty}}, None) for f in fams]
+            _panels(ps, axs, rows, lambda ax, it=iter(fams): XLAB.get(next(it), ""), MEAS[m], PROCESS[p], cap=CAP[m])
+            _legend(axs, spare, PROCESS[p], (0, "upper right"))
+            written.append(ps.save(fig, os.path.join(figs, f"kitzoom_emis_{m}_{p}")))
+        for a in sty:
+            if a in o["core"]["arms"]:
+                print(f"  EMIS {p} {a}: core relmed {_seedmed(o['core']['arms'][a], 'relmed'):.3g} mse(ln) "
+                      f"{LN ** 2 * _seedmed(o['core']['arms'][a], 'mse'):.3g} | bulk mse(ln) {LN ** 2 * _seedmed(o['bulk'][a], 'mse'):.3g}")
     # the core, every process: both measures side by side
     fig, (a1, a2) = ps.figure(ncols=2)
     for k in ORDER:
