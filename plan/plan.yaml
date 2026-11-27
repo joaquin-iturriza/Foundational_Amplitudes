@@ -30215,7 +30215,7 @@ entries:
       - 'wiring within 3 MC errors: numbers to Joaquin in the deck'
       - 'beyond: KITSURR path fault, fix and rerun'
   step_waits:
-    '32': FA-ccin2p3-65066301 FA-ccin2p3-df8e8413
+    '32': FA-ccin2p3-de4314f4
     '30': FA-ccin2p3-69541363 FA-ccin2p3-6f1a5dad FA-ccin2p3-ff4af2bc
     '29': FA-ccin2p3-69541363
   handoff:
