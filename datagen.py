@@ -647,6 +647,8 @@ def mixed_generation(paths, z_max=5.0, n_bins=10, any_version=False):
     by = {}
     for role, d in paths.items():
         for name, pth in d.items():
+            if mg.is_kit(name):
+                continue   # a KIT pool is a slice of KIT's fixed HDF5 file, no generator; with __hard its roles mix bulk and hard rows in different shares by design
             try:
                 sha = (json.load(open(pth + ".recipe.json")).get("provenance") or {}).get("pipeline_sha256")
             except (OSError, ValueError):
