@@ -34993,6 +34993,22 @@ entries:
       lr.'
     sources: 1/7 and 7 <- t t~ V same-HP rerun spread 0.78-6.96 (results.tex sec:datasaving, the passed step-20/step-30 designs'
       bar); 5x jump <- sec:ladder seeds' blow-ups against 1.5x seed noise; 100 GPU-h <- D575 names this work
+    passed_at: '2026-11-27T10:36:08+00:00'
+    reviewer: 'Rerun of the passed 2026-11-26 14:52 held-out qqg A2 arms (FT lr_scale 1 and 0.1, uug and uugg; 4 x 1 V100,
+      3.2 GPU-h under D575) on fixed code @ff4f2e0cf; only the code and the run tags differ, SCR-A2 (6f1a5dad, ff4af2bc) reused
+      as the matched control, unaffected (its asym_sd is its own std 1.4780). Fix read: under target_stats=own with input_asym_factor
+      the map now keeps the parent''s readouts and asym_sd and sets asym_out = (shift + m_p - m_o, s_o), mu = (logsumexp +
+      shift)/std; old checkpoints load with std = asym_sd; job_kit.sh A_ft uses target_stats=own with map_head default true
+      (the untested map_head=false case is not used). tests/test_head_map_own_stats.py run locally: ok. Rerun, not rescoring,
+      is needed: the trained function had the D_t slopes fixed at 1/s_p in own units. Check 2: step-30 FT exponents -0.95/-0.50
+      = 0.487 x truth = s_o/s_p (1.4780/3.0365), deepest-bin log-MSE 3-46 vs SCR-A2 7e-5..0.06; the held-out start moved soft
+      bins 0.57-2.59 decades vs scratch in the non-A2 fine-tunes (findings 2026-11-11); step-0 validation 1.82e3 gives a direct
+      load check. Check 3: BEATS/LOSES at R 1/7, 7 against the t t~ V same-HP rerun spread 0.78-6.96 (sec:datasaving), one
+      seed per D315, same as sibling cells. No-branch is the kit_hpo_tt_ft_r5 FT search best against best (lr re-tuned). HETEROSC;
+      disk 4 x 80 MB vs 9.1 GB free on CC /sps (df now); wall from the same step-30 runs (40 min). Advice: the 4 h script-default
+      limit is 5x the 0.8 h target, pass --hdr=--time=01:30:00. Searched: heldoutqqg, held-out q, asym_sd, asym_out, target_stats=own,
+      map_head in docs/results.tex (none); plan kit_benchmark findings 2026-11-10/11, 2026-11-27 10:18 and 10:33; site runs
+      for ftfix/heldoutqqg (none submitted); site decisions D570-D575.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
