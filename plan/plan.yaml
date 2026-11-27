@@ -30406,6 +30406,7 @@ entries:
     '32': FA-ccin2p3-a8d68ffe
     '33': FA-ccin2p3-ddd2e7a7
     '36': detached drive.py kit_hpo_uugg_ft_heldoutqqg (pid 2497598, DONE event)
+    '34': CPU reads ccj_d398435d7985 (collect) and ccj_4ad504a93003 (curves) queued on CC htc; then the uug search design
   handoff:
     state: '2026-11-27 ~14:55 @0553d1e06. Step 34''s open check settled: a bug, not transfer. model.input_asym_factor''s asym_sd
       (readout unit AND output divisor) was overwritten by the parent''s at the fine-tune load, and the target_stats=own map
