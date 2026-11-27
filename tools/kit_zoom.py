@@ -201,7 +201,7 @@ def _seedmed(rows, k):
 VLAB = {"x": r"soft gluon $x=2E_g/\sqrt{s}$", "y": r"collinear $y=s_{qg}/s$",
         "ygg": r"gluon-gluon collinear $y=s_{gg}/s$", "yqg": r"quark-gluon collinear $y=s_{qg}/s$",
         "beta": r"top velocity $\beta$", "sqrts": r"$\sqrt{s}$ [GeV]",
-        "a": r"gluon angle $\min_i s_{ig}/(s\,x)$", "z": r"gluon energy share $z=E_{\rm soft}/(E_1+E_2)$",
+        "a": r"gluon angle $\min_i s_{ig}/(s\,x)$", "z": r"gluon energy share $z=E_{\rm soft}/(E_{\rm soft}+E_{\rm hard})$",
         "xg": r"collinear gluon $x_g=2E_g/\sqrt{s}$"}
 VLAB_UUG = dict(VLAB, a=r"gluon angle $y/x$, $y=\min s_{qg}/s$", x=r"gluon energy $x=2E_g/\sqrt{s}$")
 MEAS = {"rel": r"mean $|\mathcal{M}^2_{\rm pred}-\mathcal{M}^2_{\rm true}|/\mathcal{M}^2_{\rm true}$",
