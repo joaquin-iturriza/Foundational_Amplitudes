@@ -28411,8 +28411,8 @@ entries:
       FA-ccin2p3-5819e2fe FA-ccin2p3-e5c41742 FA-ccin2p3-27013dea FA-ccin2p3-aca0bcaa FA-ccin2p3-2128f5f5 (fairnlo_arms.py
       FT lines, limit 1:00, target 0.25 h); on their end KIT-score read FT vs SCR-A2 vs V/B per D (design PASS 2026-11-26T02:27
       / 13:00), with the parent''s and arms'' curves'
-    29: 'Slide-10 metrics never reported: bias, 99th percentile, |M|^2-weighted relative error per bin and the azimuth harmonic
-      h (computed by his evaluate.py, kit_result.json) into the slide-9-style summary for A2 (fine-tunes when they exist)'
+    29: 'Slide-10 metrics: A2 and protocol B done (finding 2026-11-27 ~03:30, kit_readout --slide10); add the fine-tunes,
+      tt FT per D (step 24) and uug/uugg FT1/FT0.1 (step 30), when they end'
     30: 'Protocol A pretrained, ee_qqg/qqgg families held out, A2, uug/uugg (D575, design PASS): parent smoke FA-ccin2p3-42ae3468
       (recipe transfer_finale_kit_heldout_qqg.yaml @6a6ca8839); on its clean end the real parent (tag kit_heldoutqqg_a2, limit
       14 h, target 10 h) + FT1/FT0.1/SCR-A2 50-step smokes from the smoke parent; SCR-A2 real arms once the parent''s config
@@ -30076,7 +30076,7 @@ entries:
     29:
       feeds: Bakar's slide-10 metrics reported
       if:
-      - 'metrics present for every A2 run: summary drawn'
+      - 'metrics present for every fine-tune: table completed'
       - 'a run lacks them: rescore it (REREAD)'
     30:
       feeds: 'Bakar''s most interesting test: limits without hard data when pretrained with the target family held out'
@@ -30091,7 +30091,6 @@ entries:
       - 'beyond 3 errors: KITSURR path fault, fix and rerun before any number goes out'
   step_waits:
     '24': FA-ccin2p3-5819e2fe FA-ccin2p3-e5c41742 FA-ccin2p3-27013dea FA-ccin2p3-aca0bcaa FA-ccin2p3-2128f5f5
-    '29': FA-ccin2p3-5819e2fe FA-ccin2p3-e5c41742 FA-ccin2p3-27013dea FA-ccin2p3-aca0bcaa FA-ccin2p3-2128f5f5
     '32': FA-ccin2p3-b9d55720 FA-ccin2p3-96ce4464
     '30': FA-ccin2p3-69541363 FA-ccin2p3-6f1a5dad FA-ccin2p3-ff4af2bc
   handoff:
