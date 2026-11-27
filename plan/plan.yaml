@@ -42628,6 +42628,13 @@ entries:
     withdrawn_at: '2026-11-26T20:21:11+00:00'
     withdrawn_why: his 'Do whatever needs to be done' settles it; the sync block was fixed in our repo (61c2b9698), CC's file
       untouched
+  - ask: 'Scope: the off-shellness input of our latest setup: try another encoding of it, or keep it as is?'
+    at: '2026-11-27T01:10:50+00:00'
+    searched: 'CLAUDE.md (a repair never changes the inputs) and site decisions D564/D567: none chooses this encoding. 2026-11-14T04:31
+      is the paper draft''s LaTeX source he pasted (describes the input, chooses no encoding); 2026-11-10T02:08 is an uploaded
+      file reference, no instruction on the input'
+    blocks: nothing
+    blocks_steps: &id004 []
   owner:
     agent: a91889ef4874423bf
     state: working
@@ -48218,6 +48225,13 @@ entries:
       diverges shouldn't wake you and it's owning agent up.
     said_at: '2026-11-24T10:33:58.174000+00:00'
     at: '2026-11-24T11:23:35+00:00'
+  ask: 'Scope: the off-shellness input of our latest setup: try another encoding of it, or keep it as is?'
+  waiting_since: '2026-11-27T01:10:50+00:00'
+  searched: 'CLAUDE.md (a repair never changes the inputs) and site decisions D564/D567: none chooses this encoding. 2026-11-14T04:31
+    is the paper draft''s LaTeX source he pasted (describes the input, chooses no encoding); 2026-11-10T02:08 is an uploaded
+    file reference, no instruction on the input'
+  blocks: nothing
+  blocks_steps: *id004
 - id: lab_llm_trial
   title: Lab LLMs in place of some subagents
   question: Can the lab's LLMs (deepseek-v4-flash, qwen3.8-27b via lpnllm) do some of our subagent work (mechanical steps,
@@ -49210,7 +49224,7 @@ entries:
       2026-11-14T04:31 (pasted SciPost template, text only) and 2026-10-02T11:24 (yes to a tf32 speed check, a precision question,
       not the batch) do not settle it.'
     blocks: nothing
-    blocks_steps: &id004 []
+    blocks_steps: &id005 []
   owner:
     agent: acb8c25b26df20051
     state: working
@@ -50450,7 +50464,7 @@ entries:
     writeup: 4b744779f
     why: two open questions to Joaquin
   blocks: nothing
-  blocks_steps: *id004
+  blocks_steps: *id005
   checked_until: '2026-11-26T18:21:15+00:00'
 - id: cc_disk
   title: What uses disk on CC and what can be deleted
@@ -50595,7 +50609,7 @@ entries:
       2026-11-10T02:08, 2026-11-11T02:02, 2026-11-11T02:09, 2026-10-04T19:25, 2026-10-31T03:39, 2026-11-12T00:33, 2026-10-05T04:33,
       2026-10-24T14:35, 2026-10-09T03:51, 2026-10-29T13:18 (other subjects: paper template, draft plan, local /tmp, cluster
       outage, a run readout, a submit log, hooks, physics, explanations, LLM use)'
-    blocks_steps: &id005
+    blocks_steps: &id006
     - 3
   owner:
     agent: a7580c28f015ad776
@@ -51161,7 +51175,7 @@ entries:
     2026-11-11T02:02, 2026-11-11T02:09, 2026-10-04T19:25, 2026-10-31T03:39, 2026-11-12T00:33, 2026-10-05T04:33, 2026-10-24T14:35,
     2026-10-09T03:51, 2026-10-29T13:18 (other subjects: paper template, draft plan, local /tmp, cluster outage, a run readout,
     a submit log, hooks, physics, explanations, LLM use)'
-  blocks_steps: *id005
+  blocks_steps: *id006
 - id: cc_login_jobs
   title: 'CC login node: recurring and long scripts moved to Slurm (CC support''s email)'
   question: 'Can every non-interactive script we run on CC''s login node (the supervisor''s maintain commands: disk_watch,
