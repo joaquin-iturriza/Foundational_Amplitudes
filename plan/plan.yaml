@@ -30314,6 +30314,11 @@ entries:
       of mine: the logged value is the HETEROSC NLL (later points go negative), and a parent trained to small sigma scores
       e^2/(2 sigma^2) on a process it never saw: step 0 is 2.65e3 uug, 9.41e3 uugg (step 30: 1.82e3); val NLL 1.89 by step
       36. Exactness rests on the unit test; the parent''s zero-shot NLL on this val pool was not computed.'
+  - at: '2026-11-27T10:48:31+00:00'
+    text: '2026-11-27 ~13:55. Correction to the ~13:10 finding: the fair FT per-D HPs were NOT searched under the bug. The
+      stage-2 searches dsave_s2_ft_ee_ttbar_nlo_d{4..8} fine-tuned from runs/data_saving/dsave_parent_treesin_r4 (sweep/sweep_config_dsave_s2_ft_ee_ttbar_nlo_d4_t5950.yaml:
+      base_config and pretrained_path treesin_r4, no input_asym_factor), so their HPs stand; the redo is the 5 fair FT finals
+      only, at those HPs (step 35), not a new search.'
   step_why:
     32:
       feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
