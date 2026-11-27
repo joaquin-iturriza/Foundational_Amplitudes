@@ -45420,6 +45420,16 @@ entries:
       processes. Validation (val_loss_no_reg, main stage, 20 points) falls -2.02 -> -6.26 with no spike, then the sigma stage.
       Figure figs/step26_tprop_heldout_per_process.png. Near-pole contrast (factor_split --pole-run) pending: CC CPU job ccj_37031841e6dd,
       detach step26_27_cpu_reads.'
+  - at: '2026-11-27T18:43:33+00:00'
+    text: '2026-11-27 step 26 near-pole read (factor_split --pole-run, CC CPU job ccj_37031841e6dd, data/c_tprop_factor_split.json
+      @16475f498): near-pole fifth minus rest mean d of log|M|^2 on g g > t b~ w- / g g > b t~ w+: -0.289 / -0.316 (se 0.032
+      / 0.029) against c_best''s -2.494 / -2.476; near-pole mean d +0.18 / +0.41 (c_best -7.65 / -7.56). Design branch PARTLY:
+      the contrast rose above c_best''s by far more than the same-setup spread 1.34 and the pair MSE passes (1.16/1.23 <=
+      5.07/4.92), but it is not within -max(2 se, 0.19) = -0.19: the factor places the top resonance in g g (gap 36.9 -> 1.16),
+      a residual 0.3 nat dip at the pole stays; the remaining error is the off-shell tails (binned mean d up to ~+1.4 at both
+      ends of the input, figs/c_tprop_factor_split_offshell_6_tbw.png). Costs: seen pooled RMSE 1.85x c_best''s, new-43 median
+      MSE 1.163 vs 0.979, H+tau processes up. Next per the design''s feature rule: the factor is not judged at trial_1860''s
+      HPs alone; the 8-trial DyHPO search for this arm, best against part (c)''s best, ~128 GPU-h > 100: Joaquin''s go.'
   step_waits:
     '26': detach step26_27_cpu_reads (factor_split.py --pole-run on runs/llmcmp_c_tprop/trial_1860, CC CPU job ccj_37031841e6dd)
     '28': 'step 26''s near-pole read (detach step26_27_cpu_reads): its branch decides step 28''s base config (c_latest, or
