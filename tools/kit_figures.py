@@ -56,6 +56,7 @@ MODELS = {"truth": ("truth", "k", None, "-"),
           "FTlr": (r"fine-tuned, lr scale $0.126$", "sky", "*", "none"),  # fair one-loop D=1e3 rerun
           "FT01": (r"fine-tuned, lr scale $0.1$", "purple", "v", "--"),   # the same fine-tune at a tenth of the lr
           "FT05": (r"fine-tuned, lr scale $0.5$", "orange", "v", "--"),   # held-out uug: the half-lr rerun (step 34)
+          "FTS": ("fine-tuned, searched", "green", "*", "-"),  # held-out qqg: the best of the 16-trial FT search (steps 34b/36)
           "SCR": ("from scratch", "blue", "o", "-"),
           "VB": ("from scratch on $V/B$,\nexact Born", "vermillion", "s", "--")}
 
@@ -566,7 +567,8 @@ SLIDE10 = {"a2": ((("factor", ("A", None)), ("B_bulk", ("B_bulk", None)), ("B", 
            # the held-out qqg protocol (steps 30/34): from scratch on the held-out parent's config vs fine-tuned from it
            # (tags _ftfix: the reruns after the asym_sd head-map fix ff4f2e0cf; the void _ft/_ft01 stay in the data)
            "heldout": ((("SCR", ("A", "heldoutqqg_scra2")), ("FT", ("A_ft", "heldoutqqg_ftfix")),
-                        ("FT01", ("A_ft", "heldoutqqg_ftfix01")), ("FT05", ("A_ft", "heldoutqqg_ftfix05"))),
+                        ("FT01", ("A_ft", "heldoutqqg_ftfix01")), ("FT05", ("A_ft", "heldoutqqg_ftfix05")),
+                        ("FTS", ("A_ft", "heldoutqqg_ftbest"))),
                        ("ee_uug", "ee_uugg"))}
 
 
@@ -609,7 +611,8 @@ def slide10_fig(path, out, arms="a2"):
                 ax.scatter(np.abs(v[neg]), yy[neg], facecolors="none", edgecolors=c, marker=mk, zorder=3)
         ax.set_xscale("log"); ax.set_xlabel(lab)
         ax.set_yticks(y); ax.set_yticklabels([t for _, _, t in rows])
-    ps.legend(axs.flat[0], "lower left"); ps.make_room(axs.flat[0])
+    # two columns: a one-column legend of five arms needs more y-range than make_room grants and squeezes the rows
+    ps.legend(axs.flat[0], "lower left", ncol=2 if len(arms) > 3 else 1); ps.make_room(axs.flat[0])
     print("saved", ps.save(fig, out))
 
 
