@@ -28722,7 +28722,7 @@ entries:
     agent: a7c4a4c4e50f1e90c
     state: working
     since: '2026-11-26T23:58:29+00:00'
-    state_at: '2026-11-27T00:34:41.921000+00:00'
+    state_at: '2026-11-27T00:52:40.478000+00:00'
     context: 185856
     context_at: '2026-11-27T00:52:48+00:00'
   findings:
