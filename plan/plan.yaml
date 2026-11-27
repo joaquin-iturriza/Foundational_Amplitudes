@@ -28725,7 +28725,7 @@ entries:
     withdrawn_why: 'D574: no more trainings for today''s reply; a pretrained held-out uug/uugg run is training'
   owner:
     agent: a94e2003bc6a91b30
-    state: working
+    state: closed
     since: '2026-11-27T09:14:35+00:00'
     state_at: '2026-11-27T10:12:29.667000+00:00'
     context: 123640
@@ -30291,37 +30291,25 @@ entries:
     '32': FA-ccin2p3-a8d68ffe
     '33': FA-ccin2p3-c5a3365b
   handoff:
-    state: '2026-11-27 ~08:55 @c39c066ff (synced; CC at 2081e2f87). Step 32 (slide 11 exact): MadEvent''s vector mode (any
-      appended vector_size) is broken on CC MG5 3.7.0 for this setup (cards say 1000 GeV, log ''Set CM energy to 1000'', yet
-      points and events at 1.1035 GeV, exact integrand too); the default card is sound (exact df8e8413 and surrogate de4314f4
-      pass the sqrt-s guard; de4314f4 sigma_hat 0.121975 +- 0.000844 pb at 2000 uug events vs exact 0.121861). The default
-      card calls the surrogate one event at a time: uug 52.7 ms, uugg 86.7 ms per call (benches, = kit_predict to 0). Re-laid
-      out under the design passed 08:37: each 1e5 run = 50 seed parts x 2000 events (job mode surr_part as a Slurm array,
-      seeds 1001-1050, dirs runs/kit/mc_madgraph_surrparts/<proc>_s<seed>, --env KIT_MC_VEC=0) + one surr_combine per process
-      (afterok on its array) into runs/kit/mc_madgraph (combine --expect 50 ''runs/kit/mc_madgraph_surrparts/<proc>_s*'',
-      then predict --surr, predict, metrics). D395 smoke in flight: FA-ccin2p3-fe5393dc (2 uug parts x 300, seeds 9001-9002,
-      runs/kit/mc_madgraph_smokeparts) -> FA-ccin2p3-ca8ba529 (surr_combine --expect 2 into runs/kit/mc_madgraph_diag_exactdef).
-      On its RUN_DONE: site pick FA --jobs 102; uug: site submit ccin2p3 FA scripts/job_kit_mc_madgraph.sh --item kit_benchmark
-      --env KIT_MC_VEC=0 --hdr=--array=0-49 --hdr=--cpus-per-task=4 --hdr=--time=04:00:00 -- surr_part ee_uug runs/kit/mc_madgraph_surrparts
-      2000 runs/kit/kit_A_ee_uug_me2_n100000_t1831_hpo_asym_cont 1001; uugg the same with ee_uugg, its run dir, --cpus-per-task=8
-      --time=06:00:00; then each surr_combine with --hdr=--dependency=afterok:<array job id> --expect 50; plan target (uug
-      1.3 h, uugg 1.5 h estimate); read the first uugg parts'' serve stats. Then the readout per the design (wiring check
-      sigma_hat/sigma vs E_exact[u], numbers, figure_exact with the tt part 12d32b55, differences from slide 11 first: default
-      card, 50 seed parts) and slides in talks/kit_reply_nov2026. Step 30: parent FA-ccin2p3-69541363 running (iteration 21334/64000
-      at 04:40 CET, ~7.9 h total); at its end FT1/FT0.1 per process (A_ft, KIT_LR_SCALE 1 / 0.1, tags heldoutqqg_ft / heldoutqqg_ft01),
-      then FT vs SCR-A2 and step 29''s slide-10 redraw.'
-    decisions: 'Joaquin''s: D570, D571, D572, D574, D575, D315. Mine: default card instead of a vector_size (the only setting
-      that integrates at the right energy on CC; repair); split into seed parts rather than one 1e5 run (one-event calls make
-      a single run ~3-10 h; parts finish in one wave); seeds 1001+ so the surrogate and exact MC errors are independent; serve
-      INFO logging off (disk); one-event Predictor path: train/val read a fixed 2-event pool, catalog lookup memoized (repo-reviewer
-      PASS); did not debug MG''s vector path further (no local KIT data; open-ended).'
-    ruled_out: KITSURR/serve as the cause of the 1.1035 GeV events; stale objects in the vec-32 work dir (all compiled after
-      vector.inc); vector_size 1024/512/256/32; MG5 version (3.7.0 both sides); FIFOs, path length.
-    running: FA-ccin2p3-fe5393dc (smoke parts array), FA-ccin2p3-ca8ba529 (smoke combine, afterok), FA-ccin2p3-69541363 (held-out
-      parent, step 30)
-    files: tools/kit_mc_madgraph.py (Predictor, cmd_combine, cmd_serve), scripts/job_kit_mc_madgraph.sh (surr_part, surr_combine),
-      tools/kit_readout.py, tools/kit_figures.py, talks/kit_reply_nov2026/main.tex
-    written: '2026-11-27T08:44:13+00:00'
+    state: '2026-11-27 ~12:10 @05b4c69ac (CC synced at 33f188ffc). Step 30 read (finding ~12:00): held-out qqg fine-tunes
+      FT1/FT0.1 (69de38db 48701a30 1a1c9a47 b6abfc18) miss every uug/uugg limit by 2-7 decades (log-MSE 3-46 vs SCR-A2 7e-5..0.06;
+      exponents -0.4..-0.95 vs -1/-2), bulk within 0.5 decades; step 29 slide-10 redraw done (kit_slide10_heldout, kit_slide10_fairnlo_{bulk,threshold,sudakov};
+      deck slides 20, 22-24, rebuilt). Ready: step 34, the FT search design (the passed design''s ''neither'' branch), read
+      first whether the parent''s factor coefficients start suppressed. In flight: steps 32 (uug slide-11: parts array 5e977b39
+      -> combine a8d68ffe) and 33 (uugg: 66fc3d1c -> c5a3365b), readout per the 08:37 design (wiring check sigma_hat/sigma
+      vs E_exact[u], eps2 quantiles, figure_exact with the tt part 12d32b55, differences from slide 11 first: default card,
+      50 seed parts), slides in talks/kit_reply_nov2026.'
+    decisions: 'Joaquin''s: D570, D571, D572, D574, D575, D315. Mine: fine-tunes launched with SCR-A2''s HP arguments verbatim
+      per process (matched control); uugg slide-11 split into its own step 33 (own readout); slide-10 held-out figure as its
+      own arm set (from scratch / fine-tuned / lr 0.1) rather than mixed into the A2+B figure (different from-scratch reference);
+      fair one-loop slide-10 metrics as three figures (one per stratum, metrics vs D_train) with the lr-0.126 rerun as its
+      own star marker (hollow already means negative bias).'
+    ruled_out: Config difference between FT and SCR-A2 beyond start weights, target_stats, lr_scale (config.yaml diff on CC).
+    running: FA-ccin2p3-5e977b39 (uug parts array), FA-ccin2p3-a8d68ffe (uug combine, afterok), FA-ccin2p3-66fc3d1c (uugg
+      parts array), FA-ccin2p3-c5a3365b (uugg combine, afterok)
+    files: tools/kit_figures.py (slide10 --arms, fairnlo --slide10), analysis/kit_benchmark/data/kit_fig_heldoutqqg.json,
+      talks/kit_reply_nov2026/main.tex, tools/kit_mc_madgraph.py, scripts/job_kit_mc_madgraph.sh, tools/kit_readout.py
+    written: '2026-11-27T10:20:05+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
