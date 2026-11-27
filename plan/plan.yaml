@@ -43934,6 +43934,9 @@ entries:
       30 seeds, same events), then one arm (data.level_file in c_latest at trial_1860''s HPs) against c_best (trial_1860)
       and the arm''s same-seed retrain for R_b; read new-43 median bias^2, the subsets (level_subsets.py), held-out pooled
       RMSE against 1.178 and the LLM''s 0.721, Suprio''s layout. Own design and review first; ~2 x 16 GPU-h'
+    29: 'step 26''s PARTLY branch (feature rule): the Breit-Wigner target arm''s own 8-trial DyHPO search over the template''s
+      space (sweep_config_llmcmp_c_tprop.yaml, single fidelity 60,840 steps), best against part (c)''s best (trial_1860);
+      ~128 GPU-h at ~16 h per trial, above 100: on Joaquin''s go; own design and review'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -44279,6 +44282,13 @@ entries:
         to Joaquin with Suprio''s layout'
       - 'NO (within R_b of c_best''s): the level lever does not carry over the emission-scale target; reported, the next attempt
         designed'
+    29:
+      feeds: 'D564: does the Breit-Wigner factor in the target, at its own best HPs, beat part (c)''s best on held out without
+        the seen cost (1.85x) seen at trial_1860''s HPs'
+      if:
+      - 'YES (best tprop trial''s held-out pooled RMSE below c_best''s 1.178 beyond the retrain spread, seen within 1.11x):
+        part (c)''s setup takes the factor'
+      - 'NO: the factor stays a per-family fix with a seen cost; reported'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
