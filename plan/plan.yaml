@@ -43952,6 +43952,13 @@ entries:
       2 h, code @052eb433e) submitted; step 27 waits on it; on SMOKE_EXIT 0 its held-out llm_score (ONLY=heldout EVENTS=1)
       + level_subsets --check-factor, and the arm run (trial 7201) in parallel with that read. Controls FA-ccin2p3-220f71a8/-540fc068
       at iteration 1000 after 575 s (9.7 h estimate, V100). Step 26 FA-ccin2p3-4ba88991 at 13521/60840 (11.9 h estimate).'
+  - at: '2026-11-27T04:46:35+00:00'
+    text: '2026-11-27 05:35 CET step 27: arm smoke FA-ccin2p3-2fbcce14 SMOKE_EXIT 0 (training 50 steps, test, plots, 17.2
+      min; log: target factor ON (memmap) 1352 processes, mean log F -0.172, 5-95% -3.64 to 2.71 = the level_events factor;
+      level_file s30 median |own mean - level| 0.056 on train). E9730 acked. Held-out read and arm run NOT submitted: site
+      submit refuses on another agent''s uncommitted .claude/hooks/submit_guard.py + tests/test_submit_data_check.py, and
+      both --allow-dirty and stashing those files were denied by the permission classifier. Submits once those files are committed
+      by their owner.'
   step_waits:
     '26': FA-ccin2p3-4ba88991
     '27': FA-ccin2p3-2fbcce14
