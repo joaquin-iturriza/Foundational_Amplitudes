@@ -66,6 +66,8 @@ def parse(name):
 def h5_path(stem):
     if stem.startswith("uq_"):       # zng_uq_benchmark's converted Zenodo 16793011 files (tools/zng_uq.py)
         return os.path.join(os.environ["DATA_DIR"], "zng_uq", f"{stem}.h5")
+    if stem.startswith("fa_"):       # our own files in KIT's layout (tools/kit_ttg.py: fa_ee_ttg, kit_benchmark step 39)
+        return os.path.join(os.environ["DATA_DIR"], "kit_like", f"{stem}.h5")
     return os.path.join(kit_dir(), f"{stem}.h5")
 
 

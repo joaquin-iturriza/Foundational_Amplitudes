@@ -42,7 +42,7 @@ TAG=; ARGS=(); for x in "$@"; do case "$x" in tag=*) TAG="_${x#tag=}";; seed=*) 
 STEM="${DS#kit_}"; FILE="${STEM%%__*}"; TGT="${STEM#*__}"
 OUT="$PROJECT_DIR/runs/kit/kit_${MODE}_${FILE}_${TGT}_n${N}_t${T}${TAG}"
 NAME="$DS"; [ "$MODE" = B ] && NAME="${DS}__hard"
-case "$FILE" in *tt*) SQ="[346, 50000]" ;; *) SQ="[1000, 1000]" ;; esac
+case "$FILE" in *ttg*) SQ="[1000, 1000]" ;; *tt*) SQ="[346, 50000]" ;; *) SQ="[1000, 1000]" ;; esac
 # the recipe lives beside the run dir, not in it: run.py refuses an existing run dir (a fresh start, never a warm one)
 mkdir -p "$PROJECT_DIR/runs/kit/recipes"
 RECIPE="$PROJECT_DIR/runs/kit/recipes/$(basename "$OUT").yaml"

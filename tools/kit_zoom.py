@@ -213,6 +213,7 @@ VLAB_UUG = dict(VLAB, a=r"gluon angle $y/x$, $y=\min s_{qg}/s$", x=r"gluon energ
 # the draft's natural log (Sec. 7, kit_vs_mlp paper figures): MSE(ln) = ln(10)^2 MSE(log10), medians ln(10) log10
 LN = float(np.log(10))
 SCALE = {"rel": 1.0, "relmed": 1.0, "mse": LN ** 2}
+CAP = {"rel": 1e6, "relmed": 1e6, "mse": 1e200}
 MEAS = {"relmed": r"median $|\Delta|$, $\Delta=|\mathcal{M}|^2_{\rm pred}/|\mathcal{M}|^2_{\rm true}-1$",
         "rel": r"mean $|\Delta|$, $\Delta=|\mathcal{M}|^2_{\rm pred}/|\mathcal{M}|^2_{\rm true}-1$",
         "mse": r"MSE$(\log|\mathcal{M}|^2)$"}
@@ -228,13 +229,22 @@ def _arms(p):
     return {a: model_style(a) for a in ORDER if a in RUNS[p]}
 
 
-def _panels(ps, axs, rows, xlab, ylab, proc, logx=True):
+def _panels(ps, axs, rows, xlab, ylab, proc, logx=True, cap=1e200):
     """one panel per (x, {arm: y}) row, every arm in ORDER's style"""
     from matplotlib.ticker import NullFormatter
+    from tools.kit_figures import clip_plot, off_entry
+    from tools.kit_vs_mlp import PAPER_OFF
     for ax, (x, ys, extra) in zip(axs, rows):
+        fin = [v for a in ys["y"] for v in np.ravel(ys["y"][a]) if np.isfinite(v)]
+        # above `cap` a value sits on the top edge, hollow (the draft's convention for off-scale medians): |Delta| beyond
+        # 1e6 (an overshoot by six decades, up to 10^231 for the raw-invariant MLP at 45 TeV) and any overflow
+        hi = min(10 * max(fin), cap) if fin else 1.0
+        off = False
         for a, (name, c, mk, ls) in ys["sty"].items():
             if a in ys["y"]:
-                ax.plot(x, ys["y"][a], color=c, marker=mk, ls=ls, label=name)
+                off |= clip_plot(ax, x, ys["y"][a], 0, hi, None, color=c, marker=mk, ls=ls, label=name)
+        if off:
+            off_entry(ax, PAPER_OFF)
         if extra:
             extra(ax)
         if logx:
@@ -275,7 +285,7 @@ def plot(figs):
                 cut = o["cuts"][v][1]
                 rows.append((b["x"], {"sty": sty, "y": {a: SCALE[m] * _seedmed(r, m) for a, r in b["arms"].items()}},
                              lambda ax, cut=cut: ax.axvline(cut, color="0.5", ls=":", label=CUT)))
-            _panels(ps, axs, rows, lambda ax, it=iter(vs): vl[next(it)], ylab, PROCESS[p])
+            _panels(ps, axs, rows, lambda ax, it=iter(vs): vl[next(it)], ylab, PROCESS[p], cap=CAP[m])
             _legend(axs, spare, PROCESS[p], (0, "upper left"))
             written.append(ps.save(fig, os.path.join(figs, f"kitzoom_bulk_{m}_{p}")))
             # (b, c) every family per bin of its singular variable, the other variable in its band
@@ -287,7 +297,7 @@ def plot(figs):
                 rows.append((b["x"], {"sty": sty, "y": ys}, None))
                 for a, y in ys.items():
                     print(f"  {m.upper()} {p} {f} {key(f)} {a}: " + " ".join(f"{x:.2g}:{v:.3g}" for x, v in zip(b["x"], y)))
-            _panels(ps, axs, rows, lambda ax, it=iter(fams): XLAB.get(next(it), ""), ylab, PROCESS[p])
+            _panels(ps, axs, rows, lambda ax, it=iter(fams): XLAB.get(next(it), ""), ylab, PROCESS[p], cap=CAP[m])
             _legend(axs, spare, PROCESS[p], (0, "upper right"))
             written.append(ps.save(fig, os.path.join(figs, f"kitzoom_fam_{m}_{p}")))
             # the deepest decade of each family against its other variable (the soft-collinear corners)
@@ -303,7 +313,7 @@ def plot(figs):
                         print(f"  SCAN {m} {p} {f} deepest {sc['deep'][0]:.1e}-{sc['deep'][1]:.1e} vs {sc['var']} {a}: "
                               + " ".join(f"{x:.2g}:{v:.3g}" for x, v in zip(sc["x"], y)))
                 _panels(ps, axs, rows, lambda ax, it=iter(sf): vl[o["fams"][next(it)]["scan"]["var"]], ylab, PROCESS[p],
-                        logx=False)
+                        logx=False, cap=CAP[m])
                 _legend(axs, spare, PROCESS[p], (0, "upper left"))
                 written.append(ps.save(fig, os.path.join(figs, f"kitzoom_scan_{m}_{p}")))
         # the medians at fixed other variable
