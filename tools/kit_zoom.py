@@ -53,7 +53,11 @@ RUNS = {"ee_uug_me2": {"factor": ["runs/kit/kit_A_ee_uug_me2_n100000_t1831_hpo_a
         "ee_tt_virt_finite": {"factor": ["runs/kit/kit_A_ee_tt_virt_finite_n100000_t1831_hpo_asym_cont"],
                               "scratch": ["runs/kit_hpo_ttvirt_thr/trial_0131"],
                               "MLP thr": [MLP.format(p="ee_tt_virt_finite", s=s) for s in range(3)],
-                              "MLP raw": [MLPR.format(p="ee_tt_virt_finite", s=s) for s in range(3)]}}
+                              "MLP raw": [MLPR.format(p="ee_tt_virt_finite", s=s) for s in range(3)]},
+        # step 39 (D600 (b)): the three arms at the plain search's best clean trial hp1668 (its scores copied lxplus -> CC)
+        "fa_ee_ttg_me2": {"factor": ["runs/kit/kit_A_fa_ee_ttg_me2_n100000_t1831_hpo_asym_hp1668"],
+                          "emis_m": ["runs/kit/kit_A_fa_ee_ttg_me2_n100000_t1831_hpo_emis_hp1668"],
+                          "scratch": ["runs/kit_hpo_ttg_plain/trial_1668"]}}
 # family -> (singular variable, other variable, its band)
 FAMS = {"ee_uug": {"coll_y": ("y", "x", (0.45, 0.55)), "soft_x": ("x", "a", (0.28, 0.32))},
         "ee_uugg": {"coll_gg_y": ("ygg", "z", (0.33, 0.37)), "coll_qg_y": ("yqg", "xg", (0.25, 0.35)),
