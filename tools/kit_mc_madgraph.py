@@ -186,8 +186,11 @@ def lhe_weights(path):
 def sigma_err_log(log):
     """(sigma, error) in pb of MadEvent's last 'Cross-section : X +- Y pb' line of a generate_events log."""
     import re
-    m = re.findall(r"Cross-section :\s*([-+0-9.eE]+) \+- ([-+0-9.eE]+) pb", open(log).read())
-    assert m, f"no cross-section line in {log}"
+    txt = open(log, errors="replace").read()
+    m = re.findall(r"Cross-section :\s*([-+0-9.eE]+) \+- ([-+0-9.eE]+) pb", txt)
+    if not m:   # MadEvent's own reason (e.g. 'Survey return zero cross section') instead of a bare assert
+        why = [l.strip() for l in txt.splitlines() if re.search(r"zero cross section|Zero result|No points passed|Error", l)]
+        sys.exit(f"{log}: MadEvent gave no cross section: {' | '.join(why[:4]) or 'no reason in the log'}")
     return float(m[-1][0]), float(m[-1][1])
 
 
