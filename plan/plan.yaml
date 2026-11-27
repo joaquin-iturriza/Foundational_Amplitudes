@@ -30073,6 +30073,14 @@ entries:
       test dotted) and the slide-10 metrics (slide ''Bias, 99th percentile, weighted error'': kit_figures.py slide10, A2 /
       bulk only / hard points added on bulk and deepest bins), after ''Summary, deepest bins''; rebuilt 0 errors 0 overfull.
       Data kit_fig_B_a2.json.'
+  - at: '2026-11-27T02:19:53+00:00'
+    text: '2026-11-27 ~04:20: slide-11 surrogate MadEvent: the survey-zero failure is vector_size 1024 (b9d55720 fails ~30
+      s in, as 8ac98689/cb3f868c); at vector_size 32 (96ce4464) the survey and generation pass: 2000 uug events, sigma_hat
+      0.12200 +- 0.00100 pb vs exact 0.121861 (+1.1e-3, 1.1 sigma); job ended FAILED only at the exact-sample re-score (test
+      dir lacks ee_uug.h5). Cost found: serve stats 30 ms per surrogate evaluation at 32 events per call (1566 s / 51616 evals
+      in channel G1c0) against the design''s 2.6 ms: >2x margin, to fix (per-call rebuild of the experiment in kit_mc_madgraph
+      serve; or find why 1024 gives survey zero). Root cause of the 1024 failure not found. 1e5 jobs b45a89e1/6360f286 out
+      at 32 meanwhile (target 5 h, limits 6/12 h).'
   step_why:
     24:
       feeds: 'D570: does fine-tuning from the signed A2 pretraining beat SCR-A2 and V/B with exact Born on ee->tt one loop
