@@ -28440,6 +28440,11 @@ entries:
       the transformer with emission scales (target_physics_factor, dim_ref qperp); (b) extrapolation plots: hold the other
       divergence parameter fixed instead of averaging over it; (c) a relative error measure beside MSE(log|M|^2) on these
       plots, to see whether the largest amplitudes dominate'
+    38: 'D600 (a): emission-scale transformer at the factor''s own HPs on u u~ g and u u~ g g (the one-change control of the
+      factor: factor command with data.target_physics_factor=true and no input_asym_factor, frames_gamma_max=4, HPs hp1918
+      / hp0798 verbatim from runs/kit/kit_A_ee_<p>_n100000_t1831_hpo_asym_cont/config.yaml, tag hpo_emis_matched; job_kit.sh
+      mode A, 1831 steps, scored by kit_predict). Design after step 34b''s review verdict (one latest design at a time), then
+      add both to tools/kit_zoom.py RUNS as the matched emission arm beside the searched one (trial_1493/1196). ~1 GPU-h.'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -30420,6 +30425,11 @@ entries:
       if:
       - 'factor wins in the bulk zoom: say by how much, relative and log measures'
       - 'emission scales win or tie: say so with the numbers'
+    38:
+      feeds: 'D600: asymptotic factor vs emission scales, matched HPs'
+      if:
+      - 'factor wins at matched HPs: say by how much, both measures'
+      - 'level/emission wins: no factor advantage in the bulk core'
   step_waits:
     '32': FA-ccin2p3-a8d68ffe
     '33': FA-ccin2p3-ddd2e7a7
