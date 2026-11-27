@@ -35410,6 +35410,8 @@ entries:
       the site holding the bigrun runs, analysis/bigrun/arms_best.py) and plot GM over processes of MSE(log|M|^2) (= GM loss
       x GM std^2 if every arm shares the standardization; check it does); x label MSE(log|M|^2); caption without the standardization
       sentence. Labels stay the fifth version (reviewed).'
+    5: 'D591: fix Fig. 17 top-row panel 2 legend; restore in Sec. 5 the result that a zero-shot bias is fixed by a few points
+      (Joaquin''s draft zip 09a1eb51-fm_amplitudes.zip)'
   done_when: null
   notes_ref: null
   match: none
@@ -36345,6 +36347,11 @@ entries:
       if:
       - 'every arm shares one standardization: replot, rebuild, send'
       - 'arms differ in standardization: recompute per-process MSE from each run''s metrics and say so'
+    5:
+      feeds: 'D591: the draft''s Sec. 5 carries the few-point bias correction and Fig. 17''s legend is right'
+      if:
+      - 'the dropped result and its figure are found: restore them in Sec. 5, section review, send'
+      - 'not found: say where it was searched and what the closest existing result is, to Joaquin'
   ask: 'Permission classifier refusal: checking the lab relay lpnclaude03''s ssh port directly (a TCP probe) was refused,
     and the relay''s sshd is a lab machine we cannot reach or fix. Jean Zay is reached only through lpnclaude03, which refuses
     ssh on port 22 since 2026-11-20. Can you find out whether the lab closed ssh on lpnclaude03 on purpose, and whether there
