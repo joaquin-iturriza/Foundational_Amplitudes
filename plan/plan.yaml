@@ -45442,7 +45442,8 @@ entries:
       p99 |log_factor + b.(x-x0)/sx| < 1e-2 holds on every held-out event; subset numbers equal the local read (arm all/s_lo/s_hi
       0.183/0.094/0.128). The output line with the p99 value was cut in the read (tail) and the re-read resubmitted the job
       (65022645, unread, harmless).'
-  step_waits: {}
+  step_waits:
+    '28': FA-ccin2p3-b07e2464 FA-ccin2p3-825c02e8
   handoff:
     state: 'Steps 26 and 27 read and recorded (findings 2026-11-27). Step 27 (per-event level, D566): level YES (new-43 median
       bias^2 arm 0.183 vs control 0.300 / retrain 0.159, R_b 1.88), sampling FAIL (arm s_lo/s_hi 0.094/0.128 vs 0.183 all;
