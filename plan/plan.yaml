@@ -52687,7 +52687,9 @@ entries:
     - every figure of the KIT reply deck redrawn in one coherent style
   decisions:
   - D582
-  next: null
+  next:
+    2: 'close the entry: plan done needs the repo-reviewer pass over tools/kit_figures.py, kit_vs_mlp.py, kit_bakar_figs.py
+      (fe50d1b28..b9f39e9f2) and a docs/results.tex line; the deck''s further slides come from kit_benchmark''s owner'
   done_when: null
   notes_ref: null
   match: kit_reply_deck_*
@@ -52708,3 +52710,9 @@ entries:
     context: 189256
     context_at: '2026-11-27T01:55:20+00:00'
   step_waits: {}
+  step_why:
+    2:
+      feeds: every figure of the KIT reply deck in one style
+      if:
+      - 'reviewer passes: plan done with the commit'
+      - 'reviewer blocks: fix the named lines, re-check with the same reviewer'
