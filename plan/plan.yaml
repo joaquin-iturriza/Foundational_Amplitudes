@@ -42330,6 +42330,9 @@ entries:
       fix first: both flags are asserted off on the memmap path (data_mmap.py:871, its docstring l.34) and the 1352-process
       catalogue needs memmap: extend data_mmap to carry the target-propagator factor (worktree, tests, repo review), smoke
       (D395), then design and review.'
+    27: 'step 26''s D395 smoke read: held-out score of the tprop smoke (FA-ccin2p3-583cc541, interactive, REREAD FA-ccin2p3-776cdd69):
+      the pair''s log_factor in runs/zz_smoke/zz_smoke_sweep_config_llmcmp_c_tprop_64943393/llm_events_heldout.csv against
+      c_best''s on the same events, and factor_split.py reads it'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -42655,6 +42658,13 @@ entries:
       - 'the resonance''s level given per event closes the gg->tbW gap: report to Joaquin with the held-out figure'
       - 'it does not: the near-pole miss is not a missing level factor; read what else differs between the q q~ and g g resonant
         regions'
+    27:
+      feeds: whether step 26's run FA-ccin2p3-4ba88991 (submitted in parallel; its training does not read this output) can
+        answer the pole-transfer question
+      if:
+      - 'factor differs (Breit-Wigner log <= 0 near the pole) and factor_split reads it: the run stands, delete the smoke
+        dir (debris)'
+      - 'factor equal to c_best''s or the read fails: cancel FA-ccin2p3-4ba88991, fix the eval path, resubmit'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
