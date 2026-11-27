@@ -30319,6 +30319,15 @@ entries:
       stage-2 searches dsave_s2_ft_ee_ttbar_nlo_d{4..8} fine-tuned from runs/data_saving/dsave_parent_treesin_r4 (sweep/sweep_config_dsave_s2_ft_ee_ttbar_nlo_d4_t5950.yaml:
       base_config and pretrained_path treesin_r4, no input_asym_factor), so their HPs stand; the redo is the 5 fair FT finals
       only, at those HPs (step 35), not a new search.'
+  - at: '2026-11-27T10:54:43+00:00'
+    text: '2026-11-27 ~14:20. Step 35 design PASS (after one FIX: load check by the head-map line, prior corrected). Fair
+      one-loop FT reruns out at site pick''s width (5 jobs, all CC, one wave), code @6da26765e8 (contains ff4f2e0cf), args
+      = step-29 FT logs verbatim, submit script /tmp scratch fair_submit.sh mirrors them: D=100 FA-ccin2p3-61a1649b, 316 8140c2e8,
+      1e3 (lr_scale 7.412) 2470856b, 3162 23020b3a, 1e4 fef5c4b7 (tags fairnlo_ftfix_d<D>; target 0.75 h, limit 1:30). Step
+      34 reruns e095fc91 79f93bfc 4a978179 aee64be1 running. On ends: step 34 readout per its design (kit_predict scores,
+      kit_figures collect, kit_readout --vs against SCR-A2; neither BEATS -> DyHPO FT search); step 35 per its design (load
+      line, then slide-10 fair figures and deck slides 22-24 redrawn; D=1e3 blow-up -> one rerun at 0.126). Deck slides 20
+      and 22-24 of talks/kit_reply_nov2026 show the void FT runs until then.'
   step_why:
     32:
       feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
