@@ -461,6 +461,35 @@ def cmd_bench(a):
     pstats.Stats(prof).sort_stats("cumulative").print_stats(35)
 
 
+def cmd_combine(a):
+    """--surrogate part runs (gen --seed k, each in its own dir) as one sample in --dir: their events pooled, sigma_hat
+    the inverse-variance mean of theirs (MadEvent's scalar calls at one event cost ~50 ms: a 1e5-event run is split)"""
+    import h5py
+    fs = [h5py.File(h5(d, a.proc, True), "r") for d in a.parts]
+    assert len({str(f.attrs["surrogate"]) for f in fs}) == 1, "parts of different surrogates"
+    s = np.array([float(f.attrs["sigma_pb"]) for f in fs])
+    e = np.array([float(f.attrs["sigma_err_pb"]) for f in fs])
+    w = 1.0 / e ** 2
+    sig, err = float((w * s).sum() / w.sum()), float(w.sum() ** -0.5)
+    chi2 = float((w * (s - sig) ** 2).sum() / max(len(s) - 1, 1))
+    out = h5(os.path.abspath(a.dir), a.proc, True)
+    with h5py.File(out + ".tmp", "w") as o:
+        for k, v in fs[0].attrs.items():
+            o.attrs[k] = v
+        fs[0].copy("bulk_test", o)
+        for k in fs[0]["mc/events"]:
+            o[f"mc/events/{k}"] = np.concatenate([f[f"mc/events/{k}"][:] for f in fs])
+        n = len(o["mc/events/me2"])
+        o.attrs.update(sigma_pb=sig, sigma_err_pb=err, n=n, parts=len(fs), part_chi2_dof=chi2,
+                       part_dirs=json.dumps([os.path.abspath(d) for d in a.parts]),
+                       check_rel=max(float(f.attrs["check_rel"]) for f in fs))
+    for f in fs:
+        f.close()
+    os.replace(out + ".tmp", out)
+    print(f"COMBINED {len(fs)} parts: {n} events, sigma_hat {sig:.6g} +- {err:.3g} pb, chi2/dof of the parts {chi2:.2f} -> {out}")
+    assert chi2 < 3, "the parts' sigma_hat disagree beyond their errors"
+
+
 def cmd_predict(a):
     from tools.kit_predict import predict
     out = os.path.join(os.path.abspath(a.dir), "pred_surr" if a.surr else "pred", os.path.basename(a.run.rstrip("/")))
@@ -654,10 +683,12 @@ def main():
     fx.add_argument("--tt-scan"); fx.add_argument("--tt-bulk"); fx.add_argument("--tt-run")
     b = sub.add_parser("bench"); b.add_argument("proc", choices=PROC); b.add_argument("run")
     b.add_argument("--batch", type=int, default=32); b.add_argument("--calls", type=int, default=20)
+    cb = sub.add_parser("combine"); cb.add_argument("proc", choices=PROC); cb.add_argument("--dir", required=True)
+    cb.add_argument("parts", nargs="+", help="the part runs' --dir")
     sub.add_parser("selfcheck")
     a = ap.parse_args()
     {"gen": cmd_gen, "serve": cmd_serve, "predict": cmd_predict, "metrics": cmd_metrics, "figure": cmd_figure, "figure_exact": cmd_figure_exact,
-     "bench": cmd_bench,
+     "bench": cmd_bench, "combine": cmd_combine,
      "selfcheck": lambda a: _selfcheck()}[a.cmd](a)
 
 

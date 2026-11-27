@@ -10,6 +10,8 @@
 #     ... -- tt <run_dir>        # the one-loop virtual: the threshold scan's integrated-correction bias (kit_threshold_scan)
 #     ... -- tt_bulk <run_dir>   # the same over KIT's whole tt bulk window 353-1739 GeV (kit_threshold_scan --window bulk)
 #     ... -- surr <ee_uug|ee_uugg> <dir> <N> <run_dir>   # slide 11 as written: MadEvent on the surrogate's |M_hat|^2
+#     ... -- surr_part <proc> <part_dir> <N> <run_dir> <seed>       # the same split over seeds (--env KIT_MC_VEC=0)
+#     ... -- surr_combine <proc> <dir> <run_dir> <part_dir>...       # the parts pooled, then predict and metrics
 _CCORCH_ROOT="${CCORCH_PROJECT_DIR:-${SLURM_SUBMIT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)}}"
 source "$_CCORCH_ROOT/sites/activate.sh"
 cd "$PROJECT_DIR"
@@ -24,6 +26,16 @@ if [ "$1" = tt_bulk ]; then
     python tools/kit_threshold_scan.py build --window bulk --dir "$D" && \
     python tools/kit_threshold_scan.py predict --dir "$D" "$2" && \
     python tools/kit_threshold_scan.py collect --dir "$D" --out "$D/kit_tt_bulk_window.json" && echo "RUN_DONE"; exit
+fi
+if [ "$1" = surr_part ]; then     # one seed's share of a split surrogate run (one-event calls at the default card)
+    python tools/kit_mc_madgraph.py gen "$2" --dir "$3" --n "$4" --surrogate "$5" --seed "$6" && echo "RUN_DONE"; exit
+fi
+if [ "$1" = surr_combine ]; then  # the parts as one sample in <dir> (the exact run's), then slide 11's readout
+    P="$2"; D="$3"; RUN="$4"; shift 4
+    python tools/kit_mc_madgraph.py combine "$P" --dir "$D" "$@" && \
+    python tools/kit_mc_madgraph.py predict "$P" --dir "$D" "$RUN" --surr && \
+    python tools/kit_mc_madgraph.py predict "$P" --dir "$D" "$RUN" && \
+    python tools/kit_mc_madgraph.py metrics --dir "$D" --out "$D/kit_mc_madgraph_${P}_surr.json" && echo "RUN_DONE"; exit
 fi
 if [ "$1" = surr ]; then
     P="$2"; D="$3"; N="$4"; RUN="$5"
