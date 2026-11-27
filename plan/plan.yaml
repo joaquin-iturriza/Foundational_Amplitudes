@@ -30550,6 +30550,12 @@ entries:
       ema on 0.901; val mu-MSE 4.46e-5, sep 2.5, largest jump 2.15x, lxplus). Arms at its HPs: factor FA-ccin2p3-cb01aa03
       (tag hpo_asym_hp1668), emission scales FA-ccin2p3-3001d863 (hpo_emis_hp1668), plain = trial_1668 KIT-scored FA-lxplus-d1e1006a.
       Target 0.6 h, 3 jobs.'
+  - at: '2026-11-27T20:26:08+00:00'
+    text: 'Step 39 next on the arms'' end (wait FA-ccin2p3-cb01aa03, 3001d863, FA-lxplus-d1e1006a): site copy FA lxplus ccin2p3
+      runs/kit_hpo_ttg_plain/trial_1668 (its kit_benchmark/predictions.h5 for kit_zoom on CC); kit_figures collect of the
+      three on CC; kit_zoom collect (RUNS[''fa_ee_ttg_me2''] added @b63615075) then plot the t t~ g figures (add ''fa_ee_ttg_me2''
+      to the plotting: PROCS tick labels are hard-coded for three processes); R = factor/emission and factor/plain per region,
+      bar 1/30..30 per the passed design; curve check of the two arms (kit_curves runs).'
   step_why:
     32:
       feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
