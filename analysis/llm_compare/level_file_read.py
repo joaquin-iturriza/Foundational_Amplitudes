@@ -5,7 +5,7 @@ the gg -> t b W pair's MSE and bias; on the new set, |our bias - the level netwo
 network moved off the level it was given; both signed mean(pred - true) of log|M|^2) and how many processes have MSE
 below the LLM's median over his seeds 0-2.
     python analysis/llm_compare/level_file_read.py [--tags a_trial5 level_file]
-Output: data/step16_level_file_read.json, and its JSON on the last line.
+Output: data/<--out, default step16_level_file_read>.json, and its JSON on the last line.
 """
 import argparse, json, os
 
@@ -24,6 +24,7 @@ def load(tag):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--tags", nargs="+", default=["a_trial5", "level_file"])
+    ap.add_argument("--out", default="step16_level_file_read", help="data/<out>.json")
     a = ap.parse_args()
     sp, lv = suprio.split(), load("lvl_diag")
     llm = {n: float(np.median(v)) for n, v in suprio.llm("mse").items()}
@@ -42,7 +43,7 @@ def main():
         r["ggtbw"] = {n: {"mse": p[n]["mse_logm2"], "bias": p[n]["bias_logm2"], "given_level_bias": lv[n]["bias_logm2"]}
                       for n in GGTBW}
         out[t] = r
-    json.dump(out, open(os.path.join(HERE, "data", "step16_level_file_read.json"), "w"), indent=1)
+    json.dump(out, open(os.path.join(HERE, "data", a.out + ".json"), "w"), indent=1)
     print(json.dumps(out))
 
 

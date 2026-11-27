@@ -51,9 +51,12 @@ ARMS = {"a_trial5": ("LLoCa, same setup as LLM", ps.C.blue, "o"),
         "b_h64": ("his setup, 64 heads", ps.C.vermillion, "s"),
         "b_h120": ("his setup, 120 heads", ps.C.yellow, "P"),
         "level_file": ("LLoCa, same setup as LLM\n+ diagrams to remove bias", "#17BECF", "d"),
+        "level_file_s30": ("LLoCa, same setup as LLM\n+ level per process", "#BCBD22", "d"),
+        "level_events_s30": ("LLoCa, same setup as LLM\n+ level per event", "#D62728", "X"),
         "c_control": ("our setup, control", ps.C.green, "<"),
         "c_best": ("LLoCa + new preprocessing", ps.C.orange, "^"),
         "c_nooffshell": ("LLoCa + new preprocessing,\nno off-shellness input", "#E377C2", "v"),
+        "c_tprop": ("LLoCa + new preprocessing\n+ Breit-Wigner in target", "#393B79", ">"),
         # --part bias only (level_source.py): a small network's level error from the process alone, no events
         "lvl_feat": ("level from process", "#999999", "h"),
         "lvl_diag": ("level from process, diagrams", "#8c564b", "p")}

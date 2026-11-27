@@ -1,0 +1,149 @@
+{
+ "lvl_diag_new_bias2_median": 0.09605255553359979,
+ "llm_new_mse_median": 0.9401282758787859,
+ "a_trial5": {
+  "interp": {
+   "mse_median": 0.020767138145517873,
+   "bias2_median": 0.0012650391990984596,
+   "shape_median": 0.01431607308791271,
+   "pooled_bias2_share": 0.3335917174407662
+  },
+  "extrap": {
+   "mse_median": 1.1436471863805278,
+   "bias2_median": 0.85859017395328,
+   "shape_median": 0.28684998620326474,
+   "pooled_bias2_share": 0.8540563913408473,
+   "off_given_level_median": 1.2692835303696395,
+   "off_given_level_p90": 2.0364816290310346,
+   "below_llm": 13
+  },
+  "ggtbw": {
+   "dc_gg_tbxwm": {
+    "mse": 26.571033600205343,
+    "bias": -4.778940053682234,
+    "given_level_bias": -3.812864476707481
+   },
+   "dc_gg_btxwp": {
+    "mse": 25.546289971443624,
+    "bias": -4.738500538816328,
+    "given_level_bias": -3.805971640542551
+   }
+  }
+ },
+ "level_file": {
+  "interp": {
+   "mse_median": 0.009890006977059133,
+   "bias2_median": 0.00032614087632829947,
+   "shape_median": 0.008831764504573894,
+   "pooled_bias2_share": 0.0943957227621952
+  },
+  "extrap": {
+   "mse_median": 0.3088952683333043,
+   "bias2_median": 0.12202547489281428,
+   "shape_median": 0.15670420756315276,
+   "pooled_bias2_share": 0.8844251578365562,
+   "off_given_level_median": 0.17357257024741557,
+   "off_given_level_p90": 0.7633731522820125,
+   "below_llm": 33
+  },
+  "ggtbw": {
+   "dc_gg_tbxwm": {
+    "mse": 44.40705193429207,
+    "bias": -6.393721207412542,
+    "given_level_bias": -3.812864476707481
+   },
+   "dc_gg_btxwp": {
+    "mse": 40.635789774224115,
+    "bias": -6.0884687140911256,
+    "given_level_bias": -3.805971640542551
+   }
+  }
+ },
+ "level_file_s30": {
+  "interp": {
+   "mse_median": 0.01120706718539382,
+   "bias2_median": 0.0009318000368283331,
+   "shape_median": 0.008971963490177086,
+   "pooled_bias2_share": 0.46473128217784215
+  },
+  "extrap": {
+   "mse_median": 0.5516331869517959,
+   "bias2_median": 0.2996894438395023,
+   "shape_median": 0.17202298923341905,
+   "pooled_bias2_share": 0.8320564609036358,
+   "off_given_level_median": 0.42269798912949597,
+   "off_given_level_p90": 1.1029865819511984,
+   "below_llm": 27
+  },
+  "ggtbw": {
+   "dc_gg_tbxwm": {
+    "mse": 27.733322004582913,
+    "bias": -4.9358637607120155,
+    "given_level_bias": -3.812864476707481
+   },
+   "dc_gg_btxwp": {
+    "mse": 37.413729173353936,
+    "bias": -5.8112105160489556,
+    "given_level_bias": -3.805971640542551
+   }
+  }
+ },
+ "level_file_s30_retrain": {
+  "interp": {
+   "mse_median": 0.012326805543453884,
+   "bias2_median": 0.0006653590933876847,
+   "shape_median": 0.00979271652070508,
+   "pooled_bias2_share": 0.30039090403147656
+  },
+  "extrap": {
+   "mse_median": 0.38407484565642974,
+   "bias2_median": 0.15908385996735733,
+   "shape_median": 0.17216104992982514,
+   "pooled_bias2_share": 0.8509993807662097,
+   "off_given_level_median": 0.5633254180809573,
+   "off_given_level_p90": 1.0750853739770156,
+   "below_llm": 30
+  },
+  "ggtbw": {
+   "dc_gg_tbxwm": {
+    "mse": 38.66854696981705,
+    "bias": -5.934538414878615,
+    "given_level_bias": -3.812864476707481
+   },
+   "dc_gg_btxwp": {
+    "mse": 42.16959134904196,
+    "bias": -6.165468755302561,
+    "given_level_bias": -3.805971640542551
+   }
+  }
+ },
+ "level_events_s30": {
+  "interp": {
+   "mse_median": 0.01390176568497082,
+   "bias2_median": 5.904309190848603e-05,
+   "shape_median": 0.013494672665937449,
+   "pooled_bias2_share": 0.445440817493934
+  },
+  "extrap": {
+   "mse_median": 0.4630042677383658,
+   "bias2_median": 0.18259438308877265,
+   "shape_median": 0.2611258088148569,
+   "pooled_bias2_share": 0.7792774608016013,
+   "off_given_level_median": 0.5364962696350473,
+   "off_given_level_p90": 1.1637458678035522,
+   "below_llm": 30
+  },
+  "ggtbw": {
+   "dc_gg_tbxwm": {
+    "mse": 32.18852068882,
+    "bias": -5.326797257431781,
+    "given_level_bias": -3.812864476707481
+   },
+   "dc_gg_btxwp": {
+    "mse": 23.038662016749225,
+    "bias": -4.455157683230808,
+    "given_level_bias": -3.805971640542551
+   }
+  }
+ }
+}
