@@ -17512,6 +17512,12 @@ entries:
     units: null
     start: '2026-11-12T02:29:02+00:00'
     at: '2026-11-12T02:29:02+00:00'
+  - batch: interactive_probe
+    wall_h: 0.17
+    jobs: 1
+    units: null
+    start: '2026-11-27T00:01:00+00:00'
+    at: '2026-11-27T00:01:00+00:00'
   findings:
   - at: '2026-10-30T22:13:12+00:00'
     text: 'lxplus repair, 2026-10-30. (1) Copy margin about 2x: the queued jobs need 26668 frozen-pool files, 13334 train-cache
