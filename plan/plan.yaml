@@ -37460,6 +37460,10 @@ entries:
       jumps >5x at evals 2,6,10,16 (11.5x), ends at 7x its best; rerun at 0.126 largest 1.62x; D=1e4 13.4x at eval 4 (warmup)
       then best at 48; held-out uug lr_scale 1 26x. asym_sd bug (fine-tunes scaled the log slopes by s_own/s_parent: exponents
       0.487x, 0.232x) fixed ff4f2e0cf, exponents exact after.'
+  - at: '2026-11-27T14:09:04+00:00'
+    text: '2026-11-27 D604: Asymptotic factor paragraph in |M|^2 (Eq. asym |M|^2 = e^Lbar (e^r + sum e^c D), e^Lbar geometric
+      mean, e^sigma geometric std over training events (preprocess_per_dataset true -> _train_raw), log only in the loss sentence);
+      draft 7ff715d; fresh reviewer FIX (loss sentence) then PASS.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
