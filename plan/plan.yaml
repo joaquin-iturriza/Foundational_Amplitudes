@@ -30125,6 +30125,18 @@ entries:
       (--calls 41) to get that check. Once the check prints <1e-9: restart the vector_size-32 1e5 jobs on the fixed code (b45a89e1
       uug, limit 6 h; 6360f286 uugg, limit 12 h; at ~8x the speed each finishes in ~1-2 h vs hours remaining), same args,
       cancel the old ones only after the new ones start.'
+  - at: '2026-11-27T03:32:28+00:00'
+    text: '2026-11-27 ~05:40 @6ecc823b5/f14d90b00. Step 24 complete, all five D. The design''s named rerun of the D=1e3 fine-tune
+      at lr_scale 0.126 (FA-ccin2p3-65e6c701, tag fairnlo_ft_d1000_lsmed; first run at 7.41 jumped 21x) is clean: largest
+      one-point val jump 2.2x, best val 2.11e-5 at the last evaluation (first run 7.08e-5, SCR-A2 5.84e-5, V/B 2.25e-4), train
+      4.75e-8 (far below val, as every arm). KIT scores (kit_figures collect on CC -> kit_fig_fairnlo.json; kit_readout --vs,
+      R = median over family strata of log10(arm/control log-MSE), bar +-0.845): rerun vs V/B threshold -0.23 LEVEL, Sudakov
+      +1.09 LOSES, bulk -0.20 LEVEL; vs SCR-A2 threshold +0.90 LOSES, Sudakov -0.19 LEVEL, bulk -0.61 LEVEL. Same as the first
+      run (vs V/B -0.11/+1.07/+0.39, vs SCR-A2 +1.02/-0.62/-0.02). Rerun bulk 1.7e-6 (first 6.5e-6, SCR-A2 6.9e-6, V/B 2.7e-6),
+      deepest threshold 4.54 (5.16, 0.163, 7.6), deepest Sudakov 0.108 (0.25, 7.72, 0.021), threshold exponent -0.24 (first
+      -0.21, SCR-A2 -0.89, V/B -0.02, truth -1.02). Design branch (c) at every D, the lr rerun included: FT beats neither
+      control on any hard family. Figures redrawn: analysis/kit_benchmark/figs/kit_fairnlo.png (rerun hollow), kit_fairnlo_d10000.png,
+      kit_curves_fairnlo.png (rerun dotted); in talks/kit_reply_nov2026/main.pdf as slides 19-21, rebuilt 0 errors 0 overfull.'
   step_why:
     24:
       feeds: 'D570: does fine-tuning from the signed A2 pretraining beat SCR-A2 and V/B with exact Born on ee->tt one loop
