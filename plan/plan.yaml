@@ -43651,6 +43651,14 @@ entries:
       factor; held out tp_5fef4ac19c49f4791e12311f in 6 s, 38/139). Gate PASSED: dc_gg_tbxwm and dc_gg_btxwp carry 1 propagator
       each (held-out meta), the q q~ twins dc_{uux,ddx,ssx,ccx,bbx}_{tbxwm,btxwp} 1 each (train meta). Smoke FA-ccin2p3-776cdd69
       (scripts/job_config_smoke.sh sweep/sweep_config_llmcmp_c_tprop.yaml 50, 20G, 2 h limit) submitted.'
+  - at: '2026-11-27T01:15:24+00:00'
+    text: '2026-11-27 02:15 step 26: smoke FA-ccin2p3-776cdd69 SMOKE_EXIT 0 through training, sigma stage, test, plots (log:
+      target_propagators ON (memmap) 382/1352 processes carry a factor, 437 propagators reach their pole; offshell masks 1352/1352).
+      Held-out read of the smoke FA-ccin2p3-583cc541 (job_llm_score.sh ONLY=heldout EVENTS=1, gpu_v100_interactive, step 27).
+      The run FA-ccin2p3-4ba88991 (sweep/trial_job.sh, sweep/sweep_config_llmcmp_c_tprop.yaml @581530563, site code @454e08e12e,
+      trial_1860 HPs, 60,840 steps, 22 h limit, wall target 16 h) submitted in parallel: its training does not read the smoke
+      read''s output; step 27''s failure branch cancels it. Attempt E FA-ccin2p3-d34fae85 still RUNNING (log only the Slurm
+      header at 02:10, started 23:58, 4 h limit).'
   step_waits:
     '25': FA-ccin2p3-d34fae85
     '26': FA-ccin2p3-4ba88991
