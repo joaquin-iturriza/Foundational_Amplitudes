@@ -28753,7 +28753,7 @@ entries:
     agent: aaa71f1f2ab069880
     state: working
     since: '2026-11-27T14:31:56+00:00'
-    state_at: '2026-11-27T14:31:56+00:00'
+    state_at: '2026-11-27T14:52:37.222000+00:00'
     context: 121083
     context_at: '2026-11-27T14:52:47+00:00'
   findings:
