@@ -43928,15 +43928,6 @@ entries:
   - D576
   - D578
   next:
-    26: 'step 15''s yes branch (2026-11-27, data/c_best_factor_split.json): the g g > t b W pair''s error is the on-shell
-      top region (near-pole fifth mean d -7.65 vs -5.16 elsewhere, se 0.05), which the same network has right on the trained
-      q q~ twins. Test whether giving the resonance''s level per event transfers it to the g g initial state: part (c)''s
-      searched best (trial_1860 HPs, sweep_config_llmcmp_c_latest.yaml) with the internal propagators'' Breit-Wigner factor
-      in the target (data.target_propagators, the canonical target-side lever) or the resonance input (data.resonance_per_event),
-      one arm, against trial_1860 itself; ~15 GPU-h (13.5 h V100 + 1.8 h sigma stage, step 22''s measured rate). Blocker to
-      fix first: both flags are asserted off on the memmap path (data_mmap.py:871, its docstring l.34) and the 1352-process
-      catalogue needs memmap: extend data_mmap to carry the target-propagator factor (worktree, tests, repo review), smoke
-      (D395), then design and review.'
     28: 'step 29 (D566 next attempt): the per-process level in part (c)''s setup. Part (c) (sweep_config_llmcmp_c_latest.yaml)
       trains on the emission-scale target with shared_standardization, so its level file must hold each process''s mean of
       that target, not of log|M|^2: extend perevent_level.py''s writer to the target''s pool means (same 2x64 diagram network,
@@ -44280,12 +44271,6 @@ entries:
     context: 173613
     context_at: '2026-11-27T18:14:49+00:00'
   step_why:
-    26:
-      feeds: 'D564: why the LLM extrapolates better than our LLoCa'
-      if:
-      - 'the resonance''s level given per event closes the gg->tbW gap: report to Joaquin with the held-out figure'
-      - 'it does not: the near-pole miss is not a missing level factor; read what else differs between the q q~ and g g resonant
-        regions'
     28:
       feeds: 'D566: does the per-process level lever (step 16, kept regardless of sampling in step 27''s control) carry to
         part (c)''s setup, where the new-family level is the largest share of the held-out error'
@@ -45431,7 +45416,6 @@ entries:
       MSE 1.163 vs 0.979, H+tau processes up. Next per the design''s feature rule: the factor is not judged at trial_1860''s
       HPs alone; the 8-trial DyHPO search for this arm, best against part (c)''s best, ~128 GPU-h > 100: Joaquin''s go.'
   step_waits:
-    '26': detach step26_27_cpu_reads (factor_split.py --pole-run on runs/llmcmp_c_tprop/trial_1860, CC CPU job ccj_37031841e6dd)
     '28': 'step 26''s near-pole read (detach step26_27_cpu_reads): its branch decides step 28''s base config (c_latest, or
       c_tprop if part (c) takes the Breit-Wigner factor)'
   handoff:
