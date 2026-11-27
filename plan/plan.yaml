@@ -52645,11 +52645,7 @@ entries:
     - every figure of the KIT reply deck redrawn in one coherent style
   decisions:
   - D582
-  next:
-    2: 'slide 6 (V/B against beta) with the searched t t~ transformer (runs/kit_hpo_ttvirt_thr/trial_0131, lxplus only): once
-      lxplus is up, rerun tools/kit_bakar_figs.py collect --searched analysis/kit_benchmark/data/kit_bakar_figs_a2.json --out
-      analysis/kit_benchmark/data/kit_bakar_figs_searched.json, plot to analysis/kit_benchmark/figs/reply_deck, copy slide5_tt_coulomb.pdf
-      into the deck, rebuild'
+  next: null
   done_when: null
   notes_ref: null
   match: kit_reply_deck_*
@@ -52669,11 +52665,4 @@ entries:
     state_at: '2026-11-27T01:40:52.397000+00:00'
     context: 177150
     context_at: '2026-11-26T19:57:48+00:00'
-  step_why:
-    2:
-      feeds: one transformer in the whole KIT reply deck
-      if:
-      - 'lxplus read: slide 6 gets the searched transformer, deck rebuilt'
-      - 'lxplus still down: slide 6 stays without a transformer curve'
-  step_waits:
-    '2': lxplus reachable in site list (ssh master down)
+  step_waits: {}
