@@ -15828,9 +15828,6 @@ entries:
     35: 'Refusal cost after the D558 fixes (133a1b102, 2026-11-25): python3 tools/token_share.py --refusals --since 2026-11-26T00:00
       --until 2026-12-03T00:00, per role and check against the 2026-11-09..23 window (13.7% of all tokens upper, 5.0% lower;
       main session 32.1%, owners 6.5%); per day, since the windows differ in length; add the after-window to par:refusal-cost'
-    36: submit_guard.py spends a site-pick unit in PreToolUse even when another parallel PreToolUse hook (wait_guard, review_backlog)
-      refuses the same submit; no refund fires. Add a 'spend' mode run from PostToolUse on a successful site submit (dry check
-      stays in PreToolUse), tests, then send Joaquin the settings.json registration diff
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16528,11 +16525,6 @@ entries:
         step'
       - 'a fixed check still misfires or a new misfire enters the top ten: fix it through a mechanical-worker and measure
         again'
-    36:
-      feeds: site pick allotments match the submissions that really went out
-      if:
-      - 'code + tests pass: send the settings diff to Joaquin'
-      - 'spend cannot be deferred: leave as is, note the gap in fa-hooks'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
