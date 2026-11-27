@@ -51171,6 +51171,18 @@ entries:
       (lpns245:8001) ''Can not write request body''. So the lab server''s backends are down, not throttling our pattern. Resume
       passes keep going at the design''s 2 calls (wake_replay5, review_replay4); not read on a subset (that would cut the
       design''s 100 wakes / 159 rounds).'
+  - at: '2026-11-27T17:05:37+00:00'
+    text: '2026-11-27T17:30: D551 wake-dispatch replay read (tools/lab_wake_trial.py report @54affd9eb, all 100 wakes answered
+      by both models): correct on all five fields (send, launch, ack set, tell Joaquin, plan verbs) DeepSeek 2/100 (Wilson
+      0.006-0.07), Qwen 0/100 (0-0.037), against do-nothing 71/100 (upper bound 0.79): outcome NO, no lab dispatcher. Wrong
+      actions on the 71 quiet wakes: DeepSeek 69, Qwen 71; correct on the 29 active: 0 and 0. The plan field is primed by
+      the prompt''s example verbs (key empty on 95/100), so as a sensitivity without it: DeepSeek 37/100, Qwen 21/100 against
+      do-nothing 72/100, still NO. Misses and extras by field over 100 (DeepSeek | Qwen): send missed 5|3, extra 6|42; launch
+      missed 3|2, extra 1|2; acks missed 4|0, extra 34|26; tell Joaquin missed 14|12, extra 21|15. So the errors are mostly
+      acting where Opus did nothing: acking events the owner acks, messaging agents, and telling Joaquin about routine ends,
+      or saying nothing where Opus told him. Read by hand: the 28 printed active wakes show the same pattern (ack where the
+      main left it to the owner, tell missed on hand-backs). Median seconds per wake 224 (DeepSeek), 167 (Qwen); our tokens
+      on these 100 wakes 42.2M.'
   handoff:
     state: 'Token-share answer done: par:labllm3 + fig:labllm3 committed ad9405eab (src tools/token_share.py @7ddc8128c, verify_claims
       0 problems): over 2026-11-09..23, 4953M tokens ($2028), owners 55.8%, main 29.3%, reviewers 5.3% (10.0% of $); routed
