@@ -30078,6 +30078,7 @@ entries:
     '29': FA-lxplus-828d67d6
     '31': FA-ccin2p3-20f0e184 FA-ccin2p3-5a47d217 FA-ccin2p3-6ce1e90c FA-ccin2p3-7bb05caf FA-ccin2p3-77c0851e FA-ccin2p3-c72af479
     '32': FA-ccin2p3-b9d55720 FA-ccin2p3-96ce4464
+    '30': FA-ccin2p3-1daf7f8f FA-ccin2p3-2f27a757
   handoff:
     state: '2026-11-27 ~02:20 @e8ff91661. Step 20: SCR-A2 + V/B at all five D done on CC (10 runs, full steps, scored; finding
       2026-11-27 lists best val and the 7 one-point val jumps 13-77x that recover; read with FT at step 24). Step 24 waits
