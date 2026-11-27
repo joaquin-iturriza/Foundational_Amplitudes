@@ -15,6 +15,13 @@ cd "$PROJECT_DIR"
 # PEL_ANCHORED=1 (D566 attempt C): --anchored on the memmap base caches PEL_MMAP (<key>/<depth> under
 # $SCRATCH/amp_mmap_cache, space-separated), output perevent_anchored_C.json; PEL_ANCHOR=process (attempt D): the
 # process-intrinsic anchor, output perevent_anchored_D.json; PEL_ANCHOR=map (attempt E): network / tree anchor maps, _E.json
+# PEL_WRITE=1 (step 28): data.level_events' coefficient file from the network + kinematics anchor map,
+# analysis/catalog_daniel/data/level_events_E_kin.json (read back with site run cat, committed on trunk)
+if [ -n "${PEL_WRITE:-}" ]; then
+  OMP_NUM_THREADS=4 python analysis/catalog_daniel/perevent_level.py --anchored --anchor map --model mlp --write-level-events \
+    --mmap $(for k in $PEL_MMAP; do echo "$SCRATCH/amp_mmap_cache/$k"; done) && echo "RUN_DONE"
+  exit $?
+fi
 if [ -n "${PEL_ANCHORED:-}" ]; then
   A=${PEL_ANCHOR:-global}; J=analysis/catalog_daniel/data/perevent_anchored_$(case $A in process) echo D;; map) echo E;; *) echo C;; esac).json
   OMP_NUM_THREADS=4 python analysis/catalog_daniel/perevent_level.py --anchored --anchor "$A" --model mlp \

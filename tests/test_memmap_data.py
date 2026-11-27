@@ -357,7 +357,7 @@ def section2_end_to_end(sweep_config, n_procs, out):
     # smaller caps: a prefix of the same cache (train_subsample / eval_subsample are not in its key)
     small = ["++data.train_subsample=1000", "++data.eval_subsample=200", "seed=42"]
     A1 = _build(sweep_config, n_procs, os.path.join(out, "off_small"), small)
-    if any(o.endswith("data.target_propagators=true") for o in SET):
+    if any(o.endswith("data.target_propagators=true") or "data.level_events=" in o for o in SET):
         # the target_propagators factor is keyed by the train caps (which propagators straddle their pole is read on
         # the run's train selection): smaller caps prebuild their own tp_<key> beside the same base
         try:

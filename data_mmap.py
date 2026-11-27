@@ -819,7 +819,13 @@ def tp_key_doc(exp, names, masks, need):
     """What data.target_propagators' factor is computed from (besides the base arrays): the masks (pdg, signed leg
     mask, M²), the widths, the straddle fraction and the train events the straddle is read on"""
     tp = exp._tp_settings()
+    lev = {}
+    if tp["level_events"]:   # data.level_events: the file's content (only when set: older tp_ keys stay valid)
+        lp = str(tp["level_events"])
+        lp = lp if os.path.isabs(lp) else os.path.join(os.path.dirname(os.path.abspath(__file__)), lp)
+        lev = {"level_events": hashlib.sha256(open(lp, "rb").read()).hexdigest()}
     return _jsonable({
+        **lev,
         "format": TP_FORMAT,
         "widths": tp["widths"],
         "pool_widths": [tp["pool_widths"].get(n, {}) for n in names],
@@ -915,7 +921,7 @@ def init_data_recipes_mmap(exp, c):
         "data.memmap: data.target_physics_hybrid (a per-process constant from its events) is implemented on the in-memory path only"
     assert not bool(cfg.data.get("resonance_per_event", False)), \
         "data.memmap: data.resonance_per_event is not implemented on the memmap path"
-    tp_on = bool(cfg.data.get("target_propagators", False))
+    tp_on = bool(cfg.data.get("target_propagators", False)) or bool(cfg.data.get("level_events"))
     # shortcut: the massless t-channel factor fits its |t| norm per run (exp._tch_norm); add it to tp_key_doc when needed
     assert not (tp_on and bool(cfg.data.get("target_propagator_tchannel", False))), \
         "data.memmap: data.target_propagator_tchannel is implemented on the in-memory path only"
@@ -975,7 +981,7 @@ def init_data_recipes_mmap(exp, c):
             _locked_build(fdir, nb, root, lambda st: _build_features(exp, c, d, meta, st, fkd, want_offshell))
     tdir = None
     if tp_on:
-        masks = exp._setup_offshell_masks(names, pdgs=exp._tp_settings()["pdgs"])
+        masks = exp._setup_offshell_masks(names, pdgs=exp._tp_settings()["pdgs"]) if exp._tp_settings()["pdgs"] else None
         tkd = tp_key_doc(exp, names, masks, need)
         tdir = os.path.join(d, "tp_" + _hash(tkd))
         if not os.path.exists(os.path.join(tdir, "meta.json")):
