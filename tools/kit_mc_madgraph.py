@@ -203,6 +203,24 @@ def standalone_exact(drv, sa, pdgs, gen, alpha_s):
     return pipe, lambda m: np.asarray(pipe.compute([(x[perm_kit], None) for x in m], perm=slot, alphas=alpha_s))
 
 
+def check_vs_kit_predict(pred, run, proc, d, n=1000):
+    """assert the Predictor `pred` gives kit_predict.predict's log10|M_hat|^2 on the first n KIT bulk_test events"""
+    import h5py
+    from tools.kit_predict import predict
+    with h5py.File(kh.h5_path(proc), "r") as K:
+        mom = K["bulk_test/bulk/momenta"][:n]
+        srv = pred.log10(mom)
+        tmp = os.path.join(d, f"chk_{proc}.h5")
+        with h5py.File(tmp, "w") as o:
+            o.attrs["metadata"] = K.attrs["metadata"]
+            o["bulk_test/bulk/momenta"] = mom
+    _, pth = predict(run, ["bulk_test"], os.path.join(d, f"chk_{proc}"), h5=tmp)
+    with h5py.File(pth, "r") as P:
+        dl = float(np.max(np.abs(srv - P["bulk_test/bulk/log10_me2"][:])))
+    print(f"CHECK server log10|M_hat|^2 vs kit_predict on {n} bulk_test events: max |delta| = {dl:.2e}", flush=True)
+    assert dl < 1e-9, "the server's surrogate is not kit_predict's"
+
+
 def cmd_gen(a):
     import h5py
     import mg5_pipeline_final as mg
@@ -245,18 +263,7 @@ def cmd_gen(a):
         print(f"CHECK exact |M|^2 vs KIT bulk_test me2 (1000 events): max |ours/KIT - 1| = {rel:.2e}", flush=True)
         assert rel < 1e-6, "the standalone does not reproduce KIT's me2"
         if a.surrogate:   # the server's in-memory |M_hat|^2 is kit_predict.predict's, event by event
-            mom = b["momenta"][:1000]
-            srv = Predictor(a.surrogate, a.proc).log10(mom)
-            tmp = os.path.join(d, f"chk_{a.proc}.h5")
-            with h5py.File(tmp, "w") as o:
-                o.attrs["metadata"] = K.attrs["metadata"]
-                o["bulk_test/bulk/momenta"] = mom
-            from tools.kit_predict import predict
-            _, pth = predict(a.surrogate, ["bulk_test"], os.path.join(d, f"chk_{a.proc}"), h5=tmp)
-            with h5py.File(pth, "r") as P:
-                dl = float(np.max(np.abs(srv - P["bulk_test/bulk/log10_me2"][:])))
-            print(f"CHECK server log10|M_hat|^2 vs kit_predict on 1000 bulk_test events: max |delta| = {dl:.2e}", flush=True)
-            assert dl < 1e-9, "the server's surrogate is not kit_predict's"
+            check_vs_kit_predict(Predictor(a.surrogate, a.proc), a.surrogate, a.proc, d)
     run_card = {**RUN, "nevents": a.n, "iseed": a.seed}
     env = dict(os.environ)
     if a.surrogate:
@@ -302,7 +309,7 @@ def cmd_gen(a):
 class Predictor:
     """log10 |M_hat|^2 of a KIT run on events in memory, as tools/kit_predict.predict computes it (rebuilt once with
     its best weights, each event in its own frame, the residual against a unit placeholder truth); each call re-reads
-    only the scored role through the experiment's init_data (the train pool and the run's statistics unchanged)."""
+    only the scored batch through the experiment's init_data, with the run's frozen statistics."""
 
     def __init__(self, run, proc):
         import h5py
@@ -316,6 +323,11 @@ class Predictor:
         with h5py.File(kh.h5_path(proc), "r") as f:    # one bulk event to build the run on
             self._write(f["bulk_test/bulk/momenta"][:1])
         self.exp, _ = rebuild(run, "test", self.pool, 1, event_frame=True)
+        # every later init_data reads the run's frozen statistics (the warm-start path; rebuild asserted them equal to
+        # the ones just refitted) and the scored batch as every role's pool: no per-call re-read and re-augmentation of
+        # the 1e5-event train pool (1.07 s of the 1.18 s per call, kit_mc_madgraph bench 2026-11-27)
+        shutil.copy2(os.path.join(run, "data_stats.json"), os.path.join(self.exp.cfg.run_dir, "data_stats.json"))
+        self.exp.warm_start = True
         self.recipe = str(self.exp.cfg.data.processes_file)
         self.name = yaml.safe_load(open(self.recipe))["processes"][0]["name"]
 
@@ -334,9 +346,7 @@ class Predictor:
             yaml.safe_dump(rec, open(self.recipe, "w"))
         self._write(mom)
         real = datagen.ensure_split_set
-        datagen.ensure_split_set = lambda specs, role, seed, dest_dir=None, require_cache=False: (
-            {self.name: self.pool} if role == "test" else
-            real(specs, role=role, seed=seed, dest_dir=dest_dir, require_cache=require_cache))
+        datagen.ensure_split_set = lambda specs, role, seed, dest_dir=None, require_cache=False: {self.name: self.pool}
         try:
             self.exp.init_data()
             self.exp._init_dataloader()
@@ -423,6 +433,7 @@ def cmd_bench(a):
     dt = (time.time() - t) / a.calls
     print(f"BENCH {a.proc}: {dt * 1e3:.1f} ms per call of {a.batch} events = {dt / a.batch * 1e3:.2f} ms per event")
     print(f"BENCH repeat of call 0 vs first read: max |delta log10| = {np.max(np.abs(pred.log10(mom[:a.batch]) - ref)):.2e}")
+    check_vs_kit_predict(pred, a.run, a.proc, os.path.join(os.environ["SCRATCH"], f"kitbench_{os.getpid()}"))
     pstats.Stats(prof).sort_stats("cumulative").print_stats(35)
 
 

@@ -50,7 +50,7 @@ MODELS = {"truth": ("truth", "k", None, "-"),
           # same model from scratch, and Bakar's baseline (the transformer without the factor on V/B, exact Born)
           "FT": ("fine-tuned", "sky", "v", "-"),
           "SCR": ("from scratch", "blue", "o", "-"),
-          "VB": ("from scratch on $V/B$,\nexact Born", "vermillion", "s", "--")}       # its control: the same continuation, bulk only
+          "VB": ("from scratch on $V/B$,\nexact Born", "vermillion", "s", "--")}
 
 
 def model_style(key):
@@ -472,7 +472,7 @@ def fairnlo_fig(path, out):
     from tools.kit_readout import deepest
     runs = {}
     for r in d_runs(path):
-        m = re.fullmatch(r"fairnlo_(ft|scra2|vb)_d(\d+)(_\w+)?", r["tag"])
+        m = re.fullmatch(r"fairnlo_(ft|scra2|vb)_d(\d+)(_lsmed)?", r["tag"])
         if m:
             runs[({"ft": "FT", "scra2": "SCR", "vb": "VB"}[m[1]], int(m[2]), bool(m[3]))] = r
     bulk = lambda r: next(v["logmse"] for k, v in r["strata"].items() if k.startswith("bulk_test/"))
