@@ -28455,8 +28455,6 @@ entries:
       strata against x / z / x_g); MSE(log10|M|^2) beside the relative measure on every error figure; the stability table
       (largest validation jump max_t val/min_{s<=t} val from kit_curves*.json mu-MSE curves, per arm) as a committed subcommand.
       Redraw once step 37''s scorings and D600 (a)''s matched runs are in.'
-    41: trace the origin of the frame boost cap gamma<=4 used with the asymptotic factor (frames_gamma_max; which result set
-      4) and tell Joaquin
   done_when: null
   notes_ref: null
   match: kit_*
@@ -30478,11 +30476,6 @@ entries:
       if:
       - 'drawn: hand back with captions'
       - 'a limit shows nothing new: say so with its numbers'
-    41:
-      feeds: Joaquin's D601 question which factor choices are arbitrary
-      if:
-      - 'a result set it: name it with its number'
-      - 'no result: say it is arbitrary'
   step_waits:
     '32': FA-ccin2p3-a8d68ffe
     '33': FA-ccin2p3-ddd2e7a7
