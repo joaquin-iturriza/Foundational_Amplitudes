@@ -30035,6 +30035,22 @@ entries:
       of 50; the srun client on the login node ended), resubmitted as batch jobs FA-ccin2p3-1daf7f8f (FT, tag heldoutqqg_ft_smoke2)
       and 2f27a757 (SCR-A2, tag heldoutqqg_scra2_smoke2); step 30 waits on them. Step 20 dropped (its arms are done; their
       read is step 24''s).'
+  - at: '2026-11-27T01:43:49+00:00'
+    text: '2026-11-27 ~03:10 @2ad76d096. Step 31 (design PASS 2026-11-26 14:52, D575): protocol B on the three A2 models.
+      B = the A2 model (runs/kit/kit_A_ee_<p>_n100000_t1831_hpo_asym_cont) continued 3000 steps with KIT''s hard_train strata
+      added; B_bulk = the same continuation on bulk only; one seed (D315). Runs uug FA-ccin2p3-20f0e184/5a47d217, uugg 6ce1e90c/7bb05caf,
+      tt virtual 77c0851e/c72af479 (job_kit.sh B/B_bulk tag a2B), all clean and KIT-scored. Readout tools/kit_readout.py --vs
+      on analysis/kit_benchmark/data/kit_fig_B_a2.json (kit_figures collect on CC), per family median over strata of log10(B/B_bulk
+      log-MSE), bar BEATS < log10(1/7) = -0.85: uug soft -5.46 [-5.53,-2.04], collinear -5.10 [-5.51,-1.65], bulk -0.23; uugg
+      soft -1.45, coll gg -1.68, coll qg -1.88, azimuth -1.70, bulk -0.23; tt virtual threshold -3.09 [-4.63,-2.50], Sudakov
+      -3.82 [-5.40,-2.71], bulk +0.39. B BEATS B_bulk on every family of all three processes. Deepest bins B / B_bulk: uug
+      soft 3.1e-8 / 9.2e-3, coll 5.2e-8 / 1.0e-2; uugg soft 6.7e-4 / 0.168, coll qg 2.9e-4 / 0.115; tt threshold beta 1e-4..1e-3
+      3.9e-7 / 1.67e-2, Sudakov 15-50 TeV 1.3e-4 / 6.8e-2. Exponents: B_bulk already at the exact ones on uug (soft -2.01,
+      coll -1.00) and tt threshold -0.96 (exact -1.02); B -2.00/-1.00/-1.02. B_bulk vs the A2 start: uug soft +0.22, coll
+      -0.11, uugg within 0.05, tt threshold +0.14, Sudakov +0.05, tt bulk -1.09 (the bulk continuation alone changes the hard
+      bins by < 0.25 decades). Blow-up rule (> 5x one-point val jump): largest 4.2 (uug B), none above 5, no rerun; best val
+      at the last evaluation in all six (kit_curves.py runs -> kit_curves_a2B.json). Figures analysis/kit_benchmark/figs/kit_mse_a2B_ee_{uug_me2,uugg_me2,tt_virt_finite}.png,
+      kit_curves_a2B.png.'
   step_why:
     24:
       feeds: 'D570: does fine-tuning from the signed A2 pretraining beat SCR-A2 and V/B with exact Born on ee->tt one loop
