@@ -101,7 +101,7 @@ def sci(v):
     return rf"${v / 10 ** e:.0f}\times10^{{{e}}}$"
 
 
-RUN_RE = re.compile(r"kit_(?P<mode>A_ft|A|B_bulk|B)_(?P<file>ee_[a-z]+)_(?P<target>[a-z0-9_]+?)_n(?P<n>\d+)_t(?P<t>\d+)"
+RUN_RE = re.compile(r"kit_(?P<mode>A_ft|A|B_bulk|B)_(?P<file>(?:fa_)?ee_[a-z]+)_(?P<target>[a-z0-9_]+?)_n(?P<n>\d+)_t(?P<t>\d+)"
                     r"(?:_(?P<tag>.+))?$")
 
 # Bakar's reference MLP (3 x 128, 1e5 bulk events), slide 9 of the KIT benchmark slides: log-MSE of log10|M|^2 in the

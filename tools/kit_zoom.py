@@ -236,6 +236,11 @@ CUT = "divergence-free cut"
 # the draft's arms in its legend order (kit_vs_mlp.PAPER_ORDER), D604: the emission-scale arms are collected, not drawn
 ORDER = ["factor", "scratch", "MLP log", "MLP thr", "MLP raw"]
 ORDER_EMIS = ["factor", "emis_m", "emission", "scratch"]   # the factor-vs-emission-scale figures (steps 37/38)
+# t t~ g (step 39): all three arms at one HP point, so the emission-scale arm is drawn under its plain name
+TTG_STYLE = {"emis_m": "emission"}
+PROCESS_TTG = r"$e^+e^-\to t\bar t g$"
+XLAB_TTG = {"soft_x": r"soft gluon $x=2E_g/\sqrt{s}$", "coll_tg": r"gluon-top angle $1-\cos\theta_{tg}$",
+            "threshold_beta": r"$t\bar t$ pair velocity $\beta$", "bulk_x": r"bulk, gluon $x=2E_g/\sqrt{s}$"}
 
 
 def _arms(p):
@@ -387,6 +392,49 @@ def plot(figs):
             if a in o["core"]["arms"]:
                 print(f"  EMIS {p} {a}: core relmed {_seedmed(o['core']['arms'][a], 'relmed'):.3g} mse(ln) "
                       f"{LN ** 2 * _seedmed(o['core']['arms'][a], 'mse'):.3g} | bulk mse(ln) {LN ** 2 * _seedmed(o['bulk'][a], 'mse'):.3g}")
+    # step 39 (D600 (b)): t t~ g, the three arms at one HP point (the plain search's best clean trial): every family at
+    # fixed other variable (the pair threshold has none: at fixed sqrt s its beta fixes x) and the bulk binned in x,
+    # median |Delta| and MSE(ln); then the median log|M|^2 against each limit variable beside the truth
+    p = "fa_ee_ttg_me2"
+    if p in d:
+        o = d[p]
+        sty = {a: _ms(TTG_STYLE.get(a, a)) for a in ("factor", "emis_m", "scratch") if a in o["bulk"]}
+        fams = [f for f in ("soft_x", "coll_tg", "threshold_beta") if f in o["fams"]]
+        key = lambda f: "band" if "band" in o["fams"][f] else "all"
+        print(f"{p}: missing {o['missing']}; variable check {o['check']}; core {o['core']['n']} events "
+              f"({100 * o['core']['frac']:.1f}%), cut x >= {o['cuts']['x'][1]:.3g}")
+        for a in sty:
+            print(f"  TTG {a}: core relmed {_seedmed(o['core']['arms'][a], 'relmed'):.3g} mse(ln) "
+                  f"{LN ** 2 * _seedmed(o['core']['arms'][a], 'mse'):.3g} | bulk relmed {_seedmed(o['bulk'][a], 'relmed'):.3g} "
+                  f"mse(ln) {LN ** 2 * _seedmed(o['bulk'][a], 'mse'):.3g}")
+        for m in ("relmed", "mse"):
+            fig, axs, spare = _grid(len(fams) + 1)
+            rows = []
+            for f in fams:
+                b = o["fams"][f][key(f)]
+                ys = {a: SCALE[m] * _seedmed(r, m) for a, r in b["arms"].items() if a in sty}
+                rows.append((b["x"], {"sty": sty, "y": ys}, None))
+                for a, y in ys.items():
+                    print(f"  TTG {m} {f} {key(f)} {a}: " + " ".join(f"{x:.2g}:{v:.3g}" for x, v in zip(b["x"], y)))
+            b = o["bulk_bins"]["x"]
+            rows.append((b["x"], {"sty": sty, "y": {a: SCALE[m] * _seedmed(r, m) for a, r in b["arms"].items() if a in sty}},
+                         lambda ax, cut=o["cuts"]["x"][1]: ax.axvline(cut, color="0.5", ls=":", label=CUT)))
+            labs = iter([XLAB_TTG[f] for f in fams] + [XLAB_TTG["bulk_x"]])
+            _panels(ps, axs, rows, lambda ax: next(labs), MEAS[m], PROCESS_TTG, cap=CAP[m])
+            _legend(axs, spare, PROCESS_TTG, (0, "upper right"))
+            written.append(ps.save(fig, os.path.join(figs, f"kitzoom_ttg_{m}")))
+        fig, axs, spare = _grid(len(fams))
+        for ax, f in zip(axs, fams):
+            b = o["fams"][f][key(f)]
+            name, c, _, ls = model_style("truth")
+            ax.plot(b["x"], LN * np.asarray(b["truth"]), color=c, ls=ls, label=name)
+            for a, (name, c, mk, ls) in sty.items():
+                ax.plot(b["x"], LN * _seedmed(b["arms"][a], "pred"), color=c, marker=mk, ls=ls, label=name)
+            ax.set_xscale("log"); ax.xaxis.set_minor_formatter(NullFormatter())
+            ax.set_xlabel(XLAB_TTG[f]); ax.set_ylabel(r"median $\log|\mathcal{M}|^2$")
+            ps.process_label(ax, PROCESS_TTG, loc="upper right")
+        _legend(axs, spare, PROCESS_TTG, (0, "lower left"))
+        written.append(ps.save(fig, os.path.join(figs, "kitzoom_ttg_median")))
     # the core, every process: both measures side by side
     fig, (a1, a2) = ps.figure(ncols=2)
     for k in ORDER:
