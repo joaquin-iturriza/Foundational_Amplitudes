@@ -45394,7 +45394,7 @@ entries:
       Figure figs/step27_level_per_event_heldout_per_process.png (Suprio''s layout). CC CPU job with --check-factor on the
       full arm CSV pending (detach step26_27_cpu_reads).'
   step_waits:
-    '26': FA-ccin2p3-d55e8093
+    '26': detach step26_27_cpu_reads (factor_split.py --pole-run on runs/llmcmp_c_tprop/trial_1860, CC CPU job ccj_37031841e6dd)
   handoff:
     state: 'Step 27 (per-event anchored level, D566, design PASS 2026-11-27T02:55): all three training runs COMPLETED at step
       16''s config with trial 5''s HPs: arm FA-ccin2p3-0d409c4e (sweep/sweep_config_llmcmp_level_events.yaml @e3aed380f, runs/llmcmp_level_events_s30/trial_7201),
