@@ -43758,6 +43758,18 @@ entries:
       and step 16''s frozen 3-seed level file is a lucky draw of its own (0.047 vs regressor_ens median 0.219): a 3-seed vs
       3-seed run compares draws, not per-event vs per-process. Matched alternative: both files 30-seed averaged, the control
       re-run (~2 x 16 GPU-h > 30: Joaquin''s go).'
+  - at: '2026-11-27T02:47:23+00:00'
+    text: '2026-11-27 step 27: the seeds-0-2 level_events writer FA-ccin2p3-06b459fd (E9702, COMPLETED) gives the per-event
+      file''s own new-43 median level error 0.497 (s_lo 0.783, s_hi 0.683, q_hard 0.494, q_soft 0.484; train 0.0025): one
+      network draw above attempt E''s bar 0.369, as step 16''s frozen file is a lucky one (0.047). That file is left untracked
+      on CC and not used. The seed-draw point is resolved by matched 30-seed inputs. Branch level_s30: 4facfd5af adds perevent_level
+      --level-seeds N (level_events_E_kin_s<N>.json plus the matched per-process level_file_B_diag_s<N>.json: the same network
+      on the pool means, regressor_ens'' estimator, the same seeds and events), llm_score --events-out columns log_shat, q,
+      E (from the loader momenta x mom_div), analysis/llm_compare/level_subsets.py and the configs sweep_config_llmcmp_level_file_s30.yaml
+      (control) and _level_events.yaml (arm, now _s30). 27e579c69 makes the factor check a p99. Repo review PASS of both.
+      Merge refused by trunk''s repo backlog, which still holds kit_benchmark''s kit_curves plot_runs bug (2ad76d096). Design
+      recorded (two runs, ~28 GPU-h, 13 h target); design review running. Step 26 run FA-ccin2p3-4ba88991 at 6761/60840 at
+      03:43, estimate 11.9 h of steps.'
   step_waits:
     '26': FA-ccin2p3-4ba88991
     '27': repo-reviewer a0142276334a2a739 advancing trunk's backlog past the kit_curves plot_runs fix (kit_benchmark, 2ad76d096),
