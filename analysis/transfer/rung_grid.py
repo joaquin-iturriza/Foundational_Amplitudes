@@ -74,7 +74,7 @@ def draw_final(ax, f, p, *a, **kw):
     return op
 
 
-def grid(base, probes, panel, own):
+def grid(base, probes, panel, own, whole=False):
     """Joaquin 2026-11-17 ('combined into a big 3x4 grid', 'why not merge 18 and 19 as I asked?'): the twelve probes
     in one file, the e+e- probes in the top two rows and the others in the bottom two, included scaled to the page.
     `panel(ax, p)` draws a probe; the curves every panel has share one legend strip on top, each panel's own curves
@@ -90,6 +90,12 @@ def grid(base, probes, panel, own):
         ax.set_xscale("log"); ax.set_yscale("log")
         ax.set_xlabel(r"training events $D_{\rm train}$"); ax.set_ylabel(r"MSE$(\log|\mathcal{M}|^2)$")
         ps.process_label(ax, LAB[p])
+    if whole:   # Joaquin 2026-11-27: 'each panel to have a legend that is self contained': every panel names all its curves
+        ps.layout(fig); ps.apply_headroom(fig)
+        for ax in cells:
+            ps.legend_free(ax, fontsize=ps.LEGEND_MIN_PT)
+        ps.save(fig, base)
+        return
     hl = {l: h for ax in cells for h, l in zip(*ax.get_legend_handles_labels())}
     mine = {p: own(p) for p in probes}
     common = [l for l in hl if not any(l in m for m in mine.values())]

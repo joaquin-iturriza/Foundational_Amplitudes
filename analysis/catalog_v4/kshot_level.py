@@ -134,28 +134,63 @@ def plot(res):
     ps.save(fig, os.path.join(HERE, "figs", "kshot_level"))
 
 
+KCURVE = (0, 1, 2, 4, 8, 16, 32, 64)
+
+
+def curves():
+    """The 2026-10-27 talk's form (talks/progress_oct2026b, slide 'A few events of the process remove the level',
+    from analysis/catalog_daniel/kshot_level.py) on catalog_v4: per held-out axis, the median over its probes of the
+    MSE after one offset per process fitted on K events (K = 0 the zero-shot read), and the median floor var d."""
+    rng = np.random.default_rng(0)
+    out = {}
+    for run in RUNS:
+        for ax in AXES:
+            _, d, _ = load(run, ax)
+            rows = {K: [] for K in KCURVE}
+            for v in d.values():
+                rows[0].append(float(np.mean(v ** 2)))
+                for K in KCURVE[1:]:
+                    m = []
+                    for _ in range(NDRAW):
+                        i = rng.permutation(len(v))
+                        m.append(np.mean((v[i[K:]] - v[i[:K]].mean()) ** 2))
+                    rows[K].append(float(np.mean(m)))
+            out.setdefault(run, {})[ax] = {"n": len(d), "offset": [float(np.median(rows[K])) for K in KCURVE],
+                                           "floor": float(np.median([v.var() for v in d.values()]))}
+            r = out[run][ax]
+            print(f"{run:30s} {ax:5s} n {r['n']:3d} floor {r['floor']:.3g} | "
+                  + " ".join(f"K{K}:{x:.3g}" for K, x in zip(KCURVE, r["offset"])))
+    json.dump({"K": KCURVE, "runs": out}, open(os.path.join(HERE, "data", "kshot_curves.json"), "w"), indent=1)
+    return out
+
+
+NAMES = {"H1": "new combinations", "H2": r"$2\to4$ families", "H2p5": r"$2\to5$", "H3": "physical top",
+         "H5": "one loop", "H6": r"$\alpha_s(M_Z)=0.13$", "H7E": r"$6$ to $20$ TeV", "H7c": r"$p_T>30$ GeV"}
+
+
 def paper():
-    """The paper draft's version (Sec. 5, D591), from data/kshot_level.json: one row per held-out axis, ordered by the
-    zero-shot error, the error on the x axis, both pretraining seeds (circles, squares); rows as Fig. 14 right."""
+    """The paper draft's version (Sec. 5, D591): the talk's figure redrawn on catalog_v4's pretraining default (first
+    seed; the second printed), the eight axes in two panels of four, ordered by the zero-shot error, each panel with its
+    own legend; dashed: each axis' floor."""
     import plot_style as ps
-    S = json.load(open(os.path.join(HERE, "data", "kshot_level.json")))["summary"]
-    names = {"H1": "new combinations", "H2": r"$2\to4$ families", "H2p5": r"$2\to5$", "H3": "physical top",
-             "H5": "one loop", "H6": r"$\alpha_s(M_Z)=0.13$", "H7E": r"$6$ to $20$ TeV", "H7c": r"$p_T>30$ GeV"}
-    order = sorted(AXES, key=lambda a: np.mean([S[r][a]["zero"] for r in RUNS]))
-    y = np.arange(len(order))
-    fig, (ax, cell) = ps.figure(ncols=2)   # eight rows leave no free corner: the legend in the second cell
-    series = (("zero", ps.C.blue, "zero-shot"), ("shr4", ps.C.green, "shrunk offset from 4 events"),
-              ("off16", ps.C.vermillion, "offset from 16 events"), ("floor", ps.C.grey, "floor: best offset per process"))
-    for run, mk, off in zip(RUNS, ("o", "s"), (-0.15, 0.15)):
-        first = run == RUNS[0]
-        for k, c, lab in series:
-            kw = dict(facecolors="none", edgecolors=c) if k == "floor" else dict(color=c)
-            ax.scatter([S[run][a][k] for a in order], y + off, marker=mk, label=lab if first else None, **kw)
-        ax.scatter([], [], marker=mk, color="k", label="first seed" if first else "second seed")   # the markers' key
-    ax.set_yticks(y); ax.set_yticklabels([names[a] for a in order])
-    ax.set_ylim(len(order) - 0.5, -0.5); ax.set_xscale("log")
-    ax.set_xlabel(r"MSE$(\log|\mathcal{M}|^2)$")
-    ps.legend_cell(cell, ax)
+    R = curves()[RUNS[0]]
+    order = sorted(AXES, key=lambda a: -R[a]["offset"][0])
+    x = np.array(KCURVE) + 1
+    fig, axs = ps.figure(ncols=2)
+    for ax, axes, yt in zip(axs, (order[:4], order[4:]), ((0.4, 0.6, 1.0), (0.03, 0.1, 0.3))):
+        for a, c in zip(axes, (ps.C.blue, ps.C.vermillion, ps.C.green, ps.C.purple)):
+            ax.plot(x, R[a]["offset"], "-o", color=c, label=NAMES[a])
+            ax.axhline(R[a]["floor"], color=c, ls="--")
+        ax.plot([], [], "--", color=ps.C.grey, label="floor: best offset per process")
+        ax.set_xscale("log"); ax.set_yscale("log")
+        ax.set_xticks(x, [str(k) if k in (0, 1, 4, 16, 64) else "" for k in KCURVE])
+        ax.set_xticks([], minor=True)
+        ax.set_yticks(yt, [f"{v:g}" for v in yt]); ax.set_yticks([], minor=True)   # plain numbers, not 6x10^-1
+        ax.set_xlabel(r"$K$, events of the process")
+        ax.set_ylabel(r"median MSE$(\log|\mathcal{M}|^2)$")
+    ps.layout(fig); ps.apply_headroom(fig)
+    for ax in axs:
+        ps.legend_free(ax, fontsize=ps.LEGEND_MIN_PT)
     ps.save(fig, os.path.join(HERE, "figs", "paper_kshot_level"))
 
 

@@ -67,7 +67,7 @@ if PAPER:
         for f, lab, c, m in fams(p):
             curve(ax, D, [cell(f, p, k) for k in K], color=c, marker=m, label=lab)
 
-    grid(os.path.join(FIGS, BASE), P, panel, lambda p: [upto(FOCUS[p] - 1), upto(FOCUS[p])])
+    grid(os.path.join(FIGS, BASE), P, panel, lambda p: [upto(FOCUS[p] - 1), upto(FOCUS[p])], whole=True)
 else:
     fams = lambda p: LADDER  # noqa: E731
     draw("ee", P[:6], fams, LAB)
