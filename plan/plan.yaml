@@ -35885,6 +35885,74 @@ entries:
       / emission-scale with asym|factor|kit|uug in results.tex, t8000, softpair, softpair_asym, softpair_plain, gmax4, hpo_asym_cont,
       emis_matched, the plan''s dead ends, D598/D600; the 8000-step pairs are now in prior. 1.2 GPU-h, same job script and
       readout as the factor runs.'
+  - at: '2026-11-27T15:15:52+00:00'
+    question: 'Step 39 (D600 (b), Joaquin 2026-11-27: ''also do ee to ttg, which should have one divergence suppressed, and
+      let''s see what asymptotic factors vs emission scales do there. Please plot all relevant limits''): on e+e- -> t t~
+      g at sqrt s 1 TeV, in KIT''s layout and protocol A (1e5 bulk events from scratch), is the transformer with the asymptotic
+      factor (massive eikonal for the gluon off the tops) more accurate than the same transformer on the emission-scale target
+      and than the plain transformer, in the bulk core, the whole bulk and each limit: soft gluon (x 1e-7..1e-2, the divergence
+      that stays), gluon quasi-collinear to a top (1-cos 1e-7..1e-1 at x 0.2-0.4, regulated by m_t: the suppressed one, flat
+      below the dead-cone angle), and the t t~ pair''s threshold beta 1e-4..1e-1?'
+    prior: 'Searched docs/results.tex (ttbarg, t t~ g, dead cone, ttg), the plan (kit_benchmark findings, steps 37/38), site
+      decisions D598/D600. No KIT-layout t t~ g data or run exists. Related: (1) uug/uugg factor vs emission scales: step
+      37 (searched emission arms hp1493/hp1196) factor wins whole-bulk MSE 1/137 (uug), 1/29 (uugg), deepest collinear 1/540
+      uug; step 38 matched emission arms at the factor''s HPs (FA-ccin2p3-3f44d631, dfec7e79, RUN_DONE): KIT bulk log-MSE
+      5.64e-4 (uug) and 2.30e-3 (uugg) vs the factor''s 1.98e-6 / 6.29e-5, i.e. factor/emission 1/285 and 1/37 (kit_zoom read
+      of the families pending). (2) The b b~ g dead-cone study in the catalog transfer work (results.tex ~13040-13117): m_b
+      softens the collinear direction, a weak deep-IR gain there. (3) e+e- -> t t~ g is a catalog_v4 tree (ee_ttbarg, diagrams
+      sidecar on CC and lxplus), fine-tuned in the D82 ladder (results.tex ~12055, 12085), never at KIT''s limits. (4) The
+      factor''s ttg term: wrappers._asym_terms massive eikonal @b0c667b8c with unit test (CDST''s spin-averaged massive dipole
+      ruled out: negative on 3.2% of t t~ g phase space). Data generator tools/kit_ttg.py aligned to KIT''s layout @52391359c
+      (KIT generate.py read: stratum names f''{lo:g}_{hi:g}'', bulk_train/test, hard_test 1e5, hard_train 5000, particle table,
+      metadata keys).'
+    measure: 'tools/kit_zoom.py (step 37''s passed measures, D604''s presentation): median |Delta|, mean |Delta| (Delta =
+      pred/true - 1) and MSE(ln|M|^2) on the bulk core, the whole bulk binned, and per limit stratum family per bin (5 a decade)
+      with the other variable in a band (soft at fixed gluon-top angle, quasi-collinear at fixed x as generated, threshold
+      at fixed x); plus kit_figures collect (KIT evaluate.py log-MSE per stratum) and the median log|M|^2 against each limit
+      variable beside the truth. R = factor / other arm per measure.'
+    check: 'The measure moves with the target treatment on existing data: on uug/uugg the factor vs emission-scale bulk log-MSE
+      ratio is 1/285 and 1/37 at matched HPs (step 38 logs'' evaluate.py tables), and the plain transformer''s soft-limit
+      median log|M|^2 stays flat while the truth rises 22 units of ln (kitzoom_median_ee_uug_me2, D604 figures). On t t~ g
+      the build itself checks the data: the soft strata''s log|M|^2 slope against log x is asserted at -2 +- 0.02 (tools/kit_ttg.py
+      build), and the collinear strata''s median read flat below theta ~ m_t/E_t is the dead-cone check reported with the
+      data; the factor''s massive eikonal is positive and Lorentz invariant (tests/test_input_reps.py @b0c667b8c).'
+    fixed: 'Data: tools/kit_ttg.py build @52391359c as one CPU job on CC (MadGraph standalone of e+ e- > t t~ g, sm card,
+      MT = ymt = 173.0 from KIT''s ee_tt metadata, alpha_s 0.118, 1/alpha 132.507, sqrt s 1000): bulk_train 2e5, bulk_test
+      2e5 (flat 3-body with KIT''s s_ij/s > 0.01 on t g and t~ g), hard_test 1e5 and hard_train 5000 per stratum: soft_x 5
+      decades, coll_tg 6 decades, threshold_beta 3 decades; copied to lxplus by site copy. Every arm: scripts/job_kit.sh mode
+      A (base config catalog trial 1262), dataset kit_fa_ee_ttg__me2, 1e5 train, last 1e5 of bulk_train validation, 1831 steps
+      (300 epochs), batch 16384, float64, HETEROSC + sigma stage, mu-MSE selection, seed 42, WSD cooldown 1/8, ++model.net.frames_gamma_max=4,
+      dimensionless inputs, data.target_physics_orders=false, diagrams from ee_ttbarg. HPs: the best clean trial (curve_quality
+      good, no >5x val jump) of a 16-trial single-fidelity DyHPO search on the plain arm (sweep/sweep_config_kit_hpo_ttg_plain.yaml
+      @16f8a7fe7: the template space as step 15''s uug plain search, base sweep/kit_base/kit_A_fa_ee_ttg_me2_n100000_t1831_plain
+      = the uug matched run''s resolved config with dataset kit_fa_ee_ttg__me2 and target_physics_factor false), waves 6/5/5,
+      sweep/drive.py at site pick''s width (CC, lxplus). Arms at those HPs: plain = the chosen trial itself, scored with job_kit.sh
+      KIT_SCORE_ONLY/KIT_SCORE_DIR; factor = data.target_physics_factor=false ++model.input_asym_factor=true; emission scales
+      = data.target_physics_factor=true (dim_ref qperp). One smoke first (D395: new data and launch path): the factor arm
+      at 50 steps through training, sigma stage and KIT scoring, 1 GPU. Wall and cost: build CPU job limit 4 h (1.9e6 standalone
+      evaluations plus compile; time read from its log); smoke 0.2 GPU-h; search 16 x 0.55 h target (uug plain trials 1831
+      steps ~0.4-0.5 h on V100), limit 1 h, 8.8 GPU-h; factor and emission arms 0.6 h each (uug factor 22 min training + ~10
+      min scoring), limit 1:30; plain scoring 0.25 h. Total ~11 GPU-h, under D600 (names this work) and the 30 GPU-h line.
+      Disk: 2e5+2e5+14 x 1.05e5 events x 5 x 4 float64 ~ 0.35 GB file per site, runs ~50-80 MB each, CC 9 GB free.'
+    control: 'The three arms are each other''s controls with one switch between each pair: plain (the search''s best) vs factor
+      (input_asym_factor on), plain vs emission scales (target_physics_factor on); all at the plain search''s HPs, which favours
+      the plain arm (as step 37 read: only a factor win against plain is a verdict). The uug/uugg results of steps 37/38 stand
+      beside as the massless reference.'
+    seeds: 'One seed (42) per arm (D315); spread: single-process from-scratch transformers at fixed HPs 1.1x-30x across seeds
+      (results.tex ~l.14545, quoted under D315).'
+    outcome: 'Per measure and region (bulk core, whole bulk, each family''s deepest bins): R = factor / emission and factor
+      / plain. R < 1/30 the factor wins; R > 30 the other arm wins; between, inside the seed spread, reported as not separated
+      at one seed. Factor wins the soft family and the bulk: the factor''s massive extension holds where one divergence remains,
+      the KIT package and the draft keep the factor for massive emitters. Factor loses or ties on the quasi-collinear family
+      where the truth is flat (dead cone): the eikonal term adds nothing where no divergence exists, reported as such (no
+      claim of a collinear gain there). Emission scales beat the factor (R > 30) on a family: that family''s factor term costs
+      accuracy; the factor gets a DyHPO search of its own under the feature rule before any claim. The plain arm''s soft-limit
+      median flat (as on uug): the factor''s gain there is the divergence being supplied, not learnt. Any run with a >5x val
+      jump is listed apart.'
+    sources: '1/30 and 30 <- single-process from-scratch seed spread 1.1x-30x at fixed HPs (results.tex ~l.14545, quoted under
+      D315), the bar of the passed step-37/38 designs; 5x jump <- sec:ladder seeds'' blow-ups vs 1.5x seed noise; soft slope
+      tolerance 0.02 <- measured: KIT''s uug soft-family fitted exponent -2.01 vs truth -2.00 (finding 2026-11-13); budget
+      lines <- CLAUDE.md GPU budget, D600'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
