@@ -43654,6 +43654,7 @@ entries:
   step_waits:
     '25': FA-ccin2p3-d34fae85
     '26': FA-ccin2p3-776cdd69
+    '27': FA-ccin2p3-583cc541
   handoff:
     state: 'Step 26 (target_propagators arm, design PASSED 2026-11-26T23:40, config sweep/sweep_config_llmcmp_c_tprop.yaml
       @581530563, code 1ca3514c0): prebuilds done, tp-meta gate passed (gg tbW pair and the five q q~ twin pairs carry the
