@@ -28433,6 +28433,10 @@ entries:
       0.126 (tag fairnlo_ftfix_d1000_lsmed) FA-ccin2p3-600dce4c: collect (kit_figures collect, kit_curves runs), kit_readout
       --vs V/B and SCR-A2 at D=1e3, redraw kit_fairnlo, kit_slide10_fairnlo_*, kit_curves_fairnlo with the hollow rerun marker
       and the deck frames'
+    36: 'Held-out qqg uugg fine-tune search (design 2026-11-27 ~14:10, sweep/sweep_config_kit_hpo_uugg_ft_heldoutqqg.yaml
+      @60d52cc1c): on design PASS, record the target (16 x 0.55 h), drive it with sweep/drive.py --item kit_benchmark --disk-gb
+      0.1 --hours 0.55 detached, then score the best trial with job_kit.sh KIT_SCORE_ONLY/KIT_SCORE_DIR and kit_readout --vs
+      SCR-A2 uugg'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -30376,6 +30380,11 @@ entries:
       if:
       - 'rerun clean: its numbers replace the blown-up run at D=1e3 in the readout, figures redrawn'
       - 'rerun blows up too: D=1e3 listed apart with both runs, reported'
+    36:
+      feeds: 'D575 (ii): does the held-out qqg pretraining transfer the uugg limits once the fine-tune is tuned'
+      if:
+      - 'best FT BEATS SCR-A2 on a uugg family: transfer of that limit, reported with the slide redrawn'
+      - 'no family BEATS: no transfer at this pretraining on uugg, reported with exponents and the search spread'
   step_waits:
     '32': FA-ccin2p3-a8d68ffe
     '33': FA-ccin2p3-ddd2e7a7
