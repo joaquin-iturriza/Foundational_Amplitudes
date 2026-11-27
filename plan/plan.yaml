@@ -48431,6 +48431,21 @@ entries:
       E''s bar, regressor_ens ten-ensemble max (data/perevent_anchored_E.json); 2 bootstrap sd <- measured: 30 event resamples
       per subset (level_subsets.py, attempt E''s rule); 13 h <- measured: step 16''s own V100 rate ~0.75 s/step x 60,840;
       100 GPU-h <- CLAUDE.md budget, D566 names the work'
+    fix_at: '2026-11-27T02:53:43+00:00'
+    fix: 'Re-check of the 02:52 design (three runs: arm, control, and a same-seed retrain of the control). What holds: the
+      retrain is a measurement of training noise, which the review asks for when none exists for this setup; it is not a change
+      of seeds. The first control''s checkpoints are gone, so R_b cannot come from saved outputs. The budget is ~41 GPU-h,
+      under 100 with D566 naming this work. Both control runs go out on the gate. The YES/NO/UNRESOLVED split has no overlap.
+      One point fails (the outcome threshold''s source, check 4). The NO line b_a > max(b_c, b_r) x R_b counts the noise twice:
+      max(b_c, b_r) x R_b = max^2/min, which is R_b^2 above the lower control run. What was measured (R_b) says two runs of
+      one setup differ by a factor of up to R_b, not R_b^2. With a spread like the no-level pair''s 5.2, the NO line would
+      sit above the no-level run''s 0.859, so NO is out of reach and every non-YES becomes UNRESOLVED. Fix: compare the arm
+      with the control level at one factor of R_b, using g = sqrt(b_c x b_r), the geometric mean of the two control runs.
+      YES: b_a <= g x R_b and 0.859 / b_a > R_b. NO: b_a > g x R_b. UNRESOLVED otherwise. Or argue in the design for another
+      single-R_b form; the source must give the number used. Also state as an assumption that a same-seed retrain''s divergence
+      stands for the arm-against-control run noise: the arm''s different target fully decorrelates its trajectory, and the
+      GPU''s run-to-run variation is what the retrain measures. The earlier same-setup pair (5.2x on the median MSE) shows
+      the divergence is large. Everything else passes as in the previous reviews.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
