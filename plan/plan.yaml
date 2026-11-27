@@ -30120,6 +30120,13 @@ entries:
       role to the scored batch: no per-call re-read/re-augmentation of the 1e5-event train pool. bench now also asserts the
       fast path equals kit_predict on 1000 bulk_test events (<1e-9), as cmd_gen does before every surrogate run (shared check_vs_kit_predict).
       Bench job on CC submitted (ccj_cd15ca9d4d4a, 40 calls of 32).'
+  - at: '2026-11-27T03:11:45+00:00'
+    text: '2026-11-27 ~05:45 @22f7fe70b. Step 33 bench of the fixed serve (CC, 1 thread, 40 calls of 32 uug bulk_test events):
+      150.6 ms per call = 4.71 ms per event (was 1183 ms / 37 ms), repeat of call 0 identical to 0.00; within 2x of the design''s
+      2.6 ms (1.8x). Its kit_predict comparison crashed on a missing directory (fixed @22f7fe70b); re-run bench submitted
+      (--calls 41) to get that check. Once the check prints <1e-9: restart the vector_size-32 1e5 jobs on the fixed code (b45a89e1
+      uug, limit 6 h; 6360f286 uugg, limit 12 h; at ~8x the speed each finishes in ~1-2 h vs hours remaining), same args,
+      cancel the old ones only after the new ones start.'
   step_why:
     24:
       feeds: 'D570: does fine-tuning from the signed A2 pretraining beat SCR-A2 and V/B with exact Born on ee->tt one loop
