@@ -28481,7 +28481,7 @@ entries:
     - FA-lxplus-35ac6ab5
     - FA-lxplus-9fc1e04e
     - FA-lxplus-da06f228
-    commit: 7537eff46
+    commit: ff4f2e0cf
     paths:
     - analysis/kit_benchmark/data/kit_curves_read.json
     - analysis/kit_benchmark/data/kit_fig_A.json
@@ -28507,6 +28507,7 @@ entries:
     - sweep/sweep_config_kit_hpo_uug_T.yaml
     - sweep/sweep_config_kit_hpo_uug_plain.yaml
     - sweep/sweep_config_kit_hpo_uugg_T.yaml
+    - tests/test_head_map_own_stats.py
     - tests/test_input_reps.py
     - tests/test_kit_hardps.py
     - tests/test_kit_threshold_scan.py
