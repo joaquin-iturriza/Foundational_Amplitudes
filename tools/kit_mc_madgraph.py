@@ -212,7 +212,8 @@ def cmd_gen(a):
     assert pdgs == [mg.MG5_PDG[t] for t in gen.replace(">", "").split()], (pdgs, gen)
     d = os.path.abspath(a.dir)
     tag = f"{a.proc}_surr" if a.surrogate else a.proc
-    work = os.path.join(os.environ.get("TMPDIR") or d, f"mg_{tag}")
+    # KIT_MC_WORK_IN_DIR=1: work under <dir> on the shared disk (a CC htc node with no local tmp disk, --tmp=0)
+    work = os.path.join(d if os.environ.get("KIT_MC_WORK_IN_DIR") else (os.environ.get("TMPDIR") or d), f"mg_{tag}")
     ev, sa = os.path.join(work, "ev"), os.path.join(work, "sa")
     shutil.rmtree(work, ignore_errors=True)
     os.makedirs(work)
