@@ -269,8 +269,10 @@ def cmd_gen(a):
     env = dict(os.environ)
     if a.surrogate:
         patch_surrogate(ev)
+    if a.surrogate or "KIT_MC_VEC" in os.environ:   # KIT_MC_VEC on an exact run: MadEvent's vector_size alone
         with open(f"{ev}/Cards/run_card.dat", "a") as rc:   # hidden parameters: absent from the card until set
             rc.write(f" {VEC} = vector_size ! kit_mc_madgraph: events per surrogate call\n 1 = nb_warp\n")
+    if a.surrogate:
         env["KIT_SURR_CMD"] = (f"{sys.executable} {os.path.abspath(__file__)} serve {a.proc} "
                                f"{os.path.abspath(a.surrogate)} {sa} --stats {os.path.join(d, tag + '_serve.jsonl')}")
         env["OMP_NUM_THREADS"] = "1"     # SMATRIX_MULTI's OpenMP loop: one thread per madevent process
@@ -281,7 +283,7 @@ def cmd_gen(a):
     with open(log, "a") as lf:
         subprocess.run([f"{ev}/bin/generate_events", "run_01", "-f"], cwd=ev, stdout=lf, stderr=subprocess.STDOUT,
                        check=True, env=env)
-    if a.surrogate:
+    if a.surrogate or "KIT_MC_VEC" in os.environ:
         vs = open(f"{ev}/Source/vector.inc").read()
         assert re.search(rf"WARP_SIZE={VEC}\)", vs), f"vector_size {VEC} not compiled in: {vs}"
     banner = sorted(__import__("glob").glob(f"{ev}/Events/run_01/*_banner.txt"))[0]
@@ -292,6 +294,11 @@ def cmd_gen(a):
     assert len(w) == len(mom) and np.allclose(w, w[0], rtol=1e-6), f"LHE weights not equal: {w.min()}..{w.max()}"
     assert cut_pass(mom, g - 1).all(), "a MadEvent event fails the coded cut"
     assert np.allclose(aqcd, meta["alpha_s"], rtol=1e-6), f"MadEvent alpha_s {aqcd.min()}..{aqcd.max()}"
+    if os.environ.get("KIT_MC_KEEP"):   # diagnosis: the LHE beside the sample
+        shutil.copy2(f"{ev}/Events/run_01/unweighted_events.lhe.gz", os.path.join(d, f"{tag}_unweighted_events.lhe.gz"))
+    # the coded cut and alpha_s are scale-free: only the energy shows events at the wrong scale (CC vec-32 runs: 1.1035 GeV)
+    e_in = mom[:, 0, 0] + mom[:, 1, 0]
+    assert np.allclose(e_in, meta["sqrts"], rtol=1e-9), f"MadEvent events not at sqrt s {meta['sqrts']}: {e_in.min()}..{e_in.max()}"
     me2 = exact(mom)
     pipe.__exit__(None, None, None)
     with h5py.File(kh.h5_path(a.proc), "r") as K, h5py.File(h5(d, a.proc, a.surrogate) + ".tmp", "w") as o:
@@ -505,8 +512,9 @@ def cmd_metrics(a):
             me2 = f["mc/events/me2"][:].astype(np.float64)
             hat = 10 ** P["mc/events/log10_me2"][:].astype(np.float64)
             sh, eh = float(f.attrs["sigma_pb"]), float(f.attrs["sigma_err_pb"])
-            se, ee = sigma_err_log(os.path.join(a.dir, f"{proc}_mg5.log"))     # the exact run's
-            assert abs(se / float(fe.attrs["sigma_pb"]) - 1) < 1e-4, (se, fe.attrs["sigma_pb"])
+            sl, ee = sigma_err_log(os.path.join(a.dir, f"{proc}_mg5.log"))     # the exact run's error (the log's sigma: 4 digits)
+            se = float(fe.attrs["sigma_pb"])                                     # its sigma from the banner, full precision
+            assert abs(sl / se - 1) < 1e-3, (sl, se)
             res[run + "/surrogate_sample"] = {"process": proc, "sigma_hat_pb": sh, "sigma_hat_err_pb": eh, "sigma_pb": se,
                                               "sigma_err_pb": ee, **surr_metrics(me2, hat, sh, eh, se, ee)}
         print("CLAIM " + json.dumps({run + "/surrogate_sample": res[run + "/surrogate_sample"]}))
