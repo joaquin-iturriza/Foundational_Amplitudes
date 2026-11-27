@@ -156,14 +156,17 @@ def plot(d, figs):
 
 
 def plot_runs(d, runs, base):
-    """one panel file per run (<base>_a, _b, ... in the order given): its validation and training NLL against step
-    (running median of 3), the y range 6 nats above the lowest point as kit_curves_nll"""
+    """one figure <base>, one panel per run in the order given (two columns): its validation and training NLL against
+    step (running median of 3), the y range 6 nats above the lowest point as kit_curves_nll; one legend, in the spare
+    cell when the count is odd, else in the first panel"""
     import plot_style as ps
-    figs = ps.panels(len(runs))
-    for (fig, ax), run in zip(figs, runs):
-        e = d[run]
-        curve_panel(ax, e)
-        ps.legend(ax, "upper right")
+    fig, axes = ps.figure(2, (len(runs) + 1) // 2, squeeze=False)
+    for ax, run in zip(axes.flat, runs):
+        curve_panel(ax, d[run])
+    if len(runs) % 2:
+        ps.legend_cell(axes.flat[len(runs)], [axes.flat[0]])
+    else:
+        ps.legend(axes.flat[0], "upper right")
     print(ps.save(fig, base))
 
 
