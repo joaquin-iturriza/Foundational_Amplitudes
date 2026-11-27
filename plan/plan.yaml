@@ -30532,6 +30532,11 @@ entries:
       (trial 11, CC) val mu-MSE 2.66e-5 (sep 2.70), next hp0170 3.08e-5, hp0353 3.09e-5. KIT scoring of trial_1790 FA-ccin2p3-82452f53
       (interactive); then kit_figures collect trial_1790=kit_A_ft_ee_uug_me2_n100000_t1831_heldoutqqg_ftbest, kit_readout
       --vs SCR-A2 uug (FA-ccin2p3-6f1a5dad), slide10 heldout redraw.'
+  - at: '2026-11-27T19:55:02+00:00'
+    text: 'Step 34b: KIT scoring of trial_1790 FA-ccin2p3-82452f53 FAILED at job_kit.sh''s argument check (log: ''dataset
+      kit_<file>__<target>'', exit 2; submitted without its positional args). Resubmitted with ''-- kit_ee_uug__me2 100000
+      1831 A'' (as the uugg twin a10cf427) as FA-ccin2p3-a872c019, interactive 40 min; step 34 waits on it, then collect as
+      kit_A_ft_ee_uug_me2_n100000_t1831_heldoutqqg_ftbest, readout vs SCR-A2 uug, slide10 redraw.'
   step_why:
     32:
       feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
