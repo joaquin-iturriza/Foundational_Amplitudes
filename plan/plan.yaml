@@ -44242,8 +44242,8 @@ entries:
     state: working
     since: '2026-11-27T04:02:03+00:00'
     state_at: '2026-11-27T15:57:54+00:00'
-    context: 154599
-    context_at: '2026-11-27T05:51:08+00:00'
+    context: 166726
+    context_at: '2026-11-27T15:58:02+00:00'
   step_why:
     26:
       feeds: 'D564: why the LLM extrapolates better than our LLoCa'
