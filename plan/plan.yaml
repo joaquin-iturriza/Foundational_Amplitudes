@@ -30127,7 +30127,7 @@ entries:
       - 'overhead cut below 2x: use it for any rerun, and for uugg if 6360f286 runs out of time'
       - 'not cut: find the 1024 survey-zero cause by a MadEvent run with the server timing at 1024 and 32 on one channel'
   step_waits:
-    '24': FA-ccin2p3-5819e2fe FA-ccin2p3-e5c41742 FA-ccin2p3-27013dea FA-ccin2p3-aca0bcaa FA-ccin2p3-2128f5f5
+    '24': FA-ccin2p3-65e6c701
     '32': FA-ccin2p3-b45a89e1 FA-ccin2p3-6360f286
     '30': FA-ccin2p3-69541363 FA-ccin2p3-6f1a5dad FA-ccin2p3-ff4af2bc
     '29': FA-ccin2p3-5819e2fe FA-ccin2p3-e5c41742 FA-ccin2p3-27013dea FA-ccin2p3-aca0bcaa FA-ccin2p3-2128f5f5
