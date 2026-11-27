@@ -34818,6 +34818,24 @@ entries:
       else).'
     sources: D571, D574, D575; slide 11 of analysis/kit_benchmark/source/hardps_benchmark_slides.pdf; the 2026-11-26 16:45
       design pass
+    fix_at: '2026-11-27T08:33:33+00:00'
+    fix: 'Disk (batch fits the disk): /sps/lpnhe has 9.3G free of 512G (99% used, df read 2026-11-27 on CC), and the parts
+      run their MadEvent work dirs (process dir + standalone + G* channel dirs) on /sps (htc --tmp=0, KIT_MC_WORK_IN_DIR)
+      with up to 150 at once (50 uug + 100 uugg); the design states no disk per part. Fix: read the work-dir size of one uug
+      and one uugg run at the default card (the exact runs or df8e8413/de4314f4 logs, or du of a kept dir), multiply by the
+      parts running at once, and fit it in the free disk with margin, else cap the array concurrency (--array=0-99%K) or free
+      our own debris first, stated in the design. Time per unit (same setup): the uugg part''s cost per call and calls per
+      event at the default card are assumed (1.3x, 3x uug), not read; the target 2 h and limit 8:00 rest on that. Fix: read
+      calls per event from the exact uugg 1e5 run at the default card (iseed 11, its log) and the one-event uugg serve cost
+      from a bench like the uug one (52.7 ms), or state that the uugg array is sized from its first parts'' serve stats before
+      the rest goes out. Smoke (D395): the surr_part job array (seed = base + task id, per-part dir, 4abcac768) and the surr_combine
+      chain (combine with --expect and a quoted glob, then predict --surr, predict, metrics into the exact run''s dir) have
+      never run on CC end to end; de4314f4 ran gen only and failed at its second predict. Fix: one smoke, an array of 2 uug
+      parts at a few hundred events plus surr_combine --expect 2 into a scratch copy or the exact dir, through metrics, before
+      the arrays. Threshold source: the parts'' chi2/dof < 3 stop has no source in sources; cite it (e.g. the chi2 distribution''s
+      p-value at 49/99 dof) or derive it. Everything else holds: one change (card and splitting) against the same exact control,
+      measure and MC errors (~1.0e-3 pooled, stated unresolvable for a 1.5e-3 bias, E_exact[u] resolves it), not a repeat
+      (vec-32 runs void, diag 2 cited).'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
