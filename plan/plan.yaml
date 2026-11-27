@@ -35532,6 +35532,16 @@ entries:
       named for the 7..30 band; core cut at half the limit exponent <- Joaquin''s words ''the part where the divergence doesn''t
       appear'' (2026-11-27, D598), read as: the truth''s local slope has fallen to half its limit value, shown on the binned
       figure so the cut can be read'
+    passed_at: '2026-11-27T13:16:43+00:00'
+    reviewer: 'Re-check of the 13:15 design after the 13:09 FIX: both reasons addressed. Check 2: bulk logmse in kit_fig_A_hpo.json,
+      u u~ g factor 1.979e-6 vs plain 1.748e-5 (8.8x), u u~ g g 6.29e-5 vs 1.07e-4 (1.7x), t t~ factor 1.358e-7 vs hp0131
+      6.08e-8 (2.2x). Check 3: bar now the single-process from-scratch seed spread 1.1-30x (results.tex ~l.14493, D315), 7..30
+      reported as inside it; one seed per D315. HP asymmetry used in the outcome: t t~ clean (factor at hp0131), u u~ g /
+      u u~ g g a no is not a verdict, next attempt the factor''s own 16-trial template search (sibling kit_hpo_*_T layout,
+      Joaquin''s 16 of 2026-11-12, ~18 GPU-h). Two score-only GPU jobs needed (trial_1493/1196 on CC, no KIT predictions);
+      CC /sps/lpnhe 8.76 GB free vs tens of MB per job; KIT bulk_test/hard_test; HETEROSC both arms. Searched: hpo_uug_T,
+      hpo_uugg_T, trial_1493, hp1493, hp1196, emission scale, asymptotic factor, fixed band, other variable, relative error,
+      unweighted, seed spread, fixed HPs, single-process, 6.96.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
