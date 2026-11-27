@@ -35819,6 +35819,19 @@ entries:
       curves are checked the same way (kit_curves, >5x jump listed apart).'
     sources: 1/30 and 30 <- single-process from-scratch seed spread 1.1x-30x at fixed HPs (results.tex ~l.14545, quoted under
       D315), the passed step-37 design's bar; 7 <- t t~ V same-HP rerun spread 0.78-6.96 (sec:datasaving, results.tex l.9868)
+    passed_at: '2026-11-27T13:46:24+00:00'
+    reviewer: 'Step 38 revision: one change confirmed against the factor runs'' config.yaml on CC (t1831_hpo_asym_cont uug/uugg:
+      HPs, WSD 1831, batch 16384, HETEROSC, seed 42, frames_gamma_max 4, dim_ref qperp, dim_only, orders false all match the
+      commands; only target_physics_factor false->true and input_asym_factor dropped; experiment._physics_logF: dim_only removes
+      only the coupling product, so qperp gives the emission scales). Check 2: kit_fig_A_asym/kit_fig_A/kit_fig_A_gmax4_*
+      bulk log-MSE factor 9.85e-7 vs emission 8.24e-4/1.09e-4/4.28e-4 on uug (1/110..1/840), 6.58e-5 vs 2.27e-3/1.97e-3/2.62e-3
+      on uugg (1/30..1/40); factor vs plain at 1831 steps 1.98e-6 vs 1.75e-5 (kit_fig_A_hpo). Check 3: one seed under D315,
+      spread 1.1x-30x (results.tex l.14545) and 0.78-6.96 (l.9868) read; uug''s expected effect is well above 30x, uugg at
+      the edge and the outcome reads it as band, with the uugg control''s curve-check flag making only a factor win a verdict.
+      Outcome states what each result changes (package and draft models, feature-rule sweep). Check 5 searched: emission scale
+      / emission-scale with asym|factor|kit|uug in results.tex, t8000, softpair, softpair_asym, softpair_plain, gmax4, hpo_asym_cont,
+      emis_matched, the plan''s dead ends, D598/D600; the 8000-step pairs are now in prior. 1.2 GPU-h, same job script and
+      readout as the factor runs.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
