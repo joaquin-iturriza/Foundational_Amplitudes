@@ -28726,7 +28726,7 @@ entries:
     agent: abff01bfc84c9bfbb
     state: working
     since: '2026-11-27T19:49:00+00:00'
-    state_at: '2026-11-27T20:20:07.549000+00:00'
+    state_at: '2026-11-27T23:39:44.786000+00:00'
     context: 161614
     context_at: '2026-11-27T23:39:54+00:00'
   findings:
