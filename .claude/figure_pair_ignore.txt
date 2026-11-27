@@ -52,3 +52,8 @@ talks/kit_reply_nov2026/figs/kitvm_median_nofactor_ee_uugg_me2.pdf
 talks/kit_reply_nov2026/figs/kitvm_mse_ee_tt_virt_finite.pdf
 talks/kit_reply_nov2026/figs/kitvm_mse_ee_uug_me2.pdf
 talks/kit_reply_nov2026/figs/kitvm_mse_ee_uugg_me2.pdf
+# KIT reply deck: protocol B and slide-10 copies
+talks/kit_reply_nov2026/figs/kit_protocolB_a2_ee_tt.pdf
+talks/kit_reply_nov2026/figs/kit_protocolB_a2_ee_uug.pdf
+talks/kit_reply_nov2026/figs/kit_protocolB_a2_ee_uugg.pdf
+talks/kit_reply_nov2026/figs/kit_slide10_a2.pdf
