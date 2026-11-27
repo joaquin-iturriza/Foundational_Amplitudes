@@ -48268,6 +48268,84 @@ entries:
       = arm <= control x R_b but not below 0.859 / R_b (indistinguishable from both runs), the only case that goes to Joaquin
       as the second-seed question. Also write ''below 0.859 by more than R_b'' as the ratio 0.859 / arm > R_b, since R_b is
       a ratio, not a difference. Everything else passes as in the last review.'
+  - at: '2026-11-27T02:51:46+00:00'
+    question: 'Step 27 (D566, attempt E''s YES branch; Joaquin 2026-11-25: ''there is something strange about predicting a
+      single number for a new dataset that depends on how that data was sample ... this has to perform correctly in individual
+      events regardless of that''): does a network trained with the anchored per-event level (log|M|^2 ~ c_p + b_p.(x - x0_p)/sx,
+      x = (log s_hat, Lmin - log s_hat, E), network + kinematics anchor map; c_p through data.level_file, the per-event part
+      through data.level_events) keep the per-process level''s gain on the 43 new-family held-out processes, and does its
+      level stay right when the same process is sampled another way (attempt E''s subsets)?'
+    prior: 'Step 16 (FA-ccin2p3-0ca1d68d, data/step16_level_file_read.json): per-process level file (data/level_file_B_diag.json,
+      one frozen 3-seed draw) vs part (a) trial 5: new-43 median MSE 0.309 vs 1.144, median bias^2 0.122 vs 0.859, trained
+      network off its given level by median 0.17. results.tex l.8510-8514 (D83): that level''s 0.045 is one draw, ten 3-seed
+      ensembles median 0.087 (0.016-0.19). Attempt E (step 25, data/perevent_anchored_E.json): E_sqE_kin new-43 ten-ensemble
+      median level error 0.358 vs regressor_ens 0.219, bar 0.369; subsets 0.377/0.285/0.336/0.235, q_soft below the constant''s
+      0.581 by 0.346 > 2 sd 0.140: YES. Writer FA-ccin2p3-06b459fd (seeds 0-2): per-event file new-43 0.497 (s_lo 0.783, s_hi
+      0.683, q_hard 0.494, q_soft 0.484): a draw above the bar, step 16''s file a lucky one (0.047). Retrain spread (data/rerun_spread.json):
+      his-setup control FA-lxplus-cb9273f1 vs same-config same-seed retrain FA-ccin2p3-0165aa58, new-43 median MSE 0.688 vs
+      3.58 (5.2x); bias^2 never scored for the first run and its checkpoint is gone (lxplus runs/llmcmp_a_adamw_const/trial_9000/models
+      empty, read 2026-11-27), so no bias^2 retrain spread exists, and none for a level-input run. Searched docs/results.tex,
+      plan llm_compare, site decisions --project FA for level_events, level_file, per-event level, anchored, retrain, rerun_spread,
+      s30: nothing else.'
+    measure: 'Three training runs, step 16''s config (part (a) setup, trial 5''s HPs hp1163, 60,840 steps, MSE, memmap, seed
+      42) with matched level inputs from ONE writer job (perevent_level.py --anchored --anchor map --write-level-events --level-seeds
+      30, PEL_WRITE=1 PEL_SEEDS=30: same 2000 train events per pool, the same regressor network averaged over seeds 0-29,
+      final fit on all 1352 train processes, held out predicted): ARM sweep/sweep_config_llmcmp_level_events.yaml (level_events_E_kin_s30.json
+      for data.level_file and data.level_events, trial-idx 7201), CONTROL sweep/sweep_config_llmcmp_level_file_s30.yaml (level_file_B_diag_s30.json,
+      the same network on the pool means, trial-idx 7101) and CONTROL RETRAIN (the same config and seed 42, trial-idx 7102:
+      the training-noise measurement in a level-input run, as control_retrain was for his setup; not a second seed). Read:
+      tools/llm_score.py held-out (ONLY=heldout EVENTS=1, absolute log|M|^2, per-event CSV with log_shat, q[, E]) and seen
+      for all three; analysis/llm_compare/level_subsets.py on the CSVs (new-43 median level error and bias^2 per subset all/s_lo/s_hi/q_hard/q_soft,
+      30-resample event-bootstrap sd; arm CSV factor check p99 |log_factor + b.(x-x0)/sx| < 1e-2); new-43/relabels median
+      MSE, bias^2, MSE - bias^2, pooled RMSE; R_b = rerun_spread.py --a level_file_s30 --b level_file_s30_retrain --out rerun_spread_level
+      (@3500ab2da: median_bias2_ratio, median_ratio of MSE) and the same tool on subsets'' bias^2 from level_subsets (control
+      vs retrain per subset: R_s); the paired per-process |bias - given level bias|; heldout_per_process.py (Suprio''s layout)
+      with arm and control. Log|M|^2 space only. GATE before the training GPU jobs: the writer''s check line, per-event file
+      new-43 <= 0.369 on all and each subset within attempt E''s rule; else no run. Order: (0) merge + sync; writer CPU job;
+      (1) on the gate: control and control retrain submitted at once (step 16''s launch path, only the file differs, no smoke),
+      with the arm''s CPU tp_ prebuilds (train and held-out; level_events rides the tp cache); (2) arm D395 smoke (job_config_smoke.sh
+      50 steps, 20G, 2 h) + its held-out llm_score EVENTS=1 + level_subsets --check-factor; (3) the arm run. Runs: sweep/trial_job.sh
+      --sweep-config <cfg> --detached --trial-idx <idx> --hp-idx 1163 --t-steps 60840 with trial 5''s HPs, --hdr=--mem=32G
+      --hdr=--time=18:00:00 --hdr=--cpus-per-task=4. Wall target 13 h: step 16''s own V100 rate ~0.75 s/step (trial_7001)
+      x 60,840 = 12.6 h; H100 0.2155 s/step = 3.9 h (FA-ccin2p3-0ca1d68d). GPU-h: 3 x 13 + smoke 0.3 + 7 llm_score reads ~2
+      = ~41 (> 30, < 100; D566 names this work: ''there is a way to marry these two ideas''). Disk: tp caches 0.9 GB, three
+      run dirs 4.2 GB, smoke 0.3, CSVs 0.1: ~5.5 GB of CC''s 12 GB free.'
+    check: 'Existing data: attempt E (data/perevent_anchored_E.json): on q_soft the per-process constant moves (regressor_ens
+      0.581 vs 0.219 on all) and the per-event form does not (0.235); step 16''s trained network kept its given level (median
+      |bias - given| 0.17): new-43 median bias^2 0.122 vs no-level trial 5''s 0.859 (7.0x), so a level input moves the trained
+      network''s bias^2. rerun_spread.py @3500ab2da on control_retrain vs level_file reads median bias^2 2.99 vs 0.122 (tool
+      check). Writer seeds 0-2 shows the draw problem (0.497 vs ensemble median 0.358); 30 seeds remove most of it from both
+      inputs equally. Code: tests/test_level_events.py; the smoke CSV''s factor check proves the x columns'' alignment and
+      scaling.'
+    fixed: 'Everything of step 16''s run FA-ccin2p3-0ca1d68d (llmcmp_level_file trial_7002): recipes catalog_daniel_train
+      (1352) / heldout (139), first 55,296 train events, val/test 10,000, 60,840 steps of 24,576 events, part (a)''s inputs,
+      shared_standardization, affine_multiplicity_std off, MSE mean aggregation, 8 heads x 8 blocks, seed 42, trial 5''s HPs
+      (hp1163), memmap; configs differ from step 16''s only in sweep_name and data.level_file/level_events. Both level inputs:
+      same writer commit, events, 2x64 network, seeds 0-29, kin anchor map seeds 0-9. The only arm/control difference: per-event
+      level vs per-process level.'
+    control: The control run with level_file_B_diag_s30.json (the same writer's per-process level, same seeds and events)
+      and its same-seed retrain for the noise, not step 16's frozen file (a lucky 3-seed draw); step 16's run shown beside
+      as the earlier result only.
+    seeds: Training seed 42 for all three, as every arm of the entry; the control's same-seed retrain measures the run-to-run
+      spread R_b (as control_retrain did for his setup); level networks seeds 0-29 in both files. Event noise of each subset
+      median by bootstrap.
+    outcome: 'Level: YES if arm new-43 median bias^2 <= the lower of control and retrain x... i.e. <= min(control, retrain)
+      x R_b and below part (a) trial 5''s 0.859 by more than R_b; NO if arm''s > max(control, retrain) x R_b; between, UNRESOLVED
+      at one arm seed (reported with R_b; a second arm seed is Joaquin''s call, ~13 GPU-h). Sampling: the arm passes if on
+      every subset its new-43 median level error minus its all-events value is within 2 bootstrap sd (within one run); and,
+      across runs, on the subset where the control moves (its subset minus all beyond 2 sd and beyond its retrain''s difference
+      by more than R_s), the arm''s subset value below the control''s by more than R_s. YES overall = level YES and sampling
+      pass: the per-event level is the level lever for part (c)''s setup (its own design), written up for Joaquin with the
+      figure; level NO: the trained network does not keep the per-event level, read where (per-process |bias - given level|),
+      own design; sampling fail: reported with the subset numbers, next attempt designed. Every branch: the three runs'' new/relabels/seen
+      numbers, held-out pooled RMSE against the LLM''s 0.721 and step 16''s 0.969, and the Suprio-layout figure go to Joaquin.
+      GATE fail: no training job, attempt E''s YES not holding at 30 seeds, next attempt designed.'
+    sources: 'R_b <- measured: new-43 median bias^2 ratio between the control and its same-seed retrain (rerun_spread.py median_bias2_ratio,
+      this design''s runs); R_s <- measured: the same ratio per subset (level_subsets on control and retrain); 0.859 <- measured:
+      part (a) trial 5''s new-43 median bias^2 (data/step16_level_file_read.json); 0.369 <- measured: attempt E''s bar, regressor_ens
+      ten-ensemble max (data/perevent_anchored_E.json); 2 bootstrap sd <- measured: 30 event resamples per subset (level_subsets.py,
+      attempt E''s rule); 13 h <- measured: step 16''s own V100 rate ~0.75 s/step x 60,840; 100 GPU-h <- CLAUDE.md budget,
+      D566 names the work'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
