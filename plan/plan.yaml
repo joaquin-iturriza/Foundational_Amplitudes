@@ -30540,7 +30540,8 @@ entries:
     '37': kit_zoom collect CPU job ccj_ab6a6943301b (rerun 'python tools/kit_zoom.py collect' to read; then plot, then re-collect
       after step 38's runs)
     '40': step 37's kit_zoom collect (ccj_ab6a6943301b) and step 38's runs
-    '39': the next owner (handed off at the context limit before its design; ready to start)
+    '39': 'ccj_3a07615b7f4f (CC slurm 65001699, kit_ttg build; read by rerunning: site --timeout 14400 run --job --item kit_benchmark
+      ccin2p3 FA -- python tools/kit_ttg.py build)'
   handoff:
     state: '2026-11-27 ~17:30 UTC. D604 (Joaquin: kit_zoom figures with the draft''s models, curves and names; scaling plot
       with median delta): tools/kit_zoom.py edited and collected (CC), 27 figures drawn in analysis/kit_benchmark/figs/zoom
