@@ -44284,6 +44284,8 @@ entries:
     state: working
     since: '2026-11-27T18:56:45+00:00'
     state_at: '2026-11-27T18:56:45+00:00'
+    context: 227584
+    context_at: '2026-11-27T19:22:14+00:00'
   step_why:
     28:
       feeds: 'D566: does the per-process level lever (step 16, kept regardless of sampling in step 27''s control) carry to
