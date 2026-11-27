@@ -35343,6 +35343,13 @@ entries:
       clean trial read.'
     sources: 1/7 and 7 <- t t~ V same-HP rerun spread 0.78-6.96 (results.tex sec:datasaving), the bar of the passed step-30
       and step-34 designs; 5x jump <- sec:ladder seeds' blow-ups vs 1.5x seed noise; 100 GPU-h <- D575 names this work
+    passed_at: '2026-11-27T11:57:28+00:00'
+    reviewer: 'Re-check after FIX: lr fixed at the parent''s 0.00189 (sweep config @d19d1aa5f; rule 4), step-34 arms at lr_scale
+      6.1/0.61 inside [0.1,10]; control corrected (SCR-A2 at hp0798 of kit_hpo_uugg_plain) with a BEATS confirmed only against
+      the same 16-trial A2 scratch search; disk 1.3 GB vs CC 8.5 GB free; inherited keys vs parent config.yaml listed. Check
+      2: kit_readout on kit_fig_heldoutqqg.json, lr 10x down moved R -1.21..-1.51 decades on all four uugg families. Check
+      3: bar +-0.845 decades from t t~ V rerun spread 0.78-6.96, D315 one seed. 16 trials per D428/D430. Searched: heldoutqqg,
+      held-out q, kit_hpo_uugg_ft, uugg fine-tune, hp0798, 0.01152379 in results.tex, plan, decisions.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
