@@ -16539,9 +16539,9 @@ entries:
     '35': '2026-12-03'
   owner:
     agent: aa1b0df8208df7e6a
-    state: working
+    state: stopped
     since: '2026-11-26T23:55:24+00:00'
-    state_at: '2026-11-27T04:57:57.742000+00:00'
+    state_at: '2026-11-27T05:03:54.843000+00:00'
     context: 229780
     context_at: '2026-11-27T05:09:20+00:00'
   designs:
