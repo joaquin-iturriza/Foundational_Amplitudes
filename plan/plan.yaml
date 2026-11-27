@@ -28417,13 +28417,6 @@ entries:
       0.12200+-0.00100 pb at 2000 events vs exact 0.121861). 1e5-event surrogate jobs at KIT_MC_VEC=32 FA-ccin2p3-b45a89e1
       (uug, 6 h) 6360f286 (uugg, 12 h); on their end: wiring check sigma_hat/sigma vs E_exact[u], numbers, figure_exact with
       the tt part (12d32b55), differences from slide 11 first (vector_size 32 noted as a repair: it only batches the calls)'
-    34: 'Held-out qqg uug: (a) read the queued CPU reads of the half-lr rerun (same commands re-read: site run --job --allow-stale
-      --item kit_benchmark ccin2p3 FA -- python tools/kit_figures.py collect runs/kit/kit_A_ft_ee_uug_me2_n100000_t1831_heldoutqqg_ftfix05;
-      .venv-cpu/bin/python tools/kit_curves.py runs runs/kit/kit_A_ft_ee_uug_me2_n100000_t1831_heldoutqqg_ftfix05 --out <json>),
-      merge into kit_fig_heldoutqqg.json, check its val curve for a >5x jump, redraw kit_slide10_heldout (kit_figures slide10
-      --arms heldout, FT05 arm @ad2ba3624), copy the pdf to talks/kit_reply_nov2026/figs, rebuild, check_caption; (b) design
-      the uug fine-tune search (copy sweep_config_kit_hpo_uugg_ft_heldoutqqg.yaml for uug: recipe kit_A_ee_uug, lr 0.00189),
-      review, drive'
     39: 'D600 (b): e+e- -> t t~ g, factor vs emission scales vs plain transformer, every relevant limit (soft gluon at fixed
       gluon-top angle; gluon quasi-collinear to a top, mass-regulated dead cone, at fixed x; threshold beta of the t t~ pair
       at fixed x; bulk zoom). Needs: (1) wrappers._asym_terms has no massive emitter (its own shortcut note: CDST''s massive
@@ -30555,11 +30548,6 @@ entries:
       if:
       - 'wiring within 3 MC errors: numbers to Joaquin in the deck'
       - 'beyond: KITSURR path fault, fix and rerun'
-    34:
-      feeds: 'D575 (ii): does the held-out qqg pretraining transfer the uug limits'
-      if:
-      - 'best uug FT BEATS SCR-A2 on a family: A2 scratch search on uug, then claim only if still BEATS'
-      - 'no family BEATS: no transfer on uug at this pretraining, reported'
     39:
       feeds: 'D600: what the factor and the emission scales do with one divergence suppressed'
       if:
@@ -30567,8 +30555,6 @@ entries:
       - 'no difference (mass regulates collinear): say so with numbers'
   step_waits:
     '32': FA-ccin2p3-680004d8
-    '34': 'ccj_456d0cd4751b (kit_figures collect of trial_1790 as kit_A_ft_ee_uug_me2_n100000_t1831_heldoutqqg_ftbest; re-read:
-      site --timeout 1800 run --job --allow-stale --item kit_benchmark ccin2p3 FA -- python tools/kit_figures.py collect runs/kit_hpo_uug_ft_heldoutqqg/trial_1790=kit_A_ft_ee_uug_me2_n100000_t1831_heldoutqqg_ftbest)'
     '39': detach kit_hpo_ttg_plain (drive.py, 16 trials waves 6/5/5, target 0.55 h each; launched 2026-11-27 19:18 CET)
   handoff:
     state: '2026-11-27 ~20:45 CET (owner a1df8528ae678ee1d). Done this turn: step 36 closed (uugg held-out FT search 16/16,
