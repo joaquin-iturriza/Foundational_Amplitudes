@@ -42361,6 +42361,15 @@ entries:
       fix first: both flags are asserted off on the memmap path (data_mmap.py:871, its docstring l.34) and the 1352-process
       catalogue needs memmap: extend data_mmap to carry the target-propagator factor (worktree, tests, repo review), smoke
       (D395), then design and review.'
+    27: 'step 28 (attempt E''s YES branch, D566): a training run with the anchored per-event level (network + kinematics anchor
+      map, data.level_events = analysis/catalog_daniel/data/level_events_E_kin.json, c_p through data.level_file) in place
+      of step 16''s per-process level file, step 16''s config (sweep_config_llmcmp_level_file.yaml, trial 5''s HPs) otherwise,
+      against step 16''s run FA-ccin2p3-0ca1d68d (trial_7002). Chain: code on branch level_events (eb99e2237, worktrees/level_events:
+      tests passed; repo review running) -> merge -> writer CPU job (scripts/job_perevent_level.sh PEL_WRITE=1 PEL_MMAP as
+      attempt E) -> commit the file -> design (measure: llm_score held-out + seen, level_file_read.py --tags level_file level_events
+      new-43 bias^2 / MSE-bias^2; the sampling question needs llm_score --events-out to carry x = (log s_hat, Lmin - log s_hat,
+      E) per event so the new-43 bias^2 is read on attempt E''s subsets) -> design review -> D395 smoke -> run (~16 GPU-h
+      as step 16)'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -42688,6 +42697,14 @@ entries:
       - 'the resonance''s level given per event closes the gg->tbW gap: report to Joaquin with the held-out figure'
       - 'it does not: the near-pole miss is not a missing level factor; read what else differs between the q q~ and g g resonant
         regions'
+    27:
+      feeds: 'D566: whether the per-event anchored level, robust to sampling in attempt E''s CPU read, keeps the new families''
+        level once a network is trained on it, against the per-process level file'
+      if:
+      - 'new-43 bias^2 and subset bias^2 at or below the level-file run''s within the retrain spread: the per-event level
+        replaces the level file; written up for Joaquin'
+      - 'worse beyond the retrain spread: the trained network does not keep the per-event level; reported with the figure,
+        next read where (families, subsets)'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
