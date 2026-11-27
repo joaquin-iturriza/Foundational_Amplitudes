@@ -404,6 +404,28 @@ def cmd_serve(a):
                 f.write(json.dumps({**st, "wall_s": time.time() - t0}) + "\n")
 
 
+def cmd_bench(a):
+    """The serve step's per-call cost: Predictor.log10 on --calls batches of --batch KIT bulk_test events, profiled."""
+    import cProfile
+    import pstats
+    import time
+    import h5py
+    with h5py.File(kh.h5_path(a.proc), "r") as f:
+        mom = f["bulk_test/bulk/momenta"][:a.batch * a.calls]
+    pred = Predictor(a.run, a.proc)
+    ref = pred.log10(mom[:a.batch])      # the first call outside the timing (the pool's size changes once)
+    prof = cProfile.Profile()
+    t = time.time()
+    prof.enable()
+    for i in range(a.calls):
+        out = pred.log10(mom[i * a.batch:(i + 1) * a.batch])
+    prof.disable()
+    dt = (time.time() - t) / a.calls
+    print(f"BENCH {a.proc}: {dt * 1e3:.1f} ms per call of {a.batch} events = {dt / a.batch * 1e3:.2f} ms per event")
+    print(f"BENCH repeat of call 0 vs first read: max |delta log10| = {np.max(np.abs(pred.log10(mom[:a.batch]) - ref)):.2e}")
+    pstats.Stats(prof).sort_stats("cumulative").print_stats(35)
+
+
 def cmd_predict(a):
     from tools.kit_predict import predict
     out = os.path.join(os.path.abspath(a.dir), "pred_surr" if a.surr else "pred", os.path.basename(a.run.rstrip("/")))
@@ -594,9 +616,12 @@ def main():
     fg = sub.add_parser("figure"); fg.add_argument("json"); fg.add_argument("--out", required=True); fg.add_argument("--tt", help="the threshold scan's JSON (kit_threshold_scan collect)"); fg.add_argument("--tt-run")
     fx = sub.add_parser("figure_exact"); fx.add_argument("json", nargs="*"); fx.add_argument("--out", required=True)
     fx.add_argument("--tt-scan"); fx.add_argument("--tt-bulk"); fx.add_argument("--tt-run")
+    b = sub.add_parser("bench"); b.add_argument("proc", choices=PROC); b.add_argument("run")
+    b.add_argument("--batch", type=int, default=32); b.add_argument("--calls", type=int, default=20)
     sub.add_parser("selfcheck")
     a = ap.parse_args()
     {"gen": cmd_gen, "serve": cmd_serve, "predict": cmd_predict, "metrics": cmd_metrics, "figure": cmd_figure, "figure_exact": cmd_figure_exact,
+     "bench": cmd_bench,
      "selfcheck": lambda a: _selfcheck()}[a.cmd](a)
 
 
