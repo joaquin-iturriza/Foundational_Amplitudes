@@ -17518,6 +17518,15 @@ entries:
       and reported usable. no: whichever of these misses (registration, gate record, poll, log, supervisor sorting) is fixed
       in the site tool or gate and the probe rerun.'
     sources: 0.17 GPU-h <- job_probe.sh's own --time=00:10:00 x 1 GPU; 20 min <- the supervisor's pass interval
+    passed_at: '2026-11-27T00:03:12+00:00'
+    reviewer: 'One 10-min scripts/job_probe.sh on one V100 through site submit --interactive: smallest test of the new launch
+      path (D395 smoke, CLAUDE.md infrastructure rule), serving Joaquin 2026-11-26 and D589. Pass/fail check, no control and
+      one probe. The yes outcome now covers every part of the question: registry row with a numeric Slurm id, a gate record
+      charged 0.17 GPU-h (10 min x 1 GPU, from the script''s own --time), poll reaching COMPLETED, cuda=True on a V100 in
+      the log (job_probe.sh prints these lines), and the supervisor sorting the end clean within one 20-min pass. The no outcome
+      names each miss. Code read: cmd_submit --interactive (site 825-931), srun_detached (site_gate.py 335), interactive_pick
+      (site 2225-2292). Searched: interactive and srun in the decisions (D589 only), site runs for FA (probe, interactive,
+      agent_redesign: no earlier interactive run), git log of scripts/ (submit_interactive.sh removed in a0367ad38).'
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
