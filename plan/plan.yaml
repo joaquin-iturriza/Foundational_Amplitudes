@@ -43785,6 +43785,8 @@ entries:
       03:43, estimate 11.9 h of steps.'
   step_waits:
     '26': FA-ccin2p3-4ba88991
+    '27': 'trunk''s repo backlog: kit_benchmark''s kit_curves plot_runs fix (2ad76d096), then reviewer a0142276334a2a739''s
+      advance, then the level_s30 merge'
   handoff:
     state: 'Step 26 (target_propagators arm, passed design 2026-11-26T23:40): smoke FA-ccin2p3-776cdd69 clean; its held-out
       read FA-ccin2p3-583cc541 passed the factor check (pair log_factor minus c_best''s: mean -7.9, floor -9.479 = 2 log(Gamma_t/M_t)
