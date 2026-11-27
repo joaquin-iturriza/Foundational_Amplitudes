@@ -30455,6 +30455,25 @@ entries:
       end; step-32 hung part 18 rerun FA-ccin2p3-7b95f8b0, combine a8d68ffe repointed. Step 39: massive eikonal term in wrappers._asym_terms
       @b0c667b8c (CDST''s spin-averaged massive dipole turns negative on 3% of t t~ g phase space, the eikonal is positive
       by construction), test passes. CC free disk 9 GB at submission.'
+  - at: '2026-11-27T14:19:53+00:00'
+    text: '2026-11-27 ~17:30 UTC. D604 redraw: tools/kit_zoom.py (uncommitted, blocked by the overdue repo-reviewer pillar;
+      reviewer launched) now draws only the draft''s KIT arms with kit_figures.MODELS names/styles (transformer + asymptotic
+      factor; transformer = uug hp1918, uugg hp0798, tt hp0131; MLP log invariants; tt MLP log + log(s_tt-4m_t^2); MLP raw
+      invariants, our reruns s0-2 newly collected), natural log (MSE(ln) = ln10^2 MSE(log10), medians in ln), and median |Delta|
+      (Delta = pred/true - 1) per bin beside mean |Delta| and MSE; |Delta| above 1e6 and overflows on the top edge, hollow
+      (''off the scale, on the axis edge''). 27 figures in analysis/kit_benchmark/figs/zoom (looked at all). Deepest bin (other
+      variable in its band), median |Delta| / MSE(ln): uug collinear factor 0.028/0.064, transformer 0.99/46, MLP log 0.36/0.32,
+      MLP raw 1.0/114; uug soft 0.12/0.091, 1.0/468, 0.26/0.33, 1.0/547; uugg gg 0.24/0.33, 2.4/115, 0.26/0.23, 1.0/114; uugg
+      qg 0.38/0.83, 0.99/118, 0.50/0.61, 1.0/111; uugg soft 0.42/0.86, 1.0/522, 4.4/3.0, 1.0/576; tt threshold beta 1.3e-4
+      0.30/0.12, 1.0/52, MLP thr 0.92/6.1, MLP raw 1.0/54. Bulk core median |Delta|: uug factor 2.1e-3, transformer 1.9e-3,
+      MLP log 7.9e-3, raw 6.4e-3; uugg 6.7e-3, 8.2e-3, 1.8e-2, 1.9e-2; tt 5.5e-4, 1.9e-4, MLP thr 4.6e-4, raw 1.2e-3. The
+      draft has no KIT error-against-training-size figure (paper.tex Sec. 7 holds only kitvm_paper_median and kitvm_paper_bulk);
+      ''scaling plot with median delta'' was drawn as the family figures (error against distance to the singularity) in median
+      |Delta|: kitzoom_fam_relmed_<p>. Step 39: tools/kit_ttg.py written (selftest OK; uncommitted): KIT-layout e+e- -> t
+      t~ g, sqrt s 1 TeV, m_t from KIT''s ee_tt metadata, bulk flat 3-body with s_tg/s, s_t~g/s > 0.01, strata soft_x 1e-7..1e-2,
+      coll_tg (1-cos) 1e-7..1e-1 at x 0.2-0.4, threshold_beta 1e-4..1e-1; to align with KIT: stratum names as KIT''s (str
+      of float: soft_x_1e-07_1e-06, soft_x_0.0001_0.001), N per hard stratum 1e5 (KIT), bulk_train 2e5, full particle property
+      dicts (Q, spin, T3, B, L, color, C2) as KIT''s metadata.'
   step_why:
     32:
       feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
