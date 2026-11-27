@@ -49,6 +49,31 @@ def test_slope_matches_perevent_level():
     assert np.allclose(lf, -want)
 
 
+def test_level_subsets_factor_check(tmp_path):
+    """analysis/llm_compare/level_subsets.py: its factor check passes on a CSV whose log_factor is -b.(x-x0)/sx at its
+    x columns (as tools/llm_score.py writes them) and refuses a CSV whose rows are shuffled against the factor"""
+    import json
+    import pytest
+    sys.path.insert(0, os.path.join(ROOT, "analysis", "llm_compare"))
+    import level_subsets
+    pp = _events(n_ev=300)
+    co = {"b": [0.7, -1.3, 0.4], "x0": [12.0, -3.0, 5.0], "E_legs": [3, 4]}
+    f = {"sx": [1.1, 2.2, 3.3], "coef": {"p": co}}
+    fp = tmp_path / "lev.json"; fp.write_text(json.dumps(f))
+    x = AmplitudeExperiment._level_events_x(pp, co["E_legs"])
+    lf = -((x - co["x0"]) / f["sx"]) @ co["b"]
+    rng = np.random.default_rng(1)
+    y = rng.normal(size=len(x))
+    rows = lambda lf_: "process,true_logm2,pred_logm2,log_factor,log_shat,q,E\n" + "".join(
+        "p,%.6g,%.6g,%.6g,%.6g,%.6g,%.6g\n" % (y[i], y[i] + 0.3, lf_[i], *x[i]) for i in range(len(x)))
+    c = tmp_path / "ok.csv"; c.write_text(rows(lf))
+    out = level_subsets.read(str(c), ["p"], str(fp), nboot=2)
+    assert out["factor_check_p99_abs"] < 1e-3 and abs(out["new"]["all"]["bias2"] - 0.09) < 1e-6
+    c.write_text(rows(lf[::-1]))
+    with pytest.raises(AssertionError):
+        level_subsets.read(str(c), ["p"], str(fp), nboot=2)
+
+
 if __name__ == "__main__":
     test_slope_matches_perevent_level()
     print("OK")

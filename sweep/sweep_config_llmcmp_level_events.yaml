@@ -1,8 +1,9 @@
 # llm_compare step 28 (D566, attempt E's YES branch): step 16's level-file run with the anchored per-event level
 # log|M|^2 ~ c_p + b_p.(x - x0_p)/sx (network + kinematics anchor map) in place of the per-process level: c_p through
 # data.level_file, the per-event part through data.level_events (the same file,
-# analysis/catalog_daniel/data/level_events_E_kin.json, perevent_level.py --write-level-events). Step 16's config
+# analysis/catalog_daniel/data/level_events_E_kin_s30.json, perevent_level.py --write-level-events). Step 16's config
 # unchanged except sweep_name, data.level_file and data.level_events; trial 5's HPs (hp1163) passed as --hp.
+# Step 27 design: the (c,b) network over 30 seeds (--level-seeds 30); matched control sweep_config_llmcmp_level_file_s30.yaml.
 # Below: step 16's file (sweep_config_llmcmp_level_file.yaml), its header kept.
 # llm_compare step 16 (D564): part (a)'s searched setup with each process's target mean from a frozen level predicted
 # from the process alone with diagram descriptors (analysis/catalog_daniel/data/level_file_B_diag.json, norm_explore3.py
@@ -37,7 +38,7 @@ cluster:
   gpu_min_mem: 32G   # the design's allowed GPUs (whole GPUs >= 32 GB); no model pinned
 
 paths:
-sweep_name: llmcmp_level_events
+sweep_name: llmcmp_level_events_s30
 n_trials: 8
 
 dyhpo:
@@ -64,8 +65,8 @@ fixed_params:
   data.preprocess_per_dataset: 'true'    # affine_multiplicity_std refines shared_standardization of per-dataset transforms (experiment.py assert)
   data.shared_standardization: 'true'
   data.affine_multiplicity_std: 'false'
-  data.level_file: analysis/catalog_daniel/data/level_events_E_kin.json
-  data.level_events: analysis/catalog_daniel/data/level_events_E_kin.json
+  data.level_file: analysis/catalog_daniel/data/level_events_E_kin_s30.json
+  data.level_events: analysis/catalog_daniel/data/level_events_E_kin_s30.json
   data.alphas_input: 'true'
   data.drop_coupling_powers: 'true'
   data.use_PIDs: 'false'

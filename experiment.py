@@ -2591,6 +2591,13 @@ class AmplitudeExperiment(BaseExperiment):
         f = self._lev_ev
         assert name in f["coef"], f"data.level_events: no coefficients for {name}"
         co = f["coef"][name]
+        x = AmplitudeExperiment._level_events_x(pp, co["E_legs"])
+        return ((x - np.asarray(co["x0"])) / np.asarray(f["sx"])) @ np.asarray(co["b"])
+
+    @staticmethod
+    def _level_events_x(pp, E_legs=()):
+        """x = (log s_hat, Lmin - log s_hat, E) of momenta pp (N,P,4 GeV, any frame), _level_events_slope's definition;
+        also the per-event columns of tools/llm_score.py --events-out"""
         def md(a, b):
             return a[..., 0] * b[..., 0] - (a[..., 1:] * b[..., 1:]).sum(-1)
         n = pp.shape[1]
@@ -2604,10 +2611,9 @@ class AmplitudeExperiment(BaseExperiment):
         L = np.log(s)
         Lmin = np.nanmin(lS.reshape(len(pp), -1), 1)
         E = np.zeros(len(pp))
-        for k in co["E_legs"]:
+        for k in E_legs:
             E += L - np.nanmin(lS[:, k, :], 1)
-        x = np.column_stack([L, Lmin - L, E])
-        return ((x - np.asarray(co["x0"])) / np.asarray(f["sx"])) @ np.asarray(co["b"])
+        return np.column_stack([L, Lmin - L, E])
 
     def _physics_logF(self, name, mom_phys, alphas=None):
         """log of the factor data.target_physics_factor multiplies |M|^2 by, per event: (s0 / s_hat)^(4-N) / C_p (s_hat, a
