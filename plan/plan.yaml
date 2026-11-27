@@ -28429,10 +28429,10 @@ entries:
       26x at eval 33; per the design its half-lr rerun (lr_scale 0.5, tag heldoutqqg_ftfix05) FA-ccin2p3-5b8a7e13 decides
       uug: collect it (kit_figures collect), kit_readout --vs SCR-A2 uug, redraw kit_slide10_heldout with it and the deck
       frame'
-    35: '35: Fair one-loop FT redo after the asym_sd fix (@ff4f2e0cf): the 5 fair FT runs (D=100..1e4, parent dsave_parent_finale_kit_fairnlo_a2)
-      at their unchanged stage-2 HPs (searched from the non-A2 treesin_r4 parent, so not touched by the bug), tags fairnlo_ftfix_d<D>;
-      readout as step 29 (kit_figures collect, kit_readout --slide10, the three fair slide-10 figures and deck slides 22-24
-      redrawn), FT vs SCR-A2 and VB per the 2026-11-26 02:29 design'
+    35: 'Fair one-loop: the D=1e3 fine-tune at lr_scale 7.41 (2470856b) blew up again (11.5x); its design-named rerun at lr_scale
+      0.126 (tag fairnlo_ftfix_d1000_lsmed) FA-ccin2p3-600dce4c: collect (kit_figures collect, kit_curves runs), kit_readout
+      --vs V/B and SCR-A2 at D=1e3, redraw kit_fairnlo, kit_slide10_fairnlo_*, kit_curves_fairnlo with the hollow rerun marker
+      and the deck frames'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -30372,15 +30372,13 @@ entries:
       - 'rerun BEATS SCR-A2 on a uug family: transfer of that limit, reported, slide redrawn'
       - 'rerun does not BEAT on any uug family: a uug fine-tune search like step 36''s, designed then'
     35:
-      feeds: 'D570/D575: Bakar''s fair NLO protocol, does the pretraining transfer one-loop structure'
+      feeds: 'D570/D575: does the fine-tune beat V/B and SCR-A2 on the fair one-loop setup at D=1e3'
       if:
-      - 'FT BEATS SCR-A2 or VB on a hard family: the transfer statement per the passed design''s branches (a)/(b), deck redrawn'
-      - 'FT not better than SCR-A2: branch (c), no transfer from tree + 4 bulk one loops, deck redrawn with the corrected
-        runs'
+      - 'rerun clean: its numbers replace the blown-up run at D=1e3 in the readout, figures redrawn'
+      - 'rerun blows up too: D=1e3 listed apart with both runs, reported'
   step_waits:
     '32': FA-ccin2p3-a8d68ffe
     '33': FA-ccin2p3-ddd2e7a7
-    '35': FA-ccin2p3-61a1649b FA-ccin2p3-8140c2e8 FA-ccin2p3-2470856b FA-ccin2p3-23020b3a FA-ccin2p3-fef5c4b7
   handoff:
     state: '2026-11-27 ~14:55 @0553d1e06. Step 34''s open check settled: a bug, not transfer. model.input_asym_factor''s asym_sd
       (readout unit AND output divisor) was overwritten by the parent''s at the fine-tune load, and the target_stats=own map
