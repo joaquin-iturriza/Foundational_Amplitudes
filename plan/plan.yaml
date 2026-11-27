@@ -36112,6 +36112,15 @@ entries:
       with fig:kshot (FA kshot_level.py --paper @57883e9b1). (3) Step 4: Jean Zay up; all 12 bigrun arms'' prepd_std identical
       (analysis/bigrun/std_check.py, GM sigma^2 = 1.669; baseline trial files pruned, same data settings in its sweep config);
       Fig. 14 right on MSE(log|M|^2) (FA 397798eab), draft 8f0c67c.'
+  - at: '2026-11-27T02:30:23+00:00'
+    text: '2026-11-27 Joaquin''s b87af60 comments: (1) Fig. 18 (finale_synth_paper) redrawn with every panel''s own legend
+      naming all its curves (rung_grid.grid whole=True, FA 953bb799); Fig. 17 rung_focus unchanged. (2) Sec. 5.7 ''What a
+      few target events fix'' and its axis-row figure replaced by the 2026-10-27 talk slide ''A few events of the process
+      remove the level'' redrawn on catalog_v4 short (v4_dimensionless_muon; kshot_level.py --paper @953bb799, data/kshot_curves.json):
+      median MSE after a K-event offset, K=0..64, floors dashed, two panels of four axes. Physical top 0.83 -> 0.63 at K=8,
+      floor 0.56; one loop 0.80 -> 0.52, floor 0.47; other six axes'' zero-shot within 0.003-0.16 of their floor (2->5 0.70
+      vs 0.54, 2->4 0.46 vs 0.38); one event raises the error on every axis (top 1.10). Second seed agrees (top 0.87/0.62/0.55,
+      one loop 1.00/0.54/0.49). Draft 6e30dac; fresh section reviewer running.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
