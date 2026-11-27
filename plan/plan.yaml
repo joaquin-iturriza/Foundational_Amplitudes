@@ -54474,7 +54474,8 @@ entries:
       variables per arm, with a relative error measure beside'
     2: 'D599: histograms of |M|^2 and of the emission-scale target (target_physics_factor, dim_ref qperp) against the variables
       that show how emission scales deform the target, for a few example processes'
-  done_when: null
+  done_when: test -f analysis/transfer/figs/ladder_nlo_dist_ee_bb_nlo.pdf && test -f analysis/transfer/figs/emission_target_uubar_Zggg.pdf
+    && grep -q 'label{par:ladder_nlo_hists}' docs/results.tex && grep -q 'label{par:emission_target_hists}' docs/results.tex
   notes_ref: par:ladder_nlo_hists
   match: zz_none_ladder_nlo_hists*
   evidence:
@@ -54499,3 +54500,4 @@ entries:
     state_at: '2026-11-27T12:59:59+00:00'
     context: 237043
     context_at: '2026-11-27T13:21:57+00:00'
+  checked_before: c0770dffa
