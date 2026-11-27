@@ -16548,9 +16548,9 @@ entries:
     '36': a reviewer
   owner:
     agent: aa1b0df8208df7e6a
-    state: working
+    state: stopped
     since: '2026-11-26T23:55:24+00:00'
-    state_at: '2026-11-27T04:20:24.289000+00:00'
+    state_at: '2026-11-27T04:36:35.498000+00:00'
     context: 209993
     context_at: '2026-11-27T04:43:05+00:00'
   designs:
@@ -28722,7 +28722,7 @@ entries:
     agent: a23c74133db12abe0
     state: stopped
     since: '2026-11-27T04:19:10+00:00'
-    state_at: '2026-11-27T04:34:14+00:00'
+    state_at: '2026-11-27T04:34:47.630000+00:00'
     context: 159472
     context_at: '2026-11-27T04:43:22+00:00'
   findings:
