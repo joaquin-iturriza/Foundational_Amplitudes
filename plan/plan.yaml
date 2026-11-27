@@ -30024,6 +30024,11 @@ entries:
       the arm''s steps) and save_model_at_steps, set to the real parent''s [56000] (wsd_cooldown_start(64000, 1/8)); commands
       = fairnlo_arms.py lines 2-3 + that override, limits 3:00 / 1:15. site pick: CC 1 at once, ~34 h for the batch. Item
       estimate recorded 85 GPU-h (D575 names all of it, under 100).'
+  - at: '2026-11-27T00:39:50+00:00'
+    text: '2026-11-27 ~01:45 @513415a41: slide-11 tree jobs resubmitted as FA-ccin2p3-8ac98689 (uug) / cb3f868c (uugg) with
+      --tmp=0 and KIT_MC_WORK_IN_DIR=1 (MadEvent work dir under runs/kit/mc_madgraph on /sps), both RUNNING; pending twins
+      aacf91cc/706a0f6f cancelled. Disk: the exact runs 64915673/64915674 (same process, 1e5 events) MaxDiskWrite 1.52/1.54
+      GB, an upper bound on the work dir''s peak; 3.1 GB for both vs 14 GB free on /sps/lpnhe.'
   step_why:
     20:
       feeds: 'D570: FT vs SCR-A2 vs V/B on the KIT hard bins'
