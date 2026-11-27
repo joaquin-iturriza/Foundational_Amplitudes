@@ -54475,7 +54475,7 @@ entries:
     2: 'D599: histograms of |M|^2 and of the emission-scale target (target_physics_factor, dim_ref qperp) against the variables
       that show how emission scales deform the target, for a few example processes'
   done_when: null
-  notes_ref: null
+  notes_ref: par:ladder_nlo_hists
   match: zz_none_ladder_nlo_hists*
   evidence:
     runs: []
