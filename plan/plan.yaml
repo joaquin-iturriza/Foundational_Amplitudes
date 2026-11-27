@@ -34888,6 +34888,15 @@ entries:
       values. Parts disagreeing (chi2 p < 2.7e-3, the same 3-standard-error rule as the passed design''s wiring check) stop
       combine: a part fault, read first.'
     sources: D571, D574, D575
+    passed_at: '2026-11-27T08:38:38+00:00'
+    reviewer: '08:37 slide-11 tree-run revision: one change (default card + seed parts pooled) against the same exact MadEvent
+      control (iseed 11, independent of seeds 1001-1050); measure seen on CC: de4314f4 serve = kit_predict 0.00, standalone
+      vs KIT 3.7e-13, sigma_hat/sigma-1 +9.4e-4 +- 7e-3 vs E_exact[u]-1 -1.68e-3; MC spread: uug part 6.9e-3 -> ~1.0e-3 pooled
+      over 50, stated unable to resolve a 1.5e-3 bias, E_exact[u] gives it; disk: work dir node-local /tmp (de4314f4 log /tmp/mg_ee_uug_surr),
+      per-call logging off @c39c066ff, ~0.3 GB on /sps of 9.3G free (df read today); uugg timing from the 86.7 ms bench and
+      the vec-32 serve call counts, limit 4x target; D395 smoke (2-part array + surr_combine through metrics) gates the batch;
+      chi2 stop p<2.7e-3 = the passed 3-error rule. Searched results.tex (sec:kit-mc, vector_size, MadEvent surrogate), entry
+      findings and dead ends, decisions D570-D579.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
