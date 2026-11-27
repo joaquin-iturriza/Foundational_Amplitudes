@@ -30112,6 +30112,14 @@ entries:
       weight at vector_size 1024; cause inside MadEvent not found. Split test at 256 and 512 (2000 uug events, as 96ce4464):
       FA-ccin2p3-f73b637b, c730c4cf. If 512 passes: rerun the 1e5 jobs at 512 (uug ~0.6 h, uugg ~1.5 h) if the vec-32 jobs
       b45a89e1/6360f286 have not ended; the vec-32 results are valid either way (vector_size only batches the calls).'
+  - at: '2026-11-27T03:10:39+00:00'
+    text: '2026-11-27 ~05:30 @8f6582246. Step 33: vector_size 256 and 512 split tests FA-ccin2p3-f73b637b / c730c4cf both
+      ''Survey return zero cross section'' after passing every check (E9709/E9710 acked): only 32 is known to pass (1024,
+      512, 256 fail). Root fix in the serve step instead: Predictor, after its one rebuild, copies the run''s data_stats.json
+      into the rebuild''s run dir and sets warm_start, so every later init_data reads the frozen statistics, and routes every
+      role to the scored batch: no per-call re-read/re-augmentation of the 1e5-event train pool. bench now also asserts the
+      fast path equals kit_predict on 1000 bulk_test events (<1e-9), as cmd_gen does before every surrogate run (shared check_vs_kit_predict).
+      Bench job on CC submitted (ccj_cd15ca9d4d4a, 40 calls of 32).'
   step_why:
     24:
       feeds: 'D570: does fine-tuning from the signed A2 pretraining beat SCR-A2 and V/B with exact Born on ee->tt one loop
