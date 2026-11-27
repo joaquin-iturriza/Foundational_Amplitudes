@@ -36059,6 +36059,15 @@ entries:
       D315), the bar of the passed step-37/38 designs; 5x jump <- sec:ladder seeds'' blow-ups vs 1.5x seed noise; soft slope
       tolerance 0.02 <- measured: KIT''s uug soft-family fitted exponent -2.01 vs truth -2.00 (finding 2026-11-13); budget
       lines <- CLAUDE.md GPU budget, D600'
+    passed_at: '2026-11-27T15:21:16+00:00'
+    reviewer: 'Re-check after FIX. End to end ~5 h after submission, stated stage by stage against D600 ''please train them
+      quickly''. One-line reason for the 16-trial search: feature rule on a new process, D428; the uug hyperparameters were
+      tuned massless. CC disk ~2.2 GB vs 8.1 GB read. Star-arm dead-cone probe added to prior. Build rate read from its first
+      group, split if over 20 min. Check 2: step 38 emission bulk log-MSE confirmed in logs, 5.644e-4 uug and 2.302e-3 uugg
+      (FA-ccin2p3-3f44d631 kit_64991336/43.out); vs the factor''s 1.98e-6 / 6.29e-5 (design''s numbers) that is 1/285 and
+      1/37. Check 3: seed spread 1.1-30x (results.tex l.14545), bar 30, one seed per D315. Base config differs from the uug
+      matched run''s config.yaml only in dataset and target_physics_factor. Searched results.tex for ttbarg, t\bar tg, ttg,
+      dead cone, massive eikonal, massive emitter, quasi-collinear, plus the entry and site decisions.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
