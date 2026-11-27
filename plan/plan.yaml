@@ -36097,6 +36097,18 @@ entries:
       (ls today), so the stds cannot be read or recomputed there without regenerating 448 pools. Every arm shares the data
       flags (ARM_OVR changes only inputs/model), so the arms share the standardization by construction, to be confirmed on
       the runs'' data_stats.json; GM_p(L_p sigma_p^2) = GM(L) x GM(sigma)^2 holds exactly. Step 4 re-waits to 2026-11-28.'
+  - at: '2026-11-27T02:02:26+00:00'
+    text: '2026-11-27 (Joaquin''s 2026-11-27 draft taken as is, draft 70b42cd; refs.bib entries Catani:1996vz, Xu:2020how
+      restored as cited but missing): (1) Fig. 17 legend: rung_grid.grid''s merged legend took handles from a label->handle
+      map over all panels, so the e+e- -> nu nu panel showed ''ladder steps 1-2'' with the e+e- -> Z gamma panel''s blue circle;
+      fixed in shared code (FA dbffe8024), Fig. 17 (now 18) redrawn; Fig. 16 uses the same code, its legend not merged (unchanged).
+      (2) D591 result: never in the paper draft''s history (searched all 83 commits for offset/level/few events); it is the
+      2026-10-27 talk slide ''A few events of the process remove the level'' (Daniel''s catalog, par:kshot_level, 85-95% of
+      OOD zero-shot error a level). On the draft''s Sec. 5 pretraining (catalog_v4 short, par:v4_kshot_level) the level is
+      at most a quarter of the error on six of eight axes and a third or more only on top and one loop; restored as Sec. 5.7
+      with fig:kshot (FA kshot_level.py --paper @57883e9b1). (3) Step 4: Jean Zay up; all 12 bigrun arms'' prepd_std identical
+      (analysis/bigrun/std_check.py, GM sigma^2 = 1.669; baseline trial files pruned, same data settings in its sweep config);
+      Fig. 14 right on MSE(log|M|^2) (FA 397798eab), draft 8f0c67c.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
