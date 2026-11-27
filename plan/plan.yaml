@@ -28720,9 +28720,9 @@ entries:
     withdrawn_why: 'D574: no more trainings for today''s reply; a pretrained held-out uug/uugg run is training'
   owner:
     agent: a23c74133db12abe0
-    state: working
+    state: stopped
     since: '2026-11-27T04:19:10+00:00'
-    state_at: '2026-11-27T04:19:10+00:00'
+    state_at: '2026-11-27T04:34:14+00:00'
     context: 96459
     context_at: '2026-11-27T04:20:35+00:00'
   findings:
