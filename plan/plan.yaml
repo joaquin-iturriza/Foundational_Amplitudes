@@ -17450,6 +17450,25 @@ entries:
       their mean; the model trial''s paired sd is 0.073. Recall is decided by a blind hand read. Check 5 searched: graphify,
       LSP, pyright, recall, batch, lookup, code mode, Explore in results.tex, plus the ledger (D501, D502, D206) and the entry''s
       dead ends; the prior now names the ponytail A/B. Checks 8-15 do not apply (no training, no site jobs).'
+  - at: '2026-11-27T00:00:20+00:00'
+    question: Does 'site submit ccin2p3 FA <job> --interactive' (detached srun on gpu_v100_interactive through the site gate)
+      register a run that poll, logs and the supervisor read like a batch run? (D589; Joaquin 2026-11-26 'Can't you use an
+      interactive gpu session to do the evaluations?')
+    prior: 'scripts/submit_interactive.sh (removed a0367ad38): two 2-minute evaluations ran on gpu_v100_interactive via nohup
+      srun after 2 h in the batch queue, outside the registry, item and gate. No prior interactive mode of the site tool (grep
+      interactive in ~/.local/bin/site: only ''site shell --gpu'' tty). results.tex: none found (searched interactive, srun).'
+    measure: Registry row for the run (site runs --id) with a numeric sched_id; site poll states from SUBMITTED to RUNNING/COMPLETED;
+      site logs prints the probe's site= and torch/cuda lines; the gate's CCORCH_GPU record in the ledger gpu_window.
+    check: 'Infrastructure test, no training: scripts/job_probe.sh is the repo''s infrastructure probe (CLAUDE.md: test infrastructure
+      with job_probe.sh); its log lines (site=, cuda=True gpu=Tesla V100) are what a batch probe already prints, so the same
+      lines in the interactive log show the job ran on a GPU node.'
+    fixed: scripts/job_probe.sh at trunk HEAD, its own header (10 min, 1 CPU, 1 GPU), CC's site flags (--gpus=1, --mem=32G,
+      qos gpu, account lpnhe), only the partition replaced by gpu_v100_interactive.
+    control: 'none needed: pass/fail infrastructure check; the batch route is the same code path minus the srun launch'
+    seeds: one probe
+    outcome: 'yes: registry row with a numeric slurm id, poll reaches COMPLETED, logs show cuda=True on a V100 -> document
+      the verb, short evaluations default to it via site pick. no: whichever step fails is fixed and the probe rerun.'
+    sources: no thresholds
   targets:
   - batch: lxplus_probe
     wall_h: 0.17
