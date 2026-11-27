@@ -44289,7 +44289,7 @@ entries:
     - 29
   owner:
     agent: a9175c3092ed6c0f5
-    state: working
+    state: closed
     since: '2026-11-27T18:56:45+00:00'
     state_at: '2026-11-27T19:35:36.066000+00:00'
     context: 227584
@@ -45476,25 +45476,37 @@ entries:
   step_waits:
     '28': FA-ccin2p3-b07e2464 FA-ccin2p3-825c02e8
   handoff:
-    state: 'Steps 26 and 27 read and recorded (findings 2026-11-27). Step 27 (per-event level, D566): level YES (new-43 median
-      bias^2 arm 0.183 vs control 0.300 / retrain 0.159, R_b 1.88), sampling FAIL (arm s_lo/s_hi 0.094/0.128 vs 0.183 all;
-      controls move <= 0.021): per-event level adds nothing; dead end F recorded. Step 26 (Breit-Wigner target): PARTLY: pair
-      MSE 1.16/1.23 (bar 5.07/4.92), near-pole contrast -0.29/-0.32 (c_best -2.49/-2.48, bar -0.19), seen pooled 1.85x worse,
-      held-out pooled 0.824 vs 1.178. Ready: step 28 = design the per-process level in part (c)''s setup (base c_latest; needs
-      a writer of the emission-scale target''s per-process means: perevent_level.py write_level_events; experiment.py level_file
-      block l.2380-2440 sets shared_standardization means). Step 29 held by the open ask (128 GPU-h DyHPO for the tprop arm).
-      Pending, not blocking: level_subsets --check-factor on the full arm CSV, CC CPU job 65022161 (ccj_76132d8ad315; read
-      with the same site run --job command; the first result was consumed unread).'
-    decisions: 'Joaquin''s: as before (D522-D528, D536, D537, D553, D564, D566, D567, D576-D579, D584-D589). Mine (re-justify):
-      (lxi) sampling verdict of step 27 taken by the design''s 2-bootstrap-sd rule even though the arm moves downward; (lxii)
-      step 28''s base config c_latest, not c_tprop, since part (c) takes the factor only after its search; (lxiii) level_subsets
-      numbers read locally from the fetched CSVs (same files) while the CC check-factor job waited.'
+    state: 'Step 28 (per-process level file of part (c)''s own target log(|M|^2 F) in part (c)''s setup at trial_1860''s HPs;
+      arm trial 2860 + same-seed retrain 2861 vs c_best) design PASSED 2026-11-27 ~20:10 (after one FIX). Code @264f7c8cf:
+      perevent_level.py --feat/--tag (level files record target + argv), experiment.py level_file target check + data.level_file_sigma=shared,
+      sweep/sweep_config_llmcmp_c_level.yaml, tools/cfg_diff.py. In flight: writer FA-ccin2p3-b07e2464 (CC htc, PENDING at
+      20:40; step 28 waits on it). Next on its end: read its check line ''level_file check (median level error)'' new bias2:
+      GATE < 0.314 (c_best new-43 median bias^2), else no GPU job and next attempt designed; fetch analysis/catalog_daniel/data/level_file_B_diag_s30_phys.json
+      (site run cat, it holds ''target'' and ''argv''), commit, sync (stash tests/test_supervisor_c.py of another agent around
+      sync/submit, it blocks); D395 smoke: site submit (after its own site pick in a separate call) scripts/job_config_smoke.sh
+      -- sweep/sweep_config_llmcmp_c_level.yaml 50 with --disk-gb 0.3 (site submit requires --disk-gb); check its log ''level_file:
+      per-process means ... sigma = 3.786'' (c_best''s pooled sigma) and SMOKE_EXIT 0, plus its held-out llm_score ONLY=heldout;
+      then plan target llm_compare --batch c_level_runs --wall 16 --jobs 2, site pick FA --jobs 2 --mem 20G --hours 16 (lxplus
+      at last pick), the two runs: sweep/trial_job.sh --sweep-config sweep/sweep_config_llmcmp_c_level.yaml --detached --trial-idx
+      2860|2861 --hp-idx 1860 --t-steps 60840 --hp training.lr=0.001603605 --hp training.muon_weight_decay=0.02796892 --hp
+      training.regularization_lambda=4.685537e-08 --hp training.cosanneal_warmup_frac=0.1908437 --hp training.cosanneal_eta_min=4.115949e-09
+      --hp ema=true --hp training.ema_decay=0.9831303, --hdr=--mem=20G --hdr=--time=22:00:00 --hdr=--cpus-per-task=4, --disk-gb
+      1.5 each; then scores job_llm_score.sh EVENTS=1. GAP found 20:40 (finding): llm_score writes log_shat/q only without
+      dimensionless_inputs, so the design''s subset read has no input in part (c); fix llm_score''s x from the raw test momenta
+      before the read. Step 29 (tprop 8-trial DyHPO, ~128 GPU-h) held by the open GPU-budget ask to Joaquin.'
+    decisions: 'Joaquin''s: as before (D522-D528, D536, D537, D553, D564, D566, D567, D576-D579, D584-D589); D566 covers step
+      28''s ~36 GPU-h. Mine (re-justify): (lxiv) level_file_sigma=shared so only the means change against c_best (design-review
+      FIX 1); (lxv) the writer''s 2000 events per pool as step 27, target factor from c_latest''s 2026-11-23 feat dirs (logF
+      of the two feat dirs per cache agree to 3.6e-15); (lxvi) the arm''s same-seed retrain as the noise measurement, UNRESOLVED
+      branch -> c_best retrain; (lxvii) runs go where site pick says (lxplus at pick time, CC 7 GB free under its 60 GB floor);
+      (lxviii) left the untracked root py.py (not ours, breaks pytest from root; run tests from tests/).'
     ruled_out: As before; D566 attempt F (per-event anchored level in training).
-    running: CC CPU job 65022161 (level_subsets --check-factor), not waited on
-    files: analysis/llm_compare/{level_subsets,rerun_spread,level_file_read,heldout_per_process,factor_split}.py; data/step27_level_read.json,
-      level_subsets.json, rerun_spread_level.json, step26_tprop_read.json, c_tprop_factor_split.json; figs/step27_level_per_event_heldout_per_process.png,
-      step26_tprop_heldout_per_process.png, c_tprop_factor_split_offshell_6_tbw.png
-    written: '2026-11-27T18:45:07+00:00'
+    running: FA-ccin2p3-b07e2464 (step 28 level writer, CPU, CC); duplicate check-factor CPU job 65022645 (step 27, unread,
+      harmless)
+    files: analysis/catalog_daniel/perevent_level.py, scripts/job_perevent_level.sh, tests/test_level_events.py, experiment.py
+      (level_file block), sweep/sweep_config_llmcmp_c_level.yaml, tools/cfg_diff.py, tools/llm_score.py (l.75 XS gap); analysis/llm_compare/{level_file_read,rerun_spread,level_subsets,heldout_per_process}.py;
+      data/step26_tprop_read.json (c_best numbers)
+    written: '2026-11-27T19:37:29+00:00'
   designs:
   - at: '2026-11-22T04:13:14+00:00'
     question: 'Part (a), D525: in the conditions of Suprio''s LLM pID run (D524, D526, D527: our catalog_daniel regeneration
