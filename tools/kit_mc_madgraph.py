@@ -392,6 +392,8 @@ def cmd_serve(a):
     import mg5_pipeline_final as mg
     t0 = time.time()
     pred = Predictor(a.run, a.proc)
+    # the experiment's per-call INFO lines reach MadEvent's log: 2.4 kB a call, 482 MB for 2000 uug events (de4314f4)
+    __import__("logging").disable(__import__("logging").INFO)
     meta = kh.metadata(a.proc)
     pdgs = [p["pdg"] for p in meta["particles"]]
     _, _, drv, _ = mg.detect_compiled_backend(a.sa)
@@ -475,6 +477,8 @@ def cmd_combine(a):
     w = 1.0 / e ** 2
     sig, err = float((w * s).sum() / w.sum()), float(w.sum() ** -0.5)
     chi2 = float((w * (s - sig) ** 2).sum() / max(len(s) - 1, 1))
+    from scipy.stats import chi2 as chi2d
+    pval = float(chi2d.sf(chi2 * max(len(s) - 1, 1), max(len(s) - 1, 1)))
     out = h5(os.path.abspath(a.dir), a.proc, True)
     with h5py.File(out + ".tmp", "w") as o:
         for k, v in fs[0].attrs.items():
@@ -483,14 +487,16 @@ def cmd_combine(a):
         for k in fs[0]["mc/events"]:
             o[f"mc/events/{k}"] = np.concatenate([f[f"mc/events/{k}"][:] for f in fs])
         n = len(o["mc/events/me2"])
-        o.attrs.update(sigma_pb=sig, sigma_err_pb=err, n=n, parts=len(fs), part_chi2_dof=chi2,
+        o.attrs.update(sigma_pb=sig, sigma_err_pb=err, n=n, parts=len(fs), part_chi2_dof=chi2, part_chi2_p=pval,
                        part_dirs=json.dumps([os.path.abspath(d) for d in a.parts]),
                        check_rel=max(float(f.attrs["check_rel"]) for f in fs))
     for f in fs:
         f.close()
     os.replace(out + ".tmp", out)
-    print(f"COMBINED {len(fs)} parts: {n} events, sigma_hat {sig:.6g} +- {err:.3g} pb, chi2/dof of the parts {chi2:.2f} -> {out}")
-    assert chi2 < 3, "the parts' sigma_hat disagree beyond their errors"
+    print(f"COMBINED {len(fs)} parts: {n} events, sigma_hat {sig:.6g} +- {err:.3g} pb, chi2/dof of the parts {chi2:.2f} "
+          f"(p {pval:.2g}) -> {out}")
+    # the 3-standard-error rule of the design's wiring check, as a p-value: 2.7e-3
+    assert pval > 2.7e-3, "the parts' sigma_hat disagree beyond their errors"
 
 
 def cmd_predict(a):
