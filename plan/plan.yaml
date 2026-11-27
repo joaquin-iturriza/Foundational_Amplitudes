@@ -42405,6 +42405,15 @@ entries:
       fix first: both flags are asserted off on the memmap path (data_mmap.py:871, its docstring l.34) and the 1352-process
       catalogue needs memmap: extend data_mmap to carry the target-propagator factor (worktree, tests, repo review), smoke
       (D395), then design and review.'
+    27: 'step 27 (D566, attempt E''s YES branch), design PASS 2026-11-27T02:55: three runs at step 16''s config (trial 5''s
+      HPs): per-event anchored level arm (sweep/sweep_config_llmcmp_level_events.yaml, level_events_E_kin_s30.json, trial-idx
+      7201), the same 30-seed writer''s per-process level control (sweep/sweep_config_llmcmp_level_file_s30.yaml, level_file_B_diag_s30.json,
+      7101) and its same-seed retrain (7102) for the noise R_b. Chain: merge branch level_s30 (4facfd5af + 27e579c69, repo
+      PASS; held by trunk''s repo backlog until kit_benchmark''s kit_curves plot_runs fix of 2ad76d096 lands and reviewer
+      a0142276334a2a739 advances) -> sync -> writer CPU job (job_perevent_level.sh PEL_WRITE=1 PEL_SEEDS=30 PEL_MMAP=''99c164da4365de9d7c017b75/train55296_val10000_test10000
+      b39fc80c8b10edbe4b07f6a0/train55296_val10000_test10000'', htc) -> gate (per-event file new-43 <= 0.369, subsets) ->
+      control + retrain submitted, arm tp prebuilds -> arm smoke 50 steps + held-out llm_score EVENTS=1 + level_subsets --check-factor
+      -> arm run (13 h target, 18 h limit, ~41 GPU-h total) -> read per the design'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -42727,6 +42736,13 @@ entries:
       - 'the resonance''s level given per event closes the gg->tbW gap: report to Joaquin with the held-out figure'
       - 'it does not: the near-pole miss is not a missing level factor; read what else differs between the q q~ and g g resonant
         regions'
+    27:
+      feeds: 'D566: whether the per-event anchored level keeps the new families'' level once a network is trained on it, and
+        stays right under re-sampling, against a matched per-process level'
+      if:
+      - 'b_a <= g x R_b and 0.859/b_a > R_b, subsets within 2 sd: per-event level is the lever; written up for Joaquin'
+      - 'b_a > g x R_b: the trained network does not keep the per-event level; read where, own design'
+      - 'unresolved: second arm seed (~13 GPU-h) asked of Joaquin'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
