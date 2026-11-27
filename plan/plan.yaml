@@ -52682,9 +52682,7 @@ entries:
     - every figure of the KIT reply deck redrawn in one coherent style
   decisions:
   - D582
-  next:
-    2: add the protocol-B slide drawn by kit_benchmark's owner, rebuild, send Joaquin the deck once with slide 6's transformer
-      and protocol B
+  next: null
   done_when: null
   notes_ref: null
   match: kit_reply_deck_*
@@ -52705,9 +52703,3 @@ entries:
     context: 189256
     context_at: '2026-11-27T01:55:20+00:00'
   step_waits: {}
-  step_why:
-    2:
-      feeds: 'Joaquin''s deck preference: KIT results reach him as the reply deck'
-      if:
-      - 'slide arrives: rebuild, look, send'
-      - 'not drawn: chase kit_benchmark owner'
