@@ -30385,6 +30385,15 @@ entries:
       clean fine-tune beats SCR-A2 on any family -> step 34''s branch: a uug fine-tune search like step 36''s (passed uugg
       design, parent lr 0.00189 centre). Blow-up check of the rerun''s mu-MSE curve pending (kit_curves runs CPU job ccj_4ad504a93003);
       slide 19 not yet redrawn with it (needs the collect output).'
+  - at: '2026-11-27T13:16:52+00:00'
+    text: '2026-11-27 ~14:20 UTC. Step 34 uug half-lr fine-tune rerun (FA-ccin2p3-5b8a7e13, tag heldoutqqg_ftfix05) is itself
+      a blow-up: kit_curves runs (val mu-MSE per eval, 50 evals) 0.00057 at eval 12 -> 0.054 at eval 13 (95x), recovered only
+      in the WSD cooldown to 4.3e-5 at the last eval (best = last; curve_quality sep 1.12, end_up 1). Listed apart under the
+      design''s >5x rule, like the lr-1 run (26x). Its KIT scores (kit_figures collect = the log read: bulk 1.76e-5, deepest
+      coll 0.0237, soft 0.0232) stand as read. On uug no clean hand-set fine-tune exists; the uug FT search (step 34b, sweep/sweep_config_kit_hpo_uug_ft_heldoutqqg.yaml,
+      lr fixed at the parent''s 0.00189, step-34 arms at lr_scale 6.6/3.3) is the next attempt. Step 36 uugg drive: trial
+      8 (hp1441, FA-lxplus-30fc6fe8) failed on an EOS I/O error writing hydra''s config.yaml (transient, not the HP): requeue
+      with drive.py --retry-failed FA-lxplus-30fc6fe8 when the drive ends.'
   step_why:
     32:
       feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
