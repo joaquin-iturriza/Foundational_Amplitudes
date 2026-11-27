@@ -30539,6 +30539,16 @@ entries:
       kit_<file>__<target>'', exit 2; submitted without its positional args). Resubmitted with ''-- kit_ee_uug__me2 100000
       1831 A'' (as the uugg twin a10cf427) as FA-ccin2p3-a872c019, interactive 40 min; step 34 waits on it, then collect as
       kit_A_ft_ee_uug_me2_n100000_t1831_heldoutqqg_ftbest, readout vs SCR-A2 uug, slide10 redraw.'
+  - at: '2026-11-27T20:08:15+00:00'
+    text: 'Step 34b read (E9895): searched held-out-qqg uug fine-tune (search kit_hpo_uug_ft_heldoutqqg best hp1790, val mu-MSE
+      2.66e-5, curve_quality good, largest one-point val jump 5.4x at eval 21/50, recovered: listed apart) KIT-scored FA-ccin2p3-a872c019,
+      collected @69966abb2 as heldoutqqg_ftbest. log10(FT searched / SCR-A2 uug log-MSE), median over strata [range]: bulk
+      +0.48 (8.52e-6 vs 2.81e-6, 3.0x, inside the bar), collinear +2.30 [+2.09,+2.42] (5/5 worse), soft +3.38 [+2.64,+3.65]
+      (5/5 worse). Deepest bins FT/SCR: collinear 0.905/0.00736, soft 0.0502/6.77e-5; exponents FT -0.82/-1.92 vs truth -1.00/-2.00
+      (SCR -0.99/-2.00). No family BEATS (bar 1/7..7): per the design no transfer on uug at this pretraining, no A2 scratch
+      search. The search''s bulk-val choice is far worse in the limits than the unsearched parent-lr fine-tune (ftfix vs SCR-A2:
+      collinear -1.72, soft +0.11): selecting on bulk validation does not pick the limit-accurate fine-tune. slide10 held-out
+      redrawn with the uug searched arm, deck rebuilt 26 pages 0 errors.'
   step_why:
     32:
       feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
