@@ -35953,6 +35953,20 @@ entries:
       D315), the bar of the passed step-37/38 designs; 5x jump <- sec:ladder seeds'' blow-ups vs 1.5x seed noise; soft slope
       tolerance 0.02 <- measured: KIT''s uug soft-family fitted exponent -2.01 vs truth -2.00 (finding 2026-11-13); budget
       lines <- CLAUDE.md GPU budget, D600'
+    fix_at: '2026-11-27T15:19:06+00:00'
+    fix: 'Sweep timing against Joaquin''s ''quickly'' (check 12; check 0 holds otherwise): the design gives the search''s
+      cost (16 x 0.55 h, 8.8 GPU-h) but not when it finishes against D600, whose words are ''please train them quickly, also
+      do ee to ttg''. Step 39''s own note left ''or the uug factor HPs if Joaquin prefers quick: ask'' open. Fix: state the
+      end-to-end wall time (build CPU job, smoke, three waves 6/5/5 at about 0.55 h each plus the queue wait from site pick
+      at CC+lxplus width, then the two arms and the plain scoring) and say in one line why a 16-trial search on the plain
+      arm is needed rather than the uug factor HPs hp1918. The reason: the arms are compared at a tuned baseline''s HPs on
+      a new process, per the feature rule, and the 16 trials follow D428 ''let''s do 16 for now''. No question to Joaquin
+      is needed: it is a tuning choice within budget. Everything else holds and need not change. Notes for the re-record,
+      not failures: (a) CC free disk now reads 8.1 GB (99% used), not 9 GB. Write the sum (0.35 GB file + standalone build
+      + about 20 runs x 80 MB, about 2.5 GB) against it. (b) Add to prior the dead-cone star arm (docs/results.tex ~14827,
+      16122-16156: ee->ttg as the probe of the b b~ g pretraining arm, ''level, 2x worse at 1e4''). It asks a transfer question,
+      not a target-treatment one, so it is not a repeat. (c) The 4 h build limit has no rate behind it: quote the standalone
+      C++ rate from an earlier kit_mc_madgraph run, or read it from the job''s first minutes.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
