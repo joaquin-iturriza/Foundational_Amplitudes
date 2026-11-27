@@ -29,11 +29,11 @@ ARMS_D = (("regressor_ens", "one level per process", ps.C.blue, "s"),
           ("D_sqE_bcls", "+ invariants, class slope", ps.C.vermillion, ">"))
 # attempt E: the + invariants form, one arm per anchor map, the pool's own median (a diagnostic) last
 ARMS_E = (("regressor_ens", "one level per process", ps.C.blue, "s"),
-          ("D_sqE", "anchor: ridge", ps.C.orange, "^"),
-          ("E_sqE_net", "anchor: network", ps.C.green, "v"),
-          ("E_sqE_kin", "anchor: network + kinematics", ps.C.sky, "<"),
-          ("E_sqE_hgb", "anchor: tree + kinematics", ps.C.vermillion, ">"),
-          ("D_sqE_own", "anchor: pool's own median", ps.C.purple, "D"))
+          ("D_sqE", "ridge anchor", ps.C.orange, "^"),
+          ("E_sqE_net", "network anchor", ps.C.green, "v"),
+          ("E_sqE_kin", "net + kin. anchor", ps.C.sky, "<"),
+          ("E_sqE_hgb", "tree + kin. anchor", ps.C.vermillion, ">"),
+          ("D_sqE_own", "own-median anchor", ps.C.purple, "D"))
 
 
 def main():
