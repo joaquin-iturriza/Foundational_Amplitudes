@@ -28714,7 +28714,7 @@ entries:
     agent: a9ff5bf228e6df436
     state: working
     since: '2026-11-27T01:30:08+00:00'
-    state_at: '2026-11-27T01:30:08+00:00'
+    state_at: '2026-11-27T01:40:50.588000+00:00'
     context: 148848
     context_at: '2026-11-27T01:41:03+00:00'
   findings:
@@ -35591,9 +35591,9 @@ entries:
     - 4
   owner:
     agent: ae273c97a5f27cc05
-    state: stopped
+    state: working
     since: '2026-11-27T00:04:02+00:00'
-    state_at: '2026-11-27T00:08:43.094000+00:00'
+    state_at: '2026-11-27T01:40:48.900000+00:00'
     context: 87401
     context_at: '2026-11-27T00:22:14+00:00'
   step_waits:
@@ -42629,9 +42629,9 @@ entries:
     blocks_steps: &id004 []
   owner:
     agent: a91889ef4874423bf
-    state: working
+    state: stopped
     since: '2026-11-27T01:07:43+00:00'
-    state_at: '2026-11-27T01:29:18.225000+00:00'
+    state_at: '2026-11-27T01:33:03.195000+00:00'
     context: 110879
     context_at: '2026-11-27T01:41:09+00:00'
   step_why:
@@ -52664,9 +52664,9 @@ entries:
   asks: []
   owner:
     agent: aacf740e280c0d06e
-    state: stopped
+    state: working
     since: '2026-11-26T16:41:05.231000+00:00'
-    state_at: '2026-11-26T19:35:54.459000+00:00'
+    state_at: '2026-11-27T01:40:52.397000+00:00'
     context: 177150
     context_at: '2026-11-26T19:57:48+00:00'
   step_why:
