@@ -1691,6 +1691,9 @@ class AmplitudeExperiment(BaseExperiment):
             assert _own or _tp_stats == _tp_cfg, (
                 f"frozen data stats were fitted with target_propagators={_tp_stats}, "
                 f"this run sets {_tp_cfg}")
+            assert _own or str(stats.get("level_events")) == str(self.cfg.data.get("level_events") or None), (
+                f"frozen data stats were fitted with level_events={stats.get('level_events')}, "
+                f"this run sets {self.cfg.data.get('level_events')}")
             # the signed-log scale's shift (stats written before the key were fitted without one): a mismatch would
             # read the frozen signedlog strings under one convention and refit a probe's own under another
             _ss_stats = float(stats.get("signedlog_scale_shift", 0.0) or 0.0)
@@ -1935,12 +1938,14 @@ class AmplitudeExperiment(BaseExperiment):
         #     predictions at evaluation, so raw-space metrics and plots are on the true
         #     |M|². The transform resolution, the signed-log scale and the standardization
         #     all see the modified target. Same masks as the off-shellness input. ---
-        _tp_on = bool(self.cfg.data.get("target_propagators", False))
+        # data.level_events (llm_compare D566): the per-event part of the level rides the same per-event factor
+        _tp_on = bool(self.cfg.data.get("target_propagators", False)) or bool(self.cfg.data.get("level_events"))
         _phys_on = bool(self.cfg.data.get("target_physics_factor", False))
         self._target_factor_on = _tp_on or _phys_on
         if _tp_on:
             tp = self._tp_settings()
-            tp_masks = self._setup_offshell_masks(names, pdgs=tp["pdgs"] + tp["massless"])
+            tp_masks = (self._setup_offshell_masks(names, pdgs=tp["pdgs"] + tp["massless"])
+                        if tp["pdgs"] + tp["massless"] else None)
             n_ok, red_before, red_after, n_props, n_tch = 0, [], [], 0, 0
             n_cand = 0
             for proc_idx, name in enumerate(names):
@@ -2378,6 +2383,9 @@ class AmplitudeExperiment(BaseExperiment):
         assert not self.cfg.data.get("affine_multiplicity_std", False) or (
             per_dataset and self.cfg.data.get("shared_standardization", False)), \
             "data.affine_multiplicity_std refines data.shared_standardization (per-dataset transforms, one sigma)"
+        assert not self.cfg.data.get("level_events") or (
+            str(self.cfg.data.get("level_file")) == str(self.cfg.data.level_events)), \
+            "data.level_events carries its own per-process levels c_p: set data.level_file to the same file"
         assert not self.cfg.data.get("level_file") or (
             per_dataset and self.cfg.data.get("shared_standardization", False)), \
             "data.level_file sets the means of data.shared_standardization (per-dataset transforms, one sigma)"
@@ -2503,15 +2511,17 @@ class AmplitudeExperiment(BaseExperiment):
         physics.widths: catalog_v3's heavy-quark layer, the top width following m_t), the straddle fraction and the
         massless t-channel switch (data.target_propagator_tchannel; its massless pdgs, max final multiplicity)"""
         tch_on = bool(self.cfg.data.get("target_propagator_tchannel", False))
+        bw_on = bool(self.cfg.data.get("target_propagators", False))   # off: data.level_events alone uses the factor
         return {
-            "pdgs": [int(x) for x in (self.cfg.data.get("target_propagator_pdgs", []) or [])],
+            "pdgs": [int(x) for x in (self.cfg.data.get("target_propagator_pdgs", []) or [])] if bw_on else [],
+            "level_events": self.cfg.data.get("level_events") or None,
             "widths": {int(k): float(v) for k, v in dict(self.cfg.data.get("target_propagator_widths", {}) or {}).items()},
             "pool_widths": {sp["name"]: {abs(int(k)): float(v) for k, v in ((sp.get("physics") or {}).get("widths") or {}).items()}
                             for sp in (getattr(self, "_recipe_specs", None) or [])},
             "straddle": float(self.cfg.data.get("target_propagator_straddle", 0.005)),
             "tch_on": tch_on,
             "tch_max_final": int(self.cfg.data.get("target_propagator_tchannel_max_final", 99)),
-            "massless": [1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16, 21, 22] if tch_on else [],
+            "massless": [1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16, 21, 22] if tch_on and bw_on else [],
         }
 
     def _tp_props(self, name, sel, pp, tp, n_names):
@@ -2563,7 +2573,41 @@ class AmplitudeExperiment(BaseExperiment):
             else:
                 med, floor = norm
                 logF += power * np.log(np.maximum(np.abs(s_prop), floor) / med)
+        if tp.get("level_events"):
+            logF -= self._level_events_slope(name, pp)
         return logF
+
+    def _level_events_slope(self, name, pp):
+        """data.level_events (llm_compare D566 attempt E): the per-event part b_p.(x - x0_p)/sx of the anchored level
+        log|M|^2 ~ c_p + b_p.(x - x0_p)/sx, x = (log s_hat, Lmin - log s_hat, E) of momenta pp (N,P,4 GeV, any frame):
+        Lmin the log of the smallest pair invariant (2|p_i.p_j| with an initial leg, (p_i+p_j)^2 between final legs,
+        floored at 1e-12 s_hat), E the sum over the file's massless final legs k of log s_hat - min_j log S_kj
+        (analysis/catalog_daniel/perevent_level.py events(), which writes the file; c_p is its per-process "levels",
+        read by data.level_file). Subtracted from log|M|^2 as a target factor, divided out at evaluation."""
+        if not hasattr(self, "_lev_ev"):
+            lp = str(self.cfg.data.level_events)
+            lp = lp if os.path.isabs(lp) else os.path.join(os.path.dirname(os.path.abspath(__file__)), lp)
+            self._lev_ev = json.load(open(lp))
+        f = self._lev_ev
+        assert name in f["coef"], f"data.level_events: no coefficients for {name}"
+        co = f["coef"][name]
+        def md(a, b):
+            return a[..., 0] * b[..., 0] - (a[..., 1:] * b[..., 1:]).sum(-1)
+        n = pp.shape[1]
+        s = md(pp[:, 0] + pp[:, 1], pp[:, 0] + pp[:, 1])
+        lS = np.full((len(pp), n, n), np.nan)
+        for i in range(n):
+            for j in range(max(i + 1, 2), n):
+                q = pp[:, i] + pp[:, j]
+                v = 2 * np.abs(md(pp[:, i], pp[:, j])) if i < 2 else np.abs(md(q, q))
+                lS[:, i, j] = lS[:, j, i] = np.log(np.maximum(v, 1e-12 * s))
+        L = np.log(s)
+        Lmin = np.nanmin(lS.reshape(len(pp), -1), 1)
+        E = np.zeros(len(pp))
+        for k in co["E_legs"]:
+            E += L - np.nanmin(lS[:, k, :], 1)
+        x = np.column_stack([L, Lmin - L, E])
+        return ((x - np.asarray(co["x0"])) / np.asarray(f["sx"])) @ np.asarray(co["b"])
 
     def _physics_logF(self, name, mom_phys, alphas=None):
         """log of the factor data.target_physics_factor multiplies |M|^2 by, per event: (s0 / s_hat)^(4-N) / C_p (s_hat, a
@@ -2895,6 +2939,7 @@ class AmplitudeExperiment(BaseExperiment):
                    if getattr(self, "_affine_multiplicity", None) else {}),
                 **({"level_file": self._level_file} if getattr(self, "_level_file", None) else {}),
                 "target_propagators": bool(self.cfg.data.get("target_propagators", False)),
+                **({"level_events": str(self.cfg.data.level_events)} if self.cfg.data.get("level_events") else {}),
                 "target_over_born": bool(self.cfg.data.get("target_over_born", False)),
                 "signedlog_scale_shift": self._signedlog_scale_shift(),
                 "target_physics_factor": bool(self.cfg.data.get("target_physics_factor", False)),
