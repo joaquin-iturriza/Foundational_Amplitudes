@@ -30368,6 +30368,16 @@ entries:
       kit_curves_fairnlo redrawn with the rerun (hollow / dotted), deck talks/kit_reply_nov2026 rebuilt 25 pages 0 errors
       0 overfull. Step 36 (uugg FT search, design PASS 2026-11-27 after one FIX: lr centre at the parent''s 0.00189, control
       corrected to hp0798 of the plain search, A2 scratch search on a BEATS) driven by sweep/drive.py detached (pid 2497598).'
+  - at: '2026-11-27T12:37:45+00:00'
+    text: '2026-11-27 ~15:20. Step 34 uug decided by the half-lr rerun (FA-ccin2p3-5b8a7e13, lr_scale 0.5, tag heldoutqqg_ftfix05;
+      head-map line shift +4.517 std 1.478, RUN_DONE). KIT scores read from its log''s evaluate.py table (the kit_figures
+      collect CPU job ccj_d398435d7985 still queued on CC htc): R = median log10(FT/SCR-A2 log-MSE) collinear +0.23 [-0.32,+0.51]
+      LEVEL, soft +1.78 [+1.24,+2.54] LOSES, bulk +0.80 (1.77e-5 vs 2.81e-6); deepest bins coll 0.0237 vs 0.00736, soft 0.0232
+      vs 6.8e-5; exponents coll -0.98 (truth -1.00), soft -2.01 (truth -2.00). The lr_scale-1 run''s collinear BEATS (-1.72)
+      came from a run that blew up (26x val jump) and is listed apart; the clean rerun does not reproduce it. So on uug no
+      clean fine-tune beats SCR-A2 on any family -> step 34''s branch: a uug fine-tune search like step 36''s (passed uugg
+      design, parent lr 0.00189 centre). Blow-up check of the rerun''s mu-MSE curve pending (kit_curves runs CPU job ccj_4ad504a93003);
+      slide 19 not yet redrawn with it (needs the collect output).'
   step_why:
     32:
       feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
