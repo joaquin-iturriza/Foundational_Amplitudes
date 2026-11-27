@@ -30161,6 +30161,19 @@ entries:
       bulk 6.1e-5 / -2.9e-3 / 0.028 / 0.025; soft 0.021 / -0.049 / 0.49 / 0.47 (-1.98/-2.00); coll gg 0.017 / -0.062 / 0.59
       / 0.43 (-0.98/-0.99); coll qg 0.056 / -0.17 / 0.63 / 0.53 (-0.94/-0.97); azimuth y 1e-7 0.018, h rms pred 4.1e-6 vs
       truth 0.0246. FT1/FT0.1 wait on the parent FA-ccin2p3-69541363.'
+  - at: '2026-11-27T03:49:31+00:00'
+    text: '2026-11-27 ~06:20. Slide-11 1e5 jobs FA-ccin2p3-b45a89e1 (uug) / 6360f286 (uugg) FAILED in metrics (E9716/E9717;
+      both logs read whole, DeepSeek triage did not answer). Two faults. (1) metrics'' assert of the exact run''s sigma from
+      the generate log against the h5: the log prints 4 digits (0.1219 vs banner 0.121861) -> fixed @b8568c3f9 (sigma from
+      the banner, log only for its error, consistency at 1e-3). (2) The real one: both surrogate samples are not at sqrt s:
+      every event''s incoming energy is 1.1035016 GeV instead of 1000 (also the 2000-event vec-32 smoke 96ce4464; the local
+      vec-1024 run of the design check is at 1000). Generation itself passed (uug sigma_hat 0.12158 +- 0.000137 pb vs exact
+      0.121861; uugg 2.41e-8 +- 2.7e-11 pb vs exact 0.0198228: off by 1.2e-6, so the uugg integrand is also wrong), and since
+      the coded cut and alpha_s are scale-free no check caught it; me2 of the stored events are 15.6 median vs 3.4e-5 (uug),
+      r = me2/hat 3e5..3e6. Not a reportable number. Guard @b8568c3f9: gen asserts the LHE events'' incoming energy = sqrt
+      s (rtol 1e-9) before anything is written. Diagnosis jobs (2000 uug events, vector_size 32, LHE kept): surrogate FA-ccin2p3-e07631e9
+      (runs/kit/mc_madgraph_diag_surr32) and the EXACT integrand at vector_size 32 without KITSURR 74c1767f (runs/kit/mc_madgraph_diag_exact32):
+      separates MadEvent''s vector mode at 32 on CC from the KITSURR path.'
   step_why:
     29:
       feeds: Bakar's slide-10 metrics reported
