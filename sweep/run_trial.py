@@ -324,9 +324,9 @@ def build_command(cfg, hp_params, run_dir, run_idx, result_path, t_steps,
     pre = "++" if base else ""
     if base:
         cmd += ["--config-path", base, "--config-name", "config", "run_name=null"]
-        # a base run's config.yaml has no hydra block: without these hydra writes outputs/<date>/.hydra/ under the
-        # checkout (EOS on lxplus: EIO there failed trials), which config/hydra.yaml turns off for the default config
-        cmd += ["hydra.output_subdir=null", "hydra.run.dir=."]
+        # a base run's config.yaml has no hydra block: without these hydra writes outputs/<date>/.hydra/ and run.log under
+        # the checkout (EOS on lxplus: EIO there failed trials), which config/hydra.yaml turns off for the default config
+        cmd += ["hydra.output_subdir=null", "hydra.run.dir=.", "hydra/job_logging=none", "hydra/hydra_logging=none"]
         cmd += _rerooted_base_paths(base)
     else:
         cmd.append("local=none")
