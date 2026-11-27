@@ -48145,6 +48145,30 @@ entries:
       0.369 <- measured: attempt E''s bar, regressor_ens ten-ensemble max (data/perevent_anchored_E.json); 2 bootstrap sd
       <- measured: 30 event resamples per subset (level_subsets.py, attempt E''s rule); 13 h <- measured: step 16''s own V100
       rate ~0.75 s/step x 60,840; 30 GPU-h <- CLAUDE.md budget, D566 names the work'
+    fix_at: '2026-11-27T02:47:32+00:00'
+    fix: '(1) Seeds against the measured spread, and the bar''s source (checks 3, 4): the YES/NO line ''arm new-43 median
+      bias^2 <= / > 1.97 x the control''s'' uses 1.97 = rerun_spread.json new.per_process_factor_median, a median over processes
+      of each process''s retrain factor, not the run-to-run spread of the quantity compared (a ratio of two runs'' medians
+      over the 43). The same file gives that spread for the median new-43 MSE: 0.688 vs 3.58, median_ratio 5.2 between a run
+      and its retrain. That spread comes from a run with no level input (llmcmp_a_adamw_const trial_9000 and its retrain).
+      No retrain spread is measured anywhere for a run given a level file. With one training seed per arm, a 1.97x line sits
+      inside the one measured spread of the median, so either branch can come from training noise alone. Fix: (a) give the
+      bar the spread of the quantity actually compared. Compute the ratio of the new-43 median bias^2 between the control
+      and its retrain from their saved per-event outputs (no GPU), or say why the per-process factor bounds it. (b) Or read
+      a paired per-process measure whose training noise is known (for example each process''s |bias - given level|, step 16:
+      median 0.17), with its spread stated. If neither keeps the decision above the noise with one seed per arm, a second
+      training seed for both arms (~+26 GPU-h) is Joaquin''s call. Put it to him as a question with its cost, not as ''add
+      seeds''. Every arm of the entry has run one seed. The subset branch, the arm''s own subsets against its own all-events
+      value with event-bootstrap sd, is within one run and is fine. Its ''or below the control by 2 sqrt(sd_a^2+sd_c^2)''
+      alternative crosses runs and carries the same unmeasured training noise. Say so, or drop that alternative. (2) Ordering
+      (check 19): the control run (step 16''s launch path with level_file_B_diag_s30.json, no smoke) waits for the arm''s
+      D395 smoke and prebuilds, but it reads only the writer''s file and the gate. Submit it once the gate passes, alongside
+      the smoke. Checked and holding: configs differ from step 16''s only in sweep_name and data.level_file/level_events (diff
+      at 27e579c69). Same HPs hp1163, steps, batch and optimizer, so no lr re-tune is needed. MSE is the entry''s Suprio-conditions
+      loss, as step 16. Measure reach: step 16 bias^2 0.859 -> 0.122, off-given-level median 0.17; attempt E q_soft 0.235
+      vs 0.581. Writer seeds 0-2 log: new all 0.497, q_soft 0.484. Gate at 0.369 sourced. CC free disk 12G vs ~4 GB. Rate
+      from step 16''s own run. D567 shape and the LLM''s 0.721 included. Searched results.tex for level_events, per-event,
+      anchored, level_file, retrain, rerun_spread, s30: none beyond the D83 robustness paragraph (cited in prior).'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
