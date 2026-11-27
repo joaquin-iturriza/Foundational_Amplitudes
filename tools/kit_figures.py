@@ -465,18 +465,19 @@ def protocol_b(path, out):
 
 def fairnlo_fig(path, out):
     """The fair one-loop protocol on e+e- -> t t~ virtual (kit_benchmark step 24, design 2026-11-26 02:27): <out>, KIT
-    log-MSE against D_train on bulk_test and the deepest threshold and Sudakov strata, fine-tuned (tag fairnlo_ft_d<D>),
+    log-MSE against D_train on bulk_test and the deepest threshold and Sudakov strata, fine-tuned (tag fairnlo_ftfix_d<D>,
+    step 35's reruns after the asym_sd fix ff4f2e0cf; the void fairnlo_ft_d<D> stay in the data, not drawn),
     from scratch (fairnlo_scra2_d<D>) and V/B with exact Born (fairnlo_vb_d<D>); a fine-tune rerun at another lr scale
-    (tag fairnlo_ft_d<D>_<x>) hollow beside its D. <out>_d10000: per stratum against the singular variable at 1e4."""
+    (tag fairnlo_ftfix_d<D>_lsmed) hollow beside its D. <out>_d10000: per stratum against the singular variable at 1e4."""
     import re
     import plot_style as ps
     from matplotlib.ticker import NullFormatter
     from tools.kit_readout import deepest
     runs = {}
     for r in d_runs(path):
-        m = re.fullmatch(r"fairnlo_(ft|scra2|vb)_d(\d+)(_lsmed)?", r["tag"])
+        m = re.fullmatch(r"fairnlo_(ftfix|scra2|vb)_d(\d+)(_lsmed)?", r["tag"])
         if m:
-            runs[({"ft": "FT", "scra2": "SCR", "vb": "VB"}[m[1]], int(m[2]), bool(m[3]))] = r
+            runs[({"ftfix": "FT", "scra2": "SCR", "vb": "VB"}[m[1]], int(m[2]), bool(m[3]))] = r
     bulk = lambda r: next(v["logmse"] for k, v in r["strata"].items() if k.startswith("bulk_test/"))
     cells = (("bulk", r"bulk test", bulk),
              ("threshold_beta", r"threshold, $10^{-4}<\beta<10^{-3}$", lambda r: deepest(r["strata"])["threshold_beta"][2]),
@@ -519,9 +520,9 @@ def fairnlo_slide10_fig(path, out):
     from tools.kit_readout import deepest
     runs = {}
     for r in d_runs(path):
-        m = re.fullmatch(r"fairnlo_(ft|scra2|vb)_d(\d+)(_lsmed)?", r["tag"])
+        m = re.fullmatch(r"fairnlo_(ftfix|scra2|vb)_d(\d+)(_lsmed)?", r["tag"])
         if m:
-            runs[({"ft": "FT", "scra2": "SCR", "vb": "VB"}[m[1]] if not m[3] else "FTlr", int(m[2]))] = r
+            runs[({"ftfix": "FT", "scra2": "SCR", "vb": "VB"}[m[1]] if not m[3] else "FTlr", int(m[2]))] = r
     key = {"bulk": lambda r: next(k for k in r["strata"] if k.startswith("bulk_test/")),
            "threshold": lambda r: next(k for k in r["strata"] if k.startswith(f"hard_test/{deepest(r['strata'])['threshold_beta'][0]}/")),
            "sudakov": lambda r: next(k for k in r["strata"] if k.startswith(f"hard_test/{deepest(r['strata'])['sudakov_sqrts'][0]}/"))}
@@ -534,6 +535,8 @@ def fairnlo_slide10_fig(path, out):
             for arm in ("FT", "SCR", "VB", "FTlr"):
                 name, c, mk, ls = model_style(arm)
                 ds = sorted(d for a, d in runs if a == arm)
+                if not ds:   # no run of this arm (the lr-scale rerun before it lands): no empty legend entry
+                    continue
                 v = np.array([runs[(arm, d)]["strata"][kf(runs[(arm, d)])][m] for d in ds])
                 ax.plot(ds, np.abs(v), color=c, ls=ls, label=name, marker=mk if arm == "FTlr" else None)
                 neg = v < 0
@@ -555,9 +558,10 @@ FAMNAME = {"soft_x": "soft", "coll_y": "collinear", "coll_qg_y": r"$q\to qg$", "
 # slide10 arm sets: (MODELS key, run key) per arm, the run key (mode, tag or None for any tag)
 SLIDE10 = {"a2": ((("factor", ("A", None)), ("B_bulk", ("B_bulk", None)), ("B", ("B", None))),
                   ("ee_uug", "ee_uugg", "ee_tt")),
-           # the held-out qqg protocol (step 30): from scratch on the held-out parent's config vs fine-tuned from it
-           "heldout": ((("SCR", ("A", "heldoutqqg_scra2")), ("FT", ("A_ft", "heldoutqqg_ft")),
-                        ("FT01", ("A_ft", "heldoutqqg_ft01"))), ("ee_uug", "ee_uugg"))}
+           # the held-out qqg protocol (steps 30/34): from scratch on the held-out parent's config vs fine-tuned from it
+           # (tags _ftfix: the reruns after the asym_sd head-map fix ff4f2e0cf; the void _ft/_ft01 stay in the data)
+           "heldout": ((("SCR", ("A", "heldoutqqg_scra2")), ("FT", ("A_ft", "heldoutqqg_ftfix")),
+                        ("FT01", ("A_ft", "heldoutqqg_ftfix01"))), ("ee_uug", "ee_uugg"))}
 
 
 def slide10_fig(path, out, arms="a2"):

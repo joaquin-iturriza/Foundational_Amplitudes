@@ -407,7 +407,7 @@ def fairnlo_fig(data, base):
     import plot_style as ps
     from tools.kit_figures import model_style
     d = json.load(open(data))
-    arms = {"ft": "FT", "scra2": "SCR", "vb": "VB"}
+    arms = {"ftfix": "FT", "scra2": "SCR", "vb": "VB"}  # ftfix: after the asym_sd fix ff4f2e0cf (the void _ft runs not drawn)
     Ds = sorted({int(re.search(r"_d(\d+)$", k).group(1)) for k in d if re.search(r"fairnlo_\w+_d\d+$", k)})
     fig, axes = ps.figure(2, 3)
     for ax, D in zip(axes.flat, Ds):
@@ -418,7 +418,7 @@ def fairnlo_fig(data, base):
             x = np.arange(1, len(v) + 1) * steps / len(v)     # evaluations spread evenly over the run's steps
             name, c, _, ls = model_style(key)
             ax.plot(x, smooth(v), color=c, ls=ls, label=name)
-        for run in (k for k in d if k.endswith(f"fairnlo_ft_d{D}_lsmed")):   # the fine-tune's named rerun
+        for run in (k for k in d if k.endswith(f"fairnlo_ftfix_d{D}_lsmed")):   # the fine-tune's named rerun
             v = d[run]["val"]
             x = np.arange(1, len(v) + 1) * int(re.search(r"_t(\d+)", run).group(1)) / len(v)
             name, c, _, _ = model_style("FT")
