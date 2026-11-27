@@ -30540,7 +30540,7 @@ entries:
       - 'factor helps in the soft limit and the bulk: report with numbers'
       - 'no difference (mass regulates collinear): say so with numbers'
   step_waits:
-    '32': FA-ccin2p3-a8d68ffe
+    '32': FA-ccin2p3-680004d8
     '34': 'uug FT search read: CC CPU job ccj_6f0898187890 (kit_curves sweep kit_hpo_uug_ft_heldoutqqg), re-read with the
       same command'
     '39': detach kit_hpo_ttg_plain (drive.py, 16 trials waves 6/5/5, target 0.55 h each; launched 2026-11-27 19:18 CET)
