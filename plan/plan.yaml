@@ -15836,8 +15836,9 @@ entries:
     - FA-ccin2p3-046cc7d3
     - FA-ccin2p3-5019242c
     - FA-ccin2p3-6d9a278c
+    - FA-ccin2p3-979df241
     - FA-ccin2p3-b0d50405
-    commit: 3c8d9cad6
+    commit: d2bdd1a8d
     paths:
     - .claude/hooks/context_guard.py
     - .claude/hooks/notification_absorb.py
