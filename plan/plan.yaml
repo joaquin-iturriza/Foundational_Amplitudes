@@ -43894,7 +43894,6 @@ entries:
       directory, as step 16''s 7002 did; the HPs are the same.'
   step_waits:
     '26': FA-ccin2p3-4ba88991
-    '27': FA-ccin2p3-99d211ad FA-ccin2p3-ea7163d9
   handoff:
     state: 'Step 26 (target_propagators arm, passed design 2026-11-26T23:40): smoke FA-ccin2p3-776cdd69 clean; its held-out
       read FA-ccin2p3-583cc541 passed the factor check (pair log_factor minus c_best''s: mean -7.9, floor -9.479 = 2 log(Gamma_t/M_t)
