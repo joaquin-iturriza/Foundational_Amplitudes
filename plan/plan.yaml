@@ -30481,6 +30481,7 @@ entries:
       after step 38's runs)
     '38': design reviewer (launched 2026-11-27 ~14:40 by the previous owner; verdict on plan design-pass/fix)
     '40': step 37's kit_zoom collect (ccj_ab6a6943301b) and step 38's runs
+    '39': the next owner (handed off at the context limit before its design; ready to start)
   handoff:
     state: '2026-11-27 ~15:25 @ad2ba3624. Steps 34/35 read on the fine-tunes rerun after the asym_sd fix (findings ~13:45,
       ~14:30, ~15:20). Fair one-loop (step 35) done: FT BEATS V/B on the Coulomb threshold at every D (-1.23/-2.11/-2.05 rerun/-1.73/-1.82),
