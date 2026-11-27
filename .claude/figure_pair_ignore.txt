@@ -67,3 +67,11 @@ talks/kit_reply_nov2026/figs/kit_fairnlo.png
 talks/kit_reply_nov2026/figs/kit_fairnlo.pdf
 talks/kit_reply_nov2026/figs/kit_fairnlo_d10000.png
 talks/kit_reply_nov2026/figs/kit_fairnlo_d10000.pdf
+talks/kit_reply_nov2026/figs/kit_slide10_fairnlo_bulk.png
+talks/kit_reply_nov2026/figs/kit_slide10_fairnlo_bulk.pdf
+talks/kit_reply_nov2026/figs/kit_slide10_fairnlo_sudakov.png
+talks/kit_reply_nov2026/figs/kit_slide10_fairnlo_sudakov.pdf
+talks/kit_reply_nov2026/figs/kit_slide10_fairnlo_threshold.png
+talks/kit_reply_nov2026/figs/kit_slide10_fairnlo_threshold.pdf
+talks/kit_reply_nov2026/figs/kit_slide10_heldout.png
+talks/kit_reply_nov2026/figs/kit_slide10_heldout.pdf
