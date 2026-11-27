@@ -30067,6 +30067,12 @@ entries:
       deepest 3e-8..5e-8, p99 6e-4..7e-4, w.err 2e-4..3e-4; uugg deepest 2.9e-4..7.4e-4, p99 0.068-0.081, w.err 0.042-0.071,
       h pred 1.3e-4 vs 0.0246; tt threshold 3.9e-7 / w.err 7e-4, Sudakov 1.3e-4 / w.err 1.8e-3. Fine-tunes (steps 24, 30)
       added when they exist.'
+  - at: '2026-11-27T02:01:03+00:00'
+    text: '2026-11-27 ~04:00 @09f1c69e1: KIT reply deck talks/kit_reply_nov2026/main.pdf gets the protocol-B result (three
+      slides ''Protocol B'', one per process: kit_figures.py protocolB, slide-8 layout, bulk only vs hard points added, bulk
+      test dotted) and the slide-10 metrics (slide ''Bias, 99th percentile, weighted error'': kit_figures.py slide10, A2 /
+      bulk only / hard points added on bulk and deepest bins), after ''Summary, deepest bins''; rebuilt 0 errors 0 overfull.
+      Data kit_fig_B_a2.json.'
   step_why:
     24:
       feeds: 'D570: does fine-tuning from the signed A2 pretraining beat SCR-A2 and V/B with exact Born on ee->tt one loop
