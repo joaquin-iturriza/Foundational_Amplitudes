@@ -28417,10 +28417,6 @@ entries:
       0.12200+-0.00100 pb at 2000 events vs exact 0.121861). 1e5-event surrogate jobs at KIT_MC_VEC=32 FA-ccin2p3-b45a89e1
       (uug, 6 h) 6360f286 (uugg, 12 h); on their end: wiring check sigma_hat/sigma vs E_exact[u], numbers, figure_exact with
       the tt part (12d32b55), differences from slide 11 first (vector_size 32 noted as a repair: it only batches the calls)'
-    33: 'Slide 11 exact, uugg (split from step 32, its own readout): 50 parts x 2000 events FA-ccin2p3-5e977b39''s sibling
-      array FA-ccin2p3-66fc3d1c (seeds 1001-1050, default card, 8 CPUs, target 1.5 h) -> surr_combine FA-ccin2p3-c5a3365b
-      into runs/kit/mc_madgraph; on its end: wiring check sigma_hat/sigma vs E_exact[u], eps2, numbers into the reply deck;
-      read the first parts'' serve stats against the 1.5 h estimate'
     34: 'Held-out qqg uug: (a) read the queued CPU reads of the half-lr rerun (same commands re-read: site run --job --allow-stale
       --item kit_benchmark ccin2p3 FA -- python tools/kit_figures.py collect runs/kit/kit_A_ft_ee_uug_me2_n100000_t1831_heldoutqqg_ftfix05;
       .venv-cpu/bin/python tools/kit_curves.py runs runs/kit/kit_A_ft_ee_uug_me2_n100000_t1831_heldoutqqg_ftfix05 --out <json>),
@@ -30515,11 +30511,6 @@ entries:
       if:
       - 'wiring within 3 MC errors: numbers to Joaquin in the deck'
       - 'beyond: KITSURR path fault, fix and rerun'
-    33:
-      feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
-      if:
-      - 'wiring within 3 MC errors: numbers to Joaquin in the deck'
-      - 'beyond: KITSURR or combine fault, fix and rerun'
     34:
       feeds: 'D575 (ii): does the held-out qqg pretraining transfer the uug limits'
       if:
@@ -30542,7 +30533,6 @@ entries:
       - 'no difference (mass regulates collinear): say so with numbers'
   step_waits:
     '32': FA-ccin2p3-a8d68ffe
-    '33': '2026-11-28'
     '36': 'ccj_43e0754ef0a0 (kit_figures collect of trial_1289 as kit_A_ft_ee_uugg_me2_n100000_t1831_heldoutqqg_ftbest; re-read:
       site --timeout 1800 run --job --allow-stale --item kit_benchmark ccin2p3 FA -- python tools/kit_figures.py collect runs/kit_hpo_uugg_ft_heldoutqqg/trial_1289=kit_A_ft_ee_uugg_me2_n100000_t1831_heldoutqqg_ftbest);
       retry drive detach kit_hpo_uugg_ft_heldoutqqg_retry (FA-lxplus-d5b580a2, 3e5b78e2)'
