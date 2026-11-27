@@ -30043,7 +30043,7 @@ entries:
       FA-ccin2p3-49baf8df FA-ccin2p3-0db338e9 FA-ccin2p3-e7e95e15 FA-ccin2p3-9478d077
     '29': FA-lxplus-828d67d6
     '31': FA-ccin2p3-20f0e184 FA-ccin2p3-5a47d217 FA-ccin2p3-6ce1e90c FA-ccin2p3-7bb05caf FA-ccin2p3-77c0851e FA-ccin2p3-c72af479
-    '30': 'next owner: event E9620, the failed parent smoke''s log read before any resubmission'
+    '30': FA-ccin2p3-8005fa0a
     '32': FA-ccin2p3-aacf91cc FA-ccin2p3-706a0f6f
   handoff:
     state: '2026-11-27 @bcee3530a. Slide-11 MC test done exactly as specified (D571/D574/D575; design PASS 2026-11-26 16:45).
