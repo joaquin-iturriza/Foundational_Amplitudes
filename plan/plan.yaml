@@ -30077,7 +30077,6 @@ entries:
       FA-ccin2p3-49baf8df FA-ccin2p3-0db338e9 FA-ccin2p3-e7e95e15 FA-ccin2p3-9478d077
     '29': FA-lxplus-828d67d6
     '31': FA-ccin2p3-20f0e184 FA-ccin2p3-5a47d217 FA-ccin2p3-6ce1e90c FA-ccin2p3-7bb05caf FA-ccin2p3-77c0851e FA-ccin2p3-c72af479
-    '30': FA-ccin2p3-ca04dd15 FA-ccin2p3-8c576040
     '32': FA-ccin2p3-b9d55720 FA-ccin2p3-96ce4464
   handoff:
     state: '2026-11-27 ~02:20 @e8ff91661. Step 20: SCR-A2 + V/B at all five D done on CC (10 runs, full steps, scored; finding
