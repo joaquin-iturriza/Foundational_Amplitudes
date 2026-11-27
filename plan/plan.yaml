@@ -50820,7 +50820,7 @@ entries:
   step_waits:
     '3': the D551 replays' write-up (detach wake_replay4, detach review_replay4); plan done closes the entry, so it follows
       steps 5 and 6
-    '5': detach wake_replay5
+    '5': detach wake_replay6
     '6': detach review_replay4
     '7': the next repo-reviewer pass on trunk (a301e680efb448582 passed labwake 089b53ffb on its branch, but the merge guard
       needs it inside trunk's passed backlog, watermark 5d7d59aa19)
