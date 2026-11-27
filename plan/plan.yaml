@@ -35151,6 +35151,15 @@ entries:
       own prepd_std): the fix did not reach the run, read before any score.'
     sources: 1/7 and 7 <- t t~ V test same-HP rerun spread 0.78-6.96 (results.tex sec:datasaving); 5x jump <- sec:ladder seeds'
       blow-ups vs 1.5x seed noise; 100 GPU-h <- D570 names this work
+    passed_at: '2026-11-27T10:49:22+00:00'
+    reviewer: 'Re-check after the 10:47 FIX. Load check is now the head-map log line (asym branch, shift m_p-m_o, std = the
+      run''s own prepd_std; seen on CC at +4.517/1.478 uug, +6.113/1.454 uugg) plus tests/test_head_map_own_stats.py; the
+      step-0 NLL bar is gone. The prior corrects the 13:10 finding and the correcting finding (~13:55) is on the entry; I
+      confirmed sweep_config_dsave_s2_ft_ee_ttbar_nlo_d4_t5950.yaml fine-tunes from treesin_r4 with no input_asym_factor.
+      Check 2: slope scale s_o/s_p = 0.722/3.118 = 0.232 matches the step-29 D=100 FT exponent -0.211 vs truth -1.016 (FA-ccin2p3-5819e2fe
+      log). Check 3: one seed (D315); 1/7 and 7 bars against the 0.78-6.96 test same-HP rerun spread (sec:datasaving). Only
+      code (ff4f2e0cf) and tags differ from step 29''s FT; controls unaffected; ~4 GPU-h under D570. Searched: asym_sd, fairnlo,
+      fair one-loop, fair nlo in results.tex; the entry''s findings; site decisions D402/D570/D575.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
