@@ -30088,7 +30088,7 @@ entries:
         bias to Joaquin'
       - 'beyond 3 errors: KITSURR path fault, fix and rerun before any number goes out'
   step_waits:
-    '24': FA-lxplus-828d67d6
+    '24': FA-ccin2p3-5819e2fe FA-ccin2p3-e5c41742 FA-ccin2p3-27013dea FA-ccin2p3-aca0bcaa FA-ccin2p3-2128f5f5
     '29': FA-lxplus-828d67d6
     '32': FA-ccin2p3-b9d55720 FA-ccin2p3-96ce4464
     '30': FA-ccin2p3-1daf7f8f FA-ccin2p3-2f27a757
