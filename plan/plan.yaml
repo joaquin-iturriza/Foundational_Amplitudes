@@ -43861,6 +43861,19 @@ entries:
       merge, which trunk''s repo backlog holds on kit_benchmark''s kit_curves plot_runs bug (2ad76d096); reviewer a0142276334a2a739
       has passed level_s30, 27e579c69 and 953bb799d and will advance once that fix lands. Step 26 run FA-ccin2p3-4ba88991
       is on track (estimate 11.9 h of steps).'
+  - at: '2026-11-27T03:32:43+00:00'
+    text: '2026-11-27 04:30 step 27: the 30-seed writer FA-ccin2p3-7a590292 (code @4fd363b3c, perevent_level.py --level-seeds
+      30) passed the gate. Per-event file level_events_E_kin_s30.json (sha256 40f46ca8...): new-43 median level error 0.081
+      on all events, 0.149/0.092/0.101/0.065 on s_lo/s_hi/q_hard/q_soft (all under the 0.369 bar); train 0.0007. Matched per-process
+      file level_file_B_diag_s30.json (sha256 a6134605...): new-43 0.055 on all, 0.064/0.157/0.091/0.477 on the subsets, so
+      on the singular fifth the per-process number moves 8.6x while the per-event level does not; train 0.0015 on all, 1.06
+      on q_soft. Both files stay untracked on CC, the runs read them from there. Submitted: control FA-ccin2p3-220f71a8 and
+      its same-seed retrain FA-ccin2p3-540fc068 (sweep/trial_job.sh, sweep/sweep_config_llmcmp_level_file_s30.yaml @4fd363b3c,
+      trial/hp-idx 7101/7102, trial 5''s HPs as --hp: lr 1.243724e-03, regularization_lambda 1.123008e-10, warmup 0.1634867,
+      ema True 0.9989315; 60,840 steps, 32G, 18 h limit, target 13 h); arm tp_ prebuilds FA-ccin2p3-99d211ad (train) and -ea7163d9
+      (held out), with the arm config''s fixed_params. Next on the prebuilds: arm smoke, its held-out score with level_subsets
+      --check-factor, then the arm run. The design''s --hp-idx 1163 became --hp-idx = trial-idx so each run gets its own run
+      directory, as step 16''s 7002 did; the HPs are the same.'
   step_waits:
     '26': FA-ccin2p3-4ba88991
     '27': FA-ccin2p3-99d211ad FA-ccin2p3-ea7163d9
