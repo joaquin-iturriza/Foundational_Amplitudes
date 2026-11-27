@@ -28413,10 +28413,9 @@ entries:
       / 13:00), with the parent''s and arms'' curves'
     29: 'Slide-10 metrics: A2 and protocol B done (finding 2026-11-27 ~03:30, kit_readout --slide10); add the fine-tunes,
       tt FT per D (step 24) and uug/uugg FT1/FT0.1 (step 30), when they end'
-    30: 'Protocol A pretrained, ee_qqg/qqgg families held out, A2, uug/uugg (D575, design PASS): parent smoke FA-ccin2p3-42ae3468
-      (recipe transfer_finale_kit_heldout_qqg.yaml @6a6ca8839); on its clean end the real parent (tag kit_heldoutqqg_a2, limit
-      14 h, target 10 h) + FT1/FT0.1/SCR-A2 50-step smokes from the smoke parent; SCR-A2 real arms once the parent''s config
-      exists, FT1/FT0.1 at the parent''s end'
+    30: 'Held-out qqg A2 (D575): smokes clean (1daf7f8f FT, 2f27a757 SCR-A2); SCR-A2 real arms FA-ccin2p3-6f1a5dad (uug) ff4af2bc
+      (uugg) out 2026-11-27 ~03:00; at the parent FA-ccin2p3-69541363''s end FT1/FT0.1 per process (A_ft, KIT_LR_SCALE 1 /
+      0.1, tags heldoutqqg_ft / heldoutqqg_ft01), then FT vs SCR-A2'
     32: 'Slide 11 exact (design PASS 16:45): read FA-ccin2p3-aacf91cc (uug), 706a0f6f (uugg: MadEvent on the A2 surrogate)
       and 12d32b55 (tt virtual over the bulk window 353-1739 GeV); figure_exact; hand to Joaquin'
   done_when: null
@@ -30079,10 +30078,10 @@ entries:
       - 'metrics present for every fine-tune: table completed'
       - 'a run lacks them: rescore it (REREAD)'
     30:
-      feeds: 'Bakar''s most interesting test: limits without hard data when pretrained with the target family held out'
+      feeds: 'Bakar: does the model get the limits without hard data when pretrained with the target family held out'
       if:
-      - 'best FT beats SCR-A2: positive transfer per family'
-      - 'neither: fine-tune search best against best before any no-transfer statement'
+      - 'better FT BEATS SCR-A2: transfer, positive'
+      - 'neither: kit_hpo_tt_ft_r5-style FT search, best against best'
     32:
       feeds: 'D571/D575: Bakar''s slide-11 end-user test of the packaged A2 surrogates, done as he specified'
       if:
