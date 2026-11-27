@@ -35264,6 +35264,29 @@ entries:
       jump > 5x) is listed apart and the next-best clean trial read.'
     sources: 1/7 and 7 <- t t~ V same-HP rerun spread 0.78-6.96 (results.tex sec:datasaving), the bar of the passed step-30
       and step-34 designs; 5x jump <- sec:ladder seeds' blow-ups vs 1.5x seed noise; 100 GPU-h <- D575 names this work
+    fix_at: '2026-11-27T11:55:33+00:00'
+    fix: '(1) Learning-rate window off its rule (HPO rule 4, checks 12/17): fine_tune.lr_scale multiplies training.lr, fixed
+      here at SCR-A2''s from-scratch 0.01152379, so lr_scale 1 = 6.1x the parent''s own lr (0.00189, runs/data_saving/dsave_parent_finale_kit_heldoutqqg_a2/config.yaml
+      on CC) and the window [0.1,10] spans 1.15e-3..0.115. Rule 4 centres lr_scale 1 at the pretrain lr, and the template
+      kit_hpo_tt_ft_r5 fixed lr at 1.78e-3, near its parent''s. Your own data point the other way: lr_scale 1 -> 0.1 improved
+      every uugg family by 1.2-1.5 decades (kit_readout: soft +2.24 -> +0.88, g->gg +2.05 -> +0.57, q->qg +1.40 -> +0.18,
+      azimuth +2.08 -> +0.57) and 0.1 is the window''s lower edge, so the optimum may sit at or beyond the boundary, and a
+      NO would not be a verdict. Fix: fix training.lr at the parent''s 0.00189 (window 1.9e-4..1.9e-2, both tested points
+      inside), or state another centre with its source. (2) Best against best is not what the control is (check 1, feature
+      rule): SCR-A2''s HPs (hp0798) come from kit_hpo_uugg_plain, a search on the plain-input config, not on A2 (plan finding
+      2026-11-13 ~15:00, uugg A2 6d7e80ac at hp0798). The design calls them ''the A2 config''s searched HPs''; correct that.
+      A NO stands as it is (the tuning favours the fine-tune), but a BEATS could come from tuning only the fine-tune on A2.
+      Fix: add to the BEATS branch the same template search for scratch A2 on uugg (16 trials, waves 6/5/5, same pool, steps,
+      batch, ~9 GPU-h, under D575), and claim transfer only if the best fine-tune still BEATS the best scratch-A2 trial. This
+      serves Bakar''s question (does the held-out pretraining carry the limits), under D575. (3) Disk not stated (check 14):
+      CC /sps has 8.5 GB free now (df, 99% full) with the step 32/33 arrays writing there. A step-34 uugg fine-tune is 82
+      MB and the parent 56 MB. State disk per trial times 16 plus the parent copy on lxplus against each site''s free disk
+      read at submission. (4) Inherited settings (check 18): the base is the parent''s config.yaml. List every key the sweep
+      sets that differs from it, each with its reason (iterations 1831 vs 64000, lr, data/recipe, evaluation.train_subsample
+      2000, memmap false, target/offshell stats own, scheduler/cooldown). Checks that hold: check 2 (lr_scale moved R by -1.21..-1.51
+      decades, confirmed with kit_readout on kit_fig_heldoutqqg.json); check 3 (bar +-0.845 decades from the t t~ V rerun
+      spread, D315 one seed); check 12 (16 trials per D428/D430, same as the sibling kit searches); budget ~9 GPU-h, under
+      D575.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
