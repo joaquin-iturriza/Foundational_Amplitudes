@@ -35107,6 +35107,50 @@ entries:
       per D315; 1/7 and 7 against the 0.78-6.96 test rerun spread, as passed 2026-11-26 02:29), 9 HETEROSC, 12 no HPO per
       D570, 15 (step-29 d100 FT trained 02:48-03:02 in the same config), 17 (HPs unchanged, as passed), 18 (setup = step-29
       FT runs'' logged args), 19 (no waits).'
+  - at: '2026-11-27T10:48:40+00:00'
+    question: 'Step 35 (fair one-loop protocol, D570/D575; rerun of the FT arm of the design passed 2026-11-26 02:29 after
+      a bug fix): on Bakar''s fair NLO setup for ee->tt one-loop virtual (parent dsave_parent_finale_kit_fairnlo_a2, A2 with
+      the asymptotic factor), does the fine-tune beat SCR-A2 and VB per D = 100, 316, 1e3, 3162, 1e4 on bulk, Coulomb and
+      Sudakov strata, now that the fine-tune''s factor runs in its own units? Step 29''s five FT runs (and the D=1e3 lr_scale-0.126
+      rerun) carried the parent''s asym_sd 3.118 against own std 0.677-0.722 (survey ccj_d0485fb1ba2c), scaling the Coulomb
+      and Sudakov slopes by ~0.23; they are void. SCR-A2 and VB are from scratch (asym_sd = own) and stand. (Revision after
+      the 10:47 FIX: load check and prior corrected.)'
+    prior: 'Searched plan kit_benchmark findings 2026-11-27T03:33 (step 29 fair slide-10 metrics: FT threshold exponent -0.21..-0.24
+      vs truth -1.02, log-MSE 4.4-5.7 in beta 1e-4..1e-3), ~12:40 and ~13:10 (the bug, its fix @ff4f2e0cf, the survey), results.tex
+      sec:datasaving (the stage-2 searches), D570, D575. The HPs: stage-2 search bests sweeps_local/dsave_s2_ft_ee_ttbar_nlo_d{4..8}_*
+      from parent runs/data_saving/dsave_parent_treesin_r4 (sweep/sweep_config_dsave_s2_ft_ee_ttbar_nlo_d4_t5950.yaml: no
+      input_asym_factor), so the bug did not touch the HP choice; this design reuses them unchanged and CORRECTS the ~13:10
+      finding, which said the searches ran under the bug (correcting finding ~13:55). Differs from step 29''s FT only in the
+      code and tags (fairnlo_ftfix_d<D>).'
+    measure: 'As the passed design: kit_predict (Bakar''s evaluate.py) per run: log10-MSE, bias, p99, |M|^2-weighted error
+      and exponents per stratum; kit_figures collect into analysis/kit_benchmark/data/kit_fig_fairnlo.json (the void FT entries
+      kept listed apart as the bug''s cause); kit_readout --slide10 and --vs: per family (bulk; Coulomb; Sudakov) and D, R
+      = arm/control log-MSE median over strata. Load check: each FT''s head-map log line shows the asym branch (''asym output
+      shift <m_p - m_o> std <own prepd_std>''), its std equal to the run''s data_stats prepd_std; exactness of the map rests
+      on tests/test_head_map_own_stats.py. No step-0 NLL bar (the logged step-0 value is the HETEROSC NLL: 2.65e3/9.41e3 on
+      the fixed step-34 runs).'
+    check: 'The bug moves the measure: s_o/s_p = 0.722/3.118 = 0.232 and the step-29 FT threshold exponents -0.21..-0.24 =
+      0.232 x -1.02 (truth); the parent function is preserved exactly at load (tests/test_head_map_own_stats.py, fails on
+      the old code); the branch fired on CC in the step-34 reruns (shift +4.517 std 1.478 uug, +6.113 std 1.454 uugg).'
+    fixed: 'Every setting of the step-29 FT runs as submitted (logs of FA-ccin2p3-5819e2fe e5c41742 27013dea aca0bcaa 2128f5f5):
+      scripts/job_kit.sh A_ft kit_ee_tt__virt_finite <D> <T>, T = 5950 at D=100 and 8500 above, KIT_PARENT=runs/data_saving/dsave_parent_finale_kit_fairnlo_a2,
+      KIT_LR_SCALE per D 0.1259/0.1224/7.412/0.1637/0.1090, training.lr per D 0.00811/0.006665/0.006833/0.007817/0.004648
+      and the stage-2 best layer_decay, muon_weight_decay, regularization_lambda, cosanneal_warmup_frac, cosanneal_eta_min,
+      ema, ema_decay copied verbatim from those logs, CosineAnnealingLR, fine_tune.offshell_stats=own, target_stats own, float64,
+      HETEROSC + mu_mse + sigma stage, seed 42. Wall: those runs took 18-44 min submit to end -> target 0.75 h, limit 1:30.
+      5 x 0.75 = 3.75 GPU-h (+0.3 for the conditional D=1e3 rerun) under D570''s 100. Disk ~80 MB each, CC /sps 10 GB free
+      (read at submit). No smoke: same job script, config, data as step 29.'
+    control: SCR-A2 and VB per D from step 29 (from scratch, asym_sd = own std, unaffected), same data, steps, batch, seed
+      and scoring; only the start differs for SCR-A2. References beside as in the passed design (Bakar's MLP, package v6 A2).
+    seeds: 'One seed (42) per run (D315); spread: t t~ V same-HP rerun spread 0.46-4.84 val, 0.78-6.96 test (sec:datasaving).'
+    outcome: 'As the passed design, per family and D: BEATS R < 1/7, LOSES R > 7, else LEVEL; branches (a) FT BEATS VB on
+      a hard family -> positive statement, FT vs SCR-A2 says whether pretraining or the factor carries it; (b) FT LEVEL/LOSES
+      vs VB but BEATS SCR-A2 -> transfer within the factor model, baseline wins; (c) FT not better than SCR-A2 -> no transfer,
+      reported. A run that blows up (validation jump > 5x) is listed apart; FT D=1e3 at lr_scale 7.41 blowing up is rerun
+      once at 0.126 (the median of the other four), stated. Load check fails (no asym head-map line, or its std not the run''s
+      own prepd_std): the fix did not reach the run, read before any score.'
+    sources: 1/7 and 7 <- t t~ V test same-HP rerun spread 0.78-6.96 (results.tex sec:datasaving); 5x jump <- sec:ladder seeds'
+      blow-ups vs 1.5x seed noise; 100 GPU-h <- D570 names this work
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
