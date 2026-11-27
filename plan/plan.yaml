@@ -30241,6 +30241,17 @@ entries:
       x 300 events FA-ccin2p3-fe5393dc (array), then surr_combine into the exact diag dir FA-ccin2p3-ca8ba529 (afterok). On
       its RUN_DONE: uug array (4 CPUs, target 1.3 h, limit 4 h) and uugg array (8 CPUs, target 1.5 h estimate, limit 6 h),
       each with its surr_combine.'
+  - at: '2026-11-27T09:29:54+00:00'
+    text: '2026-11-27 ~10:45. Slide-11 split-layout D395 smoke passed: parts array FA-ccin2p3-fe5393dc (2 uug parts x 300
+      events, seeds 9001-9002, default card) and surr_combine FA-ccin2p3-ca8ba529 (log read, RUN_DONE): COMBINED 2 parts,
+      600 events, sigma_hat 0.121057 +- 0.00143 pb, parts chi2/dof 0.87 (p 0.35); metrics ran: sigma_hat/sigma-1 = -0.0158
+      +- 0.0136 against the 2000-event exact diag run (0.122999 pb) vs E_exact[u]-1 = -1.68e-3 (within 1.1 errors: wiring
+      sound). Batch out per the 08:37 design at site pick''s width (102 CPU jobs, all on CC htc, one wave): uug array FA-ccin2p3-5e977b39
+      (50 x 2000, seeds 1001-1050, 4 CPUs, 8G, limit 4 h, target 1.3 h) -> combine a8d68ffe; uugg array 66fc3d1c (8 CPUs,
+      16G, limit 6 h, target 1.5 h estimate) -> combine c5a3365b; both combines --expect 50 into runs/kit/mc_madgraph, code
+      @33f188ffc. Held-out qqg parent FA-ccin2p3-69541363 finished cleanly 09:59; fine-tunes out @8bdfa20ea (job_kit.sh A_ft,
+      KIT_PARENT runs/data_saving/dsave_parent_finale_kit_heldoutqqg_a2, n=1e5, 1831 steps, SCR-A2''s HPs per process): lr_scale
+      1 uug 69de38db, uugg 48701a30; lr_scale 0.1 uug 1a1c9a47, uugg b6abfc18; target 0.8 h.'
   step_why:
     29:
       feeds: Bakar's slide-10 metrics reported
