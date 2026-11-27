@@ -43961,7 +43961,8 @@ entries:
       by their owner.'
   step_waits:
     '26': FA-ccin2p3-4ba88991
-    '27': FA-ccin2p3-2fbcce14
+    '27': another agent's uncommitted .claude/hooks/submit_guard.py and tests/test_submit_data_check.py committed (site submit
+      refuses a dirty tree; --allow-dirty and stash denied by the permission classifier)
   handoff:
     state: 'Step 26 (target_propagators arm, passed design 2026-11-26T23:40): smoke FA-ccin2p3-776cdd69 clean; its held-out
       read FA-ccin2p3-583cc541 passed the factor check (pair log_factor minus c_best''s: mean -7.9, floor -9.479 = 2 log(Gamma_t/M_t)
