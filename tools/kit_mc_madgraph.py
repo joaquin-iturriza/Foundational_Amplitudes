@@ -207,6 +207,7 @@ def check_vs_kit_predict(pred, run, proc, d, n=1000):
     """assert the Predictor `pred` gives kit_predict.predict's log10|M_hat|^2 on the first n KIT bulk_test events"""
     import h5py
     from tools.kit_predict import predict
+    os.makedirs(d, exist_ok=True)
     with h5py.File(kh.h5_path(proc), "r") as K:
         mom = K["bulk_test/bulk/momenta"][:n]
         srv = pred.log10(mom)
