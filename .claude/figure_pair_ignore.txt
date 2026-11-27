@@ -75,4 +75,4 @@ talks/kit_reply_nov2026/figs/kit_slide10_fairnlo_threshold.png
 talks/kit_reply_nov2026/figs/kit_slide10_fairnlo_threshold.pdf
 talks/kit_reply_nov2026/figs/kit_slide10_heldout.png
 talks/kit_reply_nov2026/figs/kit_slide10_heldout.pdf
-talks/kit_reply_nov2026/figs/kit_mc_slide11_tree  # deck copy of analysis/kit_benchmark/figs/kit_mc_slide11_tree (pair there); the deck uses only the pdf
+talks/kit_reply_nov2026/figs/kit_mc_slide11_tree.pdf
