@@ -16563,7 +16563,7 @@ run's length.}
 On the $5000$ test events of the one-loop $e^+e^-\to d\bar d$ and $b\bar b$ pools, the ladder's arms at $D=10^4$ (the
 cells of Fig.~\ref{fig:ladder}, each its sweep's best checkpoint) reproduce the distributions of $\log_{10}|\mathcal M|^2$,
 and of $\sqrt{\hat s}$ and $\cos\theta^*$ weighted by $|\mathcal M|^2$, bin by bin; the ratio leaves $1\pm0.1$ only in bins
-of a few events at the largest $|\mathcal M|^2$ (Fig.~\ref{fig:ladder_nlo_dist}, scratch, rung~9, synthetic and finale).
+of a few events at the largest $|\mathcal M|^2$ (Fig.~\ref{fig:ladder_nlo_dist}, scratch, rung~9, synthetic and finale; every arm in Fig.~\ref{fig:ladder_nlo_all}).
 The relative error $\Delta=|\mathcal M|^2_{\rm pred}/|\mathcal M|^2_{\rm true}-1$ has, over those four arms, a median $|\Delta|$ of
 $1.3\times10^{-4}$ (rung~9) to $2.2\times10^{-3}$ (synthetic) on $d\bar d$ and $1.1\times10^{-4}$ (rung~9) to
 $7.2\times10^{-4}$ (scratch) on $b\bar b$. The MSE of $\ln|\mathcal M|^2$ weighs every event alike, yet the $Z$ pole
@@ -16619,6 +16619,17 @@ the shared test order, checked on the $9$ arms whose own predictions remain on C
 \caption{Median $|\Delta|$ against MSE$(\ln|\mathcal M|^2)$ on the test events, one point per ladder arm at $D_{\rm train}=10^4$ (scratch, rungs $0$ to $9$, synthetic, finale), one-loop $d\bar d$ and $b\bar b$.}
 \label{fig:ladder_nlo_rank}
 % allow: 10^4 2 0 9 because they are the setting, powers and plotted quantiles, not results
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/transfer/figs/ladder_nlo_dist_all_ee_dd_nlo.pdf}\\[1ex]
+\includegraphics{../analysis/transfer/figs/ladder_nlo_dist_all_ee_bb_nlo.pdf}\\[1ex]
+\includegraphics{../analysis/transfer/figs/ladder_nlo_rel_all_ee_dd_nlo.pdf}\\[1ex]
+\includegraphics{../analysis/transfer/figs/ladder_nlo_rel_all_ee_bb_nlo.pdf}
+\caption{Figs.~\ref{fig:ladder_nlo_dist} and \ref{fig:ladder_nlo_rel} with every ladder arm: one-loop $d\bar d$ and $b\bar b$, true against predicted, then the median $|\Delta|$ against $\sqrt{\hat s}$ and the true $\log_{10}|\mathcal M|^2$.}
+\label{fig:ladder_nlo_all}
+% allow: 2 because it is a power, not a result
 \end{figure}
 
 \paragraph{Weight interpolation between the finale and the add-$W$ run (2026-10-22, D31 item 1).} The best checkpoint on
