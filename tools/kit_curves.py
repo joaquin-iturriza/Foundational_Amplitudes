@@ -429,6 +429,19 @@ def fairnlo_fig(data, base):
     print(ps.save(fig, base))
 
 
+def jumps(data, runs):
+    """Per run: the largest one-point validation jump v[i]/v[i-1] and where, the best evaluation, every jump above 5x
+    (the blow-up rule of the KIT designs) and the first and last value (the stability of the asymptotic-factor runs, draft Sec. 7)."""
+    d = json.load(open(data))
+    for run in runs:
+        v = np.asarray(d[run]["val"], float)
+        r = v[1:] / v[:-1]
+        i = int(np.nanargmax(r))
+        print(f"{run}: largest val jump {r[i]:.2f}x at eval {i + 1}/{len(v)}, best {np.nanmin(v):.3g} at eval "
+              f"{int(np.nanargmin(v))}/{len(v)}, jumps > 5x at evals {[int(k) + 1 for k in np.flatnonzero(r > 5)]}, "
+              f"first and last val {v[0]:.3g} {v[-1]:.3g}")
+
+
 def main():  # dup-ok: argparse boilerplate (collect/read), no shared logic
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -442,8 +455,11 @@ def main():  # dup-ok: argparse boilerplate (collect/read), no shared logic
     v = sub.add_parser("runsfig"); v.add_argument("data"); v.add_argument("runs", nargs="+"); v.add_argument("--out", required=True)
     g = sub.add_parser("ftfig"); g.add_argument("search"); g.add_argument("arms"); g.add_argument("--out", required=True)
     q = sub.add_parser("fairnlofig"); q.add_argument("data"); q.add_argument("--out", required=True)
+    j = sub.add_parser("jumps"); j.add_argument("data"); j.add_argument("runs", nargs="+")
     a = ap.parse_args()
-    if a.cmd == "fairnlofig":
+    if a.cmd == "jumps":
+        jumps(a.data, a.runs)
+    elif a.cmd == "fairnlofig":
         fairnlo_fig(a.data, a.out)
     elif a.cmd == "ftfig":
         ft_fig(a.search, a.arms, a.out)
