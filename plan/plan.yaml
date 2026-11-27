@@ -28420,6 +28420,9 @@ entries:
       0.12200+-0.00100 pb at 2000 events vs exact 0.121861). 1e5-event surrogate jobs at KIT_MC_VEC=32 FA-ccin2p3-b45a89e1
       (uug, 6 h) 6360f286 (uugg, 12 h); on their end: wiring check sigma_hat/sigma vs E_exact[u], numbers, figure_exact with
       the tt part (12d32b55), differences from slide 11 first (vector_size 32 noted as a repair: it only batches the calls)'
+    33: 'fix the slide-11 surrogate MadEvent cost: 30 ms per evaluation at vector_size 32 against the design''s 2.6 ms (finding
+      of 2026-11-27): cut the per-call overhead of kit_mc_madgraph.py''s serve step, or find why vector_size 1024 gives survey
+      zero'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -30103,6 +30106,11 @@ entries:
       if:
       - 'wiring within 3 MC errors: numbers to Joaquin in the deck'
       - 'beyond: KITSURR path fault, fix and rerun'
+    33:
+      feeds: Joaquin's 'do it exactly as slide 11 specifies' at a cost within 2x of the design
+      if:
+      - 'overhead cut below 2x: use it for any rerun, and for uugg if 6360f286 runs out of time'
+      - 'not cut: find the 1024 survey-zero cause by a MadEvent run with the server timing at 1024 and 32 on one channel'
   step_waits:
     '24': FA-ccin2p3-5819e2fe FA-ccin2p3-e5c41742 FA-ccin2p3-27013dea FA-ccin2p3-aca0bcaa FA-ccin2p3-2128f5f5
     '32': FA-ccin2p3-b45a89e1 FA-ccin2p3-6360f286
