@@ -28484,7 +28484,7 @@ entries:
     - FA-lxplus-35ac6ab5
     - FA-lxplus-9fc1e04e
     - FA-lxplus-da06f228
-    commit: ff4f2e0cf
+    commit: 1f216b9a3
     paths:
     - analysis/kit_benchmark/data/kit_curves_read.json
     - analysis/kit_benchmark/data/kit_fig_A.json
@@ -28492,6 +28492,7 @@ entries:
     - analysis/kit_benchmark/data/kit_fig_Aft_thrloop.json
     - analysis/kit_benchmark/data/kit_hpo.json
     - analysis/kit_benchmark/data/kit_hpo_tt_divform_rezero.json
+    - analysis/kit_benchmark/data/kit_mc_madgraph_ee_uugg.json
     - analysis/kit_benchmark/data/kit_mc_test.json
     - analysis/kit_benchmark/data/kit_threshold_scan.json
     - analysis/kit_benchmark/data/kit_verdict_A_hpo_ftsearch.json
@@ -28529,6 +28530,7 @@ entries:
     - tools/kit_saturation_probe.py
     - tools/kit_target_slope.py
     - tools/kit_threshold_scan.py
+    - tools/kit_ttg.py
     - tools/kit_vs_mlp.py
   dead_ends:
   - tried: 'Design 2026-11-12 09:06: seeds 43, 44 of softpairthr and target V x beta (tt virtual) to measure the transformer''s
