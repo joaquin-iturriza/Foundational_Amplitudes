@@ -30269,6 +30269,24 @@ entries:
       coefficients bounded within +-10 target std; fine_tune.target_stats=own re-standardizes the target). Figures: analysis/kit_benchmark/figs/kit_slide10_heldout.png
       and the fair one-loop slide-10 metrics against D_train kit_slide10_fairnlo_{bulk,threshold,sudakov}.png (step 29); KIT
       reply deck talks/kit_reply_nov2026/main.pdf slides 20 and 22-24.'
+  - at: '2026-11-27T10:33:20+00:00'
+    text: '2026-11-27 ~12:40 @ff4f2e0cf. Step 34''s open check read: the held-out qqg fine-tunes'' asymptotic factor ran in
+      the parent''s units, a bug. model.input_asym_factor''s buffer asym_sd (the unit of both readouts AND the divisor of
+      the output, wrappers._asym_mu) is filled with the run''s own target std at build, then overwritten by the parent''s
+      at the fine-tune load (load_state_dict); and the target_stats=own head map rescaled only readout row 0 (the regular
+      term), not the coefficient row. Read on CC: parent dsave_parent_finale_kit_heldoutqqg_a2 prepd_std 3.0365, asym_sd 3.0365;
+      FT uug (69de38db) own prepd_std 1.4780 but asym_sd 3.0365; SCR-A2 uug asym_sd 1.4780. With asym_sd = s_p the output
+      mu = logsumexp(...)/s_p is read as (y - m_o)/s_o, so every log D slope is scaled by s_o/s_p = 0.487: the FT1 exponents
+      -0.95 soft (truth -2.00) and -0.50 collinear (truth -1.00) are exactly that; step-0 validation 1.82e3 (the function
+      not preserved). Fix @ff4f2e0cf: buffer asym_out (shift, std), mu = (logsumexp + shift)/std; experiment sets (0, s_own);
+      under target_stats=own the map keeps the parent''s readouts and asym_sd (their unit) and sets shift += m_p - m_o, std
+      = s_o (exact); a checkpoint without asym_out loads as before (std = asym_sd), and a rebuild on its own stats maps nothing,
+      so old runs re-read unchanged. Tested: tests/test_head_map_own_stats.py::test_asym_factor_step0_is_parent_zero_shot
+      (y of the fine-tune at load = parent''s to 1e-9 in the bulk, a soft x 1e-6 and a collinear y 1e-7 uug event; old-format
+      parent; rebuild unchanged), fails on the old map; test_input_reps, test_parent_target_stats, test_level_file pass. Not
+      tested: target_stats=own with fine_tune.map_head=false (output std stays the parent''s), an L-GATr asym model (no such
+      flag there). Every earlier A_ft run with the factor under target_stats=own is affected (fair one-loop FT threshold exponent
+      -0.21..-0.24 vs truth -1.02 suggests so): survey of runs/kit/kit_A_ft_* asym_sd vs own std running (ccj_d0485fb1ba2c).'
   step_why:
     32:
       feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
