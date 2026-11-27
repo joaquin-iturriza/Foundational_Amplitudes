@@ -73,7 +73,31 @@ def test_level_subsets_factor_check(tmp_path):
     with pytest.raises(AssertionError):
         level_subsets.read(str(c), ["p"], str(fp), nboot=2)
 
+def test_mmap_pools_feat_target(tmp_path):
+    """perevent_level.mmap_pools with a features dir (step 28): the pool rows' last column is |M|^2 exp(logF) of that
+    dir at the segment's own events, the training target of part (c)'s configuration; without it the raw |M|^2"""
+    import json
+    from perevent_level import mmap_pools
+    P, n = 3, [4, 5]
+    segs, ev0, p0 = [], 0, 0
+    for i, k in enumerate(n):
+        segs.append({"name": f"p{i}", "role": "train", "n": k, "P": P, "ev0": ev0, "p0": p0})
+        ev0 += k; p0 += k * P
+    rng = np.random.default_rng(1)
+    np.save(tmp_path / "mom.npy", rng.normal(size=(p0, 4)).astype(np.float32))
+    np.save(tmp_path / "pdg.npy", np.full(p0, 21.0, np.float32))
+    amp = rng.uniform(1, 2, ev0); np.save(tmp_path / "amp.npy", amp)
+    (tmp_path / "meta.json").write_text(json.dumps({"segs": segs}))
+    fd = tmp_path / "feat_x"; fd.mkdir()
+    lF = rng.normal(size=ev0) * 5; np.save(fd / "logF.npy", lF)
+    (fd / "meta.json").write_text(json.dumps({"key_doc": {"phys": [1.0]}}))
+    raw, tgt = mmap_pools([str(tmp_path)]), mmap_pools([str(tmp_path)], ["feat_x"])
+    assert np.allclose(raw["p1"](9)[:, -1], amp[4:9])
+    assert np.allclose(tgt["p1"](9)[:, -1], amp[4:9] * np.exp(lF[4:9]))
+    assert np.allclose(tgt["p0"](2)[:, -1], amp[:2] * np.exp(lF[:2]))
+
 
 if __name__ == "__main__":
     test_slope_matches_perevent_level()
     print("OK")
+

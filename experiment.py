@@ -2429,12 +2429,29 @@ class AmplitudeExperiment(BaseExperiment):
                             "data.level_file replaces data.affine_multiplicity_std's mu_N: set one of them"
                         lp = str(self.cfg.data.level_file)
                         lp = lp if os.path.isabs(lp) else os.path.join(os.path.dirname(os.path.abspath(__file__)), lp)
-                        lv = json.load(open(lp))["levels"]
+                        lf_doc = json.load(open(lp))
+                        lv = lf_doc["levels"]
+                        # the levels are means of one target: log|M|^2 (no "target", files before step 28) or
+                        # log(|M|^2 F) of the feat key_doc "phys" the writer read (perevent_level.py --feat)
+                        lt = (lf_doc.get("target") or {}).get("phys")
+                        if bool(self.cfg.data.get("target_physics_factor", False)):
+                            d_ = self.cfg.data
+                            want = [str(float(d_.get("target_physics_s0", 289.0))),
+                                    bool(d_.get("target_physics_dim_only", False)),
+                                    str(d_.get("target_physics_dim_ref", "shat")),
+                                    bool(d_.get("target_physics_orders", False))]
+                            assert lt is not None and [lt[0], lt[3], lt[4], lt[8]] == want, \
+                                f"data.level_file {lp}: levels of target {lt}, the run's factor is {want}"
+                        else:
+                            assert lt is None, f"data.level_file {lp}: levels of log(|M|^2 F) {lt}, the run has no factor"
                         missing = [nm for nm in names if nm not in lv]
                         assert not missing, f"data.level_file {lp}: no level for {missing}"
                         lev = np.array([float(lv[nm]) for nm in names])
                         # sigma is affine_multiplicity_std's own (the run it replaces): only the means change
-                        sd = fit_affine_multiplicity(n, [int(npart_of(nm)) for nm in names], mu_p, sd_p)[2]
+                        # data.level_file_sigma=shared (step 28: part (c) ran without affine_multiplicity_std) keeps the
+                        # pooled shared sigma above, so the means are the one change
+                        if str(self.cfg.data.get("level_file_sigma", "affine")) != "shared":
+                            sd = fit_affine_multiplicity(n, [int(npart_of(nm)) for nm in names], mu_p, sd_p)[2]
                         prepd_means, prepd_stds = lev.tolist(), [sd] * len(names)
                         self._level_file = {"path": str(self.cfg.data.level_file), "sigma": sd,
                                             "levels": {k: float(v) for k, v in lv.items()}}

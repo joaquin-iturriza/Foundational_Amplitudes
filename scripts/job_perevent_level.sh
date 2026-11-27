@@ -17,10 +17,11 @@ cd "$PROJECT_DIR"
 # process-intrinsic anchor, output perevent_anchored_D.json; PEL_ANCHOR=map (attempt E): network / tree anchor maps, _E.json
 # PEL_WRITE=1 (step 28): data.level_events' coefficient file from the network + kinematics anchor map,
 # analysis/catalog_daniel/data/level_events_E_kin.json (read back with site run cat, committed on trunk); PEL_SEEDS=N
-# (step 27): the network over seeds 0..N-1, files _s<N>, with the matched per-process file level_file_B_diag_s<N>.json
+# (step 27): the network over seeds 0..N-1, files _s<N>, with the matched per-process file level_file_B_diag_s<N>.json;
+# PEL_FEAT='<feat_ dir per PEL_MMAP cache>' PEL_TAG=_phys (step 28): the levels of that config's target log(|M|^2 F)
 if [ -n "${PEL_WRITE:-}" ]; then
   OMP_NUM_THREADS=4 python analysis/catalog_daniel/perevent_level.py --anchored --anchor map --model mlp --write-level-events \
-    --level-seeds "${PEL_SEEDS:-3}" \
+    --level-seeds "${PEL_SEEDS:-3}" ${PEL_FEAT:+--feat $PEL_FEAT} ${PEL_TAG:+--tag $PEL_TAG} \
     --mmap $(for k in $PEL_MMAP; do echo "$SCRATCH/amp_mmap_cache/$k"; done) && echo "RUN_DONE"
   exit $?
 fi

@@ -191,27 +191,42 @@ def from_surrogate():
 
 
 MMAP_ROLE = {}
+TAG = ""   # --tag: suffix of the written level files
+TARGET = {}   # --feat: the target factor the levels are means of (feat key_doc "phys", read by experiment's level_file)
 
 
-def mmap_pools(dirs):
+def mmap_pools(dirs, feats=None):
     """{process: f(k) -> its first k train-role events as pool rows (4P momenta, P PDG ids, |M|^2)} from memmap base
     caches, which hold every pool's first events in pool order, momenta boosted to the incoming pair's frame (the
-    invariants used here do not change)"""
+    invariants used here do not change). feats (one feat_<fk> dir name per cache, llm_compare step 28): |M|^2 times
+    exp(logF) of that features dir, i.e. the training target of the configuration that built it (part (c)'s
+    emission-scale target), so the levels written are means of that target"""
     out = {}
-    for d in dirs:
+    for di, d in enumerate(dirs):
         m = json.load(open(os.path.join(d, "meta.json")))
         mom, pdg, amp = (np.load(os.path.join(d, x + ".npy"), mmap_mode="r") for x in ("mom", "pdg", "amp"))
+        lF = None
+        if feats:
+            fd = os.path.join(d, feats[di])
+            kd = json.load(open(os.path.join(fd, "meta.json")))["key_doc"]
+            print("target factor from", fd, kd, flush=True)
+            assert TARGET.setdefault("phys", kd["phys"]) == kd["phys"], "--feat: the caches' factors differ"
+            TARGET.setdefault("feat", []).append(os.path.join(os.path.basename(os.path.dirname(d)), os.path.basename(d), feats[di]))
+            lF = np.load(os.path.join(fd, "logF.npy"), mmap_mode="r")
         segs = {}
         for sg in m["segs"]:  # the train role, else the first role the cache holds for the process
             if sg["name"] not in segs or sg["role"] == "train":
                 segs[sg["name"]] = sg
         for sg in segs.values():
             MMAP_ROLE[sg["name"]] = sg["role"]
-            def rows(k, sg=sg, mom=mom, pdg=pdg, amp=amp):  # bound now: the next cache rebinds the names
+            def rows(k, sg=sg, mom=mom, pdg=pdg, amp=amp, lF=lF):  # bound now: the next cache rebinds the names
                 k, P = min(k, sg["n"]), sg["P"]
                 mo = np.asarray(mom[sg["p0"]: sg["p0"] + k * P], np.float64).reshape(k, 4 * P)
                 pd = np.asarray(pdg[sg["p0"]: sg["p0"] + k * P], np.float64).reshape(k, P)
-                return np.column_stack([mo, pd, np.asarray(amp[sg["ev0"]: sg["ev0"] + k], np.float64)])
+                am = np.asarray(amp[sg["ev0"]: sg["ev0"] + k], np.float64)
+                if lF is not None:
+                    am = am * np.exp(np.asarray(lF[sg["ev0"]: sg["ev0"] + k], np.float64))
+                return np.column_stack([mo, pd, am])
             out[sg["name"]] = rows
     return out
 
@@ -436,7 +451,7 @@ def write_level_events(D, tr, ho, new, Xp_tr, Xp_ho, Kp_tr, Kp_ho, events, seeds
     Th = np.mean([mlp(r).fit(sp.transform(Xp_tr), (T - tm) / ts).predict(sp.transform(np.vstack([Xp_tr, Xp_ho])))
                   .reshape(len(tr) + len(ho), -1) for r in seeds], 0) * ts + tm
     Th = dict(zip(list(tr) + list(ho), Th))
-    sfx = "" if list(seeds) == [0, 1, 2] else f"_s{len(seeds)}"
+    sfx = ("" if list(seeds) == [0, 1, 2] else f"_s{len(seeds)}") + TAG
 
     def check(pred):
         chk = {}
@@ -445,7 +460,8 @@ def write_level_events(D, tr, ho, new, Xp_tr, Xp_ho, Kp_tr, Kp_ho, events, seeds
             for n in ns:
                 p, y, sd = pred(n), D[n]["y"], D[n]["y"].std()
                 e.append({s: float((p[m] - y[m]).mean() ** 2 / sd ** 2) for s, m in subsets(D[n]).items()})
-            chk[g] = {s: float(np.median([x[s] for x in e])) for s in SUBSETS}
+                e[-1]["bias2"] = float((p - y).mean() ** 2)   # nat^2, the trained network's bias^2 scale
+            chk[g] = {s: float(np.median([x[s] for x in e])) for s in SUBSETS + ("bias2",)}
         return chk
     chk = check(lambda n: Th[n][0] + X[n] @ Th[n][1:])
     print("level_events check (median level error):", chk, flush=True)
@@ -459,12 +475,13 @@ def write_level_events(D, tr, ho, new, Xp_tr, Xp_ho, Kp_tr, Kp_ho, events, seeds
         print("level_file check (median level error):", chk_p, flush=True)
         json.dump({"source": "analysis/catalog_daniel/perevent_level.py --anchored --anchor map --write-level-events "
                              f"--level-seeds {len(seeds)} (the regressor's network on the pool means, seeds "
-                             f"{seeds[0]}-{seeds[-1]}, {events} events per pool)", "check": chk_p,
+                             f"{seeds[0]}-{seeds[-1]}, {events} events per pool)", "argv": sys.argv[1:], "check": chk_p,
+                   "target": TARGET or None,
                    "levels": {n: float(lv[n]) for n in D}},
                   open(os.path.join(HERE, "data", f"level_file_B_diag{sfx}.json"), "w"), indent=1)
     out = {"source": "analysis/catalog_daniel/perevent_level.py --anchored --anchor map --write-level-events "
                      f"(E_sqE_kin, (c,b) seeds {seeds[0]}-{seeds[-1]}, anchor seeds 0-9, {events} events per pool)",
-           "x": list(cols), "sx": sx.tolist(), "check": chk,
+           "x": list(cols), "sx": sx.tolist(), "check": chk, "argv": sys.argv[1:], "target": TARGET or None,
            "levels": {n: float(Th[n][0]) for n in D},
            "coef": {n: {"b": [float(v) for v in Th[n][1:]], "x0": [float(v) for v in x0p[n]], "E_legs": D[n]["E_legs"]}
                     for n in D}}
@@ -489,7 +506,13 @@ def main():
                     "seeds 0..N-1; N != 3 also writes the matched per-process file data/level_file_B_diag_s<N>.json")
     ap.add_argument("--search", type=int, default=0, help="step 20: DyHPO GP trials on the content-signature "
                     "cross-fit (1 network seed per fit), then the best read as candidate B[_mlp]_tuned")
+    ap.add_argument("--feat", nargs="+", help="with --mmap: one feat_<fk> dir name per cache; the target is "
+                    "log(|M|^2 F) with that dir's logF (step 28: part (c)'s emission-scale target)")
+    ap.add_argument("--tag", default="", help="suffix of the files --write-level-events writes (e.g. _phys)")
     a = ap.parse_args()
+    global TAG
+    TAG = a.tag
+    assert not a.feat or (a.mmap and len(a.feat) == len(a.mmap)), "--feat: one features dir per --mmap cache"
     if a.surrogate:
         return from_surrogate()
     meta = {"dc_" + p["folder"]: p for p in json.load(open(os.path.join(HERE, "classes_default.json")))["processes"]}
@@ -498,7 +521,7 @@ def main():
     lev = json.load(open(os.path.join(HERE, "data", "level_file_B_diag.json")))["levels"]
     cache = os.path.join(os.environ["SCRATCH"], "amp_data_cache")
     files = sorted(os.listdir(cache))
-    mm = mmap_pools(a.mmap) if a.mmap else {}
+    mm = mmap_pools(a.mmap, a.feat) if a.mmap else {}
     D, missing = {}, []
     for split, f in (("train", "catalog_daniel_train"), ("heldout", "catalog_daniel_heldout")):
         for p in yaml.safe_load(open(os.path.join(ROOT, "recipes", f + ".yaml")))["processes"]:
