@@ -1,0 +1,6 @@
+# producer: /home/joaquin/work/FA/tools/kit_figures.py 236f6dd10eacc24d46cfce9b355d59aa564be373
+from scratch
+fine-tuned
+fine-tuned, lr scale $0.1$
+fine-tuned, lr scale $0.5$
+fine-tuned, searched
