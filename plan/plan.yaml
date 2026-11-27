@@ -54164,11 +54164,14 @@ entries:
     - relative measure
   decisions:
   - D598
-  next: 'Joaquin 2026-11-27 (D598): ''Plot hists over amplitude and phase space variables for ee to dd and bb 1 loop datasets
-    from the ladder study. True and predicted'' and ''Can you use a relative measure for all the relevant plots I just talked
-    about instead of mse log M? To see if we are not dominated by the largest amplitudes''. Find the ladder study''s runs
-    on these two probes (analysis/transfer, the draft''s ladder figures), draw ps.true_pred_hist for |M|^2 and the phase-space
-    variables per arm, with a relative error measure beside'
+  next:
+    1: 'Joaquin 2026-11-27 (D598): ''Plot hists over amplitude and phase space variables for ee to dd and bb 1 loop datasets
+      from the ladder study. True and predicted'' and ''Can you use a relative measure for all the relevant plots I just talked
+      about instead of mse log M? To see if we are not dominated by the largest amplitudes''. Find the ladder study''s runs
+      on these two probes (analysis/transfer, the draft''s ladder figures), draw ps.true_pred_hist for |M|^2 and the phase-space
+      variables per arm, with a relative error measure beside'
+    2: 'D599: histograms of |M|^2 and of the emission-scale target (target_physics_factor, dim_ref qperp) against the variables
+      that show how emission scales deform the target, for a few example processes'
   done_when: null
   notes_ref: null
   match: zz_none_ladder_nlo_hists*
@@ -54178,3 +54181,9 @@ entries:
     paths: []
   dead_ends: []
   asks: []
+  step_why:
+    2:
+      feeds: Joaquin's question how emission scales deform the target
+      if:
+      - 'deformation visible: show where (which variable, which region)'
+      - 'target barely changes: say so with the spread numbers'
