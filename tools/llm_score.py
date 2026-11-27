@@ -68,8 +68,33 @@ assert F is not None or not bool(cfg.data.get("target_physics_factor", False)), 
 logF = np.log(np.asarray(F, dtype=np.float64)[exp._split_indices["test"]]).ravel() if F is not None else None
 sse_z, n = np.zeros(len(names)), np.zeros(len(names), dtype=np.int64)
 S = np.zeros((len(names), 5))   # per process sums of pred, true, pred^2, true^2, pred true (absolute log|M|^2)
-EV = []   # --events-out: per event process index, true, pred, log F[, the standardized off-shellness slot]
+EV = []   # --events-out: per event process index, true, pred, log F[, the standardized off-shellness slot], x
 OSH = getattr(exp, "_offshell_cols", None)
+# x = (log s_hat, Lmin - log s_hat[, E]) per event (experiment._level_events_x) from the loader's momenta: Lorentz
+# transformed (invariants kept) and divided by mom_div, so x * mom_div is GeV; E only with data.level_events (its legs)
+XS = a.events_out and not bool(cfg.data.get("dimensionless_inputs", False))
+LEV = json.load(open(os.path.join(ROOT, str(cfg.data.level_events)))) if XS and cfg.data.get("level_events") else None
+from experiment import AmplitudeExperiment  # noqa: E402
+
+
+def xcols(particles, ptr, p):
+    """(events, 2 or 3) x of a batch, grouped by particle count"""
+    pp = particles.double().cpu().numpy() * exp.mom_div
+    ptr = ptr.cpu().numpy()
+    cnt = np.diff(ptr)
+    out = np.zeros((len(cnt), 2 if LEV is None else 3))
+    for c in np.unique(cnt):
+        ev = np.flatnonzero(cnt == c)
+        if LEV is None:
+            out[ev] = AmplitudeExperiment._level_events_x(pp[ptr[ev][:, None] + np.arange(c)])[:, :2]
+        else:
+            for i in np.unique(p[ev]):
+                e = ev[p[ev] == i]
+                out[e] = AmplitudeExperiment._level_events_x(pp[ptr[e][:, None] + np.arange(c)],
+                                                             LEV["coef"][names[int(i)]]["E_legs"])
+    return out
+
+
 k = 0
 with torch.no_grad():
     for data in exp.test_loader:
@@ -83,7 +108,8 @@ with torch.no_grad():
         np.add.at(S, p, np.stack([q, t, q * q, t * t, q * t], 1))
         if a.events_out:
             ev = np.stack([p, t, q, np.broadcast_to(lf, p.shape)], 1)   # + the target factor log F (0 without)
-            EV.append(np.concatenate([ev, osh], 1) if OSH else ev)
+            ev = np.concatenate([ev, osh], 1) if OSH else ev
+            EV.append(np.concatenate([ev, xcols(data[0], data[4], p)], 1) if XS else ev)
         k += p.size
 assert logF is None or k == logF.size, (k, None if logF is None else logF.size)
 assert (n > 0).all(), [nm for nm, k in zip(names, n) if k == 0]
@@ -113,7 +139,8 @@ if a.events_out:  # the first --events-max test events of each process, in loade
     keep = np.concatenate([np.flatnonzero(ev[:, 0] == i)[: a.events_max] for i in range(len(names))])
     with open(a.events_out, "w") as f:
         f.write("process,true_logm2,pred_logm2,log_factor"
-                + "".join(",offshell_%d" % g for g in (exp._internal_mass_pdgs if OSH else [])) + "\n")
+                + "".join(",offshell_%d" % g for g in (exp._internal_mass_pdgs if OSH else []))
+                + (",log_shat,q" + (",E" if LEV is not None else "") if XS else "") + "\n")
         f.writelines(names[int(r[0])] + "".join(",%.6g" % v for v in r[1:]) + "\n" for r in ev[keep])
 shutil.rmtree(cfg.run_dir, ignore_errors=True)
 os.makedirs(os.path.dirname(os.path.abspath(a.out)), exist_ok=True)

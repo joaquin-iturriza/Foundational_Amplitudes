@@ -266,7 +266,8 @@ def anchor_fit(X, y, lam=1e-3):
     return np.concatenate([[ym - xm @ b], b])
 
 
-def anchored(D, tr, ho, new, rel, meta, grp, pfeat, lev, events, nboot=30, mode="global", write_events=False):
+def anchored(D, tr, ho, new, rel, meta, grp, pfeat, lev, events, nboot=30, mode="global", write_events=False,
+             level_seeds=3):
     ANCH = {"global": globals()["ANCH"], "process": ANCH_D, "map": ANCH_E}[mode]
     rng = np.random.default_rng(0)
     Xs = rng.normal(size=(500, 2)); assert np.allclose(anchor_fit(np.column_stack([Xs, np.ones(500)]),
@@ -317,7 +318,7 @@ def anchored(D, tr, ho, new, rel, meta, grp, pfeat, lev, events, nboot=30, mode=
         return {n: a[it[n]] for n in D}
 
     if write_events:
-        return write_level_events(D, tr, ho, new, Xp_tr, Xp_ho, Kp_tr, Kp_ho, events)
+        return write_level_events(D, tr, ho, new, Xp_tr, Xp_ho, Kp_tr, Kp_ho, events, seeds=range(level_seeds))
     X, T = {}, {}
     for tag, cols in ANCH.items():
         allx = np.concatenate([np.column_stack([D[n][c] for c in cols]) for n in tr])
@@ -415,7 +416,10 @@ def write_level_events(D, tr, ho, new, Xp_tr, Xp_ho, Kp_tr, Kp_ho, events, seeds
     regressor's network for (c_p, b_p), both fitted once on all training processes (training processes in-sample, held
     out predicted, as data/level_file_B_diag.json for step 16), the network over seeds 0-2 (step 16's file: 3 seeds). Writes
     data/level_events_E_kin.json: "levels" (c_p, read by data.level_file), "coef" {b, x0, E_legs}, "sx", and "check":
-    this file's own level error on the 43 new and the training processes, full pool and subsets."""
+    this file's own level error on the 43 new and the training processes, full pool and subsets. With seeds other than
+    0-2 (--level-seeds N: seeds 0..N-1, step 27's matched pair) the names carry _s<N>, and the per-process level of the
+    same network on the pool means (regressor_ens' estimator, the same seeds and events) is written beside it as
+    data/level_file_B_diag_s<N>.json (data.level_file of the matched control), with its own check."""
     cols = ("L", "q", "E")
     allx = np.concatenate([np.column_stack([D[n][c] for c in cols]) for n in tr])
     sx = allx.std(0)
@@ -432,21 +436,39 @@ def write_level_events(D, tr, ho, new, Xp_tr, Xp_ho, Kp_tr, Kp_ho, events, seeds
     Th = np.mean([mlp(r).fit(sp.transform(Xp_tr), (T - tm) / ts).predict(sp.transform(np.vstack([Xp_tr, Xp_ho])))
                   .reshape(len(tr) + len(ho), -1) for r in seeds], 0) * ts + tm
     Th = dict(zip(list(tr) + list(ho), Th))
-    chk = {}
-    for g, ns in (("new", new), ("train", tr)):
-        e = []
-        for n in ns:
-            p, y, sd = Th[n][0] + X[n] @ Th[n][1:], D[n]["y"], D[n]["y"].std()
-            e.append({s: float((p[m] - y[m]).mean() ** 2 / sd ** 2) for s, m in subsets(D[n]).items()})
-        chk[g] = {s: float(np.median([x[s] for x in e])) for s in SUBSETS}
+    sfx = "" if list(seeds) == [0, 1, 2] else f"_s{len(seeds)}"
+
+    def check(pred):
+        chk = {}
+        for g, ns in (("new", new), ("train", tr)):
+            e = []
+            for n in ns:
+                p, y, sd = pred(n), D[n]["y"], D[n]["y"].std()
+                e.append({s: float((p[m] - y[m]).mean() ** 2 / sd ** 2) for s, m in subsets(D[n]).items()})
+            chk[g] = {s: float(np.median([x[s] for x in e])) for s in SUBSETS}
+        return chk
+    chk = check(lambda n: Th[n][0] + X[n] @ Th[n][1:])
     print("level_events check (median level error):", chk, flush=True)
+    if sfx:  # the matched per-process level: the same network, seeds and events on the pool means
+        ybar = np.array([D[n]["y"].mean() for n in tr])
+        ym, ys = ybar.mean(), ybar.std() + 1e-12
+        lv = np.mean([mlp(r).fit(sp.transform(Xp_tr), (ybar - ym) / ys).predict(sp.transform(np.vstack([Xp_tr, Xp_ho])))
+                      for r in seeds], 0) * ys + ym
+        lv = dict(zip(list(tr) + list(ho), lv))
+        chk_p = check(lambda n: np.full(len(D[n]["y"]), lv[n]))
+        print("level_file check (median level error):", chk_p, flush=True)
+        json.dump({"source": "analysis/catalog_daniel/perevent_level.py --anchored --anchor map --write-level-events "
+                             f"--level-seeds {len(seeds)} (the regressor's network on the pool means, seeds "
+                             f"{seeds[0]}-{seeds[-1]}, {events} events per pool)", "check": chk_p,
+                   "levels": {n: float(lv[n]) for n in D}},
+                  open(os.path.join(HERE, "data", f"level_file_B_diag{sfx}.json"), "w"), indent=1)
     out = {"source": "analysis/catalog_daniel/perevent_level.py --anchored --anchor map --write-level-events "
-                     f"(E_sqE_kin, (c,b) seeds {list(seeds)}, anchor seeds 0-9, {events} events per pool)",
+                     f"(E_sqE_kin, (c,b) seeds {seeds[0]}-{seeds[-1]}, anchor seeds 0-9, {events} events per pool)",
            "x": list(cols), "sx": sx.tolist(), "check": chk,
            "levels": {n: float(Th[n][0]) for n in D},
            "coef": {n: {"b": [float(v) for v in Th[n][1:]], "x0": [float(v) for v in x0p[n]], "E_legs": D[n]["E_legs"]}
                     for n in D}}
-    json.dump(out, open(os.path.join(HERE, "data", "level_events_E_kin.json"), "w"), indent=1)
+    json.dump(out, open(os.path.join(HERE, "data", f"level_events_E_kin{sfx}.json"), "w"), indent=1)
     return out
 
 
@@ -463,6 +485,8 @@ def main():
                     "data/perevent_anchored_D.json) or by network / tree maps (attempt E, perevent_anchored_E.json)")
     ap.add_argument("--write-level-events", action="store_true", help="with --anchored --anchor map: write "
                     "data/level_events_E_kin.json (data.level_events of step 28) instead of attempt E's read")
+    ap.add_argument("--level-seeds", type=int, default=3, help="--write-level-events: the (c,b) network averaged over "
+                    "seeds 0..N-1; N != 3 also writes the matched per-process file data/level_file_B_diag_s<N>.json")
     ap.add_argument("--search", type=int, default=0, help="step 20: DyHPO GP trials on the content-signature "
                     "cross-fit (1 network seed per fit), then the best read as candidate B[_mlp]_tuned")
     a = ap.parse_args()
@@ -512,7 +536,7 @@ def main():
 
     if a.anchored:
         return anchored(D, tr, ho, new, rel, meta, grp_p, pfeat, lev, a.events, mode=a.anchor,
-                        write_events=a.write_level_events)
+                        write_events=a.write_level_events, level_seeds=a.level_seeds)
     global CANDS
     if a.model == "mlp":
         CANDS = CANDS[:-1] + ("B_mlp",)
