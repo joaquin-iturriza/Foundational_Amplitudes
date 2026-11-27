@@ -61,3 +61,9 @@ talks/kit_reply_nov2026/figs/kit_protocolB_a2_ee_tt.png
 talks/kit_reply_nov2026/figs/kit_protocolB_a2_ee_uug.png
 talks/kit_reply_nov2026/figs/kit_protocolB_a2_ee_uugg.png
 talks/kit_reply_nov2026/figs/kit_slide10_a2.png
+talks/kit_reply_nov2026/figs/kit_curves_fairnlo.png
+talks/kit_reply_nov2026/figs/kit_curves_fairnlo.pdf
+talks/kit_reply_nov2026/figs/kit_fairnlo.png
+talks/kit_reply_nov2026/figs/kit_fairnlo.pdf
+talks/kit_reply_nov2026/figs/kit_fairnlo_d10000.png
+talks/kit_reply_nov2026/figs/kit_fairnlo_d10000.pdf
