@@ -30516,6 +30516,13 @@ entries:
       a decade, the 1/x^2 limit); quasi-collinear 1-cos 1e-7..1e-1 -5.84, -5.83, -5.84, -5.82, -5.68, -5.31 (flat below 1e-4:
       the dead cone, no divergence); threshold beta 1e-4..1e-1 -6.77 flat (no tree Coulomb term); bulk -6.06. Copied to lxplus
       (site copy). Smoke next.'
+  - at: '2026-11-27T18:19:39+00:00'
+    text: 'Step 39 smoke FA-ccin2p3-5ad7429c (factor arm, 50 steps, CC interactive V100) passed D395: training, sigma stage,
+      KIT scoring of bulk and all 14 hard strata and exponents ran (KIT_DONE rc=0, RUN_DONE in the .out; the supervisor''s
+      ''no end marker'' read the .err''s last line). Its training diverged (val 1.56 -> 1e8 at step 3, 3e13 at step 8) at
+      job_kit''s lr law evaluated at T=50, lr 0.193 (vs ~0.027 at T=1831); a smoke artefact, not the launch path: the search
+      sets lr in [1.7e-3, 1.5e-2] and the arms take the searched lr. No re-smoke. ttg plain search launched (detach kit_hpo_ttg_plain),
+      target recorded 16 x 0.55 h.'
   step_why:
     32:
       feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
