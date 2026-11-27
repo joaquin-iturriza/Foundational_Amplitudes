@@ -30082,6 +30082,23 @@ entries:
       in channel G1c0) against the design''s 2.6 ms: >2x margin, to fix (per-call rebuild of the experiment in kit_mc_madgraph
       serve; or find why 1024 gives survey zero). Root cause of the 1024 failure not found. 1e5 jobs b45a89e1/6360f286 out
       at 32 meanwhile (target 5 h, limits 6/12 h).'
+  - at: '2026-11-27T02:58:02+00:00'
+    text: '2026-11-27 ~05:00 @d62d6c9d7. Step 24, fair one-loop protocol on ee->tt virtual (design PASS 2026-11-26 02:27),
+      4 of 5 D final, FT D=1e3 rerun pending. KIT scores collected (kit_figures collect on CC -> analysis/kit_benchmark/data/kit_fig_fairnlo.json),
+      readout kit_readout --vs per D, R = log10(arm/control log-MSE), median over family strata, bar +-0.845 (1/7, 7). FT
+      vs V/B (Bakar''s baseline): threshold LEVEL at every D (-0.10, -0.22, -0.11, -0.30, -0.34 for D=100,316,1e3,3162,1e4);
+      Sudakov LEVEL at 100/316/1e4 (+0.02, +0.15, +0.55), LOSES at 1e3 (+1.07) and 3162 (+3.11); bulk LEVEL except BEATS at
+      1e4 (-0.86). FT vs SCR-A2: threshold LOSES at 1e3 (+1.02) and 3162 (+0.87), LEVEL else (+0.61, -0.01, -0.17); Sudakov
+      LOSES at 100 (+1.68), LEVEL else; bulk BEATS at 1e4 (-1.06), LEVEL else. SCR-A2 vs V/B: threshold BEATS at 1e3 (-1.13)
+      and 3162 (-1.28), LEVEL else; Sudakov BEATS at 100 (-1.66), LOSES at 1e3 (+1.56) and 3162 (+3.17). Design branch (c)
+      at every D: FT beats neither V/B nor SCR-A2 on any hard family: no transfer of one-loop structure from the tree + 4
+      bulk one-loop pretraining (inconclusive by the design: tree has no loop functions). Threshold exponent FT -0.21..-0.24
+      at every D vs truth -1.02 (SCR-A2 -0.45..-0.89, V/B ~0.0). Deepest threshold log-MSE FT 4.4-5.7, SCR-A2 0.16-2.6, V/B
+      7.6-8.3. Bulk at 1e4: FT 8.2e-8, SCR-A2 9.5e-7, V/B 6.0e-7. Curves (kit_curves runs -> kit_curves_fairnlo.json): every
+      arm fails curve_quality separation (train far below val at these D); one-point val jumps >5x: FT 1e3 21x (point 10,
+      unstable over the first ~3500 steps), SCR-A2 25/16/13x and V/B 77/16/15x at 1e3/3162/1e4, all recovering to their best
+      later; listed apart. Per the design FT D=1e3 (lr_scale 7.41) rerun at lr_scale 0.126: FA-ccin2p3-65e6c701 (tag fairnlo_ft_d1000_lsmed).
+      Figures analysis/kit_benchmark/figs/kit_fairnlo.png, kit_fairnlo_d10000.png, kit_curves_fairnlo.png.'
   step_why:
     24:
       feeds: 'D570: does fine-tuning from the signed A2 pretraining beat SCR-A2 and V/B with exact Born on ee->tt one loop
