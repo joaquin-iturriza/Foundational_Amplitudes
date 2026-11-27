@@ -42393,6 +42393,14 @@ entries:
       fix first: both flags are asserted off on the memmap path (data_mmap.py:871, its docstring l.34) and the 1352-process
       catalogue needs memmap: extend data_mmap to carry the target-propagator factor (worktree, tests, repo review), smoke
       (D395), then design and review.'
+    27: 'step 27 (D566, attempt E''s YES branch), matched 30-seed design recorded 2026-11-27: per-event anchored level arm
+      (sweep/sweep_config_llmcmp_level_events.yaml, level_events_E_kin_s30.json) against the per-process level from the same
+      writer, events and 30 seeds (sweep/sweep_config_llmcmp_level_file_s30.yaml, level_file_B_diag_s30.json), step 16''s
+      config otherwise. Chain: branch level_s30 (4facfd5af + 27e579c69, repo PASS of 4facfd5af; merge held by trunk''s repo
+      backlog: the kit_curves plot_runs bug 2ad76d096 of kit_benchmark and 953bb799d unreviewed) -> merge, sync -> writer
+      CPU job PEL_WRITE=1 PEL_SEEDS=30 -> gate (per-event file new-43 <= 0.369, subsets) -> tp prebuilds -> arm smoke 50 steps
+      + held-out llm_score EVENTS=1 + level_subsets --check-factor -> both runs (13 h target, 18 h limit, ~28 GPU-h) -> read
+      per the design'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -42712,6 +42720,13 @@ entries:
       - 'the resonance''s level given per event closes the gg->tbW gap: report to Joaquin with the held-out figure'
       - 'it does not: the near-pole miss is not a missing level factor; read what else differs between the q q~ and g g resonant
         regions'
+    27:
+      feeds: 'D566: whether the per-event anchored level keeps the new families'' level once a network is trained on it, and
+        stays right under re-sampling, against a matched per-process level'
+      if:
+      - 'arm new-43 median bias^2 <= 1.97x the control''s and below 0.859, subsets within 2 sd or below the control''s: per-event
+        level is the lever; written up for Joaquin'
+      - 'arm bias^2 > 1.97x the control''s: the trained network does not keep the per-event level; read where, own design'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
