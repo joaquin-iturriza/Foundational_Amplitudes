@@ -54185,3 +54185,8 @@ entries:
       if:
       - 'deformation visible: show where (which variable, which region)'
       - 'target barely changes: say so with the spread numbers'
+  owner:
+    agent: aa38370d51fc4097f
+    state: working
+    since: '2026-11-27T12:59:59+00:00'
+    state_at: '2026-11-27T12:59:59+00:00'
