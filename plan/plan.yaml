@@ -30266,6 +30266,7 @@ entries:
     '30': FA-ccin2p3-69de38db,FA-ccin2p3-48701a30,FA-ccin2p3-1a1c9a47,FA-ccin2p3-b6abfc18
     '29': step 30's fine-tunes FA-ccin2p3-69de38db 48701a30 1a1c9a47 b6abfc18 (read with step 30)
     '32': FA-ccin2p3-a8d68ffe
+    '33': FA-ccin2p3-c5a3365b
   handoff:
     state: '2026-11-27 ~08:55 @c39c066ff (synced; CC at 2081e2f87). Step 32 (slide 11 exact): MadEvent''s vector mode (any
       appended vector_size) is broken on CC MG5 3.7.0 for this setup (cards say 1000 GeV, log ''Set CM energy to 1000'', yet
