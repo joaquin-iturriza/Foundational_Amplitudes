@@ -45399,6 +45399,16 @@ entries:
       0.040 -> best 4.3e-4 at point 17, spike 2.1e-3 at 18, ends 6.9e-4; retrain 0.037 -> 3.4e-4 at the end, spike at 11.
       Figure figs/step27_level_per_event_heldout_per_process.png (Suprio''s layout). CC CPU job with --check-factor on the
       full arm CSV pending (detach step26_27_cpu_reads).'
+  - at: '2026-11-27T17:48:59+00:00'
+    text: '2026-11-27 step 26 scores (Breit-Wigner factor in the target, part (c)''s searched best HPs, FA-ccin2p3-4ba88991
+      scored by FA-ccin2p3-d55e8093; reads @3f4fbf82a data/step26_tprop_read.json): g g > t b~ w- / g g > b t~ w+ MSE of log|M|^2
+      1.16 / 1.23 (bias +0.42/+0.66) against c_best''s 36.9 / 35.5 (bias -5.66/-5.54) and the design''s bar 5.07/4.92: the
+      pair''s MSE passes. Held-out pooled RMSE 0.824 (c_best 1.178, LLM 0.721); new-43 median MSE 1.163 (c_best 0.979), median
+      bias^2 0.670 (0.314), below the LLM''s per-process median on 22 of 43 (c_best 26); relabels median MSE 5.4e-4 (7.1e-4);
+      seen pooled RMSE 0.0985 against c_best''s 0.0533 = 1.85x, beyond the 1.11x retrain spread: a side effect on the trained
+      processes. Validation (val_loss_no_reg, main stage, 20 points) falls -2.02 -> -6.26 with no spike, then the sigma stage.
+      Figure figs/step26_tprop_heldout_per_process.png. Near-pole contrast (factor_split --pole-run) pending: CC CPU job ccj_37031841e6dd,
+      detach step26_27_cpu_reads.'
   step_waits:
     '26': detach step26_27_cpu_reads (factor_split.py --pole-run on runs/llmcmp_c_tprop/trial_1860, CC CPU job ccj_37031841e6dd)
   handoff:
