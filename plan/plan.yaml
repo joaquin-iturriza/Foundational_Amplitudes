@@ -35457,19 +35457,21 @@ entries:
     - FA-ccin2p3-264b3f81
     - FA-ccin2p3-4fa87893
     - FA-ccin2p3-9f53a445
-    commit: bb35ba1a
+    commit: b87af60
     paths:
     - .claude/skills/figure-style/SKILL.md
     - .claude/skills/paper-writing-style/SKILL.md
     - /home/joaquin/drafts/fm_amplitudes_2026-11/paper.tex
     - /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/draft_sec2_pages.pdf
     - /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/overleaf_update_v5.zip
+    - analysis/bigrun/std_check.py
     - analysis/catalog_v3/collect_catft_curves.py
     - analysis/catalog_v3/data/catft_curves.json
     - analysis/catalog_v3/data/muon_ft_sep.json
     - analysis/catalog_v3/ft_curves_fig.py
     - analysis/catalog_v4/figs/paper_muon_ft.png
     - analysis/catalog_v4/figs/paper_unseen.png
+    - analysis/catalog_v4/kshot_level.py
     - analysis/catalog_v4/paper_sec3_figs.py
     - analysis/data_saving/data/example_cells.json
     - analysis/data_saving/example_reruns.py
