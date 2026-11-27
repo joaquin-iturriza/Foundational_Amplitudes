@@ -35993,6 +35993,14 @@ entries:
     text: '2026-11-26: Jean Zay still refuses ssh (site list UNREACHABLE; retry site run jeanzay FA -- hostname: connection
       refused at lpnclaude03.in2p3.fr:22), down since 2026-11-20; the bigrun data_stats.json exist only there (searched 2026-11-25).
       Step 4 re-waits to 2026-11-27.'
+  - at: '2026-11-27T00:08:03+00:00'
+    text: '2026-11-27: Jean Zay still refuses ssh (site list UNREACHABLE; retry site run jeanzay FA -- hostname: connection
+      refused at the relay lpnclaude03.in2p3.fr:22), down since 2026-11-20. Route around checked: the 448-process runs (compare_models/bigrun_arm.sh,
+      sweep_config_jeanzay_bigrun_baseline.yaml) standardize per dataset (data.preprocess_per_dataset=true) on the frozen
+      fiducial-cut pools $SCRATCH/datasets_scanbig_cut of recipes/scan_bigrun_100k.yaml; that pool dir does not exist on CC-IN2P3
+      (ls today), so the stds cannot be read or recomputed there without regenerating 448 pools. Every arm shares the data
+      flags (ARM_OVR changes only inputs/model), so the arms share the standardization by construction, to be confirmed on
+      the runs'' data_stats.json; GM_p(L_p sigma_p^2) = GM(L) x GM(sigma)^2 holds exactly. Step 4 re-waits to 2026-11-28.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
