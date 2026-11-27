@@ -30319,6 +30319,7 @@ entries:
   step_waits:
     '32': FA-ccin2p3-a8d68ffe
     '33': FA-ccin2p3-c5a3365b
+    '34': FA-ccin2p3-e095fc91 FA-ccin2p3-79f93bfc FA-ccin2p3-4a978179 FA-ccin2p3-aee64be1
   handoff:
     state: '2026-11-27 ~12:10 @05b4c69ac (CC synced at 33f188ffc). Step 30 read (finding ~12:00): held-out qqg fine-tunes
       FT1/FT0.1 (69de38db 48701a30 1a1c9a47 b6abfc18) miss every uug/uugg limit by 2-7 decades (log-MSE 3-46 vs SCR-A2 7e-5..0.06;
