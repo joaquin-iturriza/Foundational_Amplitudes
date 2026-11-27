@@ -355,16 +355,21 @@ BIGRUN = {"setup used": 4.86e-4,
           r"$+$ nonlinear emb.": 5.79e-4,
           r"$+$ nonlinear emb., $-$ colour": 6.81e-4,
           r"$+$ nonlinear emb., $-$ off-shellness": 8.63e-4}
+# The arms share one per-dataset standardization of log|M|^2 (analysis/bigrun/std_check.py: prepd_std identical in all
+# twelve arms' data_stats.json; the baseline's trial files are pruned, its sweep config has the same data settings), so
+# the geometric mean over processes of the MSE of log|M|^2 is the standardized one times GM_p(sigma_p^2) = 1.669
+# (Joaquin, figs3: 'why state that it's the standardized logM^2?').
+BIGRUN_VAR = 1.6690
 
 
 def inputs(ax):
     rows = sorted(BIGRUN.items(), key=lambda kv: kv[1])
     y = np.arange(len(rows))
-    ax.plot([v for _, v in rows], y, "o", color="k")   # black: the left panel's colours name its sets
+    ax.plot([v * BIGRUN_VAR for _, v in rows], y, "o", color="k")   # black: the left panel's colours name its sets
     ax.set_yticks(y); ax.set_yticklabels([k for k, _ in rows])
     ax.set_ylim(len(rows) - 0.5, -0.5); ax.set_xscale("log")
-    ax.set_xticks([4e-4, 6e-4, 8e-4], [r"$4\cdot10^{-4}$", r"$6\cdot10^{-4}$", r"$8\cdot10^{-4}$"]); ax.minorticks_off()
-    ax.set_xlabel("standardized MSE")
+    ax.set_xticks([7e-4, 1e-3], [r"$7\cdot10^{-4}$", r"$10^{-3}$"]); ax.minorticks_off()
+    ax.set_xlabel(MSE_LAB)
 
 
 if __name__ == "__main__":
