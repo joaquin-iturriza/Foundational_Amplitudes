@@ -267,7 +267,7 @@ def wake_fig(rep):
     bx.set_xticks(range(len(fields)), [t for _, t in fields])
     bx.set_ylabel("wakes, of 100")
     bx.set_xlabel("action against Opus's")
-    ps.legend(bx, "upper left")
+    ps.legend(bx, "upper right")
     ps.save(fig, "analysis/lab_llm_trial/figs/wake_dispatch")
 
 
