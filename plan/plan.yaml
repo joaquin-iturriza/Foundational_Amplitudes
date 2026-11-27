@@ -16481,6 +16481,10 @@ entries:
       (a pasted LaTeX template); 2026-11-13T06:45 (resampling); 2026-10-06T00:17 (old transfer plan); 2026-11-16T20:00 (a
       writing-style skill); 2026-10-15T13:07 and 2026-10-15T13:14 (an old design explanation, not how the gate counts)
     blocks: nothing
+    blocks_steps: []
+  - ask: 'Scope: the hook registration diff sent 2026-11-27 for the submission guard: go?'
+    at: '2026-11-27T13:52:45+00:00'
+    searched: 'site decisions: none on this diff; CLAUDE.md: hook registrations need his go'
     blocks_steps: &id001 []
   step_why:
     11:
@@ -18142,18 +18146,10 @@ entries:
       .claude/hooks/send_check.py tests/test_redesign_d.py tests/test_setup_scenarios.py tests/test_send_check_axes.py tests/test_mechanical_brief.py
       tests/test_hooks_real.py; scratchpad audit/ (hand-read cases)
     written: '2026-11-26T00:06:45+00:00'
-  ask: 'GPU budget: the site''s budget gate charges a new job its full time limit (it cannot know the real run time), so a
-    batch with generous limits is held even when its expected use fits (part (b): 275 GPU-h of limits for ~196 expected).
-    Should the gate charge the GPU-h each submission declares (--est-gpu-hours) instead, with the supervisor''s 2x-target
-    overrun alert still catching a run that goes long? That loosens your own budget check.'
-  waiting_since: '2026-11-25T05:54:49+00:00'
-  searched: D153, D242, D244, D511, D536 (budget amounts, silent on how the gate counts); 2026-11-25T01:10 (his question on
-    the gate, no choice); 2026-11-10T02:08 (draft and slide uploads); 2026-10-05T21:17 (a pin on an old plot); 2026-11-14T04:31
-    (a pasted LaTeX template); 2026-11-13T06:45 (resampling); 2026-10-06T00:17 (old transfer plan); 2026-11-16T20:00 (a writing-style
-    skill); 2026-10-15T13:07 and 2026-10-15T13:14 (an old design explanation, not how the gate counts)
-  blocks: nothing
+  ask: 'Scope: the hook registration diff sent 2026-11-27 for the submission guard: go?'
+  waiting_since: '2026-11-27T13:52:45+00:00'
+  searched: 'site decisions: none on this diff; CLAUDE.md: hook registrations need his go'
   blocks_steps: *id001
-  checked_until: '2026-11-26T18:21:01+00:00'
 - id: error_correlates
   title: What correlates with the error and the predicted uncertainty
   question: Beyond the largest |eta| and the collinearity (smallest pair invariant over s_hat), which event and process quantities
