@@ -30550,7 +30550,7 @@ entries:
       - 'no difference (mass regulates collinear): say so with numbers'
   step_waits:
     '32': FA-ccin2p3-680004d8
-    '34': FA-ccin2p3-82452f53
+    '34': FA-ccin2p3-a872c019
     '39': detach kit_hpo_ttg_plain (drive.py, 16 trials waves 6/5/5, target 0.55 h each; launched 2026-11-27 19:18 CET)
   handoff:
     state: '2026-11-27 ~20:45 CET (owner a1df8528ae678ee1d). Done this turn: step 36 closed (uugg held-out FT search 16/16,
