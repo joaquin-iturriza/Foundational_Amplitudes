@@ -42408,6 +42408,7 @@ entries:
     runs:
     - FA-ccin2p3-0165aa58
     - FA-ccin2p3-037bf5e1
+    - FA-ccin2p3-06b459fd
     - FA-ccin2p3-2c3a581b
     - FA-ccin2p3-31184b71
     - FA-ccin2p3-46d58dc0
@@ -42431,7 +42432,7 @@ entries:
     - FA-lxplus-b43687b7
     - FA-lxplus-cb9273f1
     - FA-lxplus-e48ee20a
-    commit: 1ca3514c0
+    commit: 27e579c69
     paths:
     - analysis/catalog_daniel/dancat_plain_mse.py
     - analysis/llm_compare/check_score_vs_preds.py
@@ -42445,6 +42446,7 @@ entries:
     - analysis/llm_compare/factor_split.py
     - analysis/llm_compare/heldout_per_process.py
     - analysis/llm_compare/level_source.py
+    - analysis/llm_compare/level_subsets.py
     - config/amplitudes.yaml
     - data_mmap.py
     - datagen.py
@@ -42457,6 +42459,7 @@ entries:
     - sweep/sweep_config_llmcmp_a_adamw_const.yaml
     - sweep/sweep_config_llmcmp_c_nooffshell.yaml
     - sweep/sweep_config_llmcmp_c_tprop.yaml
+    - sweep/sweep_config_llmcmp_level_file_s30.yaml
     - tests/test_alphas_input.py
     - tests/test_level_file.py
     - tests/test_memmap_data.py
