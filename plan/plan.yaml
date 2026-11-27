@@ -18103,6 +18103,16 @@ entries:
       as ''broke, folded'' (E9258, E8964, E8568), then the same run can reach a second record (7d2180f8 COMPLETED then FAILED)
       - left for the next owner to read. Part (b) has no real case yet: the only lxplus ssh failure since 11-24 was a connection
       reset during a maintain prune (E9213), not a down probe.'
+  - at: '2026-11-27T00:22:57+00:00'
+    text: '2026-11-27 step 36 done (D589): site submit <site> <project> <job> --interactive (detached srun on CC gpu_v100_interactive
+      through the site gate; ~/.local/bin/site, site_gate.py srun_detached, sites.toml interactive_partition, site-tool reference;
+      backups *.bak-20261127-interactive) and site pick allotting a batch under 1 GPU-h there when its GPUs are free (8 free
+      V100 vs ~9.3 h batch wait at the test). Probes of scripts/job_probe.sh: FA-ccin2p3-5019242c (slurm 64943443) ran 5 copies
+      (srun one task per allocated CPU), fixed by --ntasks=1; FA-ccin2p3-6d9a278c (64943457) one copy, cuda=True V100, gate
+      gpu_window 0.17 GPU-h declared; FA-ccin2p3-b0d50405 (64943489) polled by the supervisor and sorted finished clean on
+      RUN_DONE (E9632), no RUN event. All three sorted clean (exit 0 without a marker also counts clean, so job_probe''s RUN_DONE
+      line 3c8d9cad6 was not required). Not tested: a queued (not immediate) start; CC''s view of the srun client on the login
+      node.'
   handoff:
     state: '2026-11-26: D562 audit done (step 36: removed open-ask matcher 8da026b88, reply check at Stop 8e53d6eb0, brief_guard
       cut check 2022ad363; fixed send_check axes a675aee7a; kept the rest, see finding 2026-11-25). Owner misbooking fixed:
