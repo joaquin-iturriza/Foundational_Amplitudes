@@ -35647,9 +35647,9 @@ entries:
     - 4
   owner:
     agent: a78c473fc9aa32d21
-    state: working
+    state: stopped
     since: '2026-11-27T02:18:45+00:00'
-    state_at: '2026-11-27T02:18:45+00:00'
+    state_at: '2026-11-27T02:35:25.362000+00:00'
     context: 163617
     context_at: '2026-11-27T02:32:59+00:00'
   step_waits:
