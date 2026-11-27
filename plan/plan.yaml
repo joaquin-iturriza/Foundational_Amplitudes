@@ -43744,7 +43744,6 @@ entries:
       re-run (~2 x 16 GPU-h > 30: Joaquin''s go).'
   step_waits:
     '26': FA-ccin2p3-4ba88991
-    '27': repo-reviewer of branch level_events (eb99e2237, 83be936a8)
   handoff:
     state: 'Step 26 (target_propagators arm, design PASSED 2026-11-26T23:40, config sweep/sweep_config_llmcmp_c_tprop.yaml
       @581530563, code 1ca3514c0): prebuilds done, tp-meta gate passed (gg tbW pair and the five q q~ twin pairs carry the
