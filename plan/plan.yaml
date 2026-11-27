@@ -48528,6 +48528,18 @@ entries:
       (data/perevent_anchored_E.json); 2 bootstrap sd <- measured: 30 event resamples per subset (level_subsets.py, attempt
       E''s rule); 13 h <- measured: step 16''s own V100 rate ~0.75 s/step x 60,840; 100 GPU-h <- CLAUDE.md budget, D566 names
       the work'
+    passed_at: '2026-11-27T02:55:08+00:00'
+    reviewer: 'Step 27, three runs at step 16''s config: per-event anchored level (arm) vs the same 30-seed writer''s per-process
+      level (control) plus a same-seed control retrain. Configs differ from step 16''s only in sweep_name and the level files
+      (diff at 27e579c69). Same HPs hp1163, steps, batch, optimizer. MSE and Suprio''s target are the entry''s conditions.
+      Measure reach: a level input moved the new-43 median bias^2 from 0.859 to 0.122 in step 16, the network stayed a median
+      0.17 off its given level, and attempt E''s q_soft was 0.235 vs the constant''s 0.581. Noise: R_b is measured in this
+      setup by the retrain, and the earlier same-setup pair differed 5.2x (rerun_spread.json), so training is not deterministic.
+      Bar at one factor of R_b around g = sqrt(b_c b_r). Outcome is a non-overlapping YES/NO/UNRESOLVED split with sourced
+      thresholds (0.859, 0.369, 2 bootstrap sd, R_b). Writer gate from the seeds 0-2 log (0.497 > 0.369). Controls go out
+      on the gate. About 41 GPU-h, under 100 with D566. CC has 12G free vs ~5.5 GB. Searched docs/results.tex, the plan entry
+      and site decisions for level_events, per-event, anchored, level_file, retrain, rerun_spread, s30: only the D83 robustness
+      paragraph and attempts A-E, all cited.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
