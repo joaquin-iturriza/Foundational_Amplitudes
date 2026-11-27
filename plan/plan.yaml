@@ -43691,6 +43691,19 @@ entries:
       the CSV (CPU job ccj_cd451a6943d0, exit 0). The run FA-ccin2p3-4ba88991 stands (RUNNING, iteration 1 at 02:24). Smoke
       dir runs/zz_smoke/zz_smoke_sweep_config_llmcmp_c_tprop_64943393 left in place (its rm was refused by the permission
       classifier; not in the way: 13 GB free).'
+  - at: '2026-11-27T02:06:08+00:00'
+    text: '2026-11-27 step 25 (D566 attempt E) read, passed design (FA-ccin2p3-d34fae85, perevent_level.py --anchored --anchor
+      map @579d356ad, data/perevent_anchored_E.json @a1fbf982a, figs/perevent_anchored_E.png by perevent_anchored_fig.py @a1fbf982a).
+      References reproduce (shared 44.7 vs 47, regressor 0.0466 vs 0.044). 43 new, ten-ensemble median (min-max) of the new-set
+      median level error, bar = regressor_ens max 0.369: regressor_ens 0.219 (0.098-0.369); D_sqE ridge 0.383 (0.154-0.796,
+      = attempt D); E_sqE_net 0.415 (0.115-1.92) partly; E_sqE_kin 0.358 (0.101-0.922) KEPT; E_sqE_hgb 0.307 (0.094-1.59)
+      KEPT; own median 0.182. Subsets s_lo/s_hi/q_hard/q_soft (boot sd): kin 0.377/0.285/0.336/0.235 (s_lo above the bar by
+      0.008 but e_S-e_all 0.019 < 2 sd 0.052: within) and on q_soft, the only subset where the constant moves (regressor_ens
+      0.581 vs 0.219), below it by 0.346 > 2 sqrt(0.051^2+0.048^2)=0.140: kin PASSES both (YES); hgb 0.281/0.300/0.378/0.285:
+      q_hard 0.378 above the bar and 0.071 above its e_all > 2 sd 0.034: fails sampling. Anchor miss on new (L, q, E in sx):
+      ridge 0.158/0.464/0.211, net 0.057/0.255/0.117, kin 0.099/0.159/0.095, hgb 0.061/0.104/0.007. Caveats: kin''s pass is
+      at the bar''s edge (0.358 vs 0.369) and its ensembles spread wider than the control''s (max 0.922 vs 0.369; 3 of 10
+      above 0.49). Design branch YES (kin map): next its training-run design (per-event level replacing the level file).'
   step_waits:
     '26': FA-ccin2p3-4ba88991
   handoff:
