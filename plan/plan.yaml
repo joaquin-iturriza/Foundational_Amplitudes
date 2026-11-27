@@ -45425,9 +45425,7 @@ entries:
       ends of the input, figs/c_tprop_factor_split_offshell_6_tbw.png). Costs: seen pooled RMSE 1.85x c_best''s, new-43 median
       MSE 1.163 vs 0.979, H+tau processes up. Next per the design''s feature rule: the factor is not judged at trial_1860''s
       HPs alone; the 8-trial DyHPO search for this arm, best against part (c)''s best, ~128 GPU-h > 100: Joaquin''s go.'
-  step_waits:
-    '28': 'step 26''s near-pole read (detach step26_27_cpu_reads): its branch decides step 28''s base config (c_latest, or
-      c_tprop if part (c) takes the Breit-Wigner factor)'
+  step_waits: {}
   handoff:
     state: 'Step 27 (per-event anchored level, D566, design PASS 2026-11-27T02:55): all three training runs COMPLETED at step
       16''s config with trial 5''s HPs: arm FA-ccin2p3-0d409c4e (sweep/sweep_config_llmcmp_level_events.yaml @e3aed380f, runs/llmcmp_level_events_s30/trial_7201),
