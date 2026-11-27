@@ -172,6 +172,11 @@ def report(R):
                                         "z_events": float(np.mean(zw)), "z_mse": float(lr2[zw].sum() / lr2.sum()),
                                         "top_mse": float(lr2[top].sum() / lr2.sum()),
                                         "top_over_rest": float(np.median(ad[top]) / np.median(ad[~top]))}
+    for probe, d in J.items():   # over the arms: the Z window's share of events and of the MSE (percent), the top/rest range
+        a = list(d.values())
+        d.update(z_ev_pct=100 * a[0]["z_events"], z_mse_pct_lo=100 * min(x["z_mse"] for x in a),
+                 z_mse_pct_hi=100 * max(x["z_mse"] for x in a), tor_lo=min(x["top_over_rest"] for x in a),
+                 tor_hi=max(x["top_over_rest"] for x in a))
     return J
 
 
