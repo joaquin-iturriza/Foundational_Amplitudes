@@ -79,7 +79,7 @@ RUN = {"lpp1": 0, "lpp2": 0, "ebeam1": 500.0, "ebeam2": 500.0, "fixed_ren_scale"
        "mmjj": 0.0, "ptheavy": 0.0, "use_syst": "False", "cut_decays": "False"}
 
 
-VEC = 1024        # MadEvent's vector_size: events per surrogate call
+VEC = int(os.environ.get("KIT_MC_VEC", 1024))   # MadEvent's vector_size: events per surrogate call
 KITSURR = """      SUBROUTINE KITSURR(P, OUT, N)
 C     kit_mc_madgraph --surrogate: OUT(i) *= |M_hat|^2/|M|^2 at P(:,:,i), from the serve process ($KIT_SURR_CMD) over
 C     two FIFOs: sent M, NEXTERNAL (int32) and P of the M events with OUT /= 0, read M ratios (float64)
