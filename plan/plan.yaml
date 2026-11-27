@@ -28430,6 +28430,10 @@ entries:
       from runs/data_saving/dsave_parent_finale_kit_heldoutqqg_a2, best FT against SCR-A2 (FA-ccin2p3-6f1a5dad, ff4af2bc);
       prior to read first: the factor''s per-leg coefficients the parent hands over (wrappers._asym_mu) and the target_stats=own
       re-standardization, which an lr search may not reach'
+    35: '35: Fair one-loop FT redo after the asym_sd fix (@ff4f2e0cf): the 5 fair FT runs (D=100..1e4, parent dsave_parent_finale_kit_fairnlo_a2)
+      at their unchanged stage-2 HPs (searched from the non-A2 treesin_r4 parent, so not touched by the bug), tags fairnlo_ftfix_d<D>;
+      readout as step 29 (kit_figures collect, kit_readout --slide10, the three fair slide-10 figures and deck slides 22-24
+      redrawn), FT vs SCR-A2 and VB per the 2026-11-26 02:29 design'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -30316,6 +30320,12 @@ entries:
       if:
       - 'best FT beats SCR-A2: transfer, positive'
       - 'neither: report to Joaquin that pretraining with the family held out does not carry the limits, with what was searched'
+    35:
+      feeds: 'D570/D575: Bakar''s fair NLO protocol, does the pretraining transfer one-loop structure'
+      if:
+      - 'FT BEATS SCR-A2 or VB on a hard family: the transfer statement per the passed design''s branches (a)/(b), deck redrawn'
+      - 'FT not better than SCR-A2: branch (c), no transfer from tree + 4 bulk one loops, deck redrawn with the corrected
+        runs'
   step_waits:
     '32': FA-ccin2p3-a8d68ffe
     '33': FA-ccin2p3-c5a3365b
