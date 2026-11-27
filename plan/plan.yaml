@@ -36131,6 +36131,13 @@ entries:
       floor 0.56; one loop 0.80 -> 0.52, floor 0.47; other six axes'' zero-shot within 0.003-0.16 of their floor (2->5 0.70
       vs 0.54, 2->4 0.46 vs 0.38); one event raises the error on every axis (top 1.10). Second seed agrees (top 0.87/0.62/0.55,
       one loop 1.00/0.54/0.49). Draft 6e30dac; fresh section reviewer running.'
+  - at: '2026-11-27T02:34:02+00:00'
+    text: '2026-11-27 done: draft 14b5142 (63 pp, overfulls 9, as before). Fig. 18 every panel its own full legend (FA 953bb799);
+      Sec. 5.7 ''A few events of a new process remove the zero-shot bias'' with the talk''s figure redrawn on catalog_v4 short
+      (kshot_level.py --paper @953bb799, data e33ca4ec). Fresh section reviewer FIX (heading, split as plotted, one anchor,
+      caption, data commit), FIX (0.07 -> 0.06 unrounded, 2->4 not ''well above''), PASS. PDF scratchpad draft_sec57_final.pdf.
+      Pre-existing in Joaquin''s 70b42cd: stray line 20 of paper.tex ''{\noindent\makebox[\textwidth][c]{#1}}'' gives ''Missing
+      \begin{document}'' (compiles on), left as he wrote it.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
