@@ -30489,6 +30489,26 @@ entries:
       target overfits; the searched emission arm (own HPs) is better in the soft limit (uug soft deepest 0.56 vs 227) but
       still 6x / 3x above the factor there. Verdict per the passed design: factor win (uugg flagged as in the design: its
       factor control fails the curve check, a factor win stands). KIT package and the draft keep the factor.'
+  - at: '2026-11-27T15:42:13+00:00'
+    text: '2026-11-27 ~17:40 UTC (owner a1df8528ae678ee1d). (1) Step 36 read (E9802): held-out qqg uugg fine-tune search kit_hpo_uugg_ft_heldoutqqg,
+      14/16 trials returned (2 failed on EOS I/O, retried FA-lxplus-d5b580a2/3e5b78e2), 9 pass curve_quality; chosen hp1289
+      val mu-MSE 1.97e-4 (sep 2.43); trial_1289 KIT-scored (FA-ccin2p3-a10cf427) and collected into kit_fig_heldoutqqg.json
+      @787658287 as heldoutqqg_ftbest. Against SCR-A2 uugg (FA-ccin2p3-ff4af2bc), log10(FT/SCR log-MSE) per stratum, median
+      [range]: bulk +0.12, coll_gg +0.14 [+0.13,+0.18], coll_qg +0.26 [+0.05,+0.44], azimuth +0.13 [+0.10,+0.15], soft +0.65
+      [+0.32,+0.84]; deepest bins FT/SCR: bulk 8.11e-5/6.14e-5, g->gg 0.023/0.017, q->qg 0.063/0.056, soft 0.092/0.021, azimuth
+      0.024/0.018; exponents FT -0.99/-0.98/-1.99 vs truth -0.99/-0.97/-2.00. Every family slightly worse, all inside the
+      bar 1/7..7 (worst stratum 6.9x, soft x): no family BEATS, so per the design no transfer of the uugg limits at this pretraining
+      once the fine-tune is tuned; no A2 scratch search triggered. kit_slide10_heldout redrawn with the arm ''fine-tuned,
+      searched'' (legend font smaller so the rows are not squeezed), deck rebuilt 26 pages 0 errors. (2) Step 33 read: u u~
+      g g slide 11 exact, combine FA-ccin2p3-ddd2e7a7 (50 parts, chi2/dof 0.68): sigma_hat 0.0197574 +- 2.2e-5 pb on |M_hat|^2
+      vs sigma 0.0198228 +- 2.3e-5 pb: sigma_hat/sigma - 1 = -0.0033 +- 0.0016; reweighted exact events E_exact[u]-1 = -0.00135
+      +- 0.00012; difference 1.2 MC errors: wiring sound. eps2 = <r>/r_max on the surrogate''s events: 0.877 (q 0.99), 0.742
+      (0.999), 0.585 (0.9999), 0.389 (max of 1e5); r_max 1.14/1.35/1.71/2.58. Figure kit_mc_slide11_tree (u u~ g g only; u
+      u~ g waits on step 32) @b41e496e3, frame added to the reply deck @4e37ea0ea. (3) Step 39 build ccj_3a07615b7f4f failed
+      its own soft check: soft_x 1e-7..1e-6 median log10|M|^2 0.024, slope -0.003 (expected -2): the sm card''s top width
+      saturates the top propagator next to the soft gluon at 1/(m_t Gamma_t) once 2p_t.k < m_t Gamma_t (x < ~5e-4). Fixed
+      @1f216b9a3 (WT = 0: external stable tops, the tree''s exact soft limit), rebuild submitted (same command, CC job 65003701).
+      (4) E9821 was no failure (CCJ_NO_RESULT of two just-submitted CPU reads, read later by the previous owner @60777007a).'
   step_why:
     32:
       feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
