@@ -28425,6 +28425,11 @@ entries:
       array FA-ccin2p3-66fc3d1c (seeds 1001-1050, default card, 8 CPUs, target 1.5 h) -> surr_combine FA-ccin2p3-c5a3365b
       into runs/kit/mc_madgraph; on its end: wiring check sigma_hat/sigma vs E_exact[u], eps2, numbers into the reply deck;
       read the first parts'' serve stats against the 1.5 h estimate'
+    34: 'Held-out qqg A2, next attempt (the passed design''s ''neither'' branch, finding 2026-11-27 ~12:00: FT1/FT0.1 miss
+      every uug/uugg limit by 2-7 decades, SCR-A2 does not): design a kit_hpo_tt_ft_r5-style FT search per process (uug, uugg)
+      from runs/data_saving/dsave_parent_finale_kit_heldoutqqg_a2, best FT against SCR-A2 (FA-ccin2p3-6f1a5dad, ff4af2bc);
+      prior to read first: the factor''s per-leg coefficients the parent hands over (wrappers._asym_mu) and the target_stats=own
+      re-standardization, which an lr search may not reach'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -30277,6 +30282,11 @@ entries:
       if:
       - 'wiring within 3 MC errors: numbers to Joaquin in the deck'
       - 'beyond: KITSURR or combine fault, fix and rerun'
+    34:
+      feeds: 'Bakar: does the model get the limits without hard data when pretrained with the target family held out'
+      if:
+      - 'best FT beats SCR-A2: transfer, positive'
+      - 'neither: report to Joaquin that pretraining with the family held out does not carry the limits, with what was searched'
   step_waits:
     '32': FA-ccin2p3-a8d68ffe
     '33': FA-ccin2p3-c5a3365b
