@@ -44268,7 +44268,7 @@ entries:
     blocks_steps: &id004 []
   owner:
     agent: a854c89e3ac6e6139
-    state: working
+    state: closed
     since: '2026-11-27T17:31:49+00:00'
     state_at: '2026-11-27T18:42:15.862000+00:00'
     context: 173613
@@ -45427,36 +45427,25 @@ entries:
       HPs alone; the 8-trial DyHPO search for this arm, best against part (c)''s best, ~128 GPU-h > 100: Joaquin''s go.'
   step_waits: {}
   handoff:
-    state: 'Step 27 (per-event anchored level, D566, design PASS 2026-11-27T02:55): all three training runs COMPLETED at step
-      16''s config with trial 5''s HPs: arm FA-ccin2p3-0d409c4e (sweep/sweep_config_llmcmp_level_events.yaml @e3aed380f, runs/llmcmp_level_events_s30/trial_7201),
-      control FA-ccin2p3-220f71a8 (sweep_config_llmcmp_level_file_s30.yaml @4fd363b3c, runs/llmcmp_level_file_s30/trial_7101),
-      retrain FA-ccin2p3-540fc068 (trial_7102); RESULT_JSON val_loss 5.80e-4 / 4.31e-4 / 3.39e-4 (each in its own z, not comparable:
-      compare in log|M|^2 only). Arm smoke FA-ccin2p3-2fbcce14 passed D395; its held-out read passed the factor check (p99
-      9.2e-5, max 3.6e-3 < 1e-2; step 28 done). Step 27 waits on the scores FA-ccin2p3-c18c9887 (arm), -cd724930 (control),
-      -dff2eadb (retrain) (job_llm_score.sh EVENTS=1, seen + held out, 4 h limit, target 3 h). On their end, per the passed
-      design: level_subsets.py --runs level_file_s30=<7101 csv> level_file_s30_retrain=<7102 csv> level_events_s30=<7201 csv>
-      --check-factor analysis/catalog_daniel/data/level_events_E_kin_s30.json (CPU job, site --timeout 900 run --job; CSVs
-      runs/<sweep>/trial_<i>/llm_events_heldout.csv); rerun_spread.py --a level_file_s30 --b level_file_s30_retrain --out
-      rerun_spread_level (R_b = median_bias2_ratio, g = sqrt(b_c b_r)); outcome YES if b_a <= g R_b and 0.859/b_a > R_b, NO
-      if b_a > g R_b, else UNRESOLVED (Joaquin: second arm seed ~13 GPU-h); sampling: each subset''s arm level error minus
-      its all-events value within 2 bootstrap sd; heldout_per_process.py (Suprio''s layout, analysis/llm_compare/suprio_llm_heldout_fig.png)
-      with arm and control; new-43/relabels/seen numbers and held-out pooled RMSE vs the LLM''s 0.721 and step 16''s 0.969.
-      Step 26 (target_propagators arm, design PASS 2026-11-26T23:40): run FA-ccin2p3-4ba88991 COMPLETED (runs/llmcmp_c_tprop/trial_1860,
-      sigma stage 1.94 h); waits on its score FA-ccin2p3-d55e8093; then factor_split --pole-run on runs/llmcmp_c_tprop/trial_1860,
-      level_file_read.py --tags c_best c_tprop, heldout_per_process.py with c_best and c_tprop, factor_split --fig --panels
-      tbw for both, read per its design.'
-    decisions: 'Joaquin''s: D522-D528, D536, D537, D553, D564, D566, D567, D576-D579, D584-D589. Mine (re-justify): earlier
-      (i)-(lviii); (lix) the arm run went out in parallel with its smoke''s held-out read (training does not read it; the
-      fail branch would have cancelled it); the read passed; (lx) the four scoring jobs went out together (one wave, 5 at
-      once offered).'
-    ruled_out: As before; D566 attempts A-D dead ends; attempt E ridge/network-only/tree anchor maps; step 15's even-spread
-      hypothesis.
-    running: FA-ccin2p3-c18c9887, -cd724930, -dff2eadb (step 27 scores), FA-ccin2p3-d55e8093 (step 26 score)
-    files: 'sweep/sweep_config_llmcmp_level_events.yaml, sweep/sweep_config_llmcmp_level_file_s30.yaml, sweep/sweep_config_llmcmp_c_tprop.yaml,
-      analysis/llm_compare/level_subsets.py, analysis/llm_compare/rerun_spread.py, analysis/llm_compare/heldout_per_process.py,
-      analysis/llm_compare/factor_split.py, analysis/llm_compare/level_file_read.py, tools/llm_score.py, scripts/job_llm_score.sh;
-      CC-only: analysis/catalog_daniel/data/level_events_E_kin_s30.json, level_file_B_diag_s30.json, runs/zz_smoke/zz_smoke_sweep_config_llmcmp_level_events_64949743/level_subsets_smoke.json'
-    written: '2026-11-27T17:07:36+00:00'
+    state: 'Steps 26 and 27 read and recorded (findings 2026-11-27). Step 27 (per-event level, D566): level YES (new-43 median
+      bias^2 arm 0.183 vs control 0.300 / retrain 0.159, R_b 1.88), sampling FAIL (arm s_lo/s_hi 0.094/0.128 vs 0.183 all;
+      controls move <= 0.021): per-event level adds nothing; dead end F recorded. Step 26 (Breit-Wigner target): PARTLY: pair
+      MSE 1.16/1.23 (bar 5.07/4.92), near-pole contrast -0.29/-0.32 (c_best -2.49/-2.48, bar -0.19), seen pooled 1.85x worse,
+      held-out pooled 0.824 vs 1.178. Ready: step 28 = design the per-process level in part (c)''s setup (base c_latest; needs
+      a writer of the emission-scale target''s per-process means: perevent_level.py write_level_events; experiment.py level_file
+      block l.2380-2440 sets shared_standardization means). Step 29 held by the open ask (128 GPU-h DyHPO for the tprop arm).
+      Pending, not blocking: level_subsets --check-factor on the full arm CSV, CC CPU job 65022161 (ccj_76132d8ad315; read
+      with the same site run --job command; the first result was consumed unread).'
+    decisions: 'Joaquin''s: as before (D522-D528, D536, D537, D553, D564, D566, D567, D576-D579, D584-D589). Mine (re-justify):
+      (lxi) sampling verdict of step 27 taken by the design''s 2-bootstrap-sd rule even though the arm moves downward; (lxii)
+      step 28''s base config c_latest, not c_tprop, since part (c) takes the factor only after its search; (lxiii) level_subsets
+      numbers read locally from the fetched CSVs (same files) while the CC check-factor job waited.'
+    ruled_out: As before; D566 attempt F (per-event anchored level in training).
+    running: CC CPU job 65022161 (level_subsets --check-factor), not waited on
+    files: analysis/llm_compare/{level_subsets,rerun_spread,level_file_read,heldout_per_process,factor_split}.py; data/step27_level_read.json,
+      level_subsets.json, rerun_spread_level.json, step26_tprop_read.json, c_tprop_factor_split.json; figs/step27_level_per_event_heldout_per_process.png,
+      step26_tprop_heldout_per_process.png, c_tprop_factor_split_offshell_6_tbw.png
+    written: '2026-11-27T18:45:07+00:00'
   designs:
   - at: '2026-11-22T04:13:14+00:00'
     question: 'Part (a), D525: in the conditions of Suprio''s LLM pID run (D524, D526, D527: our catalog_daniel regeneration
