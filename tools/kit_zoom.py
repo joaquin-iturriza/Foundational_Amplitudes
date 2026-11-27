@@ -331,6 +331,30 @@ def plot(figs):
                 ps.process_label(ax, PROCESS[p], loc="upper right")
             _legend(axs, spare, PROCESS[p], (0, "lower left"))
             written.append(ps.save(fig, os.path.join(figs, f"kitzoom_median_{p}")))
+    # the draft's median figure (kit_vs_mlp kitvm_paper_median: u u~ g collinear and soft, t t~ high energy in TeV and
+    # threshold, whole strata) with median |Delta| in place of the median log|M|^2 (D604)
+    fig, axs = ps.figure(ncols=2, nrows=2)
+    axs = list(np.ravel(axs))
+    for i, (p, fs) in enumerate((("ee_uug_me2", ("coll_y", "soft_x")), ("ee_tt_virt_finite", ("sudakov_sqrts", "threshold_beta")))):
+        rows = []
+        for f in fs:
+            b = d[p]["fams"][f]["all"]
+            sx = 1e-3 if f == "sudakov_sqrts" else 1.0
+            rows.append((sx * np.asarray(b["x"]), {"sty": _arms(p), "y": {a: _seedmed(r, "relmed") for a, r in b["arms"].items()}}, None))
+        labs = iter(fs)
+        _panels(ps, axs[2 * i:2 * i + 2], rows, lambda ax: (lambda f: r"$\sqrt{s}$ [TeV]" if f == "sudakov_sqrts" else XLAB[f])(next(labs)),
+                (MEAS_TT if p.startswith("ee_tt") else MEAS)["relmed"], PROCESS[p], cap=CAP["relmed"])
+    axs[2].set_xticks([2, 5, 10, 20, 50], ["2", "5", "10", "20", "50"])
+    from tools.kit_vs_mlp import LEG_PT, PAPER_OFF
+    for i in (1, 3):   # one legend per process row, as the draft's
+        hl = {}
+        for a in axs[i - 1:i + 1]:
+            for h, l in zip(*a.get_legend_handles_labels()):
+                hl.setdefault(l, h)
+        if PAPER_OFF in hl:
+            hl[PAPER_OFF] = hl.pop(PAPER_OFF)
+        ps.legend(axs[i], "lower left", handles=list(hl.values()), labels=list(hl), fontsize=LEG_PT)
+    written.append(ps.save(fig, os.path.join(figs, "kitzoom_paper_relmed")))
     # the core, every process: both measures side by side
     fig, (a1, a2) = ps.figure(ncols=2)
     for k in ORDER:
