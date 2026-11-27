@@ -28407,8 +28407,10 @@ entries:
   - D572
   - D573
   next:
-    24: 'Fair one-loop FT at every D when the parent FA-lxplus-828d67d6 (runs/data_saving/dsave_parent_finale_kit_fairnlo_a2)
-      ends: fairnlo_arms.py FT lines, then read FT vs SCR-A2 vs V/B per D (design PASS 2026-11-26T02:27 / 13:00)'
+    24: 'Fair one-loop FT at every D from the real parent (FA-lxplus-828d67d6 done 2026-11-26 21:16, copied to CC): FT runs
+      FA-ccin2p3-5819e2fe FA-ccin2p3-e5c41742 FA-ccin2p3-27013dea FA-ccin2p3-aca0bcaa FA-ccin2p3-2128f5f5 (fairnlo_arms.py
+      FT lines, limit 1:00, target 0.25 h); on their end KIT-score read FT vs SCR-A2 vs V/B per D (design PASS 2026-11-26T02:27
+      / 13:00), with the parent''s and arms'' curves'
     29: 'Slide-10 metrics never reported: bias, 99th percentile, |M|^2-weighted relative error per bin and the azimuth harmonic
       h (computed by his evaluate.py, kit_result.json) into the slide-9-style summary for A2 (fine-tunes when they exist)'
     30: 'Protocol A pretrained, ee_qqg/qqgg families held out, A2, uug/uugg (D575, design PASS): parent smoke FA-ccin2p3-42ae3468
