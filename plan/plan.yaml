@@ -30220,6 +30220,15 @@ entries:
       is fixed before the 1e5 jobs go (one forward per call, cached per-process setup, or MadEvent''s vector mode repaired).
       Vector-mode check: the kept exact vec-32 work dir compiled every Source/lib/P1 object after vector.inc (04:48:47-49),
       so no stale objects; local MG5 is the same 3.7.0.'
+  - at: '2026-11-27T08:21:12+00:00'
+    text: '2026-11-27 ~07:30. Slide-11 diagnosis 2, surrogate at MadEvent''s default card FA-ccin2p3-de4314f4 (log read):
+      gen passed every check (standalone 3.7e-13, server = kit_predict 0.00) and the sqrt-s guard: 2000 uug events at 1000
+      GeV, MadEvent on |M_hat|^2 gives sigma_hat 0.121975 +- 0.000844 pb vs exact 0.121861 (1e5 run): sigma_hat/sigma - 1
+      = +9.4e-4 +- 7e-3, consistent with E_exact[u]-1 = -1.68e-3 (wiring sound at this precision). The job then stopped at
+      predict on the exact sample, which this diagnosis dir does not hold (runs/kit/mc_madgraph has it): expected, not a fault.
+      Cost: 199k one-event serve calls for 2000 events (~100 per event, survey included), 69 ms per call, 1 h 48 min wall
+      (refine ran 2 serves in parallel). So the default card is the route for slide 11; the per-call cost is being cut (one
+      forward per call, cached catalog lookup) before the 1e5 jobs.'
   step_why:
     29:
       feeds: Bakar's slide-10 metrics reported
