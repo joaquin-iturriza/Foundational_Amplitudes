@@ -58,10 +58,14 @@ RUNS = {"ee_uug_me2": {"factor": ["runs/kit/kit_A_ee_uug_me2_n100000_t1831_hpo_a
 FAMS = {"ee_uug": {"coll_y": ("y", "x", (0.45, 0.55)), "soft_x": ("x", "a", (0.28, 0.32))},
         "ee_uugg": {"coll_gg_y": ("ygg", "z", (0.33, 0.37)), "coll_qg_y": ("yqg", "xg", (0.25, 0.35)),
                     "soft_x": ("x", "a", (0.14, 0.17))},
-        "ee_tt": {"threshold_beta": ("beta", None, None), "sudakov_sqrts": ("sqrts", None, None)}}
+        "ee_tt": {"threshold_beta": ("beta", None, None), "sudakov_sqrts": ("sqrts", None, None)},
+        # t t~ g (step 39): soft at gluon-top 1 - cos in [0.8, 1.2] (uniform top direction in the pair frame), the
+        # quasi-collinear family at x in [0.25, 0.35] (generated 0.2-0.4), the pair threshold has no second variable
+        "fa_ee_ttg": {"soft_x": ("x", "ctg", (0.8, 1.2)), "coll_tg": ("ctg", "x", (0.25, 0.35)),
+                      "threshold_beta": ("beta", None, None)}}
 # bulk variable -> the limit's exponent of |M|^2 (None: an upper cut instead)
 BULKV = {"ee_uug": {"x": -2, "y": -1}, "ee_uugg": {"x": -2, "ygg": -1, "yqg": -1},
-         "ee_tt": {"beta": -1, "sqrts": None}}
+         "ee_tt": {"beta": -1, "sqrts": None}, "fa_ee_ttg": {"x": -2}}
 SQRTS_MAX = 1739.0
 
 SITE = r'''
@@ -90,6 +94,11 @@ def variables(stem, p):
         ymin = np.where(k == 0, np.minimum(yqg[:, :2].min(1), ygg), np.minimum(yqg[:, 2:].min(1), ygg))
         return {"x": xs, "ygg": ygg, "yqg": yqg.min(1), "z": e.min(1) / e.sum(1),
                 "xg": 2 * e[np.arange(len(e)), gj] / rs, "a": ymin / xs, "yqg4": yqg, "xg2": 2 * e / rs[:, None]}
+    if stem == "fa_ee_ttg":   # tools/kit_ttg.py: x of the gluon, 1 - cos of its angle to the top, beta of the pair
+        t, tb, g = p[:, 2], p[:, 3], p[:, 4]
+        ctg = 1 - (t[:, 1:] * g[:, 1:]).sum(-1) / (np.linalg.norm(t[:, 1:], axis=1) * np.linalg.norm(g[:, 1:], axis=1))
+        tt = t + tb
+        return {"x": 2 * g[:, 0] / rs, "ctg": ctg, "beta": np.sqrt(np.clip(1 - 4 * dot(t, t) / dot(tt, tt), 1e-30, None))}
     t = p[:, 2]
     return {"beta": np.sqrt(np.clip(1 - 4 * dot(t, t) / s, 1e-30, None)), "sqrts": rs}
 def measures(d):
