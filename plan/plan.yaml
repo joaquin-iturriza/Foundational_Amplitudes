@@ -35448,11 +35448,6 @@ entries:
     3: 'Het loss vs MSE (Fig. 9, removed from the draft by Joaquin 2026-11-13): come back to it. The het network leaves ~1-11%
       of 2->2 test events unfitted with large sigma (median |Delta| better 118/146, MSE worse on most 2->2); evaluation checked,
       no bug; training precision not checked'
-    4: 'Fig. 14 right on MSE(log|M|^2) (Joaquin figs3: ''why state that it''s the standardized logM^2? is it different from
-      everything else we are showing?''): read the 448-process arms'' per-process standardization (data_stats.json prepd_std,
-      the site holding the bigrun runs, analysis/bigrun/arms_best.py) and plot GM over processes of MSE(log|M|^2) (= GM loss
-      x GM std^2 if every arm shares the standardization; check it does); x label MSE(log|M|^2); caption without the standardization
-      sentence. Labels stay the fifth version (reviewed).'
     5: 'D591: fix Fig. 17 top-row panel 2 legend; restore in Sec. 5 the result that a zero-shot bias is fixed by a few points
       (Joaquin''s draft zip 09a1eb51-fm_amplitudes.zip)'
   done_when: null
@@ -35641,7 +35636,6 @@ entries:
     context_at: '2026-11-27T02:00:41+00:00'
   step_waits:
     '3': '2026-12-15: deferred, marked for later on 2026-11-17; no run'
-    '4': '2026-11-28'
   findings:
   - at: '2026-11-13T02:46:58+00:00'
     text: '2026-11-13 ~03:50 Joaquin: ''we should start actually doing the work on the draft with what we have ... Let''s
@@ -36397,11 +36391,6 @@ entries:
       if:
       - 'Joaquin returns to it: design the follow-up he asks for'
       - 'never: stays out of the paper'
-    4:
-      feeds: a Fig. 14 right on the same quantity as every other figure
-      if:
-      - 'every arm shares one standardization: replot, rebuild, send'
-      - 'arms differ in standardization: recompute per-process MSE from each run''s metrics and say so'
     5:
       feeds: 'D591: the draft''s Sec. 5 carries the few-point bias correction and Fig. 17''s legend is right'
       if:
