@@ -45442,6 +45442,17 @@ entries:
       p99 |log_factor + b.(x-x0)/sx| < 1e-2 holds on every held-out event; subset numbers equal the local read (arm all/s_lo/s_hi
       0.183/0.094/0.128). The output line with the p99 value was cut in the read (tail) and the re-read resubmitted the job
       (65022645, unread, harmless).'
+  - at: '2026-11-27T19:20:43+00:00'
+    text: '2026-11-27 ~20:15 step 28: design PASSED (design-reviewer, after one FIX: sigma kept at c_best''s pooled shared
+      sigma via new data.level_file_sigma=shared, config diff vs trial_1860''s config.yaml by tools/cfg_diff.py (24 keys,
+      only data.level_file/_sigma functional), c_best eval-only re-score added, disk read). Code @264f7c8cf (repo-reviewer
+      pass): perevent_level.py --feat/--tag writes level files of a config''s target log(|M|^2 F) with its target and argv
+      recorded; experiment.py refuses a level file whose target differs from the run''s factor. Submitted on CC, code @48b09d329:
+      the 30-seed writer FA-ccin2p3-b07e2464 (job_perevent_level.sh PEL_WRITE=1 PEL_SEEDS=30 PEL_TAG=_phys PEL_FEAT = c_latest''s
+      feat dirs; GATE: new-43 median nat^2 bias < 0.314) and c_best''s held-out re-score FA-ccin2p3-825c02e8 (REREAD=FA-ccin2p3-29ce8950,
+      ONLY=heldout EVENTS=1, interactive V100). Next on the writer: read its check, fetch and commit level_file_B_diag_s30_phys.json,
+      sync, D395 smoke of sweep/sweep_config_llmcmp_c_level.yaml, then on SMOKE_EXIT 0 the arm (trial 2860) + same-seed retrain
+      (2861) at trial_1860''s HPs where site pick places them (lxplus at pick time), wall target 16 h.'
   step_waits:
     '28': FA-ccin2p3-b07e2464 FA-ccin2p3-825c02e8
   handoff:
