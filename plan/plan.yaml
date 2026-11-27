@@ -43653,7 +43653,7 @@ entries:
       (scripts/job_config_smoke.sh sweep/sweep_config_llmcmp_c_tprop.yaml 50, 20G, 2 h limit) submitted.'
   step_waits:
     '25': FA-ccin2p3-d34fae85
-    '26': FA-ccin2p3-776cdd69
+    '26': FA-ccin2p3-4ba88991
     '27': FA-ccin2p3-583cc541
   handoff:
     state: 'Step 26 (target_propagators arm, design PASSED 2026-11-26T23:40, config sweep/sweep_config_llmcmp_c_tprop.yaml
