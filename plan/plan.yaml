@@ -18122,6 +18122,16 @@ entries:
       RUN_DONE (E9632), no RUN event. All three sorted clean (exit 0 without a marker also counts clean, so job_probe''s RUN_DONE
       line 3c8d9cad6 was not required). Not tested: a queued (not immediate) start; CC''s view of the srun client on the login
       node.'
+  - at: '2026-11-27T05:01:34+00:00'
+    text: '2026-11-27 site-pick unit leak fixed in code (merge 7aff5591c, review PASS at 3f627e429): submit_guard reserve
+      mode (PreToolUse holds the unit, checked and written under one flock on placement/.lock), spend mode (PostToolUse/PostToolUseFailure
+      spends it, or releases it when a site: refusal submitted nothing), unconfirmed reservations lapse after 15 min (a parallel
+      PreToolUse hook refused). Mode is set by the hook command, so a session''s hook snapshot is always consistent; inactive
+      until Joaquin registers it in .claude/settings.json (PreToolUse ''submit_guard.py reserve'', PostToolUseFailure ''refund''
+      -> ''spend'', PostToolUse Bash ''+ submit_guard.py spend''). Tests tests/test_submit_data_check.py: 7 pass incl. test_reserve_then_spend
+      and test_reserve_concurrent (2x50 reserves keep 100; without the flock only 50 survived). Not fixed: site pick rewrites
+      FA.json without this lock (held reservations count against a new plan for up to 15 min); one unreproduced failure of
+      the chain case in a direct run (1 of 21).'
   handoff:
     state: '2026-11-26: D562 audit done (step 36: removed open-ask matcher 8da026b88, reply check at Stop 8e53d6eb0, brief_guard
       cut check 2022ad363; fixed send_check axes a675aee7a; kept the rest, see finding 2026-11-25). Owner misbooking fixed:
