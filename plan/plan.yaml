@@ -30431,6 +30431,16 @@ entries:
       of its set. Step 34: FT05 collected, slide 19 (kit_slide10_heldout) redrawn, deck 25 pages 0 errors; uug FT search driving
       (step 34b, design PASS). D600: steps 38 (matched emission runs, design recorded, reviewer launched), 39 (t t~ g, needs
       the massive dipole in wrappers._asym_terms and a KIT-like ttg file), 40 (kit_zoom every limit; code done, needs collect+plot).'
+  - at: '2026-11-27T13:33:33+00:00'
+    text: '2026-11-27 ~14:55 UTC. Step 38 design FIX (reviewer): revise once. Add to prior the 8000-step protocol-A runs (bulk
+      log-MSE uug/uugg): emission scales dimensionless _t8000 8.24e-4/2.27e-3, _t8000_softpair 1.09e-4/1.97e-3, _t8000_softpair_gmax4
+      4.28e-4/2.62e-3 vs factor _t8000_asym_cont 9.85e-7/6.58e-5 (factor 100-840x lower on uug, 30-40x on uugg; pairs also
+      differ in frame cap or inputs, kit_fig_A*.json) and say what the new pair adds (frame cap and inputs on both arms, searched
+      HPs, 1831-step WSD) and use those ratios as the expected effect in check; say coupling orders off is a constant on one
+      process; say what R>30 or in-between changes (e.g. KIT package keeps the factor models / a same sweep for the factor
+      under the feature rule); say how uugg is read given its factor run failed the curve check (train-val separation 4.1
+      nats in the last ~150 cooldown steps, kit_curves_hpo_uugg.json, finding 2026-11-14). Script: scratchpad design38.py
+      of the previous owner (commands in the recorded design).'
   step_why:
     32:
       feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
