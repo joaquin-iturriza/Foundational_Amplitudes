@@ -50472,6 +50472,10 @@ entries:
     7: Commit the 429/500 retry of tools/lab_wake_trial.py on branch labwake (worktrees/wt-labwake, where the replays run),
       merge into trunk and remove the worktree with scripts/remove_worktree.sh once repo-reviewer a81bfbcbf3da8af32 passes
       the backlog
+    8: 'Write par:labllm4 in docs/results.tex for both D551 replays (wake dispatch: NO, numbers in the 2026-11-27T17:30 finding,
+      src tools/lab_wake_trial.py report @54affd9eb; design review: from reviews-report once review_replay4 ends) with one
+      figure (correct count of each model against the trivial baselines with Wilson bars, per task), % src/% claim lines;
+      then the notes-editor'
   done_when: null
   notes_ref: par:labllm1
   match: zz_labllm_*
@@ -51301,6 +51305,11 @@ entries:
       if:
       - 'repo-reviewer passes: commit, merge, remove the worktree after the replays end'
       - 'it blocks on lab_wake_trial.py: fix, re-check with the same reviewer'
+    8:
+      feeds: what else the lab LLMs can take (D551)
+      if:
+      - 'notes-editor passes: plan done (step 3)'
+      - 'it blocks: fix, re-check with the same notes-editor'
 - id: critical_batch
   title: Critical batch size from the gradient noise scale
   question: What is the critical batch size of our canonical setup, measured from the gradient noise scale B_simple = tr(Sigma)/|G|^2
