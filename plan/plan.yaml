@@ -34771,6 +34771,54 @@ entries:
       kit_predict to 0; E[u]-1 differs across surrogates (-1.65e-3/-3.31e-3 flat). Searched results.tex for madevent, unweighting
       effic, second-stage, slide 11, kit-mc, integrated virtual/correction, and the entry''s findings: prior covers sec:kit-mc
       and the 19:00/02:59 findings. Serves Joaquin''s 2026-11-26 14:38/16:27 words and D571/D575.'
+  - at: '2026-11-27T08:29:59+00:00'
+    question: 'Unchanged from the 2026-11-26 16:44 design (passed 16:45): slide 11 of Bakar''s slides as written (D571, D574,
+      D575) for the packaged A2 models: (1) uug, uugg: MadEvent integrating and unweighting the SURROGATE |M_hat|^2, sigma_hat/sigma
+      - 1 against the exact run''s sigma and eps2 = <r>/r_max (r = |M|^2/|M_hat|^2) on those events with its r_max quantiles;
+      (2) tt one loop: sigma[V_hat]/sigma[V]-1 over KIT''s bulk window. This revision changes only how the tree part is run,
+      forced by a MadEvent fault: (a) MadEvent''s default card (nothing appended), since any appended vector_size makes MadEvent
+      3.7.0 on CC integrate and write events at sqrt s 1.1035 GeV (exact integrand too, diag 1: e07631e9, 74c1767f); (b) each
+      1e5-event run split into seed parts pooled by tools/kit_mc_madgraph.py combine, because the default card calls the surrogate
+      one event at a time (52.7 ms per call vs 4.4 ms per event at 32).'
+    prior: 'Searched results.tex sec:kit-mc, the entry''s findings 2026-11-26 19:00 to 2026-11-27 07:30, D571-D575. Earlier:
+      (a) flat bulk_test reweighting bias -1.65e-3/-3.31e-3, eps2 0.886/0.562; (b) MadEvent on the exact |M|^2 reweighted
+      by u: E[u]-1 -1.62e-3 uug, -1.35e-3 uugg, sigma 0.121861 pb / 0.0198228 pb; (c) 2026-11-27 diagnosis 2 at the default
+      card: exact df8e8413 at 1000 GeV, sigma 0.122999 +- 0.00088 (2000 ev); surrogate de4314f4 at 1000 GeV (guard passed),
+      sigma_hat 0.121975 +- 0.000844 pb (2000 ev), 199k one-event calls (~93 per event), slowest MadEvent job 75k calls; (d)
+      the vec-32 1e5 runs b45a89e1/6360f286 void (wrong energy).'
+    measure: 'tools/kit_mc_madgraph.py @HEAD (64b890dee + combine): gen --surrogate RUN --seed k --n n --dir runs/kit/mc_madgraph_surrparts/<proc>_s<k>
+      with KIT_MC_VEC=0 (default card), every check as before (standalone vs KIT me2 <1e-6, server vs kit_predict on 1000
+      events in one call and 20 one-event calls <1e-9, sqrt-s guard on every LHE event rtol 1e-9, cut and alpha_s asserts);
+      combine pools the parts into runs/kit/mc_madgraph/<proc>_surr.h5: events concatenated (equal n per part), sigma_hat
+      the inverse-variance mean of the parts'' MadEvent sigma_hat, its error (sum 1/e_k^2)^-1/2, chi2/dof of the parts asserted
+      < 3; then predict --surr, predict (exact sample re-scored at 1 thread) and metrics exactly as before (bias = sigma_hat/sigma-1
+      with both errors, E_exact[u]-1, eps2 at max and 0.99/0.999/0.9999 quantiles, sigma share above cap). tt_bulk unchanged.'
+    check: 'The default card is checked on CC on both integrands at 2000 events: exact df8e8413 and surrogate de4314f4 pass
+      the sqrt-s guard; de4314f4''s sigma_hat/sigma-1 = +9.4e-4 +- 7e-3 is within errors of E_exact[u]-1 = -1.68e-3 (wiring
+      sound at that precision). The one-event serve equals kit_predict to 0.00 (bench 2026-11-27 09:27, 1000 events in one
+      call and 20 one per call). combine tested locally on two synthetic parts (inverse-variance mean 0.121795 +- 0.000768
+      for 0.122+-0.001 and 0.1215+-0.0012, events concatenated, bulk_test copied). The measure moves with the surrogate as
+      in the passed design (E[u]-1 differs across surrogates).'
+    fixed: 'The three A2 models; every MadEvent setting as the exact run''s (cards, cut, alpha_s, 1e5 events in total) except
+      vector_size (MadEvent''s default, a repair) and the seeds (parts: uug 50 x 2000 events seeds 1001-1050, uugg 100 x 1000
+      events seeds 1001-1100; independent of the exact run''s iseed 11, so the two MC errors are independent as the outcome
+      assumes); surrogate float64 CPU 1 thread; CPU jobs on CC htc, uug parts 4 CPUs, uugg parts 8 CPUs, 2G per CPU. Wall:
+      uug part 2000 events = the de4314f4 setup, slowest MadEvent job 75k calls x 52.7 ms ~ 66 min + survey ~6 min -> target
+      1.3 h, limit 4:00; uugg part 1000 events, cost per call and calls per event not yet measured at the default card (assumed
+      1.3x and 3x uug''s: ~1.5-2 h), target 2 h, limit 8:00, read from the first parts'' serve stats; combine jobs ~0.3 h
+      each after their parts. Differences from slide 11 stated first in the report as in the passed design, plus: the 1e5
+      events come from 50/100 seed parts pooled (statistically one run of 1e5 events with the parts'' grids).'
+    control: 'As the passed design: sigma from the exact MadEvent run (runs/kit/mc_madgraph/<proc>.h5, iseed 11, 1e5 events),
+      r from the exact |M|^2 per event, the reweighting estimates of 2026-11-26 19:00 beside; tt: MadLoop exact V on the same
+      nodes.'
+    seeds: No training; MadEvent seeds 1001-1050 (uug parts) and 1001-1100 (uugg parts); the exact control iseed 11.
+    outcome: 'As the passed design: sigma_hat/sigma-1 with its MC error (~1.2e-3 from the pooled parts and ~1.2e-3 from the
+      exact run: cannot resolve a ~1.5e-3 bias, stated so) and the wiring check |sigma_hat/sigma - E_exact[u]| within 3 errors
+      (beyond: a KITSURR or combine fault, fixed before any number goes out); E_exact[u]-1 as the resolved bias; eps2 per
+      r_max quantile against the reweighting values. A parts'' chi2/dof above 3 stops combine (a part fault, read before anything
+      else).'
+    sources: D571, D574, D575; slide 11 of analysis/kit_benchmark/source/hardps_benchmark_slides.pdf; the 2026-11-26 16:45
+      design pass
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
