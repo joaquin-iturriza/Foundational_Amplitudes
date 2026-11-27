@@ -30328,6 +30328,14 @@ entries:
       kit_figures collect, kit_readout --vs against SCR-A2; neither BEATS -> DyHPO FT search); step 35 per its design (load
       line, then slide-10 fair figures and deck slides 22-24 redrawn; D=1e3 blow-up -> one rerun at 0.126). Deck slides 20
       and 22-24 of talks/kit_reply_nov2026 show the void FT runs until then.'
+  - at: '2026-11-27T11:01:35+00:00'
+    text: '2026-11-27 ~14:50 @0553d1e06. (1) Reply deck talks/kit_reply_nov2026/main.tex: the held-out qqg frame and all six
+      fair one-loop frames (fair overview, D=1e4, bulk, threshold, Sudakov, training curves) removed, all carrying the voided
+      fine-tunes; rebuilt 0 errors, 0 overfull, 18 pages (was 25); they return redrawn from steps 34/35. (2) E9760: uugg slide-11
+      array 66fc3d1c pended 1 h on Resources; site pick shows 958 htc slots fitting 8 CPU/16G, so the binding request is CC''s
+      default MinTmpDisk 50 GB (the ~01:25 stall). Cancelled it and combine c5a3365b, resubmitted unchanged but --tmp=10G:
+      array FA-ccin2p3-83662553 (slurm 64967939), combine FA-ccin2p3-ddd2e7a7 (afterok); step 33 now waits on ddd2e7a7. Not
+      checked: whether 10G covers the uugg MadEvent work dir (uug''s ran in node /tmp; size not read).'
   step_why:
     32:
       feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
