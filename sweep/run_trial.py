@@ -485,7 +485,14 @@ def main():
 
     afs_dir, eos_dir = _sweep_dirs(cfg, sweep_name)
     results_dir= os.path.join(eos_dir, "results")
-    os.makedirs(results_dir, exist_ok=True)
+    for _try in range(5):  # EOS FUSE: concurrent trials creating the same dir can see ENOENT transiently
+        try:
+            os.makedirs(results_dir, exist_ok=True)
+            break
+        except FileNotFoundError:
+            if _try == 4:
+                raise
+            time.sleep(5 * (_try + 1))
 
     state_path  = os.path.join(afs_dir, "dyhpo_state.pkl")
     ckpt_index_path = os.path.join(afs_dir, "checkpoint_index.json")
