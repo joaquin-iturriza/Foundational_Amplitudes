@@ -28428,10 +28428,6 @@ entries:
       @60d52cc1c): on design PASS, record the target (16 x 0.55 h), drive it with sweep/drive.py --item kit_benchmark --disk-gb
       0.1 --hours 0.55 detached, then score the best trial with job_kit.sh KIT_SCORE_ONLY/KIT_SCORE_DIR and kit_readout --vs
       SCR-A2 uugg'
-    37: 'D597: (a) zoom into the bulk region where no divergence shows and compare transformer + asymptotic factor against
-      the transformer with emission scales (target_physics_factor, dim_ref qperp); (b) extrapolation plots: hold the other
-      divergence parameter fixed instead of averaging over it; (c) a relative error measure beside MSE(log|M|^2) on these
-      plots, to see whether the largest amplitudes dominate'
     39: 'D600 (b): e+e- -> t t~ g, factor vs emission scales vs plain transformer, every relevant limit (soft gluon at fixed
       gluon-top angle; gluon quasi-collinear to a top, mass-regulated dead cone, at fixed x; threshold beta of the t t~ pair
       at fixed x; bulk zoom). Needs: (1) wrappers._asym_terms has no massive emitter (its own shortcut note: CDST''s massive
@@ -30521,11 +30517,6 @@ entries:
       if:
       - 'best FT BEATS SCR-A2 on a uugg family: transfer of that limit, reported with the slide redrawn'
       - 'no family BEATS: no transfer at this pretraining on uugg, reported with exponents and the search spread'
-    37:
-      feeds: 'D597: Joaquin''s KIT comparison questions'
-      if:
-      - 'factor wins in the bulk zoom: say by how much, relative and log measures'
-      - 'emission scales win or tie: say so with the numbers'
     39:
       feeds: 'D600: what the factor and the emission scales do with one divergence suppressed'
       if:
@@ -30537,8 +30528,6 @@ entries:
       site --timeout 1800 run --job --allow-stale --item kit_benchmark ccin2p3 FA -- python tools/kit_figures.py collect runs/kit_hpo_uugg_ft_heldoutqqg/trial_1289=kit_A_ft_ee_uugg_me2_n100000_t1831_heldoutqqg_ftbest);
       retry drive detach kit_hpo_uugg_ft_heldoutqqg_retry (FA-lxplus-d5b580a2, 3e5b78e2)'
     '34': detached drive.py kit_hpo_uug_ft_heldoutqqg (pid 2752905, DONE event)
-    '37': kit_zoom collect CPU job ccj_ab6a6943301b (rerun 'python tools/kit_zoom.py collect' to read; then plot, then re-collect
-      after step 38's runs)
     '39': 'ccj_3a07615b7f4f (CC slurm 65001699, kit_ttg build; read by rerunning: site --timeout 14400 run --job --item kit_benchmark
       ccin2p3 FA -- python tools/kit_ttg.py build)'
   handoff:
