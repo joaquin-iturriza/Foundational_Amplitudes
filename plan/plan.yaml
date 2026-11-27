@@ -28436,6 +28436,10 @@ entries:
       @60d52cc1c): on design PASS, record the target (16 x 0.55 h), drive it with sweep/drive.py --item kit_benchmark --disk-gb
       0.1 --hours 0.55 detached, then score the best trial with job_kit.sh KIT_SCORE_ONLY/KIT_SCORE_DIR and kit_readout --vs
       SCR-A2 uugg'
+    37: 'D597: (a) zoom into the bulk region where no divergence shows and compare transformer + asymptotic factor against
+      the transformer with emission scales (target_physics_factor, dim_ref qperp); (b) extrapolation plots: hold the other
+      divergence parameter fixed instead of averaging over it; (c) a relative error measure beside MSE(log|M|^2) on these
+      plots, to see whether the largest amplitudes dominate'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -30402,6 +30406,11 @@ entries:
       if:
       - 'best FT BEATS SCR-A2 on a uugg family: transfer of that limit, reported with the slide redrawn'
       - 'no family BEATS: no transfer at this pretraining on uugg, reported with exponents and the search spread'
+    37:
+      feeds: 'D597: Joaquin''s KIT comparison questions'
+      if:
+      - 'factor wins in the bulk zoom: say by how much, relative and log measures'
+      - 'emission scales win or tie: say so with the numbers'
   step_waits:
     '32': FA-ccin2p3-a8d68ffe
     '33': FA-ccin2p3-ddd2e7a7
