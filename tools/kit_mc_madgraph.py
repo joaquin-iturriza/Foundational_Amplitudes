@@ -627,7 +627,7 @@ def cmd_figure(a):
 
 
 def _figure_tree(ps, d, sur, lab, cols, out):
-    fig, (a1, a2, cell) = ps.figure(ncols=3)
+    fig, (a1, a2) = ps.figure(ncols=2)    # three columns run off the printable width
     for i, k in enumerate(sur):
         e, ex = d[k], d[k.split("/")[0]]
         c = cols[e["process"]]
@@ -638,10 +638,11 @@ def _figure_tree(ps, d, sur, lab, cols, out):
     a1.plot([], [], "o", color=ps.C.grey, label="MadEvent on surrogate")
     a1.plot([], [], "s", mfc="none", color=ps.C.grey, label="reweighted exact events")
     a1.axhline(0, color="k", lw=0.8)
+    lo, hi = a1.get_ylim(); a1.set_ylim(min(lo, -0.1 * (hi - lo)), max(hi, 0.1 * (hi - lo)))    # zero in view
     a1.set_xticks(range(len(sur)), [lab[d[k]["process"]] for k in sur]); a1.set_xlim(-0.5, len(sur) - 0.5)
     a1.set_ylabel(r"$\hat\sigma/\sigma-1$")
     a2.set_xscale("log"); a2.set_xlabel(r"$1-q$"); a2.set_ylabel(r"$\epsilon_2=\langle r\rangle/r_{\max}$")
-    ps.legend_cell(cell, [a1, a2], fontsize=ps.LEGEND_MIN_PT)
+    ps.legend_free(a1)
     print("FIGURE", ps.save(fig, out + "_tree"))
 
 
