@@ -15828,6 +15828,10 @@ entries:
     35: 'Refusal cost after the D558 fixes (133a1b102, 2026-11-25): python3 tools/token_share.py --refusals --since 2026-11-26T00:00
       --until 2026-12-03T00:00, per role and check against the 2026-11-09..23 window (13.7% of all tokens upper, 5.0% lower;
       main session 32.1%, owners 6.5%); per day, since the windows differ in length; add the after-window to par:refusal-cost'
+    36: 'D589 interactive route: site submit <site> <project> <job> --interactive (detached srun on CC gpu_v100_interactive
+      through the site gate, registered with its slurm id) and site pick sending batches under 1 GPU-h there when its GPUs
+      are free (backups ~/.local/bin/site.bak-20261127-interactive, site_gate.py.bak-20261127-interactive, sites.toml.bak-20261127-interactive,
+      site-tool.txt.bak-20261127-interactive); probe scripts/job_probe.sh through it'
   done_when: null
   notes_ref: null
   match: zz_redesign_*
@@ -16514,6 +16518,11 @@ entries:
         step'
       - 'a fixed check still misfires or a new misfire enters the top ten: fix it through a mechanical-worker and measure
         again'
+    36:
+      feeds: whether short evaluations stop waiting hours in the batch queue (D589)
+      if:
+      - 'probe registers, polls to COMPLETED and its log reads: done, reported to Joaquin'
+      - 'a step fails: fix it and rerun the probe'
   step_waits:
     '11': step 14, the deck cold-read agent, held under D261/D268
     '12': the next session's first mechanical-worker (agent definitions load at session start)
