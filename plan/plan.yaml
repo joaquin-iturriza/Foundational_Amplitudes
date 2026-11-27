@@ -45354,6 +45354,26 @@ entries:
       E9830 acked. Its score (job_llm_score.sh RUN=runs/llmcmp_c_tprop/trial_1860 EVENTS=1, seen + held out, 32G, 4 h) not
       submitted: site submit refuses on another agent''s untracked analysis/transfer/data/emission_target.npz and ladder_nlo_hists.npz
       (the transfer ladder_nlo_hists work), not ignored by .gitignore; left untouched.'
+  - at: '2026-11-27T17:46:57+00:00'
+    text: '2026-11-27 step 27 read (D566, per-event anchored level vs per-process level, Suprio''s setup, trial 5''s HPs,
+      seed 42): scores FA-ccin2p3-c18c9887 (arm trial_7201), -cd724930 (control trial_7101), -dff2eadb (retrain trial_7102);
+      reads @3f4fbf82a (rerun_spread.py --out rerun_spread_level, level_file_read.py --out step27_level_read, level_subsets.py
+      on the three CSVs, data/level_subsets.json). New-43 median bias^2 of log|M|^2: arm b_a 0.183, control b_c 0.300, retrain
+      b_r 0.159: R_b 1.88, g 0.218, g R_b 0.411; b_a <= 0.411 and 0.859/b_a = 4.69 > R_b: LEVEL YES (the per-event level keeps
+      the per-process level''s gain, within the control''s run-to-run spread, no better). Sampling (level error mean(d)^2/sd^2,
+      new-43 median, all/s_lo/s_hi/q_hard/q_soft, 2 bootstrap sd): arm 0.183/0.094/0.128/0.173/0.142 (s_lo -0.089 vs 2sd 0.005,
+      s_hi -0.056 vs 0.008: FAIL by the design''s rule; q_hard, q_soft within); control 0.127/0.136/0.146/0.125/0.143, retrain
+      0.144/0.131/0.122/0.139/0.130 (moves <= 0.021 on every subset). No sampling gain (on s_lo arm bias^2 0.167 vs control
+      0.296 / retrain 0.155, not below both by R_s 1.90). Reading: trained on the per-process level, the network''s level
+      on the 43 new barely depends on which events are scored (0.122-0.146 on every subset), while the level file alone moved
+      0.055 -> 0.477 on q_soft: the network corrects the per-process level per event; the per-event level adds nothing. Other
+      numbers (arm/control/retrain): new-43 median MSE 0.463/0.552/0.384 (LLM 0.940); relabels median MSE 0.0139/0.0112/0.0123;
+      held-out pooled RMSE 0.815/0.828/0.898 (LLM 0.721, step 16 0.969); seen pooled RMSE 0.117/0.111/0.098 (LLM 0.321); new-43
+      below the LLM 30/27/30 of 43; g g > t b W pair MSE 32.2/23.0, 27.7/37.4, 38.7/42.2. Validation curves (val_loss_no_reg,
+      20 points every 3042 steps): arm falls 0.045 -> 5.8e-4 with one spike at point 14 (6.7e-3, recovered by the next); control
+      0.040 -> best 4.3e-4 at point 17, spike 2.1e-3 at 18, ends 6.9e-4; retrain 0.037 -> 3.4e-4 at the end, spike at 11.
+      Figure figs/step27_level_per_event_heldout_per_process.png (Suprio''s layout). CC CPU job with --check-factor on the
+      full arm CSV pending (detach step26_27_cpu_reads).'
   step_waits:
     '26': FA-ccin2p3-d55e8093
     '27': FA-ccin2p3-c18c9887 FA-ccin2p3-cd724930 FA-ccin2p3-dff2eadb
