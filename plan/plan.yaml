@@ -30131,6 +30131,7 @@ entries:
     '32': FA-ccin2p3-b45a89e1 FA-ccin2p3-6360f286
     '30': FA-ccin2p3-69541363 FA-ccin2p3-6f1a5dad FA-ccin2p3-ff4af2bc
     '29': FA-ccin2p3-5819e2fe FA-ccin2p3-e5c41742 FA-ccin2p3-27013dea FA-ccin2p3-aca0bcaa FA-ccin2p3-2128f5f5
+    '33': FA-ccin2p3-f73b637b FA-ccin2p3-c730c4cf
   handoff:
     state: '2026-11-27 ~04:30 @09f1c69e1. Step 31 done (protocol B on A2: B beats B_bulk on every family; finding ~03:10;
       deck slides 15-17). Step 29: slide-10 metrics for A2 and B done (kit_readout --slide10, deck slide 18 kit_figures.py
