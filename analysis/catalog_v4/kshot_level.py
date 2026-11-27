@@ -143,18 +143,19 @@ def paper():
              "H5": "one loop", "H6": r"$\alpha_s(M_Z)=0.13$", "H7E": r"$6$ to $20$ TeV", "H7c": r"$p_T>30$ GeV"}
     order = sorted(AXES, key=lambda a: np.mean([S[r][a]["zero"] for r in RUNS]))
     y = np.arange(len(order))
-    fig, ax = ps.figure()
-    series = (("zero", ps.C.blue, "zero-shot"), ("shr1", ps.C.green, "shrunk offset from 1 event"),
+    fig, (ax, cell) = ps.figure(ncols=2)   # eight rows leave no free corner: the legend in the second cell
+    series = (("zero", ps.C.blue, "zero-shot"), ("shr4", ps.C.green, "shrunk offset from 4 events"),
               ("off16", ps.C.vermillion, "offset from 16 events"), ("floor", ps.C.grey, "floor: best offset per process"))
     for run, mk, off in zip(RUNS, ("o", "s"), (-0.15, 0.15)):
         first = run == RUNS[0]
         for k, c, lab in series:
             kw = dict(facecolors="none", edgecolors=c) if k == "floor" else dict(color=c)
             ax.scatter([S[run][a][k] for a in order], y + off, marker=mk, label=lab if first else None, **kw)
+        ax.scatter([], [], marker=mk, color="k", label="first seed" if first else "second seed")   # the markers' key
     ax.set_yticks(y); ax.set_yticklabels([names[a] for a in order])
     ax.set_ylim(len(order) - 0.5, -0.5); ax.set_xscale("log")
     ax.set_xlabel(r"MSE$(\log|\mathcal{M}|^2)$")
-    ps.legend(ax, "lower left")   # the lower rows sit at large errors: the lower left corner is clear
+    ps.legend_cell(cell, ax)
     ps.save(fig, os.path.join(HERE, "figs", "paper_kshot_level"))
 
 
