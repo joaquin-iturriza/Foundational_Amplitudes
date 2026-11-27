@@ -30435,6 +30435,24 @@ entries:
       under the feature rule); say how uugg is read given its factor run failed the curve check (train-val separation 4.1
       nats in the last ~150 cooldown steps, kit_curves_hpo_uugg.json, finding 2026-11-14). Script: scratchpad design38.py
       of the previous owner (commands in the recorded design).'
+  - at: '2026-11-27T14:01:14+00:00'
+    text: '2026-11-27 ~16:00 UTC. Step 37 (D597/D598) read: kit_zoom collect (CC job ccj_ab6a6943301b) -> analysis/kit_benchmark/data/kit_zoom.json,
+      19 figures analysis/kit_benchmark/figs/zoom/kitzoom_* (drawn @fe6ec2742). R = factor / searched emission-scale arm (hp1493
+      uug, hp1196 uugg, hp0131 t t~), bar 1/30..30. Bulk core MSE(log10|M|^2): uug 9.31e-6 vs 3.28e-4 (1/35, factor wins;
+      plain transformer 5.56e-6), uugg 3.05e-5 vs 1.06e-3 (1/35 wins; plain 4.34e-5), t t~ V 9.0e-8 vs 2.7e-8 (3.4, band);
+      core mean relative error uug 3.3e-3 vs 1.16e-2, uugg 9.1e-3 vs 5.5e-2, t t~ 5.9e-4 vs 2.4e-4 (all band). Whole bulk
+      MSE: uug 1.98e-6 vs 2.71e-4 (1/137), uugg 6.29e-5 vs 1.81e-3 (1/29), t t~ 1.36e-7 vs 6.1e-8 (2.2). Deepest bin, other
+      variable in its band, MSE: uug collinear 0.012 vs 6.5 (1/540), soft 0.017 vs 0.11 (1/6.5 band); uugg gg 0.062 vs 5.8
+      (1/94), qg 0.16 vs 11 (1/69), soft 0.16 vs 0.47 (1/3 band); t t~ threshold beta 1.3e-4 0.023 vs 9.8 (1/430), Sudakov
+      sqrt s 44.7 TeV 0.098 vs 0.97 (1/10 band) where mean relative error is 4.2 (factor overshoots) vs 0.83 (emission undershoots):
+      the relative measure caps undershoots at 1 and leaves overshoots unbounded, so the plain transformer''s mean relative
+      error in deep collinear bins reaches 1e41 (uug) / 1e89 (uugg) from single overshooting events while its MSE is 8-22.
+      The plain transformer does not follow the soft limit (median log10|M|^2 flat near -2 uug, -7 uugg over x 1e-7..1e-2).
+      Matched emission arm (step 38, design PASS) running: FA-ccin2p3-3f44d631 (uug), FA-ccin2p3-dfec7e79 (uugg). Events:
+      lxplus FT-search trials (EOS EIO/ENOENT) fixed in sweep/run_trial.py @bea2d312d (makedirs retried), requeue at the drives''
+      end; step-32 hung part 18 rerun FA-ccin2p3-7b95f8b0, combine a8d68ffe repointed. Step 39: massive eikonal term in wrappers._asym_terms
+      @b0c667b8c (CDST''s spin-averaged massive dipole turns negative on 3% of t t~ g phase space, the eikonal is positive
+      by construction), test passes. CC free disk 9 GB at submission.'
   step_why:
     32:
       feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
