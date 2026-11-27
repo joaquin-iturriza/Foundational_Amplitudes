@@ -30209,6 +30209,16 @@ entries:
       pb and events at 1.1035 GeV (as if sqrt(x1 x2 s) with x1 x2 ~ 1.22e-6, not checked in the code): MadEvent''s vector
       path generates the points wrong for lpp=0 here; not our code. Bench of the one-event call cost (ccj_fc59b9eb5e95) submitted:
       the 1e5 jobs'' time comes from it and de4314f4''s serve stats (one call per phase-space point at the default card).'
+  - at: '2026-11-27T04:33:52+00:00'
+    text: '2026-11-27 ~06:05 @bf76c6ca1. Bench of the serve at MadEvent''s default card (CC htc, 1 thread, 300 one-event calls
+      of uug bulk_test, ccj_fc59b9eb5e95): 109.9 ms per call (vs 4.41 ms per event at 32 per call); repeat identical (0.00),
+      server = kit_predict on 1000 events (0.00). Split: init_data 51 ms (catalog_cfg_for_dataset 15, _finalize_data_sizing
+      9, npy writes 7, diagram setup 4), prediction 49 ms = two forwards of 23 ms (the one-event fix scores two copies, test
+      batch n/2). At ~40-60 evaluations per event (to be read from FA-ccin2p3-de4314f4''s serve stats) a 1e5-event uug run
+      is ~4e5 core-s / 32 ~ 3-5 h and uugg several times that: above 2x the design''s 0.5 h / 1.2 h, so the per-call cost
+      is fixed before the 1e5 jobs go (one forward per call, cached per-process setup, or MadEvent''s vector mode repaired).
+      Vector-mode check: the kept exact vec-32 work dir compiled every Source/lib/P1 object after vector.inc (04:48:47-49),
+      so no stale objects; local MG5 is the same 3.7.0.'
   step_why:
     29:
       feeds: Bakar's slide-10 metrics reported
