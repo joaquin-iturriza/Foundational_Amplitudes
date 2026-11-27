@@ -350,6 +350,8 @@ class Predictor:
         import yaml
         import datagen
         mom = np.asarray(mom, dtype=np.float64)
+        if len(mom) == 1:   # MadEvent's scalar calls: init_data's train batch size int(n_train / 2) is 0 at one event
+            return self.log10(np.repeat(mom, 2, axis=0))[:1]
         if len(mom) != self.n:      # the recipe's test count is the pool's size
             rec = yaml.safe_load(open(self.recipe))
             rec["processes"][0]["n_test"] = self.n = len(mom)
