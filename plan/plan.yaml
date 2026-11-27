@@ -28417,9 +28417,6 @@ entries:
   - D572
   - D573
   next:
-    30: 'Held-out qqg A2 (D575): smokes clean (1daf7f8f FT, 2f27a757 SCR-A2); SCR-A2 real arms FA-ccin2p3-6f1a5dad (uug) ff4af2bc
-      (uugg) out 2026-11-27 ~03:00; at the parent FA-ccin2p3-69541363''s end FT1/FT0.1 per process (A_ft, KIT_LR_SCALE 1 /
-      0.1, tags heldoutqqg_ft / heldoutqqg_ft01), then FT vs SCR-A2'
     32: 'Slide 11 exact (design PASS 16:45): vector_size split read: 1024 survey zero (b9d55720), 32 passes (96ce4464: sigma_hat
       0.12200+-0.00100 pb at 2000 events vs exact 0.121861). 1e5-event surrogate jobs at KIT_MC_VEC=32 FA-ccin2p3-b45a89e1
       (uug, 6 h) 6360f286 (uugg, 12 h); on their end: wiring check sigma_hat/sigma vs E_exact[u], numbers, figure_exact with
@@ -30270,11 +30267,6 @@ entries:
       and the fair one-loop slide-10 metrics against D_train kit_slide10_fairnlo_{bulk,threshold,sudakov}.png (step 29); KIT
       reply deck talks/kit_reply_nov2026/main.pdf slides 20 and 22-24.'
   step_why:
-    30:
-      feeds: 'Bakar: does the model get the limits without hard data when pretrained with the target family held out'
-      if:
-      - 'better FT BEATS SCR-A2: transfer, positive'
-      - 'neither: kit_hpo_tt_ft_r5-style FT search, best against best'
     32:
       feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
       if:
@@ -30286,7 +30278,6 @@ entries:
       - 'wiring within 3 MC errors: numbers to Joaquin in the deck'
       - 'beyond: KITSURR or combine fault, fix and rerun'
   step_waits:
-    '30': FA-ccin2p3-69de38db,FA-ccin2p3-48701a30,FA-ccin2p3-1a1c9a47,FA-ccin2p3-b6abfc18
     '32': FA-ccin2p3-a8d68ffe
     '33': FA-ccin2p3-c5a3365b
   handoff:
