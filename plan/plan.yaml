@@ -42384,8 +42384,6 @@ entries:
   - D576
   - D578
   next:
-    25: 'attempt E (step 25): the D_sqE form with a better process-intrinsic anchor map, designed, reviewed and run as a CPU
-      job on htc'
     26: 'step 15''s yes branch (2026-11-27, data/c_best_factor_split.json): the g g > t b W pair''s error is the on-shell
       top region (near-pole fifth mean d -7.65 vs -5.16 elsewhere, se 0.05), which the same network has right on the trained
       q q~ twins. Test whether giving the resonance''s level per event transfers it to the g g initial state: part (c)''s
@@ -42708,14 +42706,6 @@ entries:
     context: 103787
     context_at: '2026-11-27T02:35:40+00:00'
   step_why:
-    25:
-      feeds: 'D566: a per-event level from the process and its diagrams that keeps the level on new families and is correct
-        regardless of sampling'
-      if:
-      - 'E''s D_sqE keeps the level (<= regressor_ens max) and passes all four subsets: report to Joaquin, then its training-run
-        design (per-event level replacing the level file)'
-      - 'E fails with the own-median anchor still passing: anchor maps are the bottleneck; try the reference phase-space anchor
-        (median x of the process under a fixed flat sampling with its cuts)'
     26:
       feeds: 'D564: why the LLM extrapolates better than our LLoCa'
       if:
