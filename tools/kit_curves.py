@@ -26,6 +26,7 @@ without the mu-MSE, so a failing NLL curve can still hide a sound mu-MSE curve (
 import argparse
 import json
 import os
+import re
 import sys
 
 import numpy as np
@@ -163,8 +164,7 @@ def plot_runs(d, runs, base):
         e = d[run]
         curve_panel(ax, e)
         ps.legend(ax, "upper right")
-    for w in ps.save_panels(figs, base):
-        print(w)
+    print(ps.save(fig, base))
 
 
 SWEEP_SITE = r'''
@@ -374,22 +374,27 @@ RUN_LAB = {"softpair_plain": "control", "softpairthr": "control", "softpair": "s
 
 
 def runs_fig(data, runs, base):
-    """one panel per run (<base>_a, _b, ... in the order given): its validation and training mu-MSE against step"""
+    """one figure <base>, one panel per run in the order given (two columns): its validation and training mu-MSE
+    against step"""
     import plot_style as ps
     d = json.load(open(data))
-    figs = ps.panels(len(runs))
-    for (fig, ax), run in zip(figs, runs):
+    nr = (len(runs) + 1) // 2
+    fig, axes = ps.figure(2, nr, squeeze=False)
+    for ax in axes.flat[len(runs):]:
+        ax.remove()
+    for ax, run in zip(axes.flat, runs):
         r = d[run]
-        x = np.arange(1, len(r["val"]) + 1) * 1831 / len(r["val"])  # evaluations spread evenly over 1831 steps
+        steps = int(re.search(r"_t(\d+)", run).group(1))
+        x = np.arange(1, len(r["val"]) + 1) * steps / len(r["val"])  # evaluations spread evenly over the run's steps
         ax.plot(x, smooth(r["val"]), color=ps.C.vermillion, label="validation")
         ax.plot(x, smooth(r["train"]), color=ps.C.blue, linestyle="--", label="training")
         ax.set_yscale("log"); ax.set_xlabel("training step"); ax.set_ylabel(r"MSE$(\mu)$")
         proc = SWEEP_LAB["kit_hpo_uug_plain" if "_uug_" in run else "kit_hpo_uugg_T" if "_uugg_" in run
                          else "kit_hpo_ttvirt_thr"].split(",")[0]
-        ps.process_label(ax, proc + ", " + RUN_LAB[run.split("_hpo_")[1]], loc="lower left")
+        lab = RUN_LAB[run.split("_hpo_")[1]] if "_hpo_" in run else "+bulk" if "_B_bulk_" in run else "+hard"  # protocol B continuations, kit_figures' names
+        ps.process_label(ax, proc + ", " + lab, loc="lower left")
         ps.legend(ax, "upper right")
-    for w in ps.save_panels(figs, base):
-        print(w)
+    print(ps.save(fig, base))
 
 
 def main():  # dup-ok: argparse boilerplate (collect/read), no shared logic
