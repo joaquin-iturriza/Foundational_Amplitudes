@@ -418,9 +418,14 @@ def fairnlo_fig(data, base):
             x = np.arange(1, len(v) + 1) * steps / len(v)     # evaluations spread evenly over the run's steps
             name, c, _, ls = model_style(key)
             ax.plot(x, smooth(v), color=c, ls=ls, label=name)
+        for run in (k for k in d if k.endswith(f"fairnlo_ft_d{D}_lsmed")):   # the fine-tune's named rerun
+            v = d[run]["val"]
+            x = np.arange(1, len(v) + 1) * int(re.search(r"_t(\d+)", run).group(1)) / len(v)
+            name, c, _, _ = model_style("FT")
+            ax.plot(x, smooth(v), color=c, ls=":", label=name + r", lr scale $0.126$")
         ax.set_yscale("log"); ax.set_xlabel("training step"); ax.set_ylabel(r"validation MSE$(\mu)$")
         ps.process_label(ax, r"$t\bar t$ virtual")   # the panel's D_train goes in the caption
-    ps.legend_cell(axes.flat[len(Ds)], [axes.flat[0]])
+    ps.legend_cell(axes.flat[len(Ds)], list(axes.flat[:len(Ds)]))
     print(ps.save(fig, base))
 
 
