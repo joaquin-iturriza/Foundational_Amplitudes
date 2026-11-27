@@ -41,6 +41,8 @@ OFF = "off the scale, value printed"
 MODELS = {"truth": ("truth", "k", None, "-"),
           "factor": ("transformer + asymptotic factor", "blue", "o", "-"),
           "scratch": ("transformer", "vermillion", "s", "-"),
+          # the transformer on the emission-scale target (target_physics_factor, dim_ref qperp; kit_zoom, D598)
+          "emission": ("transformer, emission scales", "orange", "D", "-"),
           "MLP thr": ("MLP, log invariants\n" + r"and $\log(s_{t\bar t}-4m_t^2)$", "purple", "^", "--"),
           "MLP log": ("MLP, log invariants", "green", "^", "--"),
           "MLP raw": ("MLP, raw invariants", "grey", "x", ":"),
