@@ -30143,6 +30143,17 @@ entries:
       show 13-31 ms/event in the first serves and 2.4-4.4 ms/event in the recent ones (uug 122 serves, 4.76e6 events served;
       uugg 127, 4.34e6); both paths equal kit_predict (0.00), so the integrand is one function throughout. A restart would
       have discarded ~1.2 h of each run.'
+  - at: '2026-11-27T03:33:37+00:00'
+    text: '2026-11-27 ~05:45. Step 29, tt part: Bakar''s slide-10 metrics of the fair one-loop fine-tunes (kit_readout --slide10
+      on analysis/kit_benchmark/data/kit_fig_fairnlo.json @6ecc823b5; KIT evaluate.py), log-MSE / bias / p99 |pred-truth|
+      / |M|^2-weighted rel. err, D = 100, 316, 1e3, 1e3 at lr 0.126, 3162, 1e4: bulk 5.1e-5/-1.5e-4/0.021/0.0032; 4.3e-6/+6.1e-4/0.0044/0.0017;
+      6.5e-6/+5.8e-5/0.0022/4.9e-4; 1.7e-6/+5.8e-5/9.7e-4/3.1e-4; 1.4e-6/-1.2e-4/0.0018/9.6e-4; 8.2e-8/-3.2e-8/1.3e-4/6.1e-5.
+      Threshold beta 1e-4..1e-3: 5.74/-2.39/2.77/0.997; 4.74/-2.17/2.54/0.994; 5.16/-2.26/2.64/0.996; 4.54/-2.12/2.49/0.994;
+      4.52/-2.12/2.49/0.994; 4.39/-2.08/2.46/0.993 (exponent -0.21..-0.24, truth -1.02: the fine-tune under-predicts the Coulomb
+      rise by ~2 decades and its weighted error is ~1, i.e. it misses nearly all of |M|^2 there). Sudakov 15-50 TeV: 0.134/-0.15/0.81/0.62;
+      0.115/-0.039/0.65/0.60; 0.25/+0.40/0.91/0.92; 0.108/-0.036/0.65/0.58; 0.125/-0.022/0.76/0.61; 0.167/-0.13/1.09/0.63.
+      uug/uugg FT1/FT0.1 (step 30) added when the held-out parent''s fine-tunes end; the slide-10 figure is redrawn then with
+      all fine-tunes.'
   step_why:
     24:
       feeds: 'D570: does fine-tuning from the signed A2 pretraining beat SCR-A2 and V/B with exact Born on ee->tt one loop
