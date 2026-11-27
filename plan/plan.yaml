@@ -30051,6 +30051,19 @@ entries:
       bins by < 0.25 decades). Blow-up rule (> 5x one-point val jump): largest 4.2 (uug B), none above 5, no rerun; best val
       at the last evaluation in all six (kit_curves.py runs -> kit_curves_a2B.json). Figures analysis/kit_benchmark/figs/kit_mse_a2B_ee_{uug_me2,uugg_me2,tt_virt_finite}.png,
       kit_curves_a2B.png.'
+  - at: '2026-11-27T01:47:21+00:00'
+    text: '2026-11-27 ~03:30 @f3d366d31. Step 29, Bakar''s slide-10 metrics in his slide-9 layout (tools/kit_readout.py --slide10
+      on analysis/kit_benchmark/data/kit_fig_B_a2.json; KIT evaluate.py''s kit_result.json of each run; bulk_test and the
+      deepest stratum per family). A2 protocol A (runs/kit/kit_A_<p>_n100000_t1831_hpo_asym_cont) log-MSE / bias / p99 |pred-truth|
+      / |M|^2-weighted rel. err: uug bulk 1.98e-6 / -7.4e-4 / 0.0040 / 0.0018; soft x 1e-7..1e-6 0.0152 / +0.050 / 0.44 /
+      0.135 (exp -2.01, exact -2); coll y 1e-7..1e-6 0.0081 / -0.0075 / 0.27 / 0.098 (-1.00). uugg bulk 6.3e-5 / +1.5e-3 /
+      0.030 / 0.024; soft 0.186 / -0.25 / 1.37 / 0.79 (-1.94); coll qg 0.156 / -0.25 / 1.25 / 0.74 (-0.92); coll gg 0.042
+      / -0.090 / 0.75 / 0.57 (-0.98); azimuth y 1e-7 0.070 / -0.14 / 0.86 / 0.64, harmonic h rms pred 8.1e-6 vs truth 0.0246
+      (no cos 2phi modulation learnt from bulk). tt virtual bulk 1.36e-7 / +2.5e-4 / 9.8e-4 / 6.3e-4; threshold beta 1e-4..1e-3
+      0.023 / -0.15 / 0.15 / 0.30 (-0.96, exact -1); Sudakov 15-50 TeV 0.077 / +0.16 / 1.00 / 10.8. Protocol B (a2B): uug
+      deepest 3e-8..5e-8, p99 6e-4..7e-4, w.err 2e-4..3e-4; uugg deepest 2.9e-4..7.4e-4, p99 0.068-0.081, w.err 0.042-0.071,
+      h pred 1.3e-4 vs 0.0246; tt threshold 3.9e-7 / w.err 7e-4, Sudakov 1.3e-4 / w.err 1.8e-3. Fine-tunes (steps 24, 30)
+      added when they exist.'
   step_why:
     24:
       feeds: 'D570: does fine-tuning from the signed A2 pretraining beat SCR-A2 and V/B with exact Born on ee->tt one loop
