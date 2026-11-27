@@ -42704,12 +42704,10 @@ entries:
     blocks: nothing
     blocks_steps: &id004 []
   owner:
-    agent: a91889ef4874423bf
-    state: closed
-    since: '2026-11-27T01:07:43+00:00'
-    state_at: '2026-11-27T01:57:08.808000+00:00'
-    context: 242284
-    context_at: '2026-11-27T02:18:11+00:00'
+    agent: a49915a0b9c865804
+    state: working
+    since: '2026-11-27T02:33:15+00:00'
+    state_at: '2026-11-27T02:33:15+00:00'
   step_why:
     25:
       feeds: 'D566: a per-event level from the process and its diagrams that keeps the level on new families and is correct
