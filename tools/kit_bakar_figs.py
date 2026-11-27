@@ -153,14 +153,24 @@ SEARCHED = {"ee_uug_me2": ("ccin2p3", "runs/kit_hpo_uug_plain/trial_1918"),
             "ee_tt_virt_finite": ("lxplus", "runs/kit_hpo_ttvirt_thr/trial_0131")}
 
 
+def same(a, b):
+    """two sites' reads of the same events: equal to rounding"""
+    return len(a) == len(b) and np.allclose(a, b, rtol=1e-9, atol=0)
+
+
 def collect_searched(base, out):
     """`base` (a collect output) with its "transformer" replaced by the SEARCHED trials, read on their sites by the
     same SITE script over the same events"""
     from analysis.common.readers import site_python
     import shlex
     d = json.load(open(base))
-    for site in sorted({s for s, _ in SEARCHED.values()}):
-        models = {p: [("transformer", [r])] for p, (s, r) in SEARCHED.items() if s == site}
+    # an earlier output with a gap (a site down): only its missing processes are read again, the rest kept
+    todo = SEARCHED
+    if os.path.exists(out) and any("missing" in e for e in json.load(open(out)).values()):
+        d = json.load(open(out))
+        todo = {p: v for p, v in SEARCHED.items() if "transformer" in d[p].get("missing", {})}
+    for site in sorted({s for s, _ in todo.values()}):
+        models = {p: [("transformer", [r])] for p, (s, r) in todo.items() if s == site}
         try:
             part = site_python(SITE, [shlex.quote(json.dumps(models)), shlex.quote(json.dumps({})), str(PER_DECADE)],
                                "KITBAKAR", site=site, timeout=3600)
@@ -175,17 +185,19 @@ def collect_searched(base, out):
             continue
         for p, n in part.items():
             o = d[p]
+            o.pop("missing", None)
             o["result"]["transformer"] = n["result"]["transformer"]
             for f, b in n["bins"].items():
-                assert b["x"] == o["bins"][f]["x"] and b["truth"] == o["bins"][f]["truth"], f"{p} {f}: other events"
+                # the same events; two sites' numpy builds differ in the last bits (lxplus 3e-17 in x)
+                assert same(b["x"], o["bins"][f]["x"]) and same(b["truth"], o["bins"][f]["truth"]), f"{p} {f}: other events"
                 o["bins"][f] = {k: v for k, v in o["bins"][f].items() if k.split("#")[0] != "transformer"}
                 o["bins"][f].update({k: v for k, v in b.items() if k.startswith("transformer#")})
             if n["vb"]:
-                assert n["vb"]["x"] == o["vb"]["x"]
+                assert same(n["vb"]["x"], o["vb"]["x"]) and same(n["vb"]["truth"], o["vb"]["truth"])
                 o["vb"] = {k: v for k, v in o["vb"].items() if k.split("#")[0] != "transformer"}
                 o["vb"].update({k: v for k, v in n["vb"].items() if k.startswith("transformer#")})
             for st, a in n["azimuth"].items():
-                assert a["event"]["truth"] == o["azimuth"][st]["event"]["truth"]
+                assert same(a["event"]["truth"], o["azimuth"][st]["event"]["truth"])
                 o["azimuth"][st]["rms"]["transformer"] = a["rms"]["transformer"]
                 o["azimuth"][st]["event"]["transformer"] = a["event"]["transformer"]
     json.dump(d, open(out, "w"))
