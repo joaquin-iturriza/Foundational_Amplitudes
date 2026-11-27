@@ -43929,6 +43929,12 @@ entries:
       b39fc80c8b10edbe4b07f6a0/train55296_val10000_test10000'', htc) -> gate (per-event file new-43 <= 0.369, subsets) ->
       control + retrain submitted, arm tp prebuilds -> arm smoke 50 steps + held-out llm_score EVENTS=1 + level_subsets --check-factor
       -> arm run (13 h target, 18 h limit, ~41 GPU-h total) -> read per the design'
+    28: 'step 29 (D566 next attempt): the per-process level in part (c)''s setup. Part (c) (sweep_config_llmcmp_c_latest.yaml)
+      trains on the emission-scale target with shared_standardization, so its level file must hold each process''s mean of
+      that target, not of log|M|^2: extend perevent_level.py''s writer to the target''s pool means (same 2x64 diagram network,
+      30 seeds, same events), then one arm (data.level_file in c_latest at trial_1860''s HPs) against c_best (trial_1860)
+      and the arm''s same-seed retrain for R_b; read new-43 median bias^2, the subsets (level_subsets.py), held-out pooled
+      RMSE against 1.178 and the LLM''s 0.721, Suprio''s layout. Own design and review first; ~2 x 16 GPU-h'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -44267,6 +44273,14 @@ entries:
       - 'b_a <= g x R_b and 0.859/b_a > R_b, subsets within 2 sd: per-event level is the lever; written up for Joaquin'
       - 'b_a > g x R_b: the trained network does not keep the per-event level; read where, own design'
       - 'unresolved: second arm seed (~13 GPU-h) asked of Joaquin'
+    28:
+      feeds: 'D566: does the per-process level lever (step 16, kept regardless of sampling in step 27''s control) carry to
+        part (c)''s setup, where the new-family level is the largest share of the held-out error'
+      if:
+      - 'YES (arm new-43 median bias^2 below c_best''s 0.314 by more than R_b): part (c)''s setup takes the level file; reported
+        to Joaquin with Suprio''s layout'
+      - 'NO (within R_b of c_best''s): the level lever does not carry over the emission-scale target; reported, the next attempt
+        designed'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
