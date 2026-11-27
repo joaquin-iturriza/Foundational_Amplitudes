@@ -216,7 +216,10 @@ def build(out, seed):
     os.makedirs(os.path.dirname(out), exist_ok=True)
     sa = os.path.join(work, "sa")
     mg._mg5_script(f"import model sm\ngenerate {GEN}\noutput standalone_cpp {sa}\nquit\n", out + ".mg5.log")
-    mg.patch_param_card_slha(os.path.join(sa, "Cards", "param_card.dat"), {"MT": m, "ymt": m})
+    # WT 0: the tops are external and stable; with the card's width the top propagator next to a soft or collinear gluon
+    # saturates at 1/(m_t Gamma_t) once 2 p_t.k < m_t Gamma_t (x < ~5e-4), flattening the soft limit (build of
+    # 2026-11-27: soft slope -0.003 at x 1e-7..1e-6)
+    mg.patch_param_card_slha(os.path.join(sa, "Cards", "param_card.dat"), {"MT": m, "ymt": m, "WT": 0.0})
     mg.compile_backends(sa, 5)
     backend, _, drv, _ = mg.detect_compiled_backend(sa)
     assert backend == "cpp" and drv, f"no C++ driver in {sa}"
@@ -229,7 +232,7 @@ def build(out, seed):
             "particles": [dict(pdg=p, **PROPS[p], mass=(m if abs(p) == 6 else 0.0)) for p in PDGS],
             "particle_names": NAMES,
             "singular_var": "soft: x=2E_g/sqrt(s); coll: 1-cos(t,g); threshold: beta of the t t~ pair; bulk: min(s_tg, s_t~g)/s",
-            "targets": {"me2": {"n_loops": 0, "alpha_s_power": 1, "alpha_power": 2}}, "m_t": m, "seed": seed}
+            "targets": {"me2": {"n_loops": 0, "alpha_s_power": 1, "alpha_power": 2}}, "m_t": m, "w_t": 0.0, "seed": seed}
     with h5py.File(out + ".part", "w") as F:
         F.attrs["metadata"] = json.dumps(meta)
         def put(split, name, ev, sv=None, ov=None):
