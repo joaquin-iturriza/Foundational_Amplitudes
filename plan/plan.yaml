@@ -30529,6 +30529,11 @@ entries:
       default card as the other 49 (FA-ccin2p3-47fb3318, --tmp 10G, limit 4 h); combine a8d68ffe (DependencyNeverSatisfied
       on the failed array task) cancelled, resubmitted as FA-ccin2p3-680004d8 afterok on the new part, parts s1001-1050 without
       s1019 plus s1051 (--expect 50). Same MC sample size and card; a different seed is a repair.'
+  - at: '2026-11-27T19:28:48+00:00'
+    text: 'Step 34b: uug held-out FT search read (kit_curves sweep @a551adbd4): 16/16, 7 pass curve_quality; chosen hp1790
+      (trial 11, CC) val mu-MSE 2.66e-5 (sep 2.70), next hp0170 3.08e-5, hp0353 3.09e-5. KIT scoring of trial_1790 FA-ccin2p3-82452f53
+      (interactive); then kit_figures collect trial_1790=kit_A_ft_ee_uug_me2_n100000_t1831_heldoutqqg_ftbest, kit_readout
+      --vs SCR-A2 uug (FA-ccin2p3-6f1a5dad), slide10 heldout redraw.'
   step_why:
     32:
       feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
