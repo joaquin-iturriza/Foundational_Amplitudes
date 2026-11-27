@@ -37343,6 +37343,15 @@ entries:
       caption, data commit), FIX (0.07 -> 0.06 unrounded, 2->4 not ''well above''), PASS. PDF scratchpad draft_sec57_final.pdf.
       Pre-existing in Joaquin''s 70b42cd: stray line 20 of paper.tex ''{\noindent\makebox[\textwidth][c]{#1}}'' gives ''Missing
       \begin{document}'' (compiles on), left as he wrote it.'
+  - at: '2026-11-27T13:33:24+00:00'
+    text: '2026-11-27 D601: Sec. 7 Asymptotic factor rewritten from wrappers.py _asym_terms/_asym_mu (Eqs. asym, asym_dipole,
+      asym_coeff, asym_count; terms uug 2, uugg 10, tt one loop 3, ttg 0 dipoles; outputs 4/5/3 per event); draft 29fde9f,
+      fresh section reviewer FIX, FIX, PASS. Stability (tools/kit_curves.py jumps @f033a869): from-scratch factor runs largest
+      one-point val jump uug 2.69x, uugg 1.46x, tt 7.55x at eval 5 and >5x also at eval 33, best at eval 49/50 in all three;
+      the transformers without factor 8.04x, 8.79x, 5.07x. Fine-tunes with the factor: fair one-loop D=1e3 at lr_scale 7.41
+      jumps >5x at evals 2,6,10,16 (11.5x), ends at 7x its best; rerun at 0.126 largest 1.62x; D=1e4 13.4x at eval 4 (warmup)
+      then best at 48; held-out uug lr_scale 1 26x. asym_sd bug (fine-tunes scaled the log slopes by s_own/s_parent: exponents
+      0.487x, 0.232x) fixed ff4f2e0cf, exponents exact after.'
   designs:
   - at: '2026-11-13T03:11:20+00:00'
     question: 'How good is a given MSE of log|M|^2 in the draft''s data-saving figure (Sec. 2, analysis/data_saving/figs/old_setup_examples,
