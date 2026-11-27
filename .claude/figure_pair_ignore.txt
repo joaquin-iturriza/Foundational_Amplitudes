@@ -57,3 +57,7 @@ talks/kit_reply_nov2026/figs/kit_protocolB_a2_ee_tt.pdf
 talks/kit_reply_nov2026/figs/kit_protocolB_a2_ee_uug.pdf
 talks/kit_reply_nov2026/figs/kit_protocolB_a2_ee_uugg.pdf
 talks/kit_reply_nov2026/figs/kit_slide10_a2.pdf
+talks/kit_reply_nov2026/figs/kit_protocolB_a2_ee_tt.png
+talks/kit_reply_nov2026/figs/kit_protocolB_a2_ee_uug.png
+talks/kit_reply_nov2026/figs/kit_protocolB_a2_ee_uugg.png
+talks/kit_reply_nov2026/figs/kit_slide10_a2.png
