@@ -30097,7 +30097,7 @@ entries:
       - 'beyond: KITSURR path fault, fix and rerun'
   step_waits:
     '24': FA-ccin2p3-5819e2fe FA-ccin2p3-e5c41742 FA-ccin2p3-27013dea FA-ccin2p3-aca0bcaa FA-ccin2p3-2128f5f5
-    '32': FA-ccin2p3-96ce4464
+    '32': FA-ccin2p3-b45a89e1 FA-ccin2p3-6360f286
     '30': FA-ccin2p3-69541363 FA-ccin2p3-6f1a5dad FA-ccin2p3-ff4af2bc
     '29': FA-ccin2p3-5819e2fe FA-ccin2p3-e5c41742 FA-ccin2p3-27013dea FA-ccin2p3-aca0bcaa FA-ccin2p3-2128f5f5
   handoff:
