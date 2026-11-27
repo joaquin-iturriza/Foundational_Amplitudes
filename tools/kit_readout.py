@@ -103,6 +103,29 @@ def verdict(path, arm, ref):
     return out
 
 
+def slide10(path, runs):
+    """Bakar's slide-10 metrics in his slide-9 layout (kit_benchmark step 29): per run, bulk_test and each hard family's
+    deepest stratum, KIT evaluate.py's log-MSE, bias (mean of pred - truth, log10|M|^2), 99th percentile of
+    |pred - truth| and |M|^2-weighted relative error; the family's fitted exponent (pred, truth, exact); for the azimuth
+    strata the rms over events of the harmonic h = 2<log10|M|^2 cos 2phi>_phi, prediction against truth."""
+    d = json.load(open(path))
+    for name in runs:
+        r = d["runs"][name]
+        print(f"== {name}")
+        print(f"  {'bin':34s} {'log-MSE':>9s} {'bias':>9s} {'p99':>8s} {'w.rel.err':>9s}  exponent pred/truth/exact | h pred/truth")
+        sl = r.get("slopes") or {}
+        rows = [(k.split("/")[1], k) for k in r["strata"] if k.startswith("bulk_test/")]
+        rows += [(st, next(k for k in r["strata"] if k.startswith(f"hard_test/{st}/")))
+                 for fam, (st, _, _) in sorted(deepest(r["strata"]).items())]
+        for st, k in rows:
+            v = r["strata"][k]
+            fam = family(st) if k.startswith("hard_test/") else None
+            e = next((x for kk, x in sl.items() if fam and kk.startswith(fam + "/")), None)
+            es = f"  {e['pred']:+.2f}/{e['truth']:+.2f}/{e['exact']:+.0f}" if e else ""
+            h = f" | h {v['cos2phi_rms_pred']:.3g}/{v['cos2phi_rms_truth']:.3g}" if "cos2phi_rms_pred" in v else ""
+            print(f"  {st:34s} {v['logmse']:9.3g} {v['bias']:+9.2e} {v['p99_abs']:8.3g} {v['me2_weighted_rel_err']:9.3g}{es}{h}")
+
+
 if __name__ == "__main__":
     # python tools/kit_readout.py <json> [--vs <run name>] [--verdict <arm> <control> ...pairs]
     if "--verdict" in sys.argv:
@@ -113,6 +136,8 @@ if __name__ == "__main__":
         res = {f"{a} vs {r}": verdict(av[1], a, r) for a, r in zip(pairs[::2], pairs[1::2])}
         if out:
             json.dump(res, open(out, "w"), indent=1)
+    elif "--slide10" in sys.argv:   # python tools/kit_readout.py <json> --slide10 <run> ...
+        slide10(sys.argv[1], sys.argv[sys.argv.index("--slide10") + 1:])
     elif "--vs" in sys.argv:
         versus(sys.argv[1], sys.argv[sys.argv.index("--vs") + 1])
     else:
