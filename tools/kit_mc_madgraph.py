@@ -464,7 +464,10 @@ def cmd_bench(a):
 def cmd_combine(a):
     """--surrogate part runs (gen --seed k, each in its own dir) as one sample in --dir: their events pooled, sigma_hat
     the inverse-variance mean of theirs (MadEvent's scalar calls at one event cost ~50 ms: a 1e5-event run is split)"""
+    import glob
     import h5py
+    a.parts = sorted(q for d in a.parts for q in (glob.glob(d) if "*" in d else [d]))
+    assert a.expect is None or len(a.parts) == a.expect, f"{len(a.parts)} parts, expected {a.expect}"
     fs = [h5py.File(h5(d, a.proc, True), "r") for d in a.parts]
     assert len({str(f.attrs["surrogate"]) for f in fs}) == 1, "parts of different surrogates"
     s = np.array([float(f.attrs["sigma_pb"]) for f in fs])
@@ -684,7 +687,8 @@ def main():
     b = sub.add_parser("bench"); b.add_argument("proc", choices=PROC); b.add_argument("run")
     b.add_argument("--batch", type=int, default=32); b.add_argument("--calls", type=int, default=20)
     cb = sub.add_parser("combine"); cb.add_argument("proc", choices=PROC); cb.add_argument("--dir", required=True)
-    cb.add_argument("parts", nargs="+", help="the part runs' --dir")
+    cb.add_argument("parts", nargs="+", help="the part runs' --dir (a quoted glob is expanded)")
+    cb.add_argument("--expect", type=int, help="the number of parts")
     sub.add_parser("selfcheck")
     a = ap.parse_args()
     {"gen": cmd_gen, "serve": cmd_serve, "predict": cmd_predict, "metrics": cmd_metrics, "figure": cmd_figure, "figure_exact": cmd_figure_exact,
