@@ -409,11 +409,11 @@ def anchored(D, tr, ho, new, rel, meta, grp, pfeat, lev, events, nboot=30, mode=
         print(c, {g: {s: round(v, 4) for s, v in summ[c][g].items() if s != "boot_sd"} for g in ("new", "relabels")})
 
 
-def write_level_events(D, tr, ho, new, Xp_tr, Xp_ho, Kp_tr, Kp_ho, events, seeds=range(30)):
+def write_level_events(D, tr, ho, new, Xp_tr, Xp_ho, Kp_tr, Kp_ho, events, seeds=range(3)):
     """data.level_events of the training run (llm_compare step 28, attempt E's YES branch): the anchored level
     log|M|^2 ~ c_p + b_p.(x - x0_p)/sx, x = (L, q, E), with the network + kinematics anchor map (E_sqE_kin) and the
     regressor's network for (c_p, b_p), both fitted once on all training processes (training processes in-sample, held
-    out predicted, as data/level_file_B_diag.json for step 16), the network averaged over attempt E's 30 seeds. Writes
+    out predicted, as data/level_file_B_diag.json for step 16), the network over seeds 0-2 (step 16's file: 3 seeds). Writes
     data/level_events_E_kin.json: "levels" (c_p, read by data.level_file), "coef" {b, x0, E_legs}, "sx", and "check":
     this file's own level error on the 43 new and the training processes, full pool and subsets."""
     cols = ("L", "q", "E")
@@ -441,7 +441,7 @@ def write_level_events(D, tr, ho, new, Xp_tr, Xp_ho, Kp_tr, Kp_ho, events, seeds
         chk[g] = {s: float(np.median([x[s] for x in e])) for s in SUBSETS}
     print("level_events check (median level error):", chk, flush=True)
     out = {"source": "analysis/catalog_daniel/perevent_level.py --anchored --anchor map --write-level-events "
-                     f"(E_sqE_kin, {len(list(seeds))} seeds, {events} events per pool)",
+                     f"(E_sqE_kin, (c,b) seeds {list(seeds)}, anchor seeds 0-9, {events} events per pool)",
            "x": list(cols), "sx": sx.tolist(), "check": chk,
            "levels": {n: float(Th[n][0]) for n in D},
            "coef": {n: {"b": [float(v) for v in Th[n][1:]], "x0": [float(v) for v in x0p[n]], "E_legs": D[n]["E_legs"]}
