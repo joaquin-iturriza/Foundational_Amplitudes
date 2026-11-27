@@ -30503,6 +30503,9 @@ entries:
       saturates the top propagator next to the soft gluon at 1/(m_t Gamma_t) once 2p_t.k < m_t Gamma_t (x < ~5e-4). Fixed
       @1f216b9a3 (WT = 0: external stable tops, the tree''s exact soft limit), rebuild submitted (same command, CC job 65003701).
       (4) E9821 was no failure (CCJ_NO_RESULT of two just-submitted CPU reads, read later by the previous owner @60777007a).'
+  - at: '2026-11-27T15:44:23+00:00'
+    text: 'Step 36 closed: the two retried trials (hp1441 2.65e-4, hp0886 2.71e-4 val mu-MSE, both fail the curve check) do
+      not beat hp1289 (1.97e-4); search 16/16, 9 good; verdict stands: no uugg family beats SCR-A2.'
   step_why:
     32:
       feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
