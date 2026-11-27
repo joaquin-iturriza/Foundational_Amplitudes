@@ -1,0 +1,54 @@
+# kit_benchmark step 39 (D600 (b)): single-fidelity DyHPO over the template's space for the plain transformer on
+# e+e- -> t t~ g (tools/kit_ttg.py, KIT layout, 1e5 bulk events), in the setup of the asymptotic-factor KIT runs
+# (job_kit.sh mode A on the catalog trial 1262 config: dimensionless inputs, frames_gamma_max 4, coupling orders off,
+# plain log|M|^2 target), so that the factor and emission-scale arms differ from it by one switch each and are run at
+# its best HPs. Everything else as step 15's uug plain search (sweep_config_kit_hpo_uug_plain.yaml): 1831 steps (300
+# epochs of 1e5), batch 16384, WSD 1/8, 16 trials in waves 6/5/5 (D428).
+cluster:
+  scheduler: slurm
+  auto_submit: false
+  request_gpus: 1
+  mem: 11G   # peak RSS ~2 GB; <=12000 MB keeps lxplus at 4 CPUs so the V100 nodes (4 CPUs, 16 GB) can take it (E6895)
+  cpus_per_task: 4
+  time: "01:00:00"
+paths: null
+sweep_name: kit_hpo_ttg_plain
+base_config: ${PROJECT_DIR}/sweep/kit_base/kit_A_fa_ee_ttg_me2_n100000_t1831_plain
+n_trials: 16
+dyhpo:
+  surrogate: gp
+  n_candidates: 2000
+  objective_scale: auto
+  seed: 42
+  n_startup: 6
+  total_budget: 10000
+  waves: [6, 5, 5]
+fidelity_schedule:
+  t_steps: [1831]
+fixed_params:
+  data.source: recipes
+  data.processes_file: ${PROJECT_DIR}/sweep/kit_base/kit_A_fa_ee_ttg_me2_n100000_t1831_plain.recipe.yaml
+  data.train_subsample: 'null'
+  data.eval_subsample: 'null'
+  data.memmap: 'false'
+  training.dtype: float64
+  training.heterosc_select: mu_mse
+  evaluation.train_subsample: 2000
+  seed: 42
+  plot: 'true'
+  warm_start_idx: 'null'
+  fine_tune.pretrained_path: 'null'
+  training.optimizer: MuonAdamW
+  training.scheduler: WSD
+  training.wsd_cooldown_frac: 0.125
+  training.batchsize: 16384
+range_extension:
+  enabled: false
+search_space:
+- {name: training.lr, type: float_log, low: 1.667e-03, high: 1.5e-02}
+- {name: training.muon_weight_decay, type: float_log, low: 1.0e-03, high: 0.3}
+- {name: training.regularization_lambda, type: float_log, low: 1.0e-10, high: 1.0e-06}
+- {name: training.cosanneal_warmup_frac, type: float_uniform, low: 0.05, high: 0.2}
+- {name: training.cosanneal_eta_min, type: float_log, low: 1.0e-10, high: 1.0e-07}
+- {name: ema, type: categorical, choices: ["false", "true"]}
+- {name: training.ema_decay, type: float_uniform, low: 0.9, high: 0.999}
