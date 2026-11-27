@@ -28717,7 +28717,7 @@ entries:
     agent: a9ff5bf228e6df436
     state: working
     since: '2026-11-27T01:30:08+00:00'
-    state_at: '2026-11-27T01:40:50.588000+00:00'
+    state_at: '2026-11-27T01:54:46.529000+00:00'
     context: 185338
     context_at: '2026-11-27T01:55:01+00:00'
   findings:
@@ -52697,9 +52697,9 @@ entries:
   asks: []
   owner:
     agent: aacf740e280c0d06e
-    state: working
+    state: stopped
     since: '2026-11-26T16:41:05.231000+00:00'
-    state_at: '2026-11-27T01:40:52.397000+00:00'
+    state_at: '2026-11-27T01:44:38.058000+00:00'
     context: 189256
     context_at: '2026-11-27T01:55:20+00:00'
   step_waits: {}
