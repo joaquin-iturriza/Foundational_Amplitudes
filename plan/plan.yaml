@@ -28424,10 +28424,6 @@ entries:
       --arms heldout, FT05 arm @ad2ba3624), copy the pdf to talks/kit_reply_nov2026/figs, rebuild, check_caption; (b) design
       the uug fine-tune search (copy sweep_config_kit_hpo_uugg_ft_heldoutqqg.yaml for uug: recipe kit_A_ee_uug, lr 0.00189),
       review, drive'
-    36: 'Held-out qqg uugg fine-tune search (design 2026-11-27 ~14:10, sweep/sweep_config_kit_hpo_uugg_ft_heldoutqqg.yaml
-      @60d52cc1c): on design PASS, record the target (16 x 0.55 h), drive it with sweep/drive.py --item kit_benchmark --disk-gb
-      0.1 --hours 0.55 detached, then score the best trial with job_kit.sh KIT_SCORE_ONLY/KIT_SCORE_DIR and kit_readout --vs
-      SCR-A2 uugg'
     39: 'D600 (b): e+e- -> t t~ g, factor vs emission scales vs plain transformer, every relevant limit (soft gluon at fixed
       gluon-top angle; gluon quasi-collinear to a top, mass-regulated dead cone, at fixed x; threshold beta of the t t~ pair
       at fixed x; bulk zoom). Needs: (1) wrappers._asym_terms has no massive emitter (its own shortcut note: CDST''s massive
@@ -30517,11 +30513,6 @@ entries:
       if:
       - 'best uug FT BEATS SCR-A2 on a family: A2 scratch search on uug, then claim only if still BEATS'
       - 'no family BEATS: no transfer on uug at this pretraining, reported'
-    36:
-      feeds: 'D575 (ii): does the held-out qqg pretraining transfer the uugg limits once the fine-tune is tuned'
-      if:
-      - 'best FT BEATS SCR-A2 on a uugg family: transfer of that limit, reported with the slide redrawn'
-      - 'no family BEATS: no transfer at this pretraining on uugg, reported with exponents and the search spread'
     39:
       feeds: 'D600: what the factor and the emission scales do with one divergence suppressed'
       if:
@@ -30529,7 +30520,6 @@ entries:
       - 'no difference (mass regulates collinear): say so with numbers'
   step_waits:
     '32': FA-ccin2p3-a8d68ffe
-    '36': FA-lxplus-d5b580a2 FA-lxplus-3e5b78e2
     '34': detached drive.py kit_hpo_uug_ft_heldoutqqg (pid 2752905, DONE event)
     '39': ttg rebuild CC CPU job ccj_3a07615b7f4f (slurm 65003701), read by rerunning 'site --timeout 14400 run --job --allow-stale
       --item kit_benchmark ccin2p3 FA -- python tools/kit_ttg.py build'
