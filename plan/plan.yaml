@@ -50475,8 +50475,9 @@ entries:
   match: zz_labllm_*
   evidence:
     runs: []
-    commit: bfe873b5f
+    commit: 549e1b8c8
     paths:
+    - analysis/lab_llm_trial/figs/wake_dispatch.png
     - analysis/lab_llm_trial/runs.jsonl
     - analysis/lab_llm_trial/summary.json
     - analysis/lab_llm_trial/token_share.json
