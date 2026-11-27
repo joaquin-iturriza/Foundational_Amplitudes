@@ -242,14 +242,17 @@ def _asym_terms(p, ptr, n, cas, heavy, loops, sud_single=None):
     return tuple(torch.cat(x, dim=d) for x, d in zip(zip(*parts), (1, 1, 0)))
 
 
-def _asym_mu(mu_raw, alpha, ptr, n, logD, on, members, sd):
+def _asym_mu(mu_raw, alpha, ptr, n, logD, on, members, sd, out=None):
     """(B,) the standardized mu of model.input_asym_factor: log|M|^2 = log A(x) + g(x) with
     A = sum_t exp(c_t) D_t, c_t = sd * mean over the term's legs of alpha_i (per-particle readout), and
     g = log(1 + exp(r)/A), r = sd * mu_raw (the pooled readout), both readouts bounded by +-_ASYM_BOUND (tanh), so g is
     bounded and goes to 0 wherever a D_t diverges: there log|M|^2 - log(exp(c_t) D_t) -> 0, the limit's form is exact
     and only the coefficient (the reduced matrix element's role, smooth in the limit) is learned (Maitre-Truong,
     arXiv:2107.06625). In target units: mu = (log|M|^2 - mean)/sd; the bulk level `mean` cancels into the readouts.
-    mu_raw (B,), alpha (N_total,) the raw readouts; logD, on, members from _asym_terms; sd the target's std (nats)."""
+    mu_raw (B,), alpha (N_total,) the raw readouts; logD, on, members from _asym_terms; sd the target's std (nats).
+    out (2,): (shift, std) of the output, mu = (logsumexp + shift)/std, std nan = sd: a fine-tune under
+    fine_tune.target_stats=own keeps the parent's sd as the readouts' unit and maps only these
+    (BaseExperiment._map_head_to_own_stats; held-out qqg fine-tunes before it had their slopes scaled by s_own/s_parent)."""
     B_ = _ASYM_BOUND
     cnt = ptr[1:] - ptr[:-1]
     ar = torch.arange(n, device=ptr.device)
@@ -261,7 +264,11 @@ def _asym_mu(mu_raw, alpha, ptr, n, logD, on, members, sd):
     sd = sd.to(torch.float64)
     terms = torch.where(on, sd * cbar + logD, torch.full_like(logD, -torch.inf))
     reg = sd * B_ * torch.tanh(mu_raw.to(torch.float64) / B_)
-    return torch.logsumexp(torch.cat([reg[:, None], terms], 1), 1) / sd
+    lse = torch.logsumexp(torch.cat([reg[:, None], terms], 1), 1)
+    if out is None:
+        return lse / sd
+    out = out.to(torch.float64)
+    return (lse + out[0]) / torch.where(out[1].isnan(), sd, out[1])
 
 
 def _neutrinos(idx):
@@ -475,6 +482,7 @@ class AmplitudeLLoCaWrapper(nn.Module):
         self.input_asym_factor = bool(input_asym_factor)
         if self.input_asym_factor:
             self.register_buffer("asym_sd", torch.ones((), dtype=torch.float64))
+            self.register_buffer("asym_out", torch.tensor([0.0, float("nan")], dtype=torch.float64))   # _asym_mu's out
         # input_asym_sudakov_single: the Sudakov single log beside the double log, kappa = log of their ratio (_asym_terms)
         assert not input_asym_sudakov_single or self.input_asym_factor, "input_asym_sudakov_single needs input_asym_factor"
         self.asym_kappa = nn.Parameter(torch.zeros(1)) if input_asym_sudakov_single else None
@@ -540,6 +548,11 @@ class AmplitudeLLoCaWrapper(nn.Module):
         self._pd_device = None
         self._virt_by_pid = None
         self._virt_log_scale = 0.1   # signed-log virtuality scale; see _diagram_features_virtuality
+
+    def _load_from_state_dict(self, state_dict, prefix, *args):
+        if self.input_asym_factor:   # a checkpoint from before asym_out: output std asym_sd, no shift (its old forward)
+            state_dict.setdefault(prefix + "asym_out", torch.tensor([0.0, float("nan")], dtype=torch.float64))
+        super()._load_from_state_dict(state_dict, prefix, *args)
 
     def setup_particle_features(self, use_pids: bool, property_matrix=None,
                                 encoder_hidden: int = 0):
@@ -1272,7 +1285,7 @@ class AmplitudeLLoCaWrapper(nn.Module):
             n = int(max(seq_lens)) if seq_lens is not None else int(cnt.max())
             logD, on, mem = _asym_terms(fourmomenta, ptr, n, G[particle_type_indices, 7],
                                         G[particle_type_indices, 2] >= 0, loops, self.asym_kappa)
-            mu = _asym_mu(pooled[:, 0], alpha, ptr, n, logD, on, mem, self.asym_sd)
+            mu = _asym_mu(pooled[:, 0], alpha, ptr, n, logD, on, mem, self.asym_sd, self.asym_out)
             pooled = torch.cat([mu[:, None].to(pooled.dtype), pooled[:, 1:]], dim=-1)
 
         # HETEROSC + sigma_after_pool: the net handed us a RAW per-particle sigma logit, so the

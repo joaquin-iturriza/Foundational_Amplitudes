@@ -1292,6 +1292,7 @@ class AmplitudeExperiment(BaseExperiment):
                     f"model.input_asym_factor models log|M|^2 (natural log, no divided-out factor; abslog with " \
                     f"training.sign_head), got trafos {trafos}"
                 model.asym_sd.fill_(float(sds[0]))
+                model.asym_out.copy_(torch.tensor([0.0, float(sds[0])], dtype=torch.float64))
             model.setup_particle_features(
                 use_pids=use_pids,
                 property_matrix=getattr(self, "property_matrix", None),

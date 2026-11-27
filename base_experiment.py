@@ -1652,19 +1652,34 @@ class BaseExperiment:
         assert len(pm) == len(psd) == len(om) == len(osd) == 1, (
             f"target_stats=own head map needs one target standardization on each side: parent {pm}, {psd}; run {om}, {osd}")
         a, c = float(psd[0]) / float(osd[0]), (float(pm[0]) - float(om[0])) / float(osd[0])
+        if a == 1.0 and c == 0.0:   # the same stats (a run rebuilt on its own checkpoint): nothing to map
+            return
         kw = [k for k in state_dict if k.endswith("linear_out.weight") and "sign" not in k]
         kb = [k for k in state_dict if k.endswith("linear_out.bias") and "sign" not in k]
         assert len(kw) == len(kb) == 1, f"target_stats=own head map: readout tensors {kw} {kb}"
         W, b = state_dict[kw[0]].clone(), state_dict[kb[0]].clone()
-        W[0], b[0] = a * W[0], a * b[0] + c   # row 0 is mu in every role layout (mu[, sign][, sigma])
+        if getattr(self.model, "input_asym_factor", False):
+            # mu = (logsumexp + shift)/std (wrappers._asym_mu): the readouts keep the parent's unit (its asym_sd) and
+            # only the output is mapped, exactly: shift += m_p - m_o, std = s_o (mapping row 0 instead scaled the
+            # logsumexp's slope by s_o/s_p: kit_benchmark step 34)
+            (ks,) = [k for k in state_dict if k.endswith("asym_sd")]
+            ko = ks[:-len("asym_sd")] + "asym_out"
+            sh, ps = state_dict.get(ko, torch.tensor([0.0, float("nan")], dtype=torch.float64)).tolist()
+            ps = float(state_dict[ks]) if math.isnan(ps) else ps
+            assert abs(ps / float(psd[0]) - 1) < 1e-6, f"parent's asym output std {ps} != its target std {psd[0]}"
+            state_dict[ko] = torch.tensor([sh + float(pm[0]) - float(om[0]), float(osd[0])], dtype=torch.float64)
+        else:
+            W[0], b[0] = a * W[0], a * b[0] + c   # row 0 is mu in every role layout (mu[, sign][, sigma])
         pcfg_f = os.path.join(pdir, "config.yaml")
         p_het = os.path.exists(pcfg_f) and str(OmegaConf.load(pcfg_f).training.get("loss")) == "HETEROSC"
         het = str(self.cfg.training.get("loss")) == "HETEROSC" and p_het and W.shape[0] > 1
         if het:
             b[-1] = b[-1] + math.log(a)   # shortcut: sigma scales by exactly a only where softplus ~ exp (sigma << 1)
         state_dict[kw[0]], state_dict[kb[0]] = W, b
-        LOGGER.info(f"Fine-tuning: head mapped to this run's target stats (target_stats=own): mu row x{a:.4g}, "
-                    f"bias {c:+.4g}" + (f", sigma bias {math.log(a):+.4g}" if het else ""))
+        what = (f"asym output shift {float(state_dict[ko][0]):+.4g} std {osd[0]:.4g}"
+                if getattr(self.model, "input_asym_factor", False) else f"mu row x{a:.4g}, bias {c:+.4g}")
+        LOGGER.info(f"Fine-tuning: head mapped to this run's target stats (target_stats=own): {what}"
+                    + (f", sigma bias {math.log(a):+.4g}" if het else ""))
 
     def _shrink_perturb(self, lam: float, gamma: float):
         """fine_tune.shrink_perturb (plan warm_start step 14): every parameter p <- lam * p + gamma * p0, p0 the same

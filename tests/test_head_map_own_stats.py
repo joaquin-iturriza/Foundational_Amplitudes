@@ -84,9 +84,71 @@ def test_no_map_when_parent_predicts_another_quantity():
         torch.testing.assert_close(s.model.state_dict()[k], v, rtol=0, atol=0)
 
 
+def _asym_model(sd):
+    """A small model.input_asym_factor LLoCa (HETEROSC, rows [mu, alpha, sigma]) with its target std `sd`, as
+    AmplitudeExperiment._post_instantiate_model leaves it."""
+    from models.lloca import LLOCAMuPTransformer
+    from particle_ids import GLOBAL_PROPERTY_MATRIX as G
+    from wrappers import AmplitudeLLoCaWrapper
+    net = LLOCAMuPTransformer(num_scalars=16, hidden_channels_mlp=16, num_layers_mlp=2, in_channels=20,
+                              attn_reps="8x0n+2x1n", out_channels=1, num_blocks=2, num_heads=2, loss="HETEROSC",
+                              extra_main=1)
+    w = AmplitudeLLoCaWrapper(net, token_size=0, d_particle_hidden=16, input_asym_factor=True)
+    w.setup_particle_features(use_pids=False, property_matrix=G)
+    w.asym_sd.fill_(sd)
+    w.asym_out.copy_(torch.tensor([0.0, sd], dtype=torch.float64))
+    return w.double().eval()
+
+
+def test_asym_factor_step0_is_parent_zero_shot():
+    """model.input_asym_factor under target_stats=own (kit_benchmark step 34): the map keeps the parent's readouts and
+    unit and maps the output, so y = m + s mu is the parent's exactly, in the bulk and in a soft and a collinear limit
+    (mapping row 0 scaled the limits' slopes by s_o/s_p); a parent checkpoint from before asym_out (no key) maps the
+    same; a run rebuilt on its own stats loads unchanged."""
+    import numpy as np
+    from particle_ids import global_encode
+    from test_input_reps import _uug
+    tok = torch.tensor(global_encode(np.array([-11, 11, 2, -2, 21])))
+    evs = [_uug(0.9, 0.8), _uug(1 - 0.4e-6, 1 - 0.6e-6), _uug(0.7 + 1e-7 * 0.3, 1 - 1e-7)]
+    p, ptr = torch.tensor(np.concatenate(evs)), torch.tensor([0, 5, 10, 15])
+    y = lambda m, w, mean: (mean + w.asym_out[1] * m(p, torch.cat([tok] * 3), 0.0, 1.0, ptr)[:, 0]).detach()
+    for old in (False, True):
+        torch.manual_seed(1)
+        parent = _asym_model(SP)
+        with tempfile.TemporaryDirectory() as tmp:
+            os.makedirs(os.path.join(tmp, "models"))
+            json.dump({"prepd_mean": [MP], "prepd_std": [SP]}, open(os.path.join(tmp, "data_stats.json"), "w"))
+            OmegaConf.save(OmegaConf.create({"training": {"loss": "HETEROSC"}}), os.path.join(tmp, "config.yaml"))
+            sd = {k: v for k, v in parent.state_dict().items() if not (old and k == "asym_out")}
+            pt = os.path.join(tmp, "models", "m.pt.gz")
+            with gzip.open(pt, "wb") as f:
+                torch.save({"model": sd}, f)
+            s = _Stub()
+            torch.manual_seed(2)
+            s.model = _asym_model(SO)
+            s._load_pretrained_weights(pt)
+        yp, yo = y(parent, parent, MP), y(s.model, s.model, MO)
+        torch.testing.assert_close(yo, yp, rtol=0, atol=1e-9)
+        torch.testing.assert_close(s.model.asym_sd, parent.asym_sd)
+    with tempfile.TemporaryDirectory() as tmp:    # the fine-tune rebuilt on its own checkpoint and stats
+        os.makedirs(os.path.join(tmp, "models"))
+        json.dump({"prepd_mean": [MO], "prepd_std": [SO]}, open(os.path.join(tmp, "data_stats.json"), "w"))
+        OmegaConf.save(OmegaConf.create({"training": {"loss": "HETEROSC"}}), os.path.join(tmp, "config.yaml"))
+        pt = os.path.join(tmp, "models", "m.pt.gz")
+        with gzip.open(pt, "wb") as f:
+            torch.save({"model": s.model.state_dict()}, f)
+        r = _Stub()
+        r.model = _asym_model(SO)
+        r._load_pretrained_weights(pt)
+    torch.testing.assert_close(y(r.model, r.model, MO), yo, rtol=0, atol=0)
+
+
+
+
 if __name__ == "__main__":
     test_step0_is_parent_zero_shot()
     test_no_map_when_parent_predicts_another_quantity()
+    test_asym_factor_step0_is_parent_zero_shot()
     print("ok")
 
 
