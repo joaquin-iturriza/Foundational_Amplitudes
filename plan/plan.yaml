@@ -28407,11 +28407,6 @@ entries:
   - D572
   - D573
   next:
-    20: 'Fair one-loop (D570, D572, D575): real parent FA-lxplus-828d67d6 submitted (runs/data_saving/dsave_parent_finale_kit_fairnlo_a2,
-      lxplus, limit 14 h, target 10 h). On the clean end of the arm smokes FT FA-ccin2p3-3895a2a7 and SCR-A2 FA-ccin2p3-e0587622
-      (V/B smoke FA-lxplus-abac4281 clean): site pick, then SCR-A2 + V/B at all five D (fairnlo_arms.py <site> runs/data_saving/dsave_parent_finale_kit_fairnlo_a2
-      <limit>, lines 2 and 3; SCR-A2 ~2.4 h, V/B ~0.95 h limits), parent config read from lxplus (site copy to CC if picked
-      there)'
     24: 'Fair one-loop FT at every D when the parent FA-lxplus-828d67d6 (runs/data_saving/dsave_parent_finale_kit_fairnlo_a2)
       ends: fairnlo_arms.py FT lines, then read FT vs SCR-A2 vs V/B per D (design PASS 2026-11-26T02:27 / 13:00)'
     29: 'Slide-10 metrics never reported: bias, 99th percentile, |M|^2-weighted relative error per bin and the azimuth harmonic
@@ -30039,11 +30034,6 @@ entries:
       queue, the 2.4 h limits ~10x the need. Step 30: held-out smoke a3f7a776 clean; real parent FA-ccin2p3-69541363 submitted
       (14 h); uug FT/SCR-A2 smokes ca04dd15/8c576040 from the smoke parent.'
   step_why:
-    20:
-      feeds: 'D570: FT vs SCR-A2 vs V/B on the KIT hard bins'
-      if:
-      - 'smokes clean: submit SCR-A2 + V/B at all D'
-      - 'a smoke breaks: read log, fix inside the setup, resmoke'
     24:
       feeds: 'D570: does fine-tuning from the signed A2 pretraining beat SCR-A2 and V/B with exact Born on ee->tt one loop
         at 100-1e4 points'
@@ -30073,8 +30063,6 @@ entries:
       - 'beyond 3 errors: KITSURR path fault, fix and rerun before any number goes out'
   step_waits:
     '24': FA-lxplus-828d67d6
-    '20': FA-ccin2p3-09f0affd FA-ccin2p3-89c9bf31 FA-ccin2p3-6bb1ca05 FA-ccin2p3-ec020447 FA-ccin2p3-f8e9445b FA-ccin2p3-58dc86ef
-      FA-ccin2p3-49baf8df FA-ccin2p3-0db338e9 FA-ccin2p3-e7e95e15 FA-ccin2p3-9478d077
     '29': FA-lxplus-828d67d6
     '31': FA-ccin2p3-20f0e184 FA-ccin2p3-5a47d217 FA-ccin2p3-6ce1e90c FA-ccin2p3-7bb05caf FA-ccin2p3-77c0851e FA-ccin2p3-c72af479
     '32': FA-ccin2p3-b9d55720 FA-ccin2p3-96ce4464
