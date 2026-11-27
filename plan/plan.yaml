@@ -45349,6 +45349,11 @@ entries:
       numbers after 50 steps (plumbing only): new-43 median level error 0.174 (all), 0.395/0.170/0.246/0.158 on s_lo/s_hi/q_hard/q_soft.
       Arm FA-ccin2p3-0d409c4e stands. Output runs/zz_smoke/zz_smoke_sweep_config_llmcmp_level_events_64949743/level_subsets_smoke.json
       on CC.'
+  - at: '2026-11-27T16:01:20+00:00'
+    text: '2026-11-27 step 26: run FA-ccin2p3-4ba88991 COMPLETED (60,840 steps + sigma stage 1.94 h, runs/llmcmp_c_tprop/trial_1860);
+      E9830 acked. Its score (job_llm_score.sh RUN=runs/llmcmp_c_tprop/trial_1860 EVENTS=1, seen + held out, 32G, 4 h) not
+      submitted: site submit refuses on another agent''s untracked analysis/transfer/data/emission_target.npz and ladder_nlo_hists.npz
+      (the transfer ladder_nlo_hists work), not ignored by .gitignore; left untouched.'
   step_waits:
     '26': FA-ccin2p3-4ba88991
     '27': FA-ccin2p3-220f71a8 FA-ccin2p3-540fc068 FA-ccin2p3-0d409c4e
