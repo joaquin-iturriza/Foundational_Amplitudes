@@ -191,11 +191,19 @@ def plot(R, J):
     import matplotlib.pyplot as plt
     import plot_style as ps
     from scipy.stats import spearmanr
-    style = {a: dict(color=ps.CYCLE[i]) for i, a in enumerate(HIST_ARMS)}
     out = os.path.join(HERE, "figs")
     LM = r"$\log_{10}|\mathcal{M}|^2$"
-    for probe, lab in PROBES.items():
-        arms = [a for a in HIST_ARMS if (probe, a) in R]
+    # the draft's four arms, and every arm of the ladder (Joaquin 2026-10-14 on the Delta plots: "one showing all rungs
+    # for the ladder, and one showing the same ones we are showing in the scaling plots")
+    cmap = plt.get_cmap("viridis")
+    sets = [("", HIST_ARMS, {a: dict(color=ps.CYCLE[i]) for i, a in enumerate(HIST_ARMS)}),
+            ("_all", ARMS, {**{f"r{i}": dict(color=cmap(i / 9)) for i in range(10)},
+                            "scratch": dict(color=ps.C.vermillion, linestyle="--"),
+                            "synthetic": dict(color=ps.C.grey, linestyle="--"),
+                            "finale": dict(color=ps.C.orange, linestyle="--")})]
+    name = {**NAME, **{f"r{i}": f"rung {i}" for i in range(10)}}
+    for (sfx, aset, style), (probe, lab) in [(x, y) for x in sets for y in PROBES.items()]:
+        arms = [a for a in aset if (probe, a) in R]
         t0 = R[probe, arms[0]]
         # true against predicted distributions on the same test events: log|M|^2, and sqrt(s_hat), cos(theta*) with each
         # event weighted by its true / predicted |M|^2
@@ -216,32 +224,38 @@ def plot(R, J):
                 else:
                     ht = np.histogram(r[x], e, weights=r["test_true"])[0]
                     hq = np.histogram(r[x], e, weights=r["test_pred"])[0]
-                models.append(dict(label=NAME[a], edges=e, pred=hq, truth=ht, style=style[a]))
+                models.append(dict(label=name[a], edges=e, pred=hq, truth=ht, style=style[a]))
             ps.true_pred_hist(ax, models, xlabel=xl)
             if x != "lm":
                 ax.set_ylabel(r"$\sum|\mathcal{M}|^2$ per bin")
         ps.process_label(axs[0], lab)
         ps.legend_cell(axs[3], axs[0])
-        ps.save(fig, os.path.join(out, f"ladder_nlo_dist_{probe}"))
+        ps.save(fig, os.path.join(out, f"ladder_nlo_dist{sfx}_{probe}"))
         plt.close(fig)
         # the relative error Delta = |M|^2_pred / |M|^2_true - 1: its distribution, and its median against
         # sqrt(s_hat), cos(theta*) and the true log10|M|^2 (is the error larger where |M|^2 is large?)
         fig, axs = ps.figure(2, 2)
         axs = axs.ravel()
         b = np.logspace(-7, 1, 49)
+        # all arms: no cos(theta*) panel, its cell holds the legend
+        xs = (("sqrts", r"$\sqrt{\hat s}$ [GeV]"), ("lm", LM + r" (true)")) if sfx else \
+            (("sqrts", r"$\sqrt{\hat s}$ [GeV]"), ("cos", r"$\cos\theta^*$ (quark to $e^-$)"), ("lm", LM + r" (true)"))
         for a in arms:
             r = R[probe, a]
             ad = np.abs(r["test_pred"] / r["test_true"] - 1)
-            axs[0].stairs(np.histogram(ad, b)[0], b, label=NAME[a], **style[a])
-            for ax, v in zip(axs[1:], (r["sqrts"], r["cos"], np.log10(r["test_true"]))):
-                ax.plot(*_binned_median(v, ad), marker="o", **style[a])
+            axs[0].stairs(np.histogram(ad, b)[0], b, label=name[a], **style[a])
+            for ax, (x, _) in zip(axs[1:], xs):
+                ax.plot(*_binned_median(np.log10(r["test_true"]) if x == "lm" else r[x], ad), marker="o", **style[a])
         axs[0].set_xscale("log"); axs[0].set_xlabel(r"$|\Delta|$, $\Delta=|\mathcal{M}|^2_{\rm pred}/|\mathcal{M}|^2_{\rm true}-1$")
         axs[0].set_ylabel("events")
-        for ax, xl in zip(axs[1:], (r"$\sqrt{\hat s}$ [GeV]", r"$\cos\theta^*$ (quark to $e^-$)", LM + r" (true)")):
+        for ax, (_, xl) in zip(axs[1:], xs):
             ax.set_yscale("log"); ax.set_xlabel(xl); ax.set_ylabel(r"median $|\Delta|$")
         ps.process_label(axs[1], lab)
-        ps.legend(axs[0], loc="upper left")
-        ps.save(fig, os.path.join(out, f"ladder_nlo_rel_{probe}"))
+        if sfx:
+            ps.legend_cell(axs[3], axs[0])
+        else:
+            ps.legend(axs[0], loc="upper left")
+        ps.save(fig, os.path.join(out, f"ladder_nlo_rel{sfx}_{probe}"))
         plt.close(fig)
     # every ladder arm: MSE(log|M|^2) against median |Delta|, both on the test split
     fig, ax = ps.figure()
