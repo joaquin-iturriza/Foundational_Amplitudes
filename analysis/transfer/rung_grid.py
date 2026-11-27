@@ -125,7 +125,10 @@ def grid(base, probes, panel, own):
                     best = (n, ax, loc)
         own[best[1]].remove()
     names = common + (mine[probes[cells.index(best[1])]] if merged else [])
-    ps.legend(best[1], best[2], handles=[hl[l] for l in names], labels=names, fontsize=ps.LEGEND_MIN_PT)
+    # the panel's own handles: one label ('ladder steps 1-2') is a different curve in different panels, so `hl` (last
+    # panel wins) gave the merged legend another panel's marker
+    ph = {l: h for h, l in zip(*best[1].get_legend_handles_labels())}
+    ps.legend(best[1], best[2], handles=[ph.get(l, hl[l]) for l in names], labels=names, fontsize=ps.LEGEND_MIN_PT)
     print(f"{os.path.basename(base)}: common legend in panel {cells.index(best[1])} {best[2]}, covers {best[0]} points")
     ps.save(fig, base)
 
