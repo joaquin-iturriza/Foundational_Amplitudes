@@ -195,6 +195,11 @@ def run(a):
                 f.flush()
 
 
+def over(a, b):
+    """Whether field value a holds something b lacks: a set difference for id lists, a > b for flags and counts."""
+    return bool(set(a) - set(b)) if isinstance(a, list) else a > b
+
+
 def report(a):
     wakes = {w["t"]: w for w in (json.loads(l) for l in open(os.path.join(DATA, "wakes.jsonl")))}
     rows = [json.loads(l) for l in open(os.path.join(DATA, "wake_answers.jsonl"))]
@@ -214,6 +219,13 @@ def report(a):
                      "exact_ids_when_in_prompt": [sum(r["got"]["send_ids"] == wakes[r["t"]]["key"]["send_ids"]
                                                       for r in ids), len(ids)],
                      "per_field": {k: sum(r["got"][k] == wakes[r["t"]]["key"][k] for r in rs) for k in fields},
+                     # sensitivity: the prompt's example plan verbs prime answers, the key has none on 95/100
+                     "correct_no_plan": sum(all(r["got"][k] == wakes[r["t"]]["key"][k] for k in fields[:4]) for r in rs),
+                     "do_nothing_no_plan": sum(not any(wakes[r["t"]]["key"][k] for k in fields[:4]) for r in rs),
+                     "missed": {k: sum(over(wakes[r["t"]]["key"][k], r["got"][k]) for r in rs)
+                                for k in fields[:4]},
+                     "extra": {k: sum(over(r["got"][k], wakes[r["t"]]["key"][k]) for r in rs)
+                               for k in fields[:4]},
                      "wrong": [(r["t"], wakes[r["t"]]["key"], r["got"]) for r in rs if r not in ok],
                      "seconds_median": sorted(r["seconds"] for r in rs)[len(rs) // 2] if rs else None,
                      "our_tokens_of_these_wakes": sum(wakes[r["t"]]["tokens"] for r in rs)}
