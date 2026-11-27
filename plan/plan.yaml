@@ -30137,6 +30137,15 @@ entries:
       -0.21, SCR-A2 -0.89, V/B -0.02, truth -1.02). Design branch (c) at every D, the lr rerun included: FT beats neither
       control on any hard family. Figures redrawn: analysis/kit_benchmark/figs/kit_fairnlo.png (rerun hollow), kit_fairnlo_d10000.png,
       kit_curves_fairnlo.png (rerun dotted); in talks/kit_reply_nov2026/main.pdf as slides 19-21, rebuilt 0 errors 0 overfull.'
+  - at: '2026-11-27T03:32:37+00:00'
+    text: '2026-11-27 ~05:40. Step 33 done: the fixed serve''s bench (CC CPU job, 41 calls of 32 uug bulk_test events, 1 thread):
+      141.1 ms per call = 4.41 ms per event (was 37; design 2.6, 1.7x, inside 2x); repeat of call 0 identical (0.00e+00);
+      server log10|M_hat|^2 vs kit_predict on 1000 bulk_test events max |delta| 0.00e+00. The slide-11 1e5 jobs b45a89e1 (uug)
+      / 6360f286 (uugg) were not restarted: each MadEvent serve is a new Python process importing the checkout''s current
+      kit_mc_madgraph.py, so every serve started after the CC sync of the fix already runs it: serve stats (runs/kit/mc_madgraph/ee_*_surr_serve.jsonl)
+      show 13-31 ms/event in the first serves and 2.4-4.4 ms/event in the recent ones (uug 122 serves, 4.76e6 events served;
+      uugg 127, 4.34e6); both paths equal kit_predict (0.00), so the integrand is one function throughout. A restart would
+      have discarded ~1.2 h of each run.'
   step_why:
     24:
       feeds: 'D570: does fine-tuning from the signed A2 pretraining beat SCR-A2 and V/B with exact Born on ee->tt one loop
