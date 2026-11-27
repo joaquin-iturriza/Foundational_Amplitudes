@@ -18,7 +18,8 @@ me2; log10_me2; singular_var; other_var}, root attribute `metadata` (JSON).
                                   cone), so |M|^2 is expected flat below theta ~ m_t/E_t
   threshold_beta_<lo>_<hi>        the t t~ pair's velocity beta = sqrt(1 - 4 m_t^2/s_tt) log-uniform per decade 1e-4..1e-1,
                                   top direction uniform in the pair's rest frame (other_var: x = 1 - s_tt/s)
-  hard_test and hard_train hold the same strata, N_HARD events each, independent seeds.
+  hard_test (1e5 a stratum) and hard_train (5000) hold the same strata, independent seeds; stratum names as KIT's
+  (f'{lo:g}_{hi:g}': soft_x_1e-07_1e-06, soft_x_0.0001_0.001); bulk singular_var min(s_tg, s_t~g)/s (KIT: min_y).
 """
 import argparse
 import json
@@ -36,7 +37,14 @@ SQRTS, ALPHA_S, ALPHA_INV = 1000.0, 0.118, 132.507
 GEN = "e+ e- > t t~ g"
 PDGS = [-11, 11, 6, -6, 21]
 N_BULK = {"bulk_train": 200000, "bulk_test": 200000}
-N_HARD = 10000
+N_HARD = {"hard_train": 5000, "hard_test": 100000}   # KIT's N_HARD_TRAIN, N_HARD_TEST (generate.py)
+# KIT's particle table (generate.py PARTICLES: Q, spin, mass, T3 of the LH state, B, L, colour dim, C2); the top mass is
+# set from KIT's ee_tt file at build
+PROPS = {-11: dict(Q=1, spin=0.5, T3=0.5, B=0, L=-1, color=1, C2=0), 11: dict(Q=-1, spin=0.5, T3=-0.5, B=0, L=1, color=1, C2=0),
+         6: dict(Q=2 / 3, spin=0.5, T3=0.5, B=1 / 3, L=0, color=3, C2=4 / 3),
+         -6: dict(Q=-2 / 3, spin=0.5, T3=-0.5, B=-1 / 3, L=0, color=3, C2=4 / 3),
+         21: dict(Q=0, spin=1.0, T3=0, B=0, L=0, color=8, C2=3)}
+NAMES = ["e+", "e-", "t", "t~", "g"]
 YCUT = 0.01
 FAMS = {"soft_x": [(10.0 ** k, 10.0 ** (k + 1)) for k in range(-7, -2)],
         "coll_tg": [(10.0 ** k, 10.0 ** (k + 1)) for k in range(-7, -1)],
@@ -216,9 +224,11 @@ def build(out, seed):
     # the standalone at KIT's settings reproduces KIT's u u~ g |M|^2 elsewhere (kit_mc_madgraph CHECK, 1e-6); here the
     # check is the soft limit: |M|^2 x^2 flat in the deepest two soft strata
     rng = np.random.default_rng(seed)
-    meta = {"process": GEN, "sqrts": SQRTS, "alpha_s": ALPHA_S, "alpha_inv": ALPHA_INV, "generator": "tools/kit_ttg.py",
+    meta = {"process": "e+ e- -> t t~ g", "sqrts": SQRTS, "alpha_s": ALPHA_S, "alpha_inv": ALPHA_INV, "generator": "tools/kit_ttg.py",
             "bulk": f"flat three-body phase space, s_ij/s > {YCUT} for every singular pair (t g, t~ g)",
-            "particles": [{"pdg": p, "mass": (m if abs(p) == 6 else 0.0)} for p in PDGS],
+            "particles": [dict(pdg=p, **PROPS[p], mass=(m if abs(p) == 6 else 0.0)) for p in PDGS],
+            "particle_names": NAMES,
+            "singular_var": "soft: x=2E_g/sqrt(s); coll: 1-cos(t,g); threshold: beta of the t t~ pair; bulk: min(s_tg, s_t~g)/s",
             "targets": {"me2": {"n_loops": 0, "alpha_s_power": 1, "alpha_power": 2}}, "m_t": m, "seed": seed}
     with h5py.File(out + ".part", "w") as F:
         F.attrs["metadata"] = json.dumps(meta)
@@ -234,13 +244,14 @@ def build(out, seed):
         for split, n in N_BULK.items():
             ev = bulk(n, m, rng)
             check(ev, m)
-            put(split, "bulk", ev)
+            v = variables(ev, m)
+            put(split, "bulk", ev, np.minimum(v["ytg"], v["ybg"]), v["x"])
         for split in ("hard_train", "hard_test"):
             for fam, bins in FAMS.items():
                 for lo, hi in bins:
-                    ev, u, o = stratum(fam, lo, hi, N_HARD, m, rng)
+                    ev, u, o = stratum(fam, lo, hi, N_HARD[split], m, rng)
                     check(ev, m)
-                    me2 = put(split, f"{fam}_{lo:.0e}_{hi:.0e}".replace("e-0", "e-"), ev, u, o)
+                    me2 = put(split, f"{fam}_{lo:g}_{hi:g}", ev, u, o)   # KIT's names
                     if fam == "soft_x" and lo < 1e-6:
                         sl = np.polyfit(np.log10(u), np.log10(me2), 1)[0]
                         print(f"  soft slope d log|M|^2 / d log x = {sl:.4f} (expected -2)", flush=True)

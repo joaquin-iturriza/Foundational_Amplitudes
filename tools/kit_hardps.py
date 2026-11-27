@@ -37,6 +37,7 @@ SPLITS = ("bulk_train", "bulk_test", "hard_train", "hard_test")
 # is dumped with tools/dump_diagrams.py and listed here).
 DIAGRAMS_OF = {("ee_tt", "born"): "ee_ttbar", ("ee_tt", "virt_finite"): "ee_ttbar_nlo",
                ("ee_uug", "me2"): "ee_uug", ("ee_uugg", "me2"): "ee_uugg",
+               ("fa_ee_ttg", "me2"): "ee_ttbarg",   # tools/kit_ttg.py, same leg order after beam_perm
                # zng_uq_benchmark's d d~ > Z + n g files (tools/zng_uq.py), read through this layout
                ("uq_zg", "me2"): "ddbar_Zg", ("uq_zgg", "me2"): "ddbar_Zgg", ("uq_zggg", "me2"): "ddbar_Zggg",
                ("uq_zgggg", "me2"): "ddbar_Zgggg"}
