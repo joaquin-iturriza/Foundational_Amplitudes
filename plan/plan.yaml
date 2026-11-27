@@ -28417,15 +28417,6 @@ entries:
       0.12200+-0.00100 pb at 2000 events vs exact 0.121861). 1e5-event surrogate jobs at KIT_MC_VEC=32 FA-ccin2p3-b45a89e1
       (uug, 6 h) 6360f286 (uugg, 12 h); on their end: wiring check sigma_hat/sigma vs E_exact[u], numbers, figure_exact with
       the tt part (12d32b55), differences from slide 11 first (vector_size 32 noted as a repair: it only batches the calls)'
-    39: 'D600 (b): e+e- -> t t~ g, factor vs emission scales vs plain transformer, every relevant limit (soft gluon at fixed
-      gluon-top angle; gluon quasi-collinear to a top, mass-regulated dead cone, at fixed x; threshold beta of the t t~ pair
-      at fixed x; bulk zoom). Needs: (1) wrappers._asym_terms has no massive emitter (its own shortcut note: CDST''s massive
-      Q -> Q g dipole missing, ''add when a t t~ g target is fit''): add the quasi-collinear massive dipole / massive eikonal,
-      unit test; (2) a KIT-like ttg file: 1e5+1e5 bulk (catalog ee_ttbarg sqrt s window as uug''s 1 TeV) and hard_test strata
-      by soft x 1e-7..1e-2 and by gluon-top angle, generated with the MadGraph standalone path of tools/kit_mc_madgraph /
-      mg5_pipeline_final (fa-generation: probe, then the batch); (3) three runs (factor, emission scales, plain) at one searched
-      HP point (a 16-trial template search on the plain arm as for uug, ~9 GPU-h, or the uug factor HPs if Joaquin prefers
-      quick: ask), scored; (4) kit_zoom over it. Design and review before any job; budget stated in the design.'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -30579,14 +30570,8 @@ entries:
       if:
       - 'wiring within 3 MC errors: numbers to Joaquin in the deck'
       - 'beyond: KITSURR path fault, fix and rerun'
-    39:
-      feeds: 'D600: what the factor and the emission scales do with one divergence suppressed'
-      if:
-      - 'factor helps in the soft limit and the bulk: report with numbers'
-      - 'no difference (mass regulates collinear): say so with numbers'
   step_waits:
     '32': FA-ccin2p3-680004d8
-    '39': FA-ccin2p3-cb01aa03 FA-ccin2p3-3001d863 FA-lxplus-d1e1006a
   handoff:
     state: '2026-11-27 ~20:45 CET (owner a1df8528ae678ee1d). Done this turn: step 36 closed (uugg held-out FT search 16/16,
       chosen hp1289 1.97e-4; KIT-scored, vs SCR-A2 every family slightly worse but inside 1/7..7: no transfer; slide10 heldout
