@@ -30099,6 +30099,17 @@ entries:
       unstable over the first ~3500 steps), SCR-A2 25/16/13x and V/B 77/16/15x at 1e3/3162/1e4, all recovering to their best
       later; listed apart. Per the design FT D=1e3 (lr_scale 7.41) rerun at lr_scale 0.126: FA-ccin2p3-65e6c701 (tag fairnlo_ft_d1000_lsmed).
       Figures analysis/kit_benchmark/figs/kit_fairnlo.png, kit_fairnlo_d10000.png, kit_curves_fairnlo.png.'
+  - at: '2026-11-27T02:59:03+00:00'
+    text: '2026-11-27 ~05:05 @30d2912a7. Step 33, slide-11 serve cost: profiled on CC (kit_mc_madgraph.py bench ee_uug A2
+      run, 20 calls of 32 bulk_test events, 1 thread): 1183 ms per call = 37 ms per event, of which init_data 1071 ms (train-pool
+      augmentation keyed_aug 543 ms, train momentum mean/std f32_mean_std 383 ms, boosts 178 ms) and the model forward 85
+      ms: the per-call cost is the rebuild re-reading and re-augmenting the 1e5-event train pool to refit statistics, fixed
+      per call, independent of the batch. So the cost per event falls as 1/vector_size: ~2.2 ms at 512 (the design''s 2.6
+      ms). The 1024 failure (b9d55720 G1 log): ''No points passed cuts! ... max_events 5000000'' after ~30 s with no serve
+      process started (no serve stats file): MadEvent''s vectorised sampling (Source/dsample.f sample_full) never gave a non-zero
+      weight at vector_size 1024; cause inside MadEvent not found. Split test at 256 and 512 (2000 uug events, as 96ce4464):
+      FA-ccin2p3-f73b637b, c730c4cf. If 512 passes: rerun the 1e5 jobs at 512 (uug ~0.6 h, uugg ~1.5 h) if the vec-32 jobs
+      b45a89e1/6360f286 have not ended; the vec-32 results are valid either way (vector_size only batches the calls).'
   step_why:
     24:
       feeds: 'D570: does fine-tuning from the signed A2 pretraining beat SCR-A2 and V/B with exact Born on ee->tt one loop
