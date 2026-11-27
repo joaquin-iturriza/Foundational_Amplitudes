@@ -35082,6 +35082,26 @@ entries:
       once at 0.126 (the median of the other four), stated. Load check fails: the fix incomplete, read before any score.'
     sources: 1/7 and 7 <- t t~ V test same-HP rerun spread 0.78-6.96 (results.tex sec:datasaving); 5x jump <- sec:ladder seeds'
       blow-ups vs 1.5x seed noise; 100 GPU-h <- D570 names this work
+    fix_at: '2026-11-27T10:47:49+00:00'
+    fix: '(4, outcome; 2, check) The load check is a wrong criterion: ''each FT''s logged step-0 validation at the parent''s
+      zero-shot level (O(1) standardized)'', with ''load check fails: the fix incomplete''. The logged step-0 validation is
+      the HETEROSC NLL, not a standardized MSE: the owner read on the step-34 reruns at @77b4200439 (FA-ccin2p3-e095fc91 etc.)
+      uug FT 2.65e3 and uugg 9.41e3 at step 0, because a parent with small sigma scores e^2/(2 sigma^2) on unseen data, so
+      every fixed run would ''fail'' and the branch has no source for ''O(1)''. Fix: replace it with what the fix can be seen
+      to do, as the owner proposed: the head-map log line of each FT shows the asym branch with shift = m_p - m_o and std
+      = the run''s own prepd_std (read on the step-34 reruns: +4.517 / 1.478 uug, +6.113 / 1.454 uugg), plus tests/test_head_map_own_stats.py;
+      or, if a numeric step-0 criterion is kept, the mu-MSE at step 0 against the parent''s zero-shot mu-MSE on the same validation
+      set, with the source of that number. No step-0 NLL bar. (5, prior, small) The entry''s finding 2026-11-27 ~13:10 says
+      the per-D HPs came from stage-2 searches ''run under the same bug'' and that the redo needs a new stage-2 search; this
+      design says the opposite. I checked: sweep/sweep_config_dsave_s2_ft_ee_ttbar_nlo_d4_t5950.yaml has base_config and pretrained_path
+      dsave_parent_treesin_r4, V/B target, no input_asym_factor, so the design is right; state in the design that it corrects
+      that finding (and add a correcting finding), so the reader of the entry sees one account. Everything else holds: 0 (5
+      runs, ~4 GPU-h, the smallest redo of the voided arm), 1 and 11 (FT differs from step 29''s FT only in code ff4f2e0cf
+      and tags; control SCR-A2/VB from scratch, asym_sd = own, unaffected), 2 (the bug''s slope scale s_o/s_p = 0.722/3.118
+      = 0.232 matches the step-29 FT threshold exponent -0.211 vs truth -1.016 in FA-ccin2p3-5819e2fe''s log), 3 (one seed
+      per D315; 1/7 and 7 against the 0.78-6.96 test rerun spread, as passed 2026-11-26 02:29), 9 HETEROSC, 12 no HPO per
+      D570, 15 (step-29 d100 FT trained 02:48-03:02 in the same config), 17 (HPs unchanged, as passed), 18 (setup = step-29
+      FT runs'' logged args), 19 (no waits).'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
