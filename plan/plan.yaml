@@ -43968,6 +43968,14 @@ entries:
       submit refuses on another agent''s uncommitted .claude/hooks/submit_guard.py + tests/test_submit_data_check.py, and
       both --allow-dirty and stashing those files were denied by the permission classifier. Submits once those files are committed
       by their owner.'
+  - at: '2026-11-27T05:12:48+00:00'
+    text: '2026-11-27 step 27: tree clean (submit_guard merged 7aff5591c). Submitted on CC, code @e3aed380f: the smoke''s
+      held-out read FA-ccin2p3-8ed14b18 (job_llm_score.sh ONLY=heldout EVENTS=1, 20G, 1 h; step 28 waits on it for level_subsets
+      --check-factor) and the arm run FA-ccin2p3-0d409c4e (sweep/trial_job.sh, sweep/sweep_config_llmcmp_level_events.yaml
+      @e3aed380f (unchanged since 4facfd5af), trial/hp-idx 7201, trial 5''s HPs lr 1.243724e-03, regularization_lambda 1.123008e-10,
+      warmup 0.1634867, ema True 0.9989315; 60,840 steps, 32G, 4 CPUs, 18 h limit, wall target 13 h of batch level_s30_runs),
+      in parallel with the read: its training does not read it; the read''s fail branch cancels it. Step 27 waits on the arm
+      and both controls.'
   step_waits:
     '26': FA-ccin2p3-4ba88991
     '27': FA-ccin2p3-220f71a8 FA-ccin2p3-540fc068 FA-ccin2p3-0d409c4e
