@@ -218,8 +218,10 @@ def check_vs_kit_predict(pred, run, proc, d, n=1000):
     _, pth = predict(run, ["bulk_test"], os.path.join(d, f"chk_{proc}"), h5=tmp)
     with h5py.File(pth, "r") as P:
         dl = float(np.max(np.abs(srv - P["bulk_test/bulk/log10_me2"][:])))
-    print(f"CHECK server log10|M_hat|^2 vs kit_predict on {n} bulk_test events: max |delta| = {dl:.2e}", flush=True)
-    assert dl < 1e-9, "the server's surrogate is not kit_predict's"
+        one = max(abs(pred.log10(mom[i:i + 1])[0] - P["bulk_test/bulk/log10_me2"][i]) for i in range(20))
+    print(f"CHECK server log10|M_hat|^2 vs kit_predict on {n} bulk_test events: max |delta| = {dl:.2e}; "
+          f"one event per call (MadEvent's scalar DSIG), 20 events: {one:.2e}", flush=True)
+    assert dl < 1e-9 and one < 1e-9, "the server's surrogate is not kit_predict's"
 
 
 def cmd_gen(a):
@@ -326,12 +328,21 @@ class Predictor:
         import torch
         import yaml
         from tools.rebuild_run import rebuild
+        import functools
+        import experiment
         torch.set_num_threads(int(os.environ.get("KIT_THREADS", 1)))
+        # a read-only lookup in the MG5 process table, 15 of the 110 ms of a one-event call (bench 2026-11-27)
+        if not hasattr(experiment.catalog_cfg_for_dataset, "cache_info"):
+            experiment.catalog_cfg_for_dataset = functools.lru_cache(None)(experiment.catalog_cfg_for_dataset)
         self.meta = kh.metadata(proc)
         self.pool = os.path.join(os.environ["SCRATCH"], f"kitsurr_{os.getpid()}_{os.urandom(4).hex()}.npy")
         self.n = 1
+        # train and val read a fixed pool of two bulk events (with frozen statistics they set nothing but loader sizes;
+        # one row would make init_dataloader's train batch int(1/2) = 0): only the scored batch is re-written and forwarded
+        self.fixed = self.pool[:-4] + "_fixed.npy"
         with h5py.File(kh.h5_path(proc), "r") as f:    # one bulk event to build the run on
             self._write(f["bulk_test/bulk/momenta"][:1])
+            self._write(f["bulk_test/bulk/momenta"][:2], self.fixed)
         self.exp, _ = rebuild(run, "test", self.pool, 1, event_frame=True)
         # every later init_data reads the run's frozen statistics (the warm-start path; rebuild asserted them equal to
         # the ones just refitted) and the scored batch as every role's pool: no per-call re-read and re-augmentation of
@@ -341,24 +352,24 @@ class Predictor:
         self.recipe = str(self.exp.cfg.data.processes_file)
         self.name = yaml.safe_load(open(self.recipe))["processes"][0]["name"]
 
-    def _write(self, mom):
-        np.save(self.pool, kh.group_rows({"momenta": mom}, "me2", self.meta))
-        np.save(self.pool[:-4] + ".alphas.npy", np.full(len(mom), self.meta["alpha_s"]))
+    def _write(self, mom, path=None):
+        path = path or self.pool
+        np.save(path, kh.group_rows({"momenta": mom}, "me2", self.meta))
+        np.save(path[:-4] + ".alphas.npy", np.full(len(mom), self.meta["alpha_s"]))
 
     def log10(self, mom):
         import torch
         import yaml
         import datagen
         mom = np.asarray(mom, dtype=np.float64)
-        if len(mom) == 1:   # MadEvent's scalar calls: init_data's train batch size int(n_train / 2) is 0 at one event
-            return self.log10(np.repeat(mom, 2, axis=0))[:1]
         if len(mom) != self.n:      # the recipe's test count is the pool's size
             rec = yaml.safe_load(open(self.recipe))
             rec["processes"][0]["n_test"] = self.n = len(mom)
             yaml.safe_dump(rec, open(self.recipe, "w"))
         self._write(mom)
         real = datagen.ensure_split_set
-        datagen.ensure_split_set = lambda specs, role, seed, dest_dir=None, require_cache=False: {self.name: self.pool}
+        datagen.ensure_split_set = lambda specs, role, seed, dest_dir=None, require_cache=False: \
+            {self.name: self.pool if role == "test" else self.fixed}
         try:
             self.exp.init_data()
             self.exp._init_dataloader()
@@ -416,7 +427,8 @@ def cmd_serve(a):
             st["events"] += m
     finally:
         pipe.__exit__(None, None, None)
-        for f in (a.fifo_in, a.fifo_out, pred.pool, pred.pool[:-4] + ".alphas.npy"):
+        for f in (a.fifo_in, a.fifo_out, pred.pool, pred.pool[:-4] + ".alphas.npy", pred.fixed,
+                  pred.fixed[:-4] + ".alphas.npy"):
             try:
                 os.remove(f)
             except OSError:
