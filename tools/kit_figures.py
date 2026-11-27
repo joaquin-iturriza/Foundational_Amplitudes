@@ -43,6 +43,8 @@ MODELS = {"truth": ("truth", "k", None, "-"),
           "scratch": ("transformer", "vermillion", "s", "-"),
           # the transformer on the emission-scale target (target_physics_factor, dim_ref qperp; kit_zoom, D598)
           "emission": ("transformer, emission scales", "orange", "D", "-"),
+          # the same target at the factor runs' inputs and HPs (step 38, D600: the factor's one-change control)
+          "emis_m": ("transformer, emission scales,\nthe factor's hyperparameters", "sky", "P", "--"),
           "MLP thr": ("MLP, log invariants\n" + r"and $\log(s_{t\bar t}-4m_t^2)$", "purple", "^", "--"),
           "MLP log": ("MLP, log invariants", "green", "^", "--"),
           "MLP raw": ("MLP, raw invariants", "grey", "x", ":"),

@@ -37,10 +37,12 @@ PROCS = ["ee_uug_me2", "ee_uugg_me2", "ee_tt_virt_finite"]
 MLP = "runs/kit_mlp/kit_A_{p}_n100000_t14400_mlpmlp_s{s}"
 RUNS = {"ee_uug_me2": {"factor": ["runs/kit/kit_A_ee_uug_me2_n100000_t1831_hpo_asym_cont"],
                        "emission": ["runs/kit_hpo_uug_T/trial_1493"],
+                       "emis_m": ["runs/kit/kit_A_ee_uug_me2_n100000_t1831_hpo_emis_matched"],
                        "scratch": ["runs/kit_hpo_uug_plain/trial_1918"],
                        "MLP log": [MLP.format(p="ee_uug_me2", s=s) for s in range(3)]},
         "ee_uugg_me2": {"factor": ["runs/kit/kit_A_ee_uugg_me2_n100000_t1831_hpo_asym_cont"],
                         "emission": ["runs/kit_hpo_uugg_T/trial_1196"],
+                        "emis_m": ["runs/kit/kit_A_ee_uugg_me2_n100000_t1831_hpo_emis_matched"],
                         "scratch": ["runs/kit_hpo_uugg_plain/trial_0798"],
                         "MLP log": [MLP.format(p="ee_uugg_me2", s=s) for s in range(3)]},
         "ee_tt_virt_finite": {"factor": ["runs/kit/kit_A_ee_tt_virt_finite_n100000_t1831_hpo_asym_cont"],
@@ -162,6 +164,22 @@ for proc, arms in RUNS.items():
                 m = (Vh[ov] >= band[0]) & (Vh[ov] <= band[1])
                 o["fams"][fam]["band"] = binned(x[m], th[m], {a: [q[m] for q in P] for a, P in ph.items()})
                 o["fams"][fam]["band_frac"] = float(m.mean())
+                # the deepest decade of the family against the other variable: 8 equal bins over its 1-99% range
+                d = x < 10 ** (np.floor(np.log10(x.min()) + 1e-9) + 1)
+                w = Vh[ov][d]
+                e = np.linspace(*np.quantile(w, [0.01, 0.99]), 9)
+                i = np.clip(np.digitize(w, e) - 1, 0, 7)
+                sc = o["fams"][fam]["scan"] = {"var": ov, "deep": [float(x[d].min()), float(x[d].max())], "x": [], "n": [],
+                                               "arms": {a: [{"mse": [], "rel": []} for _ in P] for a, P in ph.items()}}
+                for b in range(8):
+                    mb = i == b
+                    if mb.sum() < NMIN:
+                        continue
+                    sc["x"].append(float(np.median(w[mb]))); sc["n"].append(int(mb.sum()))
+                    for a, P in ph.items():
+                        for j, q in enumerate(P):
+                            M = measures(q[d][mb] - th[d][mb])
+                            sc["arms"][a][j]["mse"].append(M["mse"]); sc["arms"][a][j]["rel"].append(M["rel"])
 print("KITZOOM " + json.dumps(out))
 '''
 
@@ -182,15 +200,36 @@ def _seedmed(rows, k):
 
 VLAB = {"x": r"soft gluon $x=2E_g/\sqrt{s}$", "y": r"collinear $y=s_{qg}/s$",
         "ygg": r"gluon-gluon collinear $y=s_{gg}/s$", "yqg": r"quark-gluon collinear $y=s_{qg}/s$",
-        "beta": r"top velocity $\beta$", "sqrts": r"$\sqrt{s}$ [GeV]"}
-REL_LAB = r"mean $|\mathcal{M}^2_{\rm pred}-\mathcal{M}^2_{\rm true}|/\mathcal{M}^2_{\rm true}$"
-TT_REL_LAB = r"mean $|V_{\rm pred}-V_{\rm true}|/|V_{\rm true}|$"
+        "beta": r"top velocity $\beta$", "sqrts": r"$\sqrt{s}$ [GeV]",
+        "a": r"gluon angle $\min_i s_{ig}/(s\,x)$", "z": r"gluon energy share $z=E_{\rm soft}/(E_1+E_2)$",
+        "xg": r"collinear gluon $x_g=2E_g/\sqrt{s}$"}
+VLAB_UUG = dict(VLAB, a=r"gluon angle $y/x$, $y=\min s_{qg}/s$", x=r"gluon energy $x=2E_g/\sqrt{s}$")
+MEAS = {"rel": r"mean $|\mathcal{M}^2_{\rm pred}-\mathcal{M}^2_{\rm true}|/\mathcal{M}^2_{\rm true}$",
+        "mse": r"MSE$(\log_{10}|\mathcal{M}|^2)$"}
+MEAS_TT = {"rel": r"mean $|V_{\rm pred}-V_{\rm true}|/|V_{\rm true}|$", "mse": r"MSE$(\log_{10}|V|)$"}
 CUT = "divergence-free cut"
+ORDER = ["factor", "emis_m", "emission", "scratch", "MLP log", "MLP thr"]
 
 
 def _arms(p):
     from tools.kit_figures import model_style
-    return {a: model_style(a) for a in RUNS[p]}
+    return {a: model_style(a) for a in ORDER if a in RUNS[p]}
+
+
+def _panels(ps, axs, rows, xlab, ylab, proc, logx=True):
+    """one panel per (x, {arm: y}) row, every arm in ORDER's style"""
+    from matplotlib.ticker import NullFormatter
+    for ax, (x, ys, extra) in zip(axs, rows):
+        for a, (name, c, mk, ls) in ys["sty"].items():
+            if a in ys["y"]:
+                ax.plot(x, ys["y"][a], color=c, marker=mk, ls=ls, label=name)
+        if extra:
+            extra(ax)
+        if logx:
+            ax.set_xscale("log"); ax.xaxis.set_minor_formatter(NullFormatter())
+        ax.set_yscale("log")
+        ax.set_xlabel(xlab(ax)); ax.set_ylabel(ylab)
+        ps.process_label(ax, proc, loc="upper right")
 
 
 def plot(figs):
@@ -201,9 +240,10 @@ def plot(figs):
     os.makedirs(figs, exist_ok=True)
     d = json.load(open(OUT))
     written = []
-    rel_lab = lambda p: TT_REL_LAB if p.startswith("ee_tt") else REL_LAB
     for p in PROCS:
         o, sty = d[p], _arms(p)
+        meas = MEAS_TT if p.startswith("ee_tt") else MEAS
+        vl = VLAB_UUG if p == "ee_uug_me2" else VLAB
         print(f"{p}: missing {o['missing']}; variable check {o['check']}; cuts "
               + "; ".join(f"{v} {c[0]} {c[1]:.3g}" for v, c in o["cuts"].items())
               + f"; core {o['core']['n']} events ({100 * o['core']['frac']:.1f}% of the bulk)")
@@ -211,23 +251,50 @@ def plot(figs):
             b = o["bulk"][a]
             print(f"  CORE {p} {a}: rel {_seedmed(rows, 'rel'):.3g} (median {_seedmed(rows, 'relmed'):.3g}) "
                   f"mse {_seedmed(rows, 'mse'):.3g} | whole bulk rel {_seedmed(b, 'rel'):.3g} mse {_seedmed(b, 'mse'):.3g}")
-        # (a) the bulk binned in each singular variable, the cut marked
-        vs = list(o["bulk_bins"])
-        fig, axs, spare = _grid(len(vs))
-        for ax, v in zip(axs, vs):
-            b = o["bulk_bins"][v]
-            for a, (name, c, mk, ls) in sty.items():
-                if a in b["arms"]:
-                    ax.plot(b["x"], _seedmed(b["arms"][a], "rel"), color=c, marker=mk, ls=ls, label=name)
-            ax.axvline(o["cuts"][v][1], color="0.5", ls=":", label=CUT)
-            ax.set_xscale("log"); ax.set_yscale("log"); ax.xaxis.set_minor_formatter(NullFormatter())
-            ax.set_xlabel(VLAB[v]); ax.set_ylabel(rel_lab(p))
-            ps.process_label(ax, PROCESS[p], loc="upper right")
-        _legend(axs, spare, PROCESS[p], (0, "upper left"))
-        written.append(ps.save(fig, os.path.join(figs, f"kitzoom_bulk_{p}")))
-        # (b) medians at fixed other variable, (c) the relative error per bin
         fams = list(o["fams"])
         key = lambda f: "band" if "band" in o["fams"][f] else "all"
+        for m, ylab in meas.items():
+            # (a) the bulk binned in each singular variable, the cut marked
+            vs = list(o["bulk_bins"])
+            fig, axs, spare = _grid(len(vs))
+            rows = []
+            for v in vs:
+                b = o["bulk_bins"][v]
+                cut = o["cuts"][v][1]
+                rows.append((b["x"], {"sty": sty, "y": {a: _seedmed(r, m) for a, r in b["arms"].items()}},
+                             lambda ax, cut=cut: ax.axvline(cut, color="0.5", ls=":", label=CUT)))
+            _panels(ps, axs, rows, lambda ax, it=iter(vs): vl[next(it)], ylab, PROCESS[p])
+            _legend(axs, spare, PROCESS[p], (0, "upper left"))
+            written.append(ps.save(fig, os.path.join(figs, f"kitzoom_bulk_{m}_{p}")))
+            # (b, c) every family per bin of its singular variable, the other variable in its band
+            fig, axs, spare = _grid(len(fams))
+            rows = []
+            for f in fams:
+                b = o["fams"][f][key(f)]
+                ys = {a: _seedmed(r, m) for a, r in b["arms"].items()}
+                rows.append((b["x"], {"sty": sty, "y": ys}, None))
+                for a, y in ys.items():
+                    print(f"  {m.upper()} {p} {f} {key(f)} {a}: " + " ".join(f"{x:.2g}:{v:.3g}" for x, v in zip(b["x"], y)))
+            _panels(ps, axs, rows, lambda ax, it=iter(fams): XLAB.get(next(it), ""), ylab, PROCESS[p])
+            _legend(axs, spare, PROCESS[p], (0, "upper right"))
+            written.append(ps.save(fig, os.path.join(figs, f"kitzoom_fam_{m}_{p}")))
+            # the deepest decade of each family against its other variable (the soft-collinear corners)
+            sf = [f for f in fams if "scan" in o["fams"][f]]
+            if sf:
+                fig, axs, spare = _grid(len(sf))
+                rows = []
+                for f in sf:
+                    sc = o["fams"][f]["scan"]
+                    ys = {a: _seedmed(r, m) for a, r in sc["arms"].items()}
+                    rows.append((sc["x"], {"sty": sty, "y": ys}, None))
+                    for a, y in ys.items():
+                        print(f"  SCAN {m} {p} {f} deepest {sc['deep'][0]:.1e}-{sc['deep'][1]:.1e} vs {sc['var']} {a}: "
+                              + " ".join(f"{x:.2g}:{v:.3g}" for x, v in zip(sc["x"], y)))
+                _panels(ps, axs, rows, lambda ax, it=iter(sf): vl[o["fams"][next(it)]["scan"]["var"]], ylab, PROCESS[p],
+                        logx=False)
+                _legend(axs, spare, PROCESS[p], (0, "upper left"))
+                written.append(ps.save(fig, os.path.join(figs, f"kitzoom_scan_{m}_{p}")))
+        # the medians at fixed other variable
         if any(key(f) == "band" for f in fams):
             fig, axs, spare = _grid(len(fams))
             for ax, f in zip(axs, fams):
@@ -242,23 +309,9 @@ def plot(figs):
                 ps.process_label(ax, PROCESS[p], loc="upper right")
             _legend(axs, spare, PROCESS[p], (0, "lower left"))
             written.append(ps.save(fig, os.path.join(figs, f"kitzoom_median_{p}")))
-        fig, axs, spare = _grid(len(fams))
-        for ax, f in zip(axs, fams):
-            b = o["fams"][f][key(f)]
-            for a, (name, c, mk, ls) in sty.items():
-                if a in b["arms"]:
-                    r = _seedmed(b["arms"][a], "rel")
-                    ax.plot(b["x"], r, color=c, marker=mk, ls=ls, label=name)
-                    print(f"  REL {p} {f} {key(f)} {a}: " + " ".join(f"{x:.2g}:{y:.3g}" for x, y in zip(b["x"], r)))
-            ax.set_xscale("log"); ax.set_yscale("log"); ax.xaxis.set_minor_formatter(NullFormatter())
-            ax.set_xlabel(XLAB.get(f, f)); ax.set_ylabel(rel_lab(p))
-            ps.process_label(ax, PROCESS[p], loc="upper right")
-        _legend(axs, spare, PROCESS[p], (0, "upper right"))
-        written.append(ps.save(fig, os.path.join(figs, f"kitzoom_rel_{p}")))
     # the core, every process: both measures side by side
     fig, (a1, a2) = ps.figure(ncols=2)
-    keys = ["factor", "emission", "scratch", "MLP log", "MLP thr"]
-    for k in keys:
+    for k in ORDER:
         name, c, mk, _ = model_style(k)
         for ax, m in ((a1, "rel"), (a2, "mse")):
             pts = [(i, _seedmed(d[p]["core"]["arms"][k], m)) for i, p in enumerate(PROCS) if k in d[p]["core"]["arms"]]
@@ -275,13 +328,35 @@ def plot(figs):
         print("FIGURE", w)
 
 
+def stability():
+    """the largest validation jump of every KIT run with a mu-MSE curve (kit_curves*.json, 50 evaluations): J =
+    max_t val_t / min_{s<=t} val_s, where it sits, and the final over the best value. NLL curves (negative values)
+    are skipped: their ratios mean nothing."""
+    import glob
+    rows = {}
+    for f in sorted(glob.glob(os.path.join(DATA, "kit_curves*.json"))):
+        d = json.load(open(f))
+        for k, r in (d.items() if isinstance(d, dict) else []):
+            if not isinstance(r, dict) or "val" not in r:
+                continue
+            v = np.array([x for x in r["val"] if x is not None], float)
+            if len(v) < 10 or (v <= 0).any():
+                continue
+            q = v / np.minimum.accumulate(v)
+            rows[k] = (os.path.basename(f), len(v), float(q.max()), int(q.argmax()), float(v.min()), float(v[-1] / v.min()))
+    for k, (f, n, j, at, best, last) in sorted(rows.items()):
+        print(f"JUMP {k:75s} {j:8.2f}x at eval {at:2d}/{n}  best {best:.2e}  last/best {last:.2f}  ({f})")
+    json.dump(rows, open(os.path.join(DATA, "kit_stability.json"), "w"), indent=0)
+
+
 def main():   # dup-ok: argparse collect/plot boilerplate, every kit tool has it
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("collect")
+    sub.add_parser("stability")
     p = sub.add_parser("plot"); p.add_argument("--figs", default=os.path.join(ROOT, "analysis/kit_benchmark/figs/zoom"))
     a = ap.parse_args()
-    collect() if a.cmd == "collect" else plot(a.figs)
+    {"collect": collect, "stability": stability}.get(a.cmd, lambda: plot(a.figs))()
 
 
 if __name__ == "__main__":
