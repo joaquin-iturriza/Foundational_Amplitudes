@@ -30425,6 +30425,7 @@ entries:
     '33': FA-ccin2p3-ddd2e7a7
     '36': detached drive.py kit_hpo_uugg_ft_heldoutqqg (pid 2497598, DONE event)
     '34': CPU reads ccj_d398435d7985 (collect) and ccj_4ad504a93003 (curves) queued on CC htc; then the uug search design
+    '37': FA-ccin2p3-9ea21f8a FA-ccin2p3-f3a731e0
   handoff:
     state: '2026-11-27 ~15:25 @ad2ba3624. Steps 34/35 read on the fine-tunes rerun after the asym_sd fix (findings ~13:45,
       ~14:30, ~15:20). Fair one-loop (step 35) done: FT BEATS V/B on the Coulomb threshold at every D (-1.23/-2.11/-2.05 rerun/-1.73/-1.82),
