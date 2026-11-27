@@ -16540,7 +16540,7 @@ entries:
     agent: aa1b0df8208df7e6a
     state: working
     since: '2026-11-26T23:55:24+00:00'
-    state_at: '2026-11-26T23:55:24+00:00'
+    state_at: '2026-11-27T00:21:37.073000+00:00'
     context: 151805
     context_at: '2026-11-27T00:21:48+00:00'
   designs:
@@ -35548,9 +35548,9 @@ entries:
     - 4
   owner:
     agent: ae273c97a5f27cc05
-    state: working
+    state: stopped
     since: '2026-11-27T00:04:02+00:00'
-    state_at: '2026-11-27T00:04:02+00:00'
+    state_at: '2026-11-27T00:08:43.094000+00:00'
     context: 87401
     context_at: '2026-11-27T00:22:14+00:00'
   step_waits:
