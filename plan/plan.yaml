@@ -30033,6 +30033,11 @@ entries:
       rule of the 02:27 design: decide there whether a rerun at half lr applies). Wall 6-14 min each: the 34 h estimate was
       queue, the 2.4 h limits ~10x the need. Step 30: held-out smoke a3f7a776 clean; real parent FA-ccin2p3-69541363 submitted
       (14 h); uug FT/SCR-A2 smokes ca04dd15/8c576040 from the smoke parent.'
+  - at: '2026-11-27T01:19:31+00:00'
+    text: '2026-11-27 ~02:25: the interactive uug arm smokes ca04dd15/8c576040 were CANCELLED mid-run (FT reached step 24
+      of 50; the srun client on the login node ended), resubmitted as batch jobs FA-ccin2p3-1daf7f8f (FT, tag heldoutqqg_ft_smoke2)
+      and 2f27a757 (SCR-A2, tag heldoutqqg_scra2_smoke2); step 30 waits on them. Step 20 dropped (its arms are done; their
+      read is step 24''s).'
   step_why:
     24:
       feeds: 'D570: does fine-tuning from the signed A2 pretraining beat SCR-A2 and V/B with exact Born on ee->tt one loop
