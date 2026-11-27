@@ -42555,6 +42555,9 @@ entries:
       b39fc80c8b10edbe4b07f6a0/train55296_val10000_test10000'', htc) -> gate (per-event file new-43 <= 0.369, subsets) ->
       control + retrain submitted, arm tp prebuilds -> arm smoke 50 steps + held-out llm_score EVENTS=1 + level_subsets --check-factor
       -> arm run (13 h target, 18 h limit, ~41 GPU-h total) -> read per the design'
+    28: 'step 27 smoke read (D395): on FA-ccin2p3-8ed14b18 (job_llm_score.sh ONLY=heldout EVENTS=1 on the arm smoke runs/zz_smoke/zz_smoke_sweep_config_llmcmp_level_events_64949743)
+      run analysis/llm_compare/level_subsets.py --check-factor on its llm_events_heldout.csv (p99 |log_factor + b.(x-x0)/sx|
+      < 1e-2) as a CPU job; fail cancels the arm FA-ccin2p3-0d409c4e and fixes the factor path'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -42884,6 +42887,11 @@ entries:
       - 'b_a <= g x R_b and 0.859/b_a > R_b, subsets within 2 sd: per-event level is the lever; written up for Joaquin'
       - 'b_a > g x R_b: the trained network does not keep the per-event level; read where, own design'
       - 'unresolved: second arm seed (~13 GPU-h) asked of Joaquin'
+    28:
+      feeds: 'D566: the arm''s per-event level reaches the held-out scoring with its x columns aligned'
+      if:
+      - 'pass: arm stands'
+      - 'fail: cancel FA-ccin2p3-0d409c4e, fix, re-smoke'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
