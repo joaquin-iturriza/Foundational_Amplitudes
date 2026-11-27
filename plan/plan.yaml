@@ -30520,7 +30520,9 @@ entries:
       - 'no difference (mass regulates collinear): say so with numbers'
   step_waits:
     '32': FA-ccin2p3-a8d68ffe
-    '34': detached drive.py kit_hpo_uug_ft_heldoutqqg (pid 2752905, DONE event)
+    '34': 'detach kit_hpo_uug_ft_heldoutqqg_r2 (drive.py relaunched 2026-11-27 16:45 CET with --retry-lost --retry-failed:
+      trials 0, 2 lost and 3 failed on the fixed EOS faults; a lost trial holds the next wave, so the first drive had sat
+      idle since 15:04)'
     '39': ttg rebuild CC CPU job ccj_3a07615b7f4f (slurm 65003701), read by rerunning 'site --timeout 14400 run --job --allow-stale
       --item kit_benchmark ccin2p3 FA -- python tools/kit_ttg.py build'
   handoff:
