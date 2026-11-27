@@ -30248,7 +30248,7 @@ entries:
   step_waits:
     '30': FA-ccin2p3-69541363 FA-ccin2p3-6f1a5dad FA-ccin2p3-ff4af2bc
     '29': FA-ccin2p3-69541363
-    '32': design-reviewer of the 2026-11-27 slide-11 revision (seed parts at the default card)
+    '32': FA-ccin2p3-ca8ba529
   handoff:
     state: '2026-11-27 ~07:15 @3326ed72b. Step 24 DONE (fair one-loop FT vs SCR-A2 vs V/B, all 5 D + D=1e3 lr 0.126 rerun:
       branch (c) everywhere; figures kit_fairnlo*, kit_curves_fairnlo; deck talks/kit_reply_nov2026 slides 19-21). Step 33
