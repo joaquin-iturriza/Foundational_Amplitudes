@@ -45355,8 +45355,7 @@ entries:
       submitted: site submit refuses on another agent''s untracked analysis/transfer/data/emission_target.npz and ladder_nlo_hists.npz
       (the transfer ladder_nlo_hists work), not ignored by .gitignore; left untouched.'
   step_waits:
-    '26': another agent's untracked analysis/transfer/data/{emission_target,ladder_nlo_hists}.npz cleared (committed or gitignored),
-      then the score job_llm_score.sh RUN=runs/llmcmp_c_tprop/trial_1860 EVENTS=1
+    '26': FA-ccin2p3-d55e8093
     '27': FA-ccin2p3-c18c9887 FA-ccin2p3-cd724930 FA-ccin2p3-dff2eadb
   handoff:
     state: 'Step 26 (target_propagators arm, passed design 2026-11-26T23:40): smoke FA-ccin2p3-776cdd69 clean; its held-out
