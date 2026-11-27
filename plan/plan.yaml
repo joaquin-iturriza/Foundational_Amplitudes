@@ -35433,6 +35433,28 @@ entries:
       designs; core cut at half the limit exponent <- Joaquin''s words ''the part where the divergence doesn''t appear'' (2026-11-27,
       D598), read as: the truth''s local slope has fallen to half its limit value, shown on the binned figure so the cut can
       be read'
+    fix_at: '2026-11-27T13:15:04+00:00'
+    fix: '(1) Matched control / lr re-tune (checks 1, 11, 17) and the no-branch (check 4): on u u~ g and u u~ g g the factor
+      runs (hpo_asym_cont) sit at the plain-target search''s HPs (hp1918 lr 0.0125, hp0798) while the emission-scale control
+      sits at the best of its own 16-trial search (hp1493 lr 7.7e-3, hp1196 lr 2.0e-3). The asymmetry is stated, but the outcome
+      does not use it: a factor win reads as yes (it won at a disadvantage), but ''level or emission wins'' cannot be read
+      as a verdict there, and the stated no-conclusion (''the factor''s bulk gain comes from the bulk''s edges'') is about
+      factor vs plain target, which this comparison does not test (the binned curves show that, not R). Fix: say that on t
+      t~ the comparison is clean (the factor already runs at hp0131, the emission-scale search''s chosen HPs: the feature
+      rule''s first step), that on u u~ g / u u~ g g a no is not a verdict, and name the next attempt on a no: the factor''s
+      own search with the same template (16 trials, 1831 steps, batch 16384, the kit_hpo_uug_T / uugg_T layout), best against
+      best, with its GPU-h; drop the edges conclusion from the no-branch or tie it to the binned curves. (2) Seeds against
+      spread (check 3): the bar 1/7..7 is taken from the t t~ V fine-tune same-HP reruns (results.tex sec:datasaving, test
+      0.78-6.96), but this entry''s own earlier noise for single-process from-scratch transformers at fixed HPs is a factor
+      1.1-30 across seeds (results.tex ''Seed noise and the best-of-trials bias'', ~line 14493; quoted in this entry''s dead
+      end of 2026-11-12 09:06 and finding 2026-11-12T09:14 under D315). The arms here are exactly that kind (single-process,
+      from scratch, one seed). Name both spreads in sources and say which applies and why; if 7 stays, an R between 7 and
+      30 (or 1/30 and 1/7) is reported as inside the from-scratch seed spread, not as a win. Everything else holds: check
+      numbers confirmed in analysis/kit_benchmark/data/kit_fig_A_hpo.json (bulk logmse u u~ g factor 1.979e-6 vs plain 1.748e-5
+      = 8.8x, u u~ g g 6.29e-5 vs 1.07e-4 = 1.7x, t t~ factor 1.358e-7 vs hp0131 6.08e-8 = 2.2x); the two scorings are needed
+      (trial_1493 and trial_1196 have no KIT predictions; both dirs on CC, with config/models/sigma_stage); CC /sps/lpnhe
+      has 8.76 GB free, the score-only outputs are tens of MB (trial_0798 is 48 MB whole); test events are KIT bulk_test/hard_test
+      as asked; HETEROSC in both arms.'
   targets:
   - batch: kit_protoA_scratch
     wall_h: 1.8
