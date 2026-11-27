@@ -28436,11 +28436,6 @@ entries:
       the transformer with emission scales (target_physics_factor, dim_ref qperp); (b) extrapolation plots: hold the other
       divergence parameter fixed instead of averaging over it; (c) a relative error measure beside MSE(log|M|^2) on these
       plots, to see whether the largest amplitudes dominate'
-    38: 'D600 (a): emission-scale transformer at the factor''s own HPs on u u~ g and u u~ g g (the one-change control of the
-      factor: factor command with data.target_physics_factor=true and no input_asym_factor, frames_gamma_max=4, HPs hp1918
-      / hp0798 verbatim from runs/kit/kit_A_ee_<p>_n100000_t1831_hpo_asym_cont/config.yaml, tag hpo_emis_matched; job_kit.sh
-      mode A, 1831 steps, scored by kit_predict). Design after step 34b''s review verdict (one latest design at a time), then
-      add both to tools/kit_zoom.py RUNS as the matched emission arm beside the searched one (trial_1493/1196). ~1 GPU-h.'
     39: 'D600 (b): e+e- -> t t~ g, factor vs emission scales vs plain transformer, every relevant limit (soft gluon at fixed
       gluon-top angle; gluon quasi-collinear to a top, mass-regulated dead cone, at fixed x; threshold beta of the t t~ pair
       at fixed x; bulk zoom). Needs: (1) wrappers._asym_terms has no massive emitter (its own shortcut note: CDST''s massive
@@ -30527,11 +30522,6 @@ entries:
       if:
       - 'factor wins in the bulk zoom: say by how much, relative and log measures'
       - 'emission scales win or tie: say so with the numbers'
-    38:
-      feeds: 'D600: asymptotic factor vs emission scales, matched HPs'
-      if:
-      - 'factor wins at matched HPs: say by how much, both measures'
-      - 'level/emission wins: no factor advantage in the bulk core'
     39:
       feeds: 'D600: what the factor and the emission scales do with one divergence suppressed'
       if:
@@ -30549,7 +30539,6 @@ entries:
     '34': detached drive.py kit_hpo_uug_ft_heldoutqqg (pid 2752905, DONE event)
     '37': kit_zoom collect CPU job ccj_ab6a6943301b (rerun 'python tools/kit_zoom.py collect' to read; then plot, then re-collect
       after step 38's runs)
-    '38': FA-ccin2p3-3f44d631 FA-ccin2p3-dfec7e79
     '40': step 37's kit_zoom collect (ccj_ab6a6943301b) and step 38's runs
     '39': the next owner (handed off at the context limit before its design; ready to start)
   handoff:
