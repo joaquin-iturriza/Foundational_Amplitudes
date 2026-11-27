@@ -50526,9 +50526,9 @@ entries:
       it is'
   owner:
     agent: a5ba353786b0cf99d
-    state: working
+    state: stopped
     since: '2026-11-25T13:58:11.325000+00:00'
-    state_at: '2026-11-27T17:18:18.458000+00:00'
+    state_at: '2026-11-27T17:20:38.774000+00:00'
     context: 205899
     context_at: '2026-11-27T17:31:34+00:00'
   designs:
