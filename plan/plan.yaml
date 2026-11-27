@@ -28732,7 +28732,7 @@ entries:
     agent: a859ce5fe75ba63ff
     state: working
     since: '2026-11-27T10:24:08+00:00'
-    state_at: '2026-11-27T10:24:08+00:00'
+    state_at: '2026-11-27T10:56:31.417000+00:00'
     context: 228856
     context_at: '2026-11-27T10:56:40+00:00'
   findings:
