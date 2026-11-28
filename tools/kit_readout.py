@@ -54,6 +54,7 @@ def versus(path, ref):
     import numpy as np
     d = json.load(open(path))
     R = d["runs"][ref]["strata"]
+    js = {}   # the numbers for % claim: lines (tools/verify_claims.py reads the last JSON line)
     for name, r in sorted(d["runs"].items()):
         if name == ref:
             continue
@@ -67,6 +68,9 @@ def versus(path, ref):
             x = np.array(x)
             print(f"  {fam:14s} n={len(x):2d} median {np.median(x):+.3f} [{x.min():+.2f}, {x.max():+.2f}] "
                   f"better: {(x < 0).sum()} worse: {(x > 0).sum()}")
+            js.setdefault(name, {})[fam] = {"median": float(np.median(x)), "min": float(x.min()), "max": float(x.max()),
+                                            "n": len(x), "worse": int((x > 0).sum())}
+    print(json.dumps(js))
 
 
 def verdict(path, arm, ref):

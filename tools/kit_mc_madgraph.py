@@ -675,6 +675,27 @@ def cmd_figure_exact(a):
         print("FIGURE", ps.save(fig, a.out + "_tt"))
 
 
+def cmd_summary(a):
+    """the numbers of docs/results.tex from the metrics JSONs (tools/verify_claims.py reads the last JSON line), per
+    process: the surrogate sample's sigma_hat/sigma - 1 and its MC error, the exact events' reweighted E_exact[u] - 1 and
+    its error, and eps2 / r_max at each quantile (q99, q999, q9999, max)"""
+    out = {}
+    for f in a.json:
+        for k, v in json.load(open(f)).items():
+            if "eps2" not in v:
+                continue
+            q = {"0.99": "q99", "0.999": "q999", "0.9999": "q9999", "max": "max"}
+            r = out.setdefault(v["process"], {})["surr" if k.endswith("/surrogate_sample") else "exact"] = {
+                "bias": v["bias"], "err": v.get("bias_err", v.get("bias_stat")), "n": v["n"], "sigma_pb": v["sigma_pb"],
+                **{"eps2_" + q[t]: x for t, x in v["eps2"].items()}, **{"rmax_" + q[t]: x for t, x in v["r_max"].items()}}
+            if "sigma_hat_pb" in v:
+                r.update(sigma_hat_pb=v["sigma_hat_pb"], sigma_hat_err_pb=v["sigma_hat_err_pb"], sigma_err_pb=v["sigma_err_pb"])
+    for r in out.values():
+        if "surr" in r and "exact" in r:   # the wiring check: the two estimates of the bias, in MC errors
+            r["sep"] = abs(r["surr"]["bias"] - r["exact"]["bias"]) / r["surr"]["err"]
+    print(json.dumps(out))
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -696,10 +717,11 @@ def main():
     cb = sub.add_parser("combine"); cb.add_argument("proc", choices=PROC); cb.add_argument("--dir", required=True)
     cb.add_argument("parts", nargs="+", help="the part runs' --dir (a quoted glob is expanded)")
     cb.add_argument("--expect", type=int, help="the number of parts")
+    sm = sub.add_parser("summary"); sm.add_argument("json", nargs="+")
     sub.add_parser("selfcheck")
     a = ap.parse_args()
     {"gen": cmd_gen, "serve": cmd_serve, "predict": cmd_predict, "metrics": cmd_metrics, "figure": cmd_figure, "figure_exact": cmd_figure_exact,
-     "bench": cmd_bench, "combine": cmd_combine,
+     "bench": cmd_bench, "combine": cmd_combine, "summary": cmd_summary,
      "selfcheck": lambda a: _selfcheck()}[a.cmd](a)
 
 

@@ -454,6 +454,25 @@ def plot(figs):
         print("FIGURE", w)
 
 
+def summary():
+    """the numbers of docs/results.tex (tools/verify_claims.py reads the last JSON line), per process and arm, in the
+    draft's natural log: MSE(ln) and median |Delta| on the bulk core and the whole bulk, and in each family's deepest
+    bin (other variable in its band where the family has one; Sudakov: the highest sqrt s bin)"""
+    d = json.load(open(OUT))
+    out = {}
+    for p, o in d.items():
+        for a in o["bulk"]:
+            r = out.setdefault(p, {})[a] = {
+                "core": {"mse": LN ** 2 * _seedmed(o["core"]["arms"][a], "mse"), "relmed": _seedmed(o["core"]["arms"][a], "relmed")},
+                "bulk": {"mse": LN ** 2 * _seedmed(o["bulk"][a], "mse"), "relmed": _seedmed(o["bulk"][a], "relmed")}}
+            for f, F in o["fams"].items():
+                b = F["band"] if "band" in F else F["all"]
+                i = -1 if f.startswith("sudakov") else 0
+                r[f] = {"x": b["x"][i], "mse": float(LN ** 2 * _seedmed(b["arms"][a], "mse")[i]),
+                        "relmed": float(_seedmed(b["arms"][a], "relmed")[i])}
+    print(json.dumps(out, default=float))
+
+
 def stability():
     """the largest validation jump of every KIT run with a mu-MSE curve (kit_curves*.json, 50 evaluations): J =
     max_t val_t / min_{s<=t} val_s, where it sits, and the final over the best value. NLL curves (negative values)
@@ -480,9 +499,10 @@ def main():   # dup-ok: argparse collect/plot boilerplate, every kit tool has it
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("collect")
     sub.add_parser("stability")
+    sub.add_parser("summary")
     p = sub.add_parser("plot"); p.add_argument("--figs", default=os.path.join(ROOT, "analysis/kit_benchmark/figs/zoom"))
     a = ap.parse_args()
-    {"collect": collect, "stability": stability}.get(a.cmd, lambda: plot(a.figs))()
+    {"collect": collect, "stability": stability, "summary": summary}.get(a.cmd, lambda: plot(a.figs))()
 
 
 if __name__ == "__main__":
