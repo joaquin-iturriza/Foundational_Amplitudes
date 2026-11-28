@@ -28420,7 +28420,7 @@ entries:
       at LO and NLO (step 4, slide 11 one-loop part), the KIT package (D573/D574) and the serve cost (step 33); then set done_when
       and notes_ref and close the entry.'
   done_when: null
-  notes_ref: null
+  notes_ref: sec:kit-protB
   match: kit_*
   evidence:
     runs:
