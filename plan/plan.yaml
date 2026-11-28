@@ -30564,6 +30564,13 @@ entries:
       -2.04. Verdict per the passed design: the factor wins the soft family against plain and the bulk against emission scales;
       emission scales beat the factor nowhere; the factor''s massive eikonal also gives the dead-cone region (unexpected),
       the pair threshold is a tie with plain. KIT package keeps the factor for massive emitters. Figures analysis/kit_benchmark/figs/zoom/kitzoom_ttg_{mse,relmed,median}.'
+  - at: '2026-11-28T03:01:56+00:00'
+    text: 'Step 32: combine FA-ccin2p3-680004d8 FAILED: AssertionError ''7 parts, expected 50'' - tools/kit_mc_madgraph.py
+      cmd_combine globbed a part argument only when it held ''*'', so the [1-9] and ? patterns stayed literal. Fixed @d48778470
+      (glob.has_magic). The seed-1051 part FA-ccin2p3-47fb3318 COMPLETED. Combine resubmitted as FA-ccin2p3-220290ae (same
+      50 parts, --expect 50). On its end: CLAIM lines -> analysis/kit_benchmark/data/kit_mc_madgraph_ee_uug.json (replace
+      the stale surrogate_sample), wiring check sigma_hat/sigma-1 vs E_exact[u]-1 within 3 MC errors, figure_exact with both
+      jsons --out analysis/kit_benchmark/figs/kit_mc_slide11, deck rebuild, caption (scratchpad cap_s11.txt).'
   step_why:
     32:
       feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
