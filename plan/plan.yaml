@@ -30571,6 +30571,13 @@ entries:
       50 parts, --expect 50). On its end: CLAIM lines -> analysis/kit_benchmark/data/kit_mc_madgraph_ee_uug.json (replace
       the stale surrogate_sample), wiring check sigma_hat/sigma-1 vs E_exact[u]-1 within 3 MC errors, figure_exact with both
       jsons --out analysis/kit_benchmark/figs/kit_mc_slide11, deck rebuild, caption (scratchpad cap_s11.txt).'
+  - at: '2026-11-28T03:21:21+00:00'
+    text: 'Step 32 read (E9925): u u~ g slide 11 exact, combine FA-ccin2p3-220290ae (50 parts s1001-1050 without s1019 plus
+      s1051, chi2/dof 0.98, p 0.52): sigma_hat 0.121674 +- 0.000114 pb on |M_hat|^2 vs sigma 0.121861 +- 0.000125 pb: sigma_hat/sigma
+      - 1 = -0.0015 +- 0.0014; reweighted exact events E_exact[u] - 1 = -0.00162 +- 0.000005; difference 0.06 MC errors: wiring
+      sound. eps2 = <r>/r_max on the surrogate''s events: 0.996 (q 0.99), 0.990 (0.999), 0.977 (0.9999), 0.943 (max of 1e5);
+      r_max 1.006/1.011/1.026/1.062. kit_mc_madgraph_ee_uug.json @2e4cae076 (stale surrogate_sample replaced), figure kit_mc_slide11_tree
+      with both processes, deck rebuilt 26 pages 0 errors.'
   step_why:
     32:
       feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
