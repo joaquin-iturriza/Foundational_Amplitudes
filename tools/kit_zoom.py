@@ -462,7 +462,7 @@ def summary():
     out = {}
     for p, o in d.items():
         for a in o["bulk"]:
-            r = out.setdefault(p, {})[a] = {
+            r = out.setdefault(p, {})[a.replace(" ", "_")] = {   # a claim key has no spaces
                 "core": {"mse": LN ** 2 * _seedmed(o["core"]["arms"][a], "mse"), "relmed": _seedmed(o["core"]["arms"][a], "relmed")},
                 "bulk": {"mse": LN ** 2 * _seedmed(o["bulk"][a], "mse"), "relmed": _seedmed(o["bulk"][a], "relmed")}}
             for f, F in o["fams"].items():   # <family>: in its band (where it has one), <family>_all: every event
