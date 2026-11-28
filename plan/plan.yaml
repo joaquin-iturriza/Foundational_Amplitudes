@@ -50625,6 +50625,30 @@ entries:
       1.178, 0.0533 <- measured: c_best held-out / seen pooled RMSE; 0.721 <- measured: Suprio''s LLM held-out pooled RMSE
       (data/suprio_cond); 2 bootstrap sd <- measured, level_subsets.py; 16 h <- measured: c_best''s V100 0.90 s/step x 60,840;
       100 GPU-h <- CLAUDE.md budget, D566 names the work'
+    fix_at: '2026-11-28T02:32:11+00:00'
+    fix: '(1) Scope, D566 (checks 6/7): Joaquin scoped this work as ''a per-event, sampling-independent use of process and
+      diagram information'' (''something strange about predicting a single number for a new dataset that depends on how that
+      data was sampled ... has to perform correctly in individual events regardless of that''). The split level adds a term,
+      mean log F over the held-out pool''s own 2000 events, that is a statistic of how that new dataset was sampled: under
+      another sampling the level, and so every per-event prediction (pred = network output x sigma + level), moves by the
+      change of mean log F. The design addresses only labels (''F is a function of the momenta, so no label is read''), never
+      this. level_subsets with the level fixed from the full pool does not test it. Fix, no GPU cost: in the read, for each
+      re-sampled subset (s_lo, s_hi, q_hard, q_soft) also score the arm with the level recomputed on the subset, pred'' =
+      pred - meanlogF(pool) + meanlogF(subset), from the EVENTS=1 CSVs (they carry log F), and report per subset the new-43
+      median |delta mean log F| and the level error under pred'' against all-events within 2 bootstrap sd. State the YES as
+      also requiring that (or say in the design, citing D566, why the generator-default sampling of the new process is the
+      assumption Joaquin allows: ''unless it assumes or knows ... how it was generated''). (2) Disk (check 14): ''read at
+      submission'' is not a reading. Read now: CC-IN2P3 /sps/lpnhe has 6.1G free (99% used), lxplus EOS 2.2P free. The batch
+      is ~3 GB (2 x 1.3 + smoke 0.3 + CSVs 0.1 + re-score): on CC that is about half of what is left on a shared full disk,
+      below a 2x margin once other jobs write. State the numbers and either place the runs on lxplus or say what frees CC
+      first. Everything else holds: one change (data.level_file to the _physsplit file, sigma kept at c_best''s 3.786) against
+      c_best at trial_1860''s HPs and seed; measure moved by a level file in part (a) (new-43 median bias^2 0.859 -> 0.122)
+      and c_best''s bias^2 share 0.87; the gate is exactly the log|M|^2 network''s own bias on the same events (lvl_diag 0.096
+      < 0.314); same-seed retrain gives R_b in this setup; thresholds sourced (0.314 c_best, R_b measured); HETEROSC, part
+      (c) target/inputs, no lr/batch/step change; llm_score x-column fix checked by the re-score''s pooled RMSE = 1.178; ordering
+      reads outputs (smoke reads the gate''s file; runs follow the D395 smoke). Searched: docs/results.tex for level_file,
+      level file, level split, physsplit, mean log F (no part (c) level entry); plan dead ends A-F and step 28; site decisions
+      D564/D566/D567.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
