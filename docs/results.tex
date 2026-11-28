@@ -13845,6 +13845,242 @@ maximum).}
 \label{fig:kit-mc-madevent}
 \end{figure}
 
+\subsection{The singular-limit benchmark: protocol B, hard points added (2026-11-27)}\label{sec:kit-protB}
+The question (D575, the benchmark's protocol B): how much do the benchmark's own hard training points add to the
+asymptotic-factor models, against the same training continued on bulk events only? Each process's model from scratch
+($10^5$ bulk events) is continued for 3000 steps once with the hard training strata added and once on the bulk alone,
+one seed. The measure is the benchmark's MSE of $\log_{10}|\mathcal M|^2$ per stratum, as the median over a family's
+strata of $R=\log_{10}$(with hard points / bulk only). The hard points lower every family of all three processes by more
+than the design's bar (a factor seven): on $e^+e^-\to u\bar ug$ $R=-5.46$ in the soft and $-5.10$ in the
+collinear strata; on $u\bar ugg$ $-1.45$ (soft), $-1.68$ (gluon-gluon collinear), $-1.88$ (quark-gluon collinear) and
+$-1.70$ (azimuthal); on the one-loop $e^+e^-\to t\bar t$ $-3.09$ at threshold and $-3.82$ at high energy. The bulk moves
+by $-0.23$, $-0.23$ and $0.39$ decades. The bulk-only continuation leaves the hard strata near the start model: its family medians differ from the start's
+by at most $0.22$ decades on $u\bar ug$, $0.05$ on $u\bar ugg$ and $0.14$ on $t\bar t$ (Fig.~\ref{fig:kit-protB}). No continuation's
+validation loss jumped more than fivefold. The design's branch: the hard points beat bulk-only training in every hard family, with the bulk inside the bar,
+so points in the limits, where a user has them, belong in the training set.
+% src: python3 tools/kit_readout.py analysis/kit_benchmark/data/kit_fig_B_a2.json --vs kit_B_bulk_ee_uug_me2_n100000_t3000_a2B @62545852b
+% claim: kit_B_ee_uug_me2_n100000_t3000_a2B.soft_x.median=-5.46
+% claim: kit_B_ee_uug_me2_n100000_t3000_a2B.coll_y.median=-5.10
+% claim: kit_B_ee_uug_me2_n100000_t3000_a2B.bulk.median=-0.23
+% claim: kit_A_ee_uug_me2_n100000_t1831_hpo_asym_cont.soft_x.median=0.22
+% src: python3 tools/kit_readout.py analysis/kit_benchmark/data/kit_fig_B_a2.json --vs kit_B_bulk_ee_uugg_me2_n100000_t3000_a2B @62545852b
+% claim: kit_B_ee_uugg_me2_n100000_t3000_a2B.soft_x.median=-1.45
+% claim: kit_B_ee_uugg_me2_n100000_t3000_a2B.coll_gg_y.median=-1.68
+% claim: kit_B_ee_uugg_me2_n100000_t3000_a2B.coll_qg_y.median=-1.88
+% claim: kit_B_ee_uugg_me2_n100000_t3000_a2B.azimuth_gg_y.median=-1.70
+% claim: kit_B_ee_uugg_me2_n100000_t3000_a2B.bulk.median=-0.23
+% claim: kit_A_ee_uugg_me2_n100000_t1831_hpo_asym_cont.soft_x.median=0.05
+% src: python3 tools/kit_readout.py analysis/kit_benchmark/data/kit_fig_B_a2.json --vs kit_B_bulk_ee_tt_virt_finite_n100000_t3000_a2B @62545852b
+% claim: kit_B_ee_tt_virt_finite_n100000_t3000_a2B.threshold_beta.median=-3.09
+% claim: kit_B_ee_tt_virt_finite_n100000_t3000_a2B.sudakov_sqrts.median=-3.82
+% claim: kit_B_ee_tt_virt_finite_n100000_t3000_a2B.bulk.median=0.39
+% claim: kit_A_ee_tt_virt_finite_n100000_t1831_hpo_asym_cont.threshold_beta.median=0.14
+% allow: 10^5 3000 10 2 because they are the training size, the continuation's steps, the log base and the square of |M|
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/kit_benchmark/figs/kit_mse_a2B_ee_uug_me2.pdf}
+\includegraphics{../analysis/kit_benchmark/figs/kit_mse_a2B_ee_tt_virt_finite.pdf}
+\caption{The benchmark's MSE of $\log_{10}|\mathcal M|^2$ ($|V|$ for the one-loop $t\bar t$) per hard stratum against
+the stratum's median distance to the limit, protocol B. Left: $e^+e^-\to u\bar ug$, collinear $y=s_{qg}/s$ and soft
+$x=2E_g/\sqrt s$; right: one-loop $e^+e^-\to t\bar t$, high energy and threshold. Factor, $\gamma\leq4$: the
+asymptotic-factor model from scratch on $10^5$ bulk events (the start); +bulk: continued on bulk events only; +hard:
+continued with the hard training strata added; truth clipped to its bulk range: the error of a predictor equal to the
+truth clipped to the $0.5\%$ to $99.5\%$ quantiles of the bulk training truth; KIT MLP, log and raw inputs: the benchmark's reference networks.}
+% allow: 10^5 10 2 4 0.5 99.5 because they are the training size, the log base, the square of |M|, the frames' boost cap and the clip quantiles
+\label{fig:kit-protB}
+\end{figure}
+
+\subsection{The singular-limit benchmark: the benchmark's error measures (2026-11-27)}\label{sec:kit-slide10}
+The question (D575, the benchmark authors' requested measures): beyond the MSE of $\log_{10}|\mathcal M|^2$, how large
+are the bias, the 99th percentile of $|\Delta\log_{10}|\mathcal M|^2|$ and the $|\mathcal M|^2$-weighted relative error
+of the asymptotic-factor models, in the bulk and in the deepest stratum of each limit, from scratch on $10^5$ bulk events
+(protocol A) and with the hard training strata added (protocol B, Sec.~\ref{sec:kit-protB})? All four come from the
+benchmark's own evaluation code (Fig.~\ref{fig:kit-slide10}). From scratch the bulk is accurate: the weighted relative
+error is $0.0018$ on $u\bar ug$, $0.024$ on $u\bar ugg$ and $6.3\times10^{-4}$ on the one-loop $e^+e^-\to t\bar t$. In the
+deepest strata it grows to $0.135$ (soft) and $0.098$ (collinear) on $u\bar ug$, to $0.79$ (soft) and $0.74$
+(quark-gluon collinear) on $u\bar ugg$, to $0.30$ at the $t\bar t$ threshold and to $10.8$ in the $t\bar t$ high-energy
+stratum, where a few events far above the truth dominate the weighted sum. The fitted exponents are the exact ones within
+$0.07$ on $u\bar ug$ and $u\bar ugg$ ($-2.01$ against $-2.00$ soft on $u\bar ug$, $-1.94$ against $-2.00$ on $u\bar ugg$)
+and $-0.96$ against $-1.02$ at threshold, so the error in the limits is an offset, not a wrong power. The azimuthal
+$\cos2\phi$ modulation of the gluon-gluon collinear limit is not learnt from the bulk: the rms of its harmonic is
+$8.1\times10^{-6}$ against $0.0246$ in the truth. The hard points bring the deepest-stratum weighted error down to
+$2.3\times10^{-4}$ and $3.3\times10^{-4}$ on $u\bar ug$, $0.042$ to $0.071$ on $u\bar ugg$, $7.0\times10^{-4}$ at threshold
+and $0.0018$ at high energy; the harmonic rises only to $1.3\times10^{-4}$.
+% src: python3 tools/kit_readout.py analysis/kit_benchmark/data/kit_fig_B_a2.json --slide10 kit_A_ee_uug_me2_n100000_t1831_hpo_asym_cont kit_A_ee_uugg_me2_n100000_t1831_hpo_asym_cont kit_A_ee_tt_virt_finite_n100000_t1831_hpo_asym_cont kit_B_ee_uug_me2_n100000_t3000_a2B kit_B_ee_uugg_me2_n100000_t3000_a2B kit_B_ee_tt_virt_finite_n100000_t3000_a2B @0c73e9635
+% claim: kit_A_ee_uug_me2_n100000_t1831_hpo_asym_cont.bulk.wrel=0.0018
+% claim: kit_A_ee_uugg_me2_n100000_t1831_hpo_asym_cont.bulk.wrel=0.024
+% claim: kit_A_ee_tt_virt_finite_n100000_t1831_hpo_asym_cont.bulk.wrel=6.3e-4
+% claim: kit_A_ee_uug_me2_n100000_t1831_hpo_asym_cont.soft_x.wrel=0.135
+% claim: kit_A_ee_uug_me2_n100000_t1831_hpo_asym_cont.coll_y.wrel=0.098
+% claim: kit_A_ee_uugg_me2_n100000_t1831_hpo_asym_cont.soft_x.wrel=0.79
+% claim: kit_A_ee_uugg_me2_n100000_t1831_hpo_asym_cont.coll_qg_y.wrel=0.74
+% claim: kit_A_ee_tt_virt_finite_n100000_t1831_hpo_asym_cont.threshold_beta.wrel=0.30
+% claim: kit_A_ee_tt_virt_finite_n100000_t1831_hpo_asym_cont.sudakov_sqrts.wrel=10.8
+% claim: kit_A_ee_uug_me2_n100000_t1831_hpo_asym_cont.soft_x.exp_pred=-2.01
+% claim: kit_A_ee_uug_me2_n100000_t1831_hpo_asym_cont.soft_x.exp_truth=-2.00
+% claim: kit_A_ee_uugg_me2_n100000_t1831_hpo_asym_cont.soft_x.exp_pred=-1.94
+% claim: kit_A_ee_tt_virt_finite_n100000_t1831_hpo_asym_cont.threshold_beta.exp_pred=-0.96
+% claim: kit_A_ee_tt_virt_finite_n100000_t1831_hpo_asym_cont.threshold_beta.exp_truth=-1.02
+% claim: kit_A_ee_uugg_me2_n100000_t1831_hpo_asym_cont.azimuth_gg_y.h_pred=8.1e-6
+% claim: kit_A_ee_uugg_me2_n100000_t1831_hpo_asym_cont.azimuth_gg_y.h_truth=0.0246
+% claim: kit_B_ee_uug_me2_n100000_t3000_a2B.soft_x.wrel=2.3e-4
+% claim: kit_B_ee_uug_me2_n100000_t3000_a2B.coll_y.wrel=3.3e-4
+% claim: kit_B_ee_uugg_me2_n100000_t3000_a2B.coll_qg_y.wrel=0.042
+% claim: kit_B_ee_uugg_me2_n100000_t3000_a2B.coll_gg_y.wrel=0.071
+% claim: kit_B_ee_tt_virt_finite_n100000_t3000_a2B.threshold_beta.wrel=7.0e-4
+% claim: kit_B_ee_tt_virt_finite_n100000_t3000_a2B.sudakov_sqrts.wrel=0.0018
+% claim: kit_B_ee_uugg_me2_n100000_t3000_a2B.azimuth_gg_y.h_pred=1.3e-4
+% allow: 10^5 99 0.07 2 10 because they are the training size, the percentile, the exponent tolerance read from the claims, the square of |M| and the log base
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/kit_benchmark/figs/kit_slide10_a2.pdf}
+\caption{The benchmark's error measures per process and stratum (bulk test events and the deepest stratum of each
+limit) for the asymptotic-factor models. Upper left: MSE of $\log_{10}|\mathcal M|^2$; upper right: $|$bias$|$ of
+$\log_{10}|\mathcal M|^2$ (open markers: negative bias); lower left: 99th percentile of $|\Delta\log_{10}|\mathcal M|^2|$;
+lower right: $|\mathcal M|^2$-weighted relative error. Transformer + asymptotic factor: from scratch on $10^5$ bulk
+events (protocol A); bulk only: that model continued $3000$ steps on bulk events; hard points added: continued with the
+hard training strata added (protocol B). $t\bar t$ virtual: the finite one-loop virtual of $e^+e^-\to t\bar t$.}
+% allow: 10^5 99 3000 10 2 because they are the training size, the percentile, the continuation's steps, the log base and the square of |M|
+\label{fig:kit-slide10}
+\end{figure}
+
+\subsection{The singular-limit benchmark: the fair one-loop protocol on $e^+e^-\to t\bar t$ (2026-11-27)}\label{sec:kit-fairnlo}
+The question (D575, the benchmark authors' fair protocol for one-loop amplitudes): with $D$ one-loop bulk points of the
+target, $D=100$ to $10^4$, does a model fine-tuned from a pretraining that holds the target's one-loop family out beat
+training from scratch, and beat the authors' baseline, a network from scratch on the ratio $V/B$ multiplied by the exact
+Born? The target is the finite virtual of $e^+e^-\to t\bar t$. The pretraining has every tree-level process of the
+catalog, the target's own Born among them, and six other one-loop processes on bulk events only; standardization, early
+stopping and inputs come from bulk events. Three arms per $D$, one seed (D315): the fine-tune (asymptotic factor, at the
+hyperparameters of the data-saving fine-tune searches), the asymptotic-factor transformer from scratch, and the $V/B$
+baseline. The measure is the median over a family's strata of $\log_{10}$(arm / control) of the benchmark's MSE of
+$\log_{10}|V|$, with the design's bar at a factor seven ($\pm0.845$). The fine-tune beats the $V/B$ baseline at the
+threshold at every $D$: the median is $-1.23$, $-2.11$, $-2.05$, $-1.73$ and $-1.82$ for $D=100$, $316$, $1000$, $3162$
+and $10^4$; against the transformer from scratch it is $-1.90$, $-0.89$ and $-1.64$ at $316$, $1000$ and $10^4$, and
+$-0.51$ and $-0.57$ at $100$ and $3162$, inside the bar. It loses to the baseline in the high-energy (Sudakov) strata at
+every $D$, by $1.07$ to $4.03$ decades, over-predicting there by $1.5$ to $1.9$ decades in $\log_{10}|V|$; the $V/B$
+baseline beats the transformer from scratch at high energy only at $D=1000$ and $3162$ ($+1.56$ and $+3.17$ for
+scratch over baseline) and is the least accurate arm at threshold, where its exponent is $0.01$
+against the truth's $-1.02$ (Fig.~\ref{fig:kit-fairnlo}). In the bulk the fine-tune is level with the baseline up to
+$D=3162$ and better at $10^4$ ($2.8\times10^{-8}$ against $6.0\times10^{-7}$). The fine-tune's threshold exponent is
+$-0.91$ to $-0.96$ at every $D$. The fine-tune at $D=1000$, run at the pretraining's learning rate, blew up (validation
+jumped elevenfold) and is listed apart; the design's rerun at a learning-rate scale of $0.126$ is the one counted. The
+design's branch (a): the pretraining transfers to the threshold, not to the high-energy limit, where the ratio to the
+exact Born is the better target.
+% src: python3 tools/kit_readout.py analysis/kit_benchmark/data/kit_fig_fairnlo.json --vs kit_A_ee_tt_virt_finite_n100_t5950_fairnlo_vb_d100 @0c73e9635
+% claim: kit_A_ft_ee_tt_virt_finite_n100_t5950_fairnlo_ftfix_d100.threshold_beta.median=-1.23
+% claim: kit_A_ft_ee_tt_virt_finite_n100_t5950_fairnlo_ftfix_d100.sudakov_sqrts.median=1.07
+% src: python3 tools/kit_readout.py analysis/kit_benchmark/data/kit_fig_fairnlo.json --vs kit_A_ee_tt_virt_finite_n316_t8500_fairnlo_vb_d316 @0c73e9635
+% claim: kit_A_ft_ee_tt_virt_finite_n316_t8500_fairnlo_ftfix_d316.threshold_beta.median=-2.11
+% src: python3 tools/kit_readout.py analysis/kit_benchmark/data/kit_fig_fairnlo.json --vs kit_A_ee_tt_virt_finite_n1000_t8500_fairnlo_vb_d1000 @0c73e9635
+% claim: kit_A_ft_ee_tt_virt_finite_n1000_t8500_fairnlo_ftfix_d1000_lsmed.threshold_beta.median=-2.05
+% claim: kit_A_ee_tt_virt_finite_n1000_t8500_fairnlo_scra2_d1000.sudakov_sqrts.median=1.56
+% src: python3 tools/kit_readout.py analysis/kit_benchmark/data/kit_fig_fairnlo.json --vs kit_A_ee_tt_virt_finite_n3162_t8500_fairnlo_vb_d3162 @0c73e9635
+% claim: kit_A_ft_ee_tt_virt_finite_n3162_t8500_fairnlo_ftfix_d3162.threshold_beta.median=-1.73
+% claim: kit_A_ft_ee_tt_virt_finite_n3162_t8500_fairnlo_ftfix_d3162.sudakov_sqrts.median=4.03
+% claim: kit_A_ee_tt_virt_finite_n3162_t8500_fairnlo_scra2_d3162.sudakov_sqrts.median=3.17
+% src: python3 tools/kit_readout.py analysis/kit_benchmark/data/kit_fig_fairnlo.json --vs kit_A_ee_tt_virt_finite_n10000_t8500_fairnlo_vb_d10000 @0c73e9635
+% claim: kit_A_ft_ee_tt_virt_finite_n10000_t8500_fairnlo_ftfix_d10000.threshold_beta.median=-1.82
+% src: python3 tools/kit_readout.py analysis/kit_benchmark/data/kit_fig_fairnlo.json --vs kit_A_ee_tt_virt_finite_n316_t8500_fairnlo_scra2_d316 @0c73e9635
+% claim: kit_A_ft_ee_tt_virt_finite_n316_t8500_fairnlo_ftfix_d316.threshold_beta.median=-1.90
+% src: python3 tools/kit_readout.py analysis/kit_benchmark/data/kit_fig_fairnlo.json --vs kit_A_ee_tt_virt_finite_n1000_t8500_fairnlo_scra2_d1000 @0c73e9635
+% claim: kit_A_ft_ee_tt_virt_finite_n1000_t8500_fairnlo_ftfix_d1000_lsmed.threshold_beta.median=-0.89
+% src: python3 tools/kit_readout.py analysis/kit_benchmark/data/kit_fig_fairnlo.json --vs kit_A_ee_tt_virt_finite_n10000_t8500_fairnlo_scra2_d10000 @0c73e9635
+% claim: kit_A_ft_ee_tt_virt_finite_n10000_t8500_fairnlo_ftfix_d10000.threshold_beta.median=-1.64
+% src: python3 tools/kit_readout.py analysis/kit_benchmark/data/kit_fig_fairnlo.json --vs kit_A_ee_tt_virt_finite_n100_t5950_fairnlo_scra2_d100 @0c73e9635
+% claim: kit_A_ft_ee_tt_virt_finite_n100_t5950_fairnlo_ftfix_d100.threshold_beta.median=-0.51
+% src: python3 tools/kit_readout.py analysis/kit_benchmark/data/kit_fig_fairnlo.json --vs kit_A_ee_tt_virt_finite_n3162_t8500_fairnlo_scra2_d3162 @0c73e9635
+% claim: kit_A_ft_ee_tt_virt_finite_n3162_t8500_fairnlo_ftfix_d3162.threshold_beta.median=-0.57
+% src: python3 tools/kit_readout.py analysis/kit_benchmark/data/kit_fig_fairnlo.json --slide10 kit_A_ft_ee_tt_virt_finite_n100_t5950_fairnlo_ftfix_d100 kit_A_ft_ee_tt_virt_finite_n316_t8500_fairnlo_ftfix_d316 kit_A_ft_ee_tt_virt_finite_n1000_t8500_fairnlo_ftfix_d1000_lsmed kit_A_ft_ee_tt_virt_finite_n3162_t8500_fairnlo_ftfix_d3162 kit_A_ft_ee_tt_virt_finite_n10000_t8500_fairnlo_ftfix_d10000 kit_A_ee_tt_virt_finite_n10000_t8500_fairnlo_vb_d10000 @0c73e9635
+% claim: kit_A_ft_ee_tt_virt_finite_n10000_t8500_fairnlo_ftfix_d10000.sudakov_sqrts.bias=1.5
+% claim: kit_A_ft_ee_tt_virt_finite_n3162_t8500_fairnlo_ftfix_d3162.sudakov_sqrts.bias=1.9
+% claim: kit_A_ee_tt_virt_finite_n10000_t8500_fairnlo_vb_d10000.threshold_beta.exp_pred=0.01
+% claim: kit_A_ee_tt_virt_finite_n10000_t8500_fairnlo_vb_d10000.threshold_beta.exp_truth=-1.02
+% claim: kit_A_ft_ee_tt_virt_finite_n10000_t8500_fairnlo_ftfix_d10000.bulk.logmse=2.8e-8
+% claim: kit_A_ee_tt_virt_finite_n10000_t8500_fairnlo_vb_d10000.bulk.logmse=6.0e-7
+% claim: kit_A_ft_ee_tt_virt_finite_n100_t5950_fairnlo_ftfix_d100.threshold_beta.exp_pred=-0.91
+% claim: kit_A_ft_ee_tt_virt_finite_n316_t8500_fairnlo_ftfix_d316.threshold_beta.exp_pred=-0.96
+% allow: 100 316 1000 3162 10^4 0.845 0.126 because they are the target sizes D, the design's bar and the rerun's learning-rate scale
+% allow: 4.03 because it is the largest Sudakov median over D, claimed above for D=3162
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/kit_benchmark/figs/kit_fairnlo.pdf}
+\caption{The fair one-loop protocol on the finite virtual of $e^+e^-\to t\bar t$: MSE of $\log_{10}|V|$ against the
+number of one-loop training events $D_{\rm train}$. Upper left: bulk test events; upper right: the deepest threshold
+stratum, $\beta\in[10^{-4},10^{-3}]$; lower left: the deepest high-energy stratum, $\sqrt s\in[15,50]$\,TeV. Fine-tuned:
+from the pretraining with the target's one-loop family held out, with the asymptotic factor; fine-tuned, lr scale
+$0.126$: the rerun of the $D=1000$ fine-tune at a lower learning rate (the filled point at $1000$ blew up); from scratch:
+the asymptotic-factor transformer from scratch; from scratch on $V/B$, exact Born: the benchmark authors' baseline. One
+seed per point.}
+% allow: 10^{-4} 10^{-3} 15 50 0.126 1000 10 because they are bin edges, energies, the rerun's learning-rate scale, its D and the log base
+\label{fig:kit-fairnlo}
+\end{figure}
+
+\subsection{The singular-limit benchmark: the $t\bar t$ threshold scan at NLO (2026-11-26)}\label{sec:kit-thrscan}
+The question (D353, the benchmark authors' request after Fig.~1 of arXiv:1506.06864): how close to the $t\bar t$
+threshold does a cross section at NLO with the surrogate's one-loop virtual stay on the exact one? The scan runs over
+$\beta=\sqrt{1-4m_t^2/s}$ from $10^{-3}$ to $0.6$ ($32$ energies, $16$ angular nodes each, $m_t=173$\,GeV,
+$\alpha_s(M_Z)=0.118$). The exact NLO is MG5\_aMC's fixed-order one from $\beta=0.012$ up and the analytic
+$\mathcal O(\alpha_s)$ correction below, where MG5\_aMC's own checks fail; at $\beta=10^{-3}$ it is $0.427$\,pb against
+$1.72\times10^{-3}$\,pb at LO, the Coulomb $1/\beta$ rise. The surrogate's NLO is the exact one with the exact integrated
+virtual replaced by the surrogate's. The packaged asymptotic-factor model (from scratch on $10^5$ bulk events, at its
+searched hyperparameters) gives $\sigma^{\rm surr}_{\rm NLO}/\sigma_{\rm NLO}-1=-0.29$ at $\beta=10^{-3}$ and stays
+within $10\%$ of the exact NLO from $\beta=0.062$ up (Fig.~\ref{fig:kit-thrscan}). The same factor at the earlier
+$8000$-step setting gives $-0.20$ at $10^{-3}$ and is within $10\%$ from $0.018$. The transformer without the factor,
+with $\log\beta^2$ as an input, gives $-0.96$ and is within $10\%$ only from $0.14$; trained on $V\beta$ instead of $V$
+it gives $-0.082$ and is within $10\%$ on the whole scan, the closest of all. The earlier protocol-B model, without the
+factor and with the hard strata down to $\beta=10^{-4}$ in training, gives $-0.90$ and is within $10\%$ from
+$\beta=0.0097$. Every model is one seed
+(D315). The factor carries the Coulomb rise into the cross section where the plain transformer does not; its remaining
+deficit near $\beta=10^{-3}$ is the offset of the deepest threshold stratum in Sec.~\ref{sec:kit-slide10}.
+% src: python3 tools/kit_threshold_scan.py summary analysis/kit_benchmark/data/kit_threshold_scan_mcmg.json @0c73e9635
+% claim: nlo_pb=0.427
+% claim: lo_pb=1.72e-3
+% claim: kit_A_ee_tt_virt_finite_n100000_t1831_hpo_asym_cont.r_1e-3=-0.29
+% claim: kit_A_ee_tt_virt_finite_n100000_t1831_hpo_asym_cont.beta_10pct=0.062
+% claim: kit_A_ee_tt_virt_finite_n100000_t8000_asym_cont_plainlog.r_1e-3=-0.20
+% claim: kit_A_ee_tt_virt_finite_n100000_t8000_asym_cont_plainlog.beta_10pct=0.018
+% claim: kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr.r_1e-3=-0.96
+% claim: kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr.beta_10pct=0.14
+% claim: kit_A_ee_tt_virt_finite_n100000_t8000_softpairthr_vbeta.r_1e-3=-0.082
+% claim: kit_B_ee_tt_virt_finite_n900000_t3000_offon.beta_10pct=0.0097
+% claim: kit_B_ee_tt_virt_finite_n900000_t3000_offon.r_1e-3=-0.90
+% allow: 1506.06864 1 10^{-3} 0.6 32 16 173 0.118 0.012 10^5 8000 10 10^{-4} 2 because they are an arXiv and figure number, the scan's range and grid, the inputs m_t and alpha_s, MG5_aMC's lowest point, the training size and steps, the 10% level, the deepest training beta and the square
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/kit_benchmark/figs/kit_threshold_scan_a2_legend.pdf}\\
+\includegraphics{../analysis/kit_benchmark/figs/kit_threshold_scan_a2.pdf}
+\caption{Threshold scan of $e^+e^-\to t\bar t$ at $\sqrt s$ from $2m_t(1+5\times10^{-7})$ upward. Upper:
+$\sigma(e^+e^-\to t\bar t)$ against $\beta=\sqrt{1-4m_t^2/s}$; lower: $\sigma^{\rm surr}_{\rm NLO}/\sigma_{\rm NLO}-1$
+against $\beta$. LO, NLO: exact; NLO scale band: $\mu_R$ from $M_Z/2$ to $2M_Z$; $\pm2\,\delta_{\rm MC}$: twice
+MG5\_aMC's integration error; coloured lines: the NLO with each surrogate's virtual (dotted, upper) and its ratio
+(lower). Factor, searched: the packaged asymptotic-factor model from scratch on $10^5$ bulk events at its searched
+hyperparameters ($\gamma\leq4$); factor, 8000 steps: the earlier factor model; no factor: the transformer with log inputs
+and $\log\beta^2$; no factor, target $V\beta$: the same trained on $V\beta$; hard points, no factor: the earlier protocol-B
+model on $9\times10^5$ events with the hard strata. Analytic / MadGraph NLO: left of the dash-dotted line the exact NLO is
+the analytic $\mathcal O(\alpha_s)$ one, right of it MG5\_aMC's.}
+% allow: 2 1 5 10^{-7} 10^5 4 8000 9 10^5 because they are the threshold, the lowest beta squared, the frames' boost cap, the training sizes and steps
+\label{fig:kit-thrscan}
+\end{figure}
+
+\subsection{The singular-limit benchmark: the package for the benchmark's authors and its serve cost (2026-11-27)}\label{sec:kit-package}
+The question (D573, D574): can the benchmark's authors run our asymptotic-factor models themselves, and what does a
+surrogate call cost inside MadEvent? The package holds the three asymptotic-factor checkpoints of protocol A
+($u\bar ug$, $u\bar ugg$, the one-loop $t\bar t$ virtual), a standalone \code{predict.py} that writes the benchmark's
+prediction files under the benchmark's names, the model code it imports and no data (\code{tools/kit\_package.py build
+--standalone}). Its check runs \code{predict.py} on shipped example events and compares with the repository's
+predictor at one CPU thread: they agree to rounding, and a clean environment built from the package's README reproduces
+the expected predictions. The predictions move with the CPU thread count, most on the $t\bar t$ high-energy strata;
+the README says so and fixes one thread. Served to MadEvent (Sec.~\ref{sec:kit-mc-madevent}), the first serve re-read
+and re-augmented the $10^5$-event training pool on every call to refit the input statistics, a fixed cost per call that
+dominated the model's forward pass. The serve now freezes the statistics after its first rebuild, so the fixed per-call cost is
+gone, with the served $\log_{10}|\hat{\mathcal M}|^2$ equal to
+the repository's predictor on the bulk test events.
+% allow: 10^5 10 2 because they are the training pool's size, the log base and the square of |M|
+
 \subsection{Hand-off: open items}\label{sec:div-open}
 Genuinely-unfinished / future work for this line (the completed findings are the subsection above):
 \begin{itemize}
