@@ -1,8 +1,9 @@
 # llm_compare step 28 (D566's next attempt after step 27): part (c)'s setup with the per-process level of its own target
 # as the means of its shared standardization (data.level_file: each process's predicted mean of log(|M|^2 F), F the
 # emission-scale factor, from analysis/catalog_daniel/perevent_level.py --write-level-events --level-seeds 30 --feat
-# <part (c)'s feat_ dirs> --tag _phys: the regressor's 2x64 network on the 2000-event pool means of that target, seeds
-# 0-29, fitted on all 1352 training processes, held out predicted). Run at part (c)'s best trial's HPs
+# <part (c)'s feat_ dirs> --level-split --tag _physsplit: the regressor's 2x64 network on the 2000-event pool means of
+# log|M|^2, seeds 0-29, fitted on all 1352 training processes, held out predicted, plus each pool's own mean log F over
+# the same events; the plain --tag _phys file failed its gate, new-43 median bias^2 0.855 >= c_best's 0.314). Run at part (c)'s best trial's HPs
 # (llmcmp_c_qperp/trial_1860, FA-ccin2p3-29ce8950) as --hp-idx 1860, against that run and this config's same-seed retrain.
 # Everything else as sweep_config_llmcmp_c_latest.yaml, below.
 # llm_compare part (c) (D523: "our latest setup with the modified target, inputs, optimizer, scheduler, and so on"):
@@ -57,7 +58,7 @@ fixed_params:   # "++" on the keys absent from config/ (Hydra appends them)
   data.preprocess_per_dataset: 'true'
   data.shared_standardization: 'true'
   data.affine_multiplicity_std: 'false'
-  data.level_file: analysis/catalog_daniel/data/level_file_B_diag_s30_phys.json   # the change against sweep_config_llmcmp_c_latest.yaml
+  data.level_file: analysis/catalog_daniel/data/level_file_B_diag_s30_physsplit.json   # the change against sweep_config_llmcmp_c_latest.yaml
   ++data.level_file_sigma: shared   # keep c_best's pooled shared sigma (the level file block would take affine_multiplicity_std's)
   ++data.target_physics_factor: 'true'
   ++data.target_physics_dim_only: 'true'
