@@ -30571,7 +30571,7 @@ entries:
       - 'wiring within 3 MC errors: numbers to Joaquin in the deck'
       - 'beyond: KITSURR path fault, fix and rerun'
   step_waits:
-    '32': FA-ccin2p3-680004d8
+    '32': FA-ccin2p3-220290ae
   handoff:
     state: '2026-11-27 ~20:45 CET (owner a1df8528ae678ee1d). Done this turn: step 36 closed (uugg held-out FT search 16/16,
       chosen hp1289 1.97e-4; KIT-scored, vs SCR-A2 every family slightly worse but inside 1/7..7: no transfer; slide10 heldout
