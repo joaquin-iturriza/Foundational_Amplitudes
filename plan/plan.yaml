@@ -45503,6 +45503,14 @@ entries:
       at the test rows: q = Lmin - log s_hat is scale-free, log s_hat from rs), test it against the in-memory x on a dimensionful
       run, then re-score c_best (REREAD=FA-ccin2p3-29ce8950) with it. The 0.5 GPU-h of 825c02e8 gave no new column (pooled
       numbers only).'
+  - at: '2026-11-28T02:30:46+00:00'
+    text: '2026-11-28 step 28 writer gate FAILED: FA-ccin2p3-b07e2464 (perevent_level.py @264f7c8cf, 2x64 network, 30 seeds,
+      2000 events per pool, fitted on the pool means of part (c)''s target log(|M|^2 F)): new-43 median bias^2 0.855 nat^2
+      >= c_best''s 0.314 (median level error mean(d)^2/sd^2 0.608 against 0.055 for step 27''s same network on log|M|^2; training
+      processes 0.0056). The process descriptors cannot place each process''s mean log F; no GPU job. Next attempt (step 30):
+      level = the network on the log|M|^2 means + each pool''s own mean log F (label-free), perevent_level.py --level-split
+      @96cd7ed21; also fixed tools/llm_score.py''s x columns under dimensionless_inputs (momenta times sqrt(s_hat) from the
+      last order column), so c_best''s re-score gives the subset read its input.'
   step_waits: {}
   handoff:
     state: 'Step 28 (per-process level file of part (c)''s own target log(|M|^2 F) in part (c)''s setup at trial_1860''s HPs;
