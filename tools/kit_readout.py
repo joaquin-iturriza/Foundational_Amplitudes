@@ -113,6 +113,7 @@ def slide10(path, runs):
     |pred - truth| and |M|^2-weighted relative error; the family's fitted exponent (pred, truth, exact); for the azimuth
     strata the rms over events of the harmonic h = 2<log10|M|^2 cos 2phi>_phi, prediction against truth."""
     d = json.load(open(path))
+    js = {}   # the numbers for % claim: lines (tools/verify_claims.py reads the last JSON line)
     for name in runs:
         r = d["runs"][name]
         print(f"== {name}")
@@ -128,6 +129,11 @@ def slide10(path, runs):
             es = f"  {e['pred']:+.2f}/{e['truth']:+.2f}/{e['exact']:+.0f}" if e else ""
             h = f" | h {v['cos2phi_rms_pred']:.3g}/{v['cos2phi_rms_truth']:.3g}" if "cos2phi_rms_pred" in v else ""
             print(f"  {st:34s} {v['logmse']:9.3g} {v['bias']:+9.2e} {v['p99_abs']:8.3g} {v['me2_weighted_rel_err']:9.3g}{es}{h}")
+            js.setdefault(name, {})[fam or "bulk"] = {
+                "stratum": st, "logmse": v["logmse"], "bias": v["bias"], "p99": v["p99_abs"],
+                "wrel": v["me2_weighted_rel_err"], **({"exp_pred": e["pred"], "exp_truth": e["truth"]} if e else {}),
+                **({"h_pred": v["cos2phi_rms_pred"], "h_truth": v["cos2phi_rms_truth"]} if "cos2phi_rms_pred" in v else {})}
+    print(json.dumps(js))
 
 
 if __name__ == "__main__":

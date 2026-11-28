@@ -385,7 +385,8 @@ def label(run):
     # step 18 (D435): log|M|^2 = log A + g, A the asymptotic factors (1/beta, log^2(s/m^2)); A1 on the log inputs, A2 on
     # plain momenta with the frames' boost capped at gamma <= 4
     asym = {"softpairthr_asym_plainlog": r", log inputs + $\log\beta^2$, asymptotic factor",
-            "asym_cont_plainlog": r", asymptotic factor, no log inputs, $\gamma\leq4$"}
+            "asym_cont_plainlog": r", asymptotic factor, no log inputs, $\gamma\leq4$",
+            "hpo_asym_cont": r", asymptotic factor, $\gamma\leq4$, searched"}
     tag = next((t for t in asym if run.endswith("_" + t)), None)
     if tag:
         inputs[run.rsplit("_", 1)[-1]] = asym[tag]
@@ -433,6 +434,20 @@ def cmd_figure(a):
     print(f"FIGURE {ps.save(fig, a.out)}")
 
 
+def cmd_summary(a):
+    """the numbers of docs/results.tex from a collected scan (tools/verify_claims.py reads the last JSON line): the exact
+    NLO and the quadrature LO at the lowest beta, and per surrogate sigma_NLO^surr/sigma_NLO - 1 at the grid points
+    nearest beta = 1e-3, 1e-2, 1e-1 with beta_1pct and beta_10pct (cmd_collect)"""
+    d = json.load(open(a.json))
+    beta = np.asarray(d["beta"])
+    at = {k: int(np.argmin(np.abs(np.log(beta / b)))) for k, b in (("r_1e-3", 1e-3), ("r_1e-2", 1e-2), ("r_1e-1", 1e-1))}
+    out = {"beta_min": float(beta[0]), "nlo_pb": d["amc"]["nlo"][0]["sigma"], "lo_pb": d["sigma_lo_quad"][0],
+           **{k.replace("r_", "beta_at_"): float(beta[i]) for k, i in at.items()}}
+    for name, s in d["surrogates"].items():
+        out[name] = {"beta_1pct": s["beta_1pct"], "beta_10pct": s["beta_10pct"], **{k: s["ratio"][i] for k, i in at.items()}}
+    print(json.dumps(out))
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -452,10 +467,13 @@ def main():
     f.add_argument("json")
     f.add_argument("--out", required=True)
     f.add_argument("--runs", nargs="*", help="these surrogates only (run names), at most six")
+    m = sub.add_parser("summary")
+    m.add_argument("json")
     for s in (b, n, p, c):
         s.add_argument("--dir", default=DEFAULT_DIR)
     a = ap.parse_args()
-    {"build": cmd_build, "nlo": cmd_nlo, "predict": cmd_predict, "collect": cmd_collect, "figure": cmd_figure}[a.cmd](a)
+    {"build": cmd_build, "nlo": cmd_nlo, "predict": cmd_predict, "collect": cmd_collect, "figure": cmd_figure,
+     "summary": cmd_summary}[a.cmd](a)
 
 
 if __name__ == "__main__":
