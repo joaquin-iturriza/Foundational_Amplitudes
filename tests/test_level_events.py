@@ -69,6 +69,10 @@ def test_level_subsets_factor_check(tmp_path):
     c = tmp_path / "ok.csv"; c.write_text(rows(lf))
     out = level_subsets.read(str(c), ["p"], str(fp), nboot=2)
     assert out["factor_check_p99_abs"] < 1e-3 and abs(out["new"]["all"]["bias2"] - 0.09) < 1e-6
+    rl = level_subsets.read(str(c), ["p"], None, nboot=2, relevel=True)   # the level on each subset's own mean log F
+    lo = x[:, 0] <= np.median(x[:, 0])
+    assert abs(rl["new"]["all"]["bias2"] - 0.09) < 1e-6 and rl["new"]["all"]["dlogF"] == 0
+    assert abs(rl["new"]["s_lo"]["dlogF"] - abs(lf[lo].mean() - lf.mean())) < 1e-4
     c.write_text(rows(lf[::-1]))
     with pytest.raises(AssertionError):
         level_subsets.read(str(c), ["p"], str(fp), nboot=2)
