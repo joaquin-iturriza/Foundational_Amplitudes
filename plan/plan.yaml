@@ -30584,6 +30584,16 @@ entries:
     text: '2026-11-28 sweep kit_hpo_smoke (CC, the 1-trial 50-step D395 smoke of the sweep launch path, FA-ccin2p3-f81cb1d0,
       read 2026-11-12 ~20:20: result json with val_mse_curve and train_eval_mse_curve, sigma stage and plots present): no
       step of the entry reads it (the entry has no next step and no wait names it); nothing to clear.'
+  - at: '2026-11-28T03:48:32+00:00'
+    text: '2026-11-28 @21914e2e8: docs/results.tex write-up of steps 32-39 (notes-editor PASS after one BLOCK, watermark 23cde1700):
+      sec:kit-emis (factor vs emission scales at matched and searched HPs, bar 1/30..30; the draft''s arms in median |Delta|,
+      fig:kit-paper-relmed), sec:kit-ttg, sec:kit-heldout (bar 1/7..7; the two blown-up hand-set uug fine-tunes listed apart
+      with where they jumped, in words: no committed tool reproduces 26x/95x), sec:kit-mc-madevent. Claims from new JSON summaries:
+      tools/kit_zoom.py summary @838e27c60, tools/kit_readout.py --vs JSON line and tools/kit_mc_madgraph.py summary @62545852b;
+      verify_claims 0 problems. Entry not closed: no done_when/notes_ref, and protocol B (step 31), the fair one-loop protocol
+      (steps 24/35), slide-10 metrics (29), threshold scan (4), package (D573/D574) and serve cost (33) are not in results.tex:
+      added as next step. kit_readout --vs reproduces protocol-B and fair-NLO medians (checked). Draft protocol-B subsection
+      (claims verified only by eye, not inserted): scratchpad kit_protB_draft.tex.'
   step_waits: {}
   handoff:
     state: '2026-11-28 ~05:00 CET (owner abff01bfc84c9bfbb). Steps 34, 39, 32 closed this session; the entry has no next step
