@@ -28711,7 +28711,7 @@ entries:
     withdrawn_why: 'D574: no more trainings for today''s reply; a pretrained held-out uug/uugg run is training'
   owner:
     agent: abff01bfc84c9bfbb
-    state: working
+    state: closed
     since: '2026-11-27T19:49:00+00:00'
     state_at: '2026-11-28T03:19:59.718000+00:00'
     context: 217790
@@ -30576,44 +30576,31 @@ entries:
       with both processes, deck rebuilt 26 pages 0 errors.'
   step_waits: {}
   handoff:
-    state: '2026-11-27 ~20:45 CET (owner a1df8528ae678ee1d). Done this turn: step 36 closed (uugg held-out FT search 16/16,
-      chosen hp1289 1.97e-4; KIT-scored, vs SCR-A2 every family slightly worse but inside 1/7..7: no transfer; slide10 heldout
-      redrawn with ''fine-tuned, searched'' @787658287, deck @51846a3ad); step 33 closed (uugg slide 11: sigma_hat/sigma-1
-      = -0.0033+-0.0016 vs E_exact[u]-1 = -0.00135, eps2 0.877/0.742/0.585/0.389; figure kit_mc_slide11_tree @b41e496e3, deck
-      frame @4e37ea0ea); step 37 dropped (done). In flight: STEP 34b: uug FT search done 16/16, chosen hp1790 (val 2.66e-5,
-      sep 2.70; kit_hpo_uug_ft_heldoutqqg.json @a551adbd4); KIT scoring FA-ccin2p3-82452f53 (KIT_SCORE_ONLY, KIT_SCORE_DIR=runs/kit_hpo_uug_ft_heldoutqqg/trial_1790).
-      On its end: site --timeout 1800 run --job --allow-stale --item kit_benchmark ccin2p3 FA -- python tools/kit_figures.py
-      collect runs/kit_hpo_uug_ft_heldoutqqg/trial_1790=kit_A_ft_ee_uug_me2_n100000_t1831_heldoutqqg_ftbest (CPU job; rerun
-      the same command to read the KITFIG line), merge its runs into analysis/kit_benchmark/data/kit_fig_heldoutqqg.json,
-      kit_readout.py <json> --vs kit_A_ee_uug_me2_n100000_t1831_heldoutqqg_scra2 and --slide10, verdict bar 1/7..7 (BEATS
-      -> A2 scratch search), redraw: kit_figures.py slide10 <json> --arms heldout --out analysis/kit_benchmark/figs/kit_slide10_heldout
-      (FTS arm already in SLIDE10), copy pdf to talks/kit_reply_nov2026/figs (git add -f), rebuild with pdflatex twice (latexmk
-      -silent does not rebuild here), check_caption (caption template scratchpad cap_s10.txt: drop ''uug search still running''),
-      hand back. STEP 32: uug slide 11: seed 1019 hangs deterministically (twice TIMEOUT); replacement part seed 1051 FA-ccin2p3-47fb3318
-      (KIT_MC_VEC=0) -> combine FA-ccin2p3-680004d8 (afterok, 50 parts s1001-1050 minus s1019 plus s1051). On its end: CLAIM
-      lines in its log -> merge ee_uug .../surrogate_sample into analysis/kit_benchmark/data/kit_mc_madgraph_ee_uug.json (the
-      old uug surrogate_sample CLAIM with mean_r 5.8e5 is stale), wiring check within 3 MC errors, redraw figure_exact with
-      both jsons (--out analysis/kit_benchmark/figs/kit_mc_slide11), deck frame already there. STEP 39: ttg data built (WT=0
-      fix @1f216b9a3; soft slope -1.9993, coll flat = dead cone, threshold flat) on CC and lxplus; smoke FA-ccin2p3-5ad7429c
-      passed D395 (its training diverged at the smoke''s lr 0.193 from job_kit''s lr law at T=50: artefact); 16-trial plain
-      search driving (detach kit_hpo_ttg_plain, log ~/.local/share/ccorch/detached/20261127-191849_kit_hpo_ttg_plain.log,
-      target 16x0.55 h recorded). On its end: kit_curves.py sweep kit_hpo_ttg_plain (CC trials need a CPU job: rerun), choose
-      best good trial, then factor arm (data.target_physics_factor=false ++model.input_asym_factor=true) and emission arm
-      (data.target_physics_factor=true) at its HPs via job_kit.sh A on kit_fa_ee_ttg__me2 (limit 1:30, target 0.6 h), plain
-      trial scored with KIT_SCORE_ONLY; add RUNS[''fa_ee_ttg_me2''] + PROCS in tools/kit_zoom.py and draw. Note: a drive.py
-      ''lost'' trial blocks the next wave until --retry-lost; CPU jobs need site pick FA --jobs N --gpus 0 before site submit.'
-    decisions: 'Joaquin''s: D598, D600, D602, D604, D575, D571, D315, D428. Mine: ttg top width 0 in the standalone (external
-      stable tops; the card width saturated the soft limit, the design''s own slope check failed) - a repair inside D600''s
-      design; no re-smoke after the diverged 50-step smoke (every stage ran; divergence from the lr law at T=50, the search
-      and arms set lr); uug part seed 1019 replaced by 1051 (deterministic hang; same N and card); slide10 legend smaller
-      font (rows were squeezed); figure_exact tree as two panels with legend inside (three columns ran off the page).'
-    ruled_out: CDST spin-averaged massive dipole as the ttg factor term (negative on 3% of phase space); rerunning uug MC
-      seed 1019 (hangs every time).
-    running: FA-ccin2p3-82452f53 (uug FT trial_1790 KIT scoring, step 34); FA-ccin2p3-47fb3318 -> FA-ccin2p3-680004d8 (step
-      32 part + combine); detach kit_hpo_ttg_plain (step 39 search)
-    files: tools/kit_figures.py, tools/kit_mc_madgraph.py, tools/kit_ttg.py, tools/kit_zoom.py, analysis/kit_benchmark/data/{kit_fig_heldoutqqg.json,kit_hpo_uug_ft_heldoutqqg.json,kit_hpo_uugg_ft_heldoutqqg.json,kit_mc_madgraph_ee_uug.json,kit_mc_madgraph_ee_uugg.json},
-      sweep/sweep_config_kit_hpo_ttg_plain.yaml, talks/kit_reply_nov2026/main.tex, scratchpad cap_s10.txt cap_s11.txt kb16/caps_emis.json
-    written: '2026-11-27T19:36:25+00:00'
+    state: '2026-11-28 ~05:00 CET (owner abff01bfc84c9bfbb). Steps 34, 39, 32 closed this session; the entry has no next step
+      left. Step 34 (held-out qqg uug, searched FT hp1790, FA-ccin2p3-a872c019): vs SCR-A2 uug bulk +0.48, collinear +2.30,
+      soft +3.38 decades of log-MSE (no family BEATS: no transfer on uug; the bulk-val search picked a fine-tune far worse
+      in the limits than the unsearched parent-lr fine-tune); slide10 heldout redrawn @69966abb2, deck rebuilt. Step 39 (t
+      t~ g, D600 (b)): plain search 16/16, best clean trial hp1668 (design''s no->5x-jump rule excluded hp0353/1166/1774);
+      arms factor FA-ccin2p3-cb01aa03, emission FA-ccin2p3-3001d863, plain trial_1668 scored FA-lxplus-d1e1006a; MSE(ln) deepest
+      soft factor 1.19 / emission 21.5 / plain 402, dead cone 0.00275/0.533/0.166, threshold 5.35e-5/5.29e-3/6.93e-5, core
+      1.35e-5/1.99e-3/2.16e-5: factor wins soft vs plain, bulk/threshold/collinear vs emission, also the dead cone; figures
+      kitzoom_ttg_{mse,relmed,median} (sent), data @3b2efd1a9. Step 32 (uug slide 11): sigma_hat/sigma-1 = -0.0015+-0.0014
+      vs E_exact[u]-1 = -0.00162 (0.06 MC errors), eps2 0.996/0.990/0.977/0.943; slide 11 with both processes @2e4cae076,
+      deck rebuilt. Left for the next owner: the docs/results.tex write-up of steps 32-39 (findings on the entry hold every
+      number) before plan done, and whatever Joaquin asks next.'
+    decisions: 'Joaquin''s: D598, D600, D602, D604, D575, D571, D315, D428. Mine: t t~ g HP point hp1668 = the best trial
+      passing curve_quality AND no one-point val jump >5x, as the passed design words it (the lower-val good trials jump 6.7-9.9x);
+      t t~ g emission arm drawn as ''transformer, emission scales'' (all arms at one HP point; kit_zoom TTG_STYLE); pair-threshold
+      family drawn without a second variable (at fixed sqrt s the pair beta fixes x); kit_figures RUN_RE accepts fa_ files;
+      kit_mc_madgraph combine expands [..]/? patterns (bug fix); scoring 82452f53 resubmitted with its missing positional
+      args.'
+    ruled_out: CDST spin-averaged massive dipole as the ttg factor term; rerunning uug MC seed 1019 (hangs).
+    running: none
+    files: tools/kit_zoom.py (t t~ g block, TTG_STYLE/XLAB_TTG), tools/kit_figures.py (RUN_RE), tools/kit_mc_madgraph.py (combine
+      glob), analysis/kit_benchmark/data/{kit_fig_ttg.json,kit_curves_ttg.json,kit_hpo_ttg_plain.json,kit_zoom.json,kit_fig_heldoutqqg.json,kit_mc_madgraph_ee_uug.json},
+      analysis/kit_benchmark/figs/zoom/kitzoom_ttg_*, analysis/kit_benchmark/figs/kit_slide10_heldout, kit_mc_slide11_tree,
+      talks/kit_reply_nov2026/main.tex; captions scratchpad cap_ttg_*.txt, cap_s10b.txt, cap_s11b.txt
+    written: '2026-11-28T03:22:02+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
