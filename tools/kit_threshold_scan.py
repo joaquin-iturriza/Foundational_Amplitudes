@@ -412,18 +412,20 @@ def cmd_figure(a):
     ax.plot(sq[ok], nlo[ok], "k-", label="NLO")
     rx.fill_between(sq[ok], -dn[ok], up[ok], color="0.85", lw=0)
     rx.fill_between(sq[ok], (-2 * err / nlo)[ok], (2 * err / nlo)[ok], color="0.6", lw=0)
-    ax.fill_between([], [], [], color="0.6", lw=0, label=r"$\pm2\,\delta_{\rm MC}$ of the NLO (lower panel)")
+    ax.fill_between([], [], [], color="0.6", lw=0, label=r"$\pm2\,\delta_{\rm MC}$ of NLO")
     # one categorical colour per model, the same in both panels (a sequential ramp made them indistinguishable)
     cols = [ps.C.blue, ps.C.vermillion, ps.C.green, ps.C.orange, ps.C.purple, ps.C.sky]
     sur = {k: v for k, v in d["surrogates"].items() if not a.runs or k in a.runs}
     assert len(sur) <= len(cols), f"{len(sur)} models, {len(cols)} colours: pick them with --runs"
+    names = dict(zip(a.runs, a.labels)) if a.labels else {}
+    assert not a.labels or len(a.labels) == len(a.runs or []), "--labels takes one per --runs entry"
     for (name, s), col in zip(sur.items(), cols):
         r = np.array([x if x is not None else np.nan for x in s["ratio"]])
-        ax.plot(sq[ok], (nlo * (1 + r))[ok], color=col, ls=":", label=label(name))
+        ax.plot(sq[ok], (nlo * (1 + r))[ok], color=col, ls=":", label=names.get(name) or label(name))
         rx.plot(sq[ok], r[ok], color=col)
     rx.axhline(0, color="k", lw=0.8)
     if ana:      # left of this line the exact NLO is the analytic O(alpha_s) one, right of it MG5_aMC's
-        for x, lab in ((ax, "exact NLO from the analytic formula (left) or MadGraph (right)"), (rx, None)):
+        for x, lab in ((ax, "analytic | MadGraph NLO"), (rx, None)):
             x.axvline(np.sqrt(max(ana) * sq[len(ana)]), color="0.4", lw=0.8, ls="-.", label=lab)
     ax.set_xscale("log")
     ax.set_ylabel(r"$\sigma(e^+e^-\to t\bar t)$ [pb]")
@@ -467,6 +469,7 @@ def main():
     f.add_argument("json")
     f.add_argument("--out", required=True)
     f.add_argument("--runs", nargs="*", help="these surrogates only (run names), at most six")
+    f.add_argument("--labels", nargs="*", help="short legend labels, one per --runs entry")
     m = sub.add_parser("summary")
     m.add_argument("json")
     for s in (b, n, p, c):
