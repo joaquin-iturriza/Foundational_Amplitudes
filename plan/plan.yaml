@@ -50743,6 +50743,14 @@ entries:
       1.178, 0.0533 <- measured: c_best held-out / seen pooled RMSE; 0.721 <- measured: Suprio''s LLM held-out pooled RMSE
       (data/suprio_cond); 2 bootstrap sd <- measured, level_subsets.py; 16 h <- measured: c_best''s V100 0.90 s/step x 60,840;
       100 GPU-h <- CLAUDE.md budget, D566 names the work'
+    passed_at: '2026-11-28T02:34:23+00:00'
+    reviewer: 'Re-review after FIX: one change (data.level_file -> _physsplit, sigma kept 3.786) vs c_best trial_1860 at its
+      HPs/seed; check 2: part (a) level file moved new-43 median bias^2 0.859->0.122, c_best bias^2 share 0.87, gate = log|M|^2
+      network''s own bias on the same events (lvl_diag 0.096 < 0.314, code @96cd7ed21 subtracts/re-adds mean log F); check
+      3: same-seed retrain gives R_b here (part (a) 1.88); D566 sampling now read: level_subsets.py --relevel @fd412d94a shifts
+      each subset by mean log F(subset) - mean log F(pool) from the CSV''s log_factor (test checks dlogF), part of YES with
+      a LEVEL-ONLY branch; disk read CC 6.1G free / lxplus 2.2P, CC takes 0.4 GB, runs refused on CC below 2x. Searched docs/results.tex
+      for level_file, level file, level split, physsplit, mean log F; plan dead ends A-F and step 28; site decisions D564/D566/D567.'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
