@@ -44108,6 +44108,14 @@ entries:
       the network already keeps the level regardless of which events are scored; the per-event part adds nothing (data/level_subsets.json,
       data/step27_level_read.json, data/rerun_spread_level.json @3f4fbf82a)'
     at: '2026-11-27T17:47:19+00:00'
+  - tried: 'Step 28 writer (FA-ccin2p3-b07e2464, perevent_level.py @264f7c8cf --feat c_latest''s feat dirs --level-seeds 30
+      --tag _phys): the 2x64 diagram network, 30 seeds, 2000 train-role events per pool, fitted on the 1352 training processes''
+      pool means of part (c)''s target log(|M|^2 F)'
+    why: 'GATE failed: the file''s new-43 median bias^2 (level - pool mean of the target)^2 is 0.855 nat^2 against c_best''s
+      trained 0.314 (median level error mean(d)^2/sd^2 0.608 vs 0.055 for step 27''s same network on log|M|^2, 11x; training
+      processes 0.0056): the network cannot place the per-process mean of log F (a function of each process''s final state
+      and kinematics) from the process descriptors; no GPU job'
+    at: '2026-11-28T02:26:02+00:00'
   asks:
   - ask: 'Scope: the data of the LLM run is not within our reach, so the comparison runs either on Suprio''s own files or
       on another pool. His training data (processes/<name>/data_running_alpha.npy, with |M|^2 and the running alpha_s) is
