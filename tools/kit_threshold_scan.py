@@ -425,7 +425,7 @@ def cmd_figure(a):
         rx.plot(sq[ok], r[ok], color=col)
     rx.axhline(0, color="k", lw=0.8)
     if ana:      # left of this line the exact NLO is the analytic O(alpha_s) one, right of it MG5_aMC's
-        for x, lab in ((ax, "analytic | MadGraph NLO"), (rx, None)):
+        for x, lab in ((ax, "analytic / MadGraph NLO"), (rx, None)):
             x.axvline(np.sqrt(max(ana) * sq[len(ana)]), color="0.4", lw=0.8, ls="-.", label=lab)
     ax.set_xscale("log")
     ax.set_ylabel(r"$\sigma(e^+e^-\to t\bar t)$ [pb]")
