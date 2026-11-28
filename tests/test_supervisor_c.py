@@ -108,6 +108,21 @@ def test_c1_cases():
     print("[C1 cases] ok")
 
 
+def test_c1_marker_on_stdout():
+    """A COMPLETED slurm run whose RUN_DONE is in the .out while the .err tail is later stays clean; with the marker
+    in neither it stays broke. Runs the real log-read command on files, then the classifier."""
+    def sort(out_txt):
+        with tempfile.TemporaryDirectory() as d:
+            open(d + "/job-77.err", "w").write("Collected 1600000 predictions\n")
+            open(d + "/job-77.out", "w").write(out_txt)
+            find = "ls -t $(find . -maxdepth 3 -name '*77*' 2>/dev/null)"
+            r = subprocess.run(["bash", "-c", S.log_read_cmd(find, RULES)], cwd=d, capture_output=True, text=True)
+            return S.sort_run_end("COMPLETED", "x", S.parse_log_read(r.stdout), RULES)[0]
+    assert sort("KIT_DONE rc=0\nRUN_DONE\n") == "clean"
+    assert sort("working\n") == "broke"
+    print("[C1 stdout marker] ok")
+
+
 def load_site():
     loader = importlib.machinery.SourceFileLoader("site_tool", os.path.join(BIN, "site"))
     spec = importlib.util.spec_from_loader("site_tool", loader)
@@ -304,6 +319,7 @@ def test_c4_plan_target():
 if __name__ == "__main__":
     test_c1_sorting()
     test_c1_cases()
+    test_c1_marker_on_stdout()
     test_c2_queues()
     test_c3_collection()
     test_c4_target()
