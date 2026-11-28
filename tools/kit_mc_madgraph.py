@@ -468,7 +468,7 @@ def cmd_combine(a):
     the inverse-variance mean of theirs (MadEvent's scalar calls at one event cost ~50 ms: a 1e5-event run is split)"""
     import glob
     import h5py
-    a.parts = sorted(q for d in a.parts for q in (glob.glob(d) if "*" in d else [d]))
+    a.parts = sorted(q for d in a.parts for q in (glob.glob(d) if glob.has_magic(d) else [d]))   # [..] and ? patterns too
     assert a.expect is None or len(a.parts) == a.expect, f"{len(a.parts)} parts, expected {a.expect}"
     fs = [h5py.File(h5(d, a.proc, True), "r") for d in a.parts]
     assert len({str(f.attrs["surrogate"]) for f in fs}) == 1, "parts of different surrogates"
