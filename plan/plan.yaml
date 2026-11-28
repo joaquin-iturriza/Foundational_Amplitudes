@@ -28412,7 +28412,13 @@ entries:
   - D493
   - D572
   - D573
-  next: null
+  next:
+    25: 'Write up in docs/results.tex the entry''s finished steps not yet there (from the entry''s findings, with % src/%
+      claim lines, then the notes-editor review): protocol A from scratch and its input/arm attempts beyond sec:kit-deepest''s
+      figure, protocol B on the A2 models (step 31), Bakar''s slide-10 metrics (step 29), the fair one-loop protocol on e+e-
+      -> t t~ virtual with FT vs SCR-A2 vs V/B per D after the asym_sd fix (steps 24/35), the threshold scan sigma(sqrt s)
+      at LO and NLO (step 4, slide 11 one-loop part), the KIT package (D573/D574) and the serve cost (step 33); then set done_when
+      and notes_ref and close the entry.'
   done_when: null
   notes_ref: null
   match: kit_*
@@ -36631,6 +36637,12 @@ entries:
     units: null
     start: '2026-11-27T20:23:32+00:00'
     at: '2026-11-27T20:23:32+00:00'
+  step_why:
+    25:
+      feeds: the entry's write-up, required before plan done (fa-results-notes)
+      if:
+      - 'every finished step written up and verify_claims passes: plan check + plan ref + plan done'
+      - 'a step''s numbers do not reproduce from a committed tool: fix the tool or re-read under REREAD, then write'
 - id: ladder_figs
   title: 'draft figs 10 and 11: from-scratch line on top'
   question: Redraw rung_grid (the draft's figs 10 and 11) with the black from-scratch line on top and clearly visible (D362).
