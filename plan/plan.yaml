@@ -44334,9 +44334,9 @@ entries:
     - 29
   owner:
     agent: a5f1d1a226203e5a6
-    state: stopped
+    state: working
     since: '2026-11-28T02:22:23+00:00'
-    state_at: '2026-11-28T03:10:55.177000+00:00'
+    state_at: '2026-11-28T05:49:43.785000+00:00'
     context: 159344
     context_at: '2026-11-28T02:55:01+00:00'
   step_why:
