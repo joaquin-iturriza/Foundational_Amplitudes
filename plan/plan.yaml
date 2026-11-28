@@ -45538,6 +45538,14 @@ entries:
       |own mean - level| over the training processes 0.066; 50 training steps and the sigma stage ran; cut at the 1 h interactive
       limit during the final per-process evaluation (no SMOKE_EXIT). Resubmitted as a 3 h batch job FA-ccin2p3-dd66bb87 (code
       @0c73e9635).'
+  - at: '2026-11-28T07:22:21+00:00'
+    text: '2026-11-28 step 30: D395 smoke FA-ccin2p3-dd66bb87 SMOKE_EXIT 0 (sigma 3.7862 = c_best''s). Wall target c_level_runs
+      16 h x 2 recorded. site pick FA --jobs 2 allotted CC, but site submit refused there on disk (CC /sps/lpnhe 5.3 GB free,
+      the site''s 5 GB margin + 2 GB per run; all of runs/zz_smoke is our llm_compare smokes, 2.3 GB, not enough to free 2
+      runs); re-picked --only lxplus (2 jobs, 1 at once now, done ~32 h by pick''s estimate). lxplus gives 3000 MB per CPU,
+      so 20G asked with 7 CPUs. Submitted the arm FA-lxplus-d4e83bb4 (trial 2860) and same-seed retrain FA-lxplus-bb0ec47a
+      (trial 2861), sweep/sweep_config_llmcmp_c_level.yaml @55929f1970, --hp-idx 1860 --t-steps 60840, trial_1860''s HPs,
+      --time 22 h; smoke held-out score FA-ccin2p3-f45f4ea9.'
   step_waits:
     '30': FA-lxplus-d4e83bb4 FA-lxplus-bb0ec47a FA-ccin2p3-f45f4ea9
   handoff:
