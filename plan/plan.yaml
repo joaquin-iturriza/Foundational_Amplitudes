@@ -44008,7 +44008,7 @@ entries:
     - FA-lxplus-b43687b7
     - FA-lxplus-cb9273f1
     - FA-lxplus-e48ee20a
-    commit: 96cd7ed21
+    commit: fd412d94a
     paths:
     - analysis/catalog_daniel/dancat_plain_mse.py
     - analysis/catalog_daniel/perevent_level.py
