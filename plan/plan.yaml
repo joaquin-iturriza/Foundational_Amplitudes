@@ -45532,6 +45532,11 @@ entries:
       true, target phys). c_best re-score FA-ccin2p3-ac30ec7e (llm_score @96cd7ed21): held-out pooled RMSE 1.1782 over 1,390,000
       events (= 1.178), CSV now carries log_shat, q (first rows log_shat ~11.6-11.9, sqrt(s_hat) ~330-380 GeV). D395 smoke
       FA-ccin2p3-50ee56d8 submitted (interactive V100).'
+  - at: '2026-11-28T05:58:09+00:00'
+    text: '2026-11-28 step 30 smoke FA-ccin2p3-50ee56d8: level_file read (physsplit), sigma = 3.7862 = c_best''s 3.786, median
+      |own mean - level| over the training processes 0.066; 50 training steps and the sigma stage ran; cut at the 1 h interactive
+      limit during the final per-process evaluation (no SMOKE_EXIT). Resubmitted as a 3 h batch job FA-ccin2p3-dd66bb87 (code
+      @0c73e9635).'
   step_waits:
     '30': FA-ccin2p3-dd66bb87
   handoff:
