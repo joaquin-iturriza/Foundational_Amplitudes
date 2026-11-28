@@ -43960,12 +43960,6 @@ entries:
   - D576
   - D578
   next:
-    28: 'step 29 (D566 next attempt): the per-process level in part (c)''s setup. Part (c) (sweep_config_llmcmp_c_latest.yaml)
-      trains on the emission-scale target with shared_standardization, so its level file must hold each process''s mean of
-      that target, not of log|M|^2: extend perevent_level.py''s writer to the target''s pool means (same 2x64 diagram network,
-      30 seeds, same events), then one arm (data.level_file in c_latest at trial_1860''s HPs) against c_best (trial_1860)
-      and the arm''s same-seed retrain for R_b; read new-43 median bias^2, the subsets (level_subsets.py), held-out pooled
-      RMSE against 1.178 and the LLM''s 0.721, Suprio''s layout. Own design and review first; ~2 x 16 GPU-h'
     29: 'step 26''s PARTLY branch (feature rule): the Breit-Wigner target arm''s own 8-trial DyHPO search over the template''s
       space (sweep_config_llmcmp_c_tprop.yaml, single fidelity 60,840 steps), best against part (c)''s best (trial_1860);
       ~128 GPU-h at ~16 h per trial, above 100: on Joaquin''s go; own design and review'
@@ -44330,14 +44324,6 @@ entries:
     since: '2026-11-28T02:22:23+00:00'
     state_at: '2026-11-28T02:22:23+00:00'
   step_why:
-    28:
-      feeds: 'D566: does the per-process level lever (step 16, kept regardless of sampling in step 27''s control) carry to
-        part (c)''s setup, where the new-family level is the largest share of the held-out error'
-      if:
-      - 'YES (arm new-43 median bias^2 below c_best''s 0.314 by more than R_b): part (c)''s setup takes the level file; reported
-        to Joaquin with Suprio''s layout'
-      - 'NO (within R_b of c_best''s): the level lever does not carry over the emission-scale target; reported, the next attempt
-        designed'
     29:
       feeds: 'D564: does the Breit-Wigner factor in the target, at its own best HPs, beat part (c)''s best on held out without
         the seen cost (1.85x) seen at trial_1860''s HPs'
@@ -45515,8 +45501,7 @@ entries:
       at the test rows: q = Lmin - log s_hat is scale-free, log s_hat from rs), test it against the in-memory x on a dimensionful
       run, then re-score c_best (REREAD=FA-ccin2p3-29ce8950) with it. The 0.5 GPU-h of 825c02e8 gave no new column (pooled
       numbers only).'
-  step_waits:
-    '28': FA-ccin2p3-b07e2464 FA-ccin2p3-825c02e8
+  step_waits: {}
   handoff:
     state: 'Step 28 (per-process level file of part (c)''s own target log(|M|^2 F) in part (c)''s setup at trial_1860''s HPs;
       arm trial 2860 + same-seed retrain 2861 vs c_best) design PASSED 2026-11-27 ~20:10 (after one FIX). Code @264f7c8cf:
