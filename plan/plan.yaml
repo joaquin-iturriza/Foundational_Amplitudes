@@ -28719,7 +28719,7 @@ entries:
     withdrawn_why: 'D574: no more trainings for today''s reply; a pretrained held-out uug/uugg run is training'
   owner:
     agent: aceee688c754bb4d1
-    state: working
+    state: closed
     since: '2026-11-28T03:33:58+00:00'
     state_at: '2026-11-28T03:33:58+00:00'
   findings:
@@ -30596,31 +30596,24 @@ entries:
       (claims verified only by eye, not inserted): scratchpad kit_protB_draft.tex.'
   step_waits: {}
   handoff:
-    state: '2026-11-28 ~05:00 CET (owner abff01bfc84c9bfbb). Steps 34, 39, 32 closed this session; the entry has no next step
-      left. Step 34 (held-out qqg uug, searched FT hp1790, FA-ccin2p3-a872c019): vs SCR-A2 uug bulk +0.48, collinear +2.30,
-      soft +3.38 decades of log-MSE (no family BEATS: no transfer on uug; the bulk-val search picked a fine-tune far worse
-      in the limits than the unsearched parent-lr fine-tune); slide10 heldout redrawn @69966abb2, deck rebuilt. Step 39 (t
-      t~ g, D600 (b)): plain search 16/16, best clean trial hp1668 (design''s no->5x-jump rule excluded hp0353/1166/1774);
-      arms factor FA-ccin2p3-cb01aa03, emission FA-ccin2p3-3001d863, plain trial_1668 scored FA-lxplus-d1e1006a; MSE(ln) deepest
-      soft factor 1.19 / emission 21.5 / plain 402, dead cone 0.00275/0.533/0.166, threshold 5.35e-5/5.29e-3/6.93e-5, core
-      1.35e-5/1.99e-3/2.16e-5: factor wins soft vs plain, bulk/threshold/collinear vs emission, also the dead cone; figures
-      kitzoom_ttg_{mse,relmed,median} (sent), data @3b2efd1a9. Step 32 (uug slide 11): sigma_hat/sigma-1 = -0.0015+-0.0014
-      vs E_exact[u]-1 = -0.00162 (0.06 MC errors), eps2 0.996/0.990/0.977/0.943; slide 11 with both processes @2e4cae076,
-      deck rebuilt. Left for the next owner: the docs/results.tex write-up of steps 32-39 (findings on the entry hold every
-      number) before plan done, and whatever Joaquin asks next.'
-    decisions: 'Joaquin''s: D598, D600, D602, D604, D575, D571, D315, D428. Mine: t t~ g HP point hp1668 = the best trial
-      passing curve_quality AND no one-point val jump >5x, as the passed design words it (the lower-val good trials jump 6.7-9.9x);
-      t t~ g emission arm drawn as ''transformer, emission scales'' (all arms at one HP point; kit_zoom TTG_STYLE); pair-threshold
-      family drawn without a second variable (at fixed sqrt s the pair beta fixes x); kit_figures RUN_RE accepts fa_ files;
-      kit_mc_madgraph combine expands [..]/? patterns (bug fix); scoring 82452f53 resubmitted with its missing positional
-      args.'
-    ruled_out: CDST spin-averaged massive dipole as the ttg factor term; rerunning uug MC seed 1019 (hangs).
+    state: '2026-11-28 (owner aceee688c754bb4d1). kit_hpo_smoke: the old D395 smoke of the sweep path, read 2026-11-12; no
+      step reads it, nothing waits on it (finding). Steps 32-39 written up in docs/results.tex @21914e2e8 (sec:kit-emis, sec:kit-ttg,
+      sec:kit-heldout, sec:kit-mc-madevent), notes-editor PASS, pushed. Entry not closed: done_when and notes_ref unset, and
+      earlier finished steps (protocol B 31, fair one-loop 24/35, slide-10 29, threshold scan 4, package D573/D574, serve
+      cost 33) are absent from results.tex. Next step (added): write those up, then plan check/ref/done. kit_readout --vs
+      prints a JSON last line now, so protocol-B and fair-NLO medians are claimable directly (both re-read and match the findings).
+      A protocol-B subsection draft is at /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/kit_protB_draft.tex
+      (not verified by verify_claims, not reviewed).'
+    decisions: 'Joaquin''s: D598, D600, D604, D575, D571, D315. Mine: the results.tex measures in natural-log MSE (the draft''s
+      ln, kit_zoom summary) for the zoom sections and log10 for the KIT evaluate.py ones; the deepest bin for zoom claims
+      = first band bin (Sudakov: last); jump sizes of the held-out blow-ups written in words because no committed tool reproduces
+      them; relative-error figures (kitzoom_emis_relmed_*, kitzoom_ttg_relmed) not included (numbers in the text, reviewer
+      non-blocking).'
+    ruled_out: none new
     running: none
-    files: tools/kit_zoom.py (t t~ g block, TTG_STYLE/XLAB_TTG), tools/kit_figures.py (RUN_RE), tools/kit_mc_madgraph.py (combine
-      glob), analysis/kit_benchmark/data/{kit_fig_ttg.json,kit_curves_ttg.json,kit_hpo_ttg_plain.json,kit_zoom.json,kit_fig_heldoutqqg.json,kit_mc_madgraph_ee_uug.json},
-      analysis/kit_benchmark/figs/zoom/kitzoom_ttg_*, analysis/kit_benchmark/figs/kit_slide10_heldout, kit_mc_slide11_tree,
-      talks/kit_reply_nov2026/main.tex; captions scratchpad cap_ttg_*.txt, cap_s10b.txt, cap_s11b.txt
-    written: '2026-11-28T03:22:02+00:00'
+    files: docs/results.tex (sec:kit-emis..sec:kit-mc-madevent), tools/kit_zoom.py (summary), tools/kit_readout.py (versus
+      JSON), tools/kit_mc_madgraph.py (summary)
+    written: '2026-11-28T03:48:49+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
