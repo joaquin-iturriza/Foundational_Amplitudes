@@ -45532,8 +45532,7 @@ entries:
       true, target phys). c_best re-score FA-ccin2p3-ac30ec7e (llm_score @96cd7ed21): held-out pooled RMSE 1.1782 over 1,390,000
       events (= 1.178), CSV now carries log_shat, q (first rows log_shat ~11.6-11.9, sqrt(s_hat) ~330-380 GeV). D395 smoke
       FA-ccin2p3-50ee56d8 submitted (interactive V100).'
-  step_waits:
-    '30': site pick for the 3 h smoke resubmission (background, this turn)
+  step_waits: {}
   handoff:
     state: 'Step 28 (per-process level file of part (c)''s own target log(|M|^2 F) in part (c)''s setup at trial_1860''s HPs;
       arm trial 2860 + same-seed retrain 2861 vs c_best) design PASSED 2026-11-27 ~20:10 (after one FIX). Code @264f7c8cf:
