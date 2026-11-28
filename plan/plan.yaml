@@ -28720,7 +28720,7 @@ entries:
     withdrawn_why: 'D574: no more trainings for today''s reply; a pretrained held-out uug/uugg run is training'
   owner:
     agent: a4129e4b804e1f6e7
-    state: working
+    state: closed
     since: '2026-11-28T05:50:24+00:00'
     state_at: '2026-11-28T05:50:24+00:00'
   findings:
@@ -30597,24 +30597,19 @@ entries:
       (claims verified only by eye, not inserted): scratchpad kit_protB_draft.tex.'
   step_waits: {}
   handoff:
-    state: '2026-11-28 (owner aceee688c754bb4d1). kit_hpo_smoke: the old D395 smoke of the sweep path, read 2026-11-12; no
-      step reads it, nothing waits on it (finding). Steps 32-39 written up in docs/results.tex @21914e2e8 (sec:kit-emis, sec:kit-ttg,
-      sec:kit-heldout, sec:kit-mc-madevent), notes-editor PASS, pushed. Entry not closed: done_when and notes_ref unset, and
-      earlier finished steps (protocol B 31, fair one-loop 24/35, slide-10 29, threshold scan 4, package D573/D574, serve
-      cost 33) are absent from results.tex. Next step (added): write those up, then plan check/ref/done. kit_readout --vs
-      prints a JSON last line now, so protocol-B and fair-NLO medians are claimable directly (both re-read and match the findings).
-      A protocol-B subsection draft is at /tmp/claude-1000/-home-joaquin-work-FA/71602535-0955-42ad-a58f-23dc320798dc/scratchpad/kit_protB_draft.tex
-      (not verified by verify_claims, not reviewed).'
-    decisions: 'Joaquin''s: D598, D600, D604, D575, D571, D315. Mine: the results.tex measures in natural-log MSE (the draft''s
-      ln, kit_zoom summary) for the zoom sections and log10 for the KIT evaluate.py ones; the deepest bin for zoom claims
-      = first band bin (Sudakov: last); jump sizes of the held-out blow-ups written in words because no committed tool reproduces
-      them; relative-error figures (kitzoom_emis_relmed_*, kitzoom_ttg_relmed) not included (numbers in the text, reviewer
-      non-blocking).'
+    state: '2026-11-28: CLOSED (plan done @b5652d66b). Step 25 written up: sec:kit-protB, sec:kit-slide10, sec:kit-fairnlo,
+      sec:kit-thrscan, sec:kit-package (notes-editor PASS after one BLOCK, watermark b5652d66b; repo-reviewer PASS on the
+      tool commits 0c73e9635, e3f7c6331, 068715a06). done_when: the nine sec:kit-* labels present and verify_claims over 23cde1700..b5652d66b.
+      The stale kit_hpo_smoke sweep trigger ends with the entry (plan.py has no verb to drop a recorded sweep).'
+    decisions: 'Joaquin''s: D315, D353, D571, D573, D574, D575, D598, D600, D604. Mine: notes_ref sec:kit-protB (first label
+      added by the write-up commit); serve-cost timing written without numbers (no committed tool reproduces CC timings);
+      the ''protocol A attempts beyond sec:kit-deepest'' part of step 25 judged covered by sec:kit-deepest''s attempts figure
+      and text; threshold scan written from kit_threshold_scan_mcmg.json (holds the packaged A2 model and the earlier models).'
     ruled_out: none new
     running: none
-    files: docs/results.tex (sec:kit-emis..sec:kit-mc-madevent), tools/kit_zoom.py (summary), tools/kit_readout.py (versus
-      JSON), tools/kit_mc_madgraph.py (summary)
-    written: '2026-11-28T03:48:49+00:00'
+    files: docs/results.tex (sec:kit-protB..sec:kit-package), tools/kit_readout.py (--slide10 JSON), tools/kit_threshold_scan.py
+      (summary, figure --labels), analysis/kit_benchmark/figs/kit_threshold_scan_a2.png
+    written: '2026-11-28T06:04:47+00:00'
   designs:
   - at: '2026-11-10T03:47:41+00:00'
     question: 'Protocol A from scratch and protocol B on the KIT hard phase-space benchmark (Bakar''s slides): how does the
