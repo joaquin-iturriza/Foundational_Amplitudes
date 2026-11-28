@@ -50535,6 +50535,86 @@ entries:
       plus an UNRESOLVED branch for the control''s spread. Searched: docs/results.tex level_file / level file / per-process
       level / emission-scale with level / c_level, dead ends A-F, D564/D566. Minor: the fixed field still says the config
       differs only in level_file; the measure field and the config also add level_file_sigma.'
+  - at: '2026-11-28T02:29:48+00:00'
+    question: 'Step 30 (step 28''s next attempt, D566; Joaquin 2026-11-25: ''there is a way to marry these two ideas''): in
+      part (c)''s setup (emission-scale target log(|M|^2 F) with one shared standardization, our inputs, HETEROSC, MuonAdamW,
+      WSD; Suprio''s run conditions), does giving each process''s level of that target as the shared standardization''s per-process
+      mean (data.level_file), built as the descriptor network''s predicted mean of log|M|^2 plus the process''s own mean log
+      F over its events (F is a function of the momenta, so no label is read), lower the trained network''s level error on
+      the 43 new-family held-out processes below part (c)''s best run (trial_1860), beyond the same-seed run-to-run spread,
+      and what does it do to the held-out pooled RMSE (c_best 1.178, LLM 0.721) and to the trained processes?'
+    prior: 'Step 28''s plain writer (FA-ccin2p3-b07e2464, perevent_level.py @264f7c8cf --feat --tag _phys; dead end recorded
+      2026-11-28): the same 2x64 network fitted on the pool means of log(|M|^2 F) itself gave new-43 median bias^2 0.855 nat^2
+      (median level error mean(d)^2/sd^2 0.608), GATE failed against c_best''s 0.314: the network cannot place the per-process
+      mean of log F from process descriptors. On log|M|^2 the same network, seeds and events (step 27, level_file_B_diag_s30.json,
+      log perevent_level_64948304.out) gave new-43 level error 0.055. Step 16 (part (a), data/step16_level_file_read.json):
+      a per-process level file of log|M|^2 moved the trained network''s new-43 median bias^2 0.859 -> 0.122. Step 27 (data/step27_level_read.json,
+      data/level_subsets.json @3f4fbf82a): the 30-seed per-process level in part (a): 0.300 / same-seed retrain 0.159 (R_b
+      1.88), kept on every re-sampled subset. c_best = llmcmp_c_qperp/trial_1860 (FA-ccin2p3-29ce8950, data/step26_tprop_read.json):
+      new-43 median bias^2 0.314, median MSE 0.979, bias^2 share 0.87, held-out pooled RMSE 1.178, seen 0.0533; log|M|^2 level
+      network alone (lvl_diag) new-43 median bias^2 0.096. Searched docs/results.tex (level_file, level file, emission-scale:
+      no part (c) level entry), plan llm_compare (steps 16, 27, 28, dead ends A-F), site decisions --project FA (level: D564,
+      D566).'
+    measure: 'Writer (CPU job, CC, scripts/job_perevent_level.sh PEL_WRITE=1 PEL_SEEDS=30 PEL_SPLIT=1 PEL_TAG=_physsplit PEL_MMAP
+      and PEL_FEAT as step 28 (c_latest''s caches 99c164da4365de9d7c017b75 / b39fc80c8b10edbe4b07f6a0 train55296_val10000_test10000,
+      feat_0e5f346a99a02389ad85b984 / feat_cc35c42b8d1385655f72ae3d), perevent_level.py @96cd7ed21 --level-split): level_p
+      = (the 2x64 network, seeds 0-29, on the 1352 training pools'' 2000-event means of log|M|^2 = log(|M|^2 F) - log F, held
+      out predicted) + mean over the same 2000 events of log F_p; the file records its target (feat key_doc phys, so experiment.py''s
+      target check passes) and "split": true. Output analysis/catalog_daniel/data/level_file_B_diag_s30_physsplit.json, fetched
+      and committed. GATE: its check new-43 median nat^2 bias (level - pool mean of the target)^2 below c_best''s 0.314; else
+      no GPU job. Sent with it (reads nothing of it): c_best''s eval-only re-score with tools/llm_score.py @96cd7ed21, whose
+      --events-out now writes log_shat, q under dimensionless_inputs (momenta times sqrt(s_hat) from the last order column,
+      asserted per batch that the loader''s momenta are per sqrt(s_hat)): job_llm_score.sh RUN=runs/llmcmp_c_qperp/trial_1860
+      ONLY=heldout EVENTS=1 REREAD=FA-ccin2p3-29ce8950, ~0.5 GPU-h; its pooled RMSE must equal 1.178. On the gate: D395 smoke
+      (scripts/job_config_smoke.sh sweep/sweep_config_llmcmp_c_level.yaml 50, through sigma stage, test, plots; its log ''level_file:
+      per-process means from ...physsplit.json, sigma = 3.786'') and its held-out llm_score; on SMOKE_EXIT 0 the two runs
+      at once: ARM sweep/sweep_config_llmcmp_c_level.yaml @1d3cca237 (c_latest + data.level_file=..._physsplit.json + data.level_file_sigma=shared)
+      trial-idx 2860 and its SAME-SEED RETRAIN 2861, both sweep/trial_job.sh --detached --hp-idx 1860 --t-steps 60840 with
+      trial_1860''s HPs (lr 1.603605e-3, muon_weight_decay 0.02796892, regularization_lambda 4.685537e-08, warmup 0.1908437,
+      eta_min 4.115949e-09, ema true 0.9831303), --hdr=--mem=20G --hdr=--time=22:00:00 --hdr=--cpus-per-task=4, --disk-gb
+      1.5. Read as step 28''s passed design: llm_score (EVENTS=1, seen + held out) on both; level_file_read.py --tags c_best
+      c_level c_level_retrain; rerun_spread.py --a c_level --b c_level_retrain (R_b); level_subsets.py on the three held-out
+      CSVs (c_best''s from the re-score); held-out and seen pooled RMSE; heldout_per_process.py (Suprio''s layout) with c_best,
+      c_level, c_level_retrain; validation curves. Log|M|^2 space. Wall target 16 h (c_best''s V100 0.90 s/step x 60,840 =
+      15.2 h). GPU-h ~36 (2 x 16 + smoke 0.3 + read 0.3 + re-score 0.5 + 2 scores ~3), > 30, < 100, D566 names the work. Disk:
+      2 x 1.3 GB + smoke 0.3 + CSVs 0.1, read at submission; runs where site pick FA --jobs 2 --mem 20G --hours 16 places
+      them.'
+    check: 'Existing data: the gate''s quantity under the split is, by construction, the log|M|^2 network''s own bias on the
+      same events: target - level = (log|M|^2 + log F) - (net + mean log F), whose per-pool mean is mean log|M|^2 - net; that
+      network''s new-43 level error is 0.055 (step 27''s file, log|M|^2, same seeds and events) against 0.608 for the plain
+      target fit, and the log|M|^2 level network''s new-43 median bias^2 is 0.096 in c_best''s read, below 0.314; so the gate
+      is expected to pass and the file differs from step 28''s only in the log F term. In c_best the bias^2 is 0.87 of the
+      new-43 pooled MSE (median 0.314), the term a better per-process mean can move; in part (a) the level file moved it 0.859
+      -> 0.122. Code: tests/test_level_events.py::test_mmap_pools_feat_target now asserts LOGF_MEAN equals the mean log F
+      of the events read; llm_score''s x columns asserted per batch (log s_hat of the dimensionless momenta = 0) and checked
+      by c_best''s re-score (pooled RMSE 1.178 unchanged, log_shat range against the recipe''s sqrt(s) window).'
+    fixed: 'Everything of c_best''s run FA-ccin2p3-29ce8950 (llmcmp_c_qperp trial_1860): recipes catalog_daniel_train (1352)
+      / heldout (139), first 55,296 train events, val/test 10,000, 60,840 steps of 24,576 events, validation every 3042 steps,
+      part (c)''s inputs and target, HETEROSC + sigma stage, MuonAdamW, WSD cooldown 1/8, 8 heads x 8 blocks, llm4lhc encoder
+      64, seed 42, trial_1860''s HPs, memmap. The config differs from sweep_config_llmcmp_c_latest.yaml in sweep_name, data.level_file
+      and data.level_file_sigma=shared (sigma stays c_best''s pooled 3.786, checked in the smoke log against c_best''s ''shared_standardization:
+      one (mu, sigma) = (3.065, 3.786)''), so the per-process means are the one change; tools/cfg_diff.py against trial_1860''s
+      config.yaml as step 28 (24 keys, only level_file/_sigma functional). Writer as step 27''s (2000 train-role events, 2x64
+      network, seeds 0-29) on log|M|^2, plus the exact mean log F.'
+    control: c_best (trial_1860, FA-ccin2p3-29ce8950, same config without data.level_file, same HPs and seed), already scored
+      (data/split/c_best_heldout.json, data/c_best_seen.json), re-scored eval-only for the x columns; the arm's same-seed
+      retrain measures the run-to-run spread R_b in this setup (step 27's pair 1.88x).
+    seeds: Training seed 42 for both runs (as c_best and every arm of the entry); the retrain is the noise measurement, not
+      a second seed; level network seeds 0-29; subset medians with 30 event-bootstrap resamples.
+    outcome: 'GATE fail (writer new-43 median bias^2 >= 0.314): no GPU job, reported, next attempt designed. Else b_c = 0.314,
+      b_a, b_r = arm and retrain''s new-43 median bias^2; g = sqrt(b_a b_r), R_b = max/min. YES if b_c / g > R_b: part (c)''s
+      setup takes the level file; reported with Suprio''s layout. NO if b_c / g <= 1: the level lever does not carry to the
+      emission-scale target; reported with where the network leaves its given level (median |bias - given level bias|), next
+      attempt designed. UNRESOLVED if 1 < b_c / g <= R_b: reported, next a c_best same-seed retrain (16 GPU-h, own design).
+      Every branch reports held-out pooled RMSE (arm, retrain) against 1.178 and 0.721; seen pooled RMSE against 0.0533 with
+      the arm/retrain ratio as the spread; new-43 below the LLM count; relabels median MSE; subset level errors (within 2
+      bootstrap sd of all-events); validation curves; the figure.'
+    sources: '0.314 <- measured: c_best''s new-43 median bias^2 (data/step26_tprop_read.json c_best.extrap.bias2_median);
+      0.855, 0.608 <- measured: FA-ccin2p3-b07e2464''s check line; 0.055 <- measured: step 27 writer log perevent_level_64948304.out;
+      0.096 <- measured: lvl_diag in step26_tprop_read.json; R_b, g <- measured: this design''s arm and retrain (rerun_spread.py);
+      1.178, 0.0533 <- measured: c_best held-out / seen pooled RMSE; 0.721 <- measured: Suprio''s LLM held-out pooled RMSE
+      (data/suprio_cond); 2 bootstrap sd <- measured, level_subsets.py; 16 h <- measured: c_best''s V100 0.90 s/step x 60,840;
+      100 GPU-h <- CLAUDE.md budget, D566 names the work'
   targets:
   - batch: gen_smoke
     wall_h: 0.5
