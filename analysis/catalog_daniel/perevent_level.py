@@ -192,6 +192,8 @@ def from_surrogate():
 
 MMAP_ROLE = {}
 TAG = ""   # --tag: suffix of the written level files
+LOGF_MEAN = {}   # --feat: each pool's mean log F over the events read (label-free: F is a function of the momenta)
+SPLIT = False   # --level-split: the per-process level = network on the log|M|^2 pool means + the pool's own mean log F
 TARGET = {}   # --feat: the target factor the levels are means of (feat key_doc "phys", read by experiment's level_file)
 
 
@@ -225,7 +227,9 @@ def mmap_pools(dirs, feats=None):
                 pd = np.asarray(pdg[sg["p0"]: sg["p0"] + k * P], np.float64).reshape(k, P)
                 am = np.asarray(amp[sg["ev0"]: sg["ev0"] + k], np.float64)
                 if lF is not None:
-                    am = am * np.exp(np.asarray(lF[sg["ev0"]: sg["ev0"] + k], np.float64))
+                    f = np.asarray(lF[sg["ev0"]: sg["ev0"] + k], np.float64)
+                    LOGF_MEAN[sg["name"]] = float(f.mean())
+                    am = am * np.exp(f)
                 return np.column_stack([mo, pd, am])
             out[sg["name"]] = rows
     return out
@@ -466,17 +470,18 @@ def write_level_events(D, tr, ho, new, Xp_tr, Xp_ho, Kp_tr, Kp_ho, events, seeds
     chk = check(lambda n: Th[n][0] + X[n] @ Th[n][1:])
     print("level_events check (median level error):", chk, flush=True)
     if sfx:  # the matched per-process level: the same network, seeds and events on the pool means
-        ybar = np.array([D[n]["y"].mean() for n in tr])
+        lFm = {n: LOGF_MEAN[n] if SPLIT else 0.0 for n in D}   # step 28 next attempt: log F's mean is known, not fitted
+        ybar = np.array([D[n]["y"].mean() - lFm[n] for n in tr])
         ym, ys = ybar.mean(), ybar.std() + 1e-12
         lv = np.mean([mlp(r).fit(sp.transform(Xp_tr), (ybar - ym) / ys).predict(sp.transform(np.vstack([Xp_tr, Xp_ho])))
                       for r in seeds], 0) * ys + ym
-        lv = dict(zip(list(tr) + list(ho), lv))
+        lv = {n: float(v) + lFm[n] for n, v in zip(list(tr) + list(ho), lv)}
         chk_p = check(lambda n: np.full(len(D[n]["y"]), lv[n]))
         print("level_file check (median level error):", chk_p, flush=True)
         json.dump({"source": "analysis/catalog_daniel/perevent_level.py --anchored --anchor map --write-level-events "
                              f"--level-seeds {len(seeds)} (the regressor's network on the pool means, seeds "
                              f"{seeds[0]}-{seeds[-1]}, {events} events per pool)", "argv": sys.argv[1:], "check": chk_p,
-                   "target": TARGET or None,
+                   "target": TARGET or None, "split": SPLIT,
                    "levels": {n: float(lv[n]) for n in D}},
                   open(os.path.join(HERE, "data", f"level_file_B_diag{sfx}.json"), "w"), indent=1)
     out = {"source": "analysis/catalog_daniel/perevent_level.py --anchored --anchor map --write-level-events "
@@ -508,10 +513,14 @@ def main():
                     "cross-fit (1 network seed per fit), then the best read as candidate B[_mlp]_tuned")
     ap.add_argument("--feat", nargs="+", help="with --mmap: one feat_<fk> dir name per cache; the target is "
                     "log(|M|^2 F) with that dir's logF (step 28: part (c)'s emission-scale target)")
+    ap.add_argument("--level-split", action="store_true", help="with --feat: the per-process level is the network "
+                    "on the pools' log|M|^2 means plus each pool's own mean log F over the same events (F is a function "
+                    "of the momenta, so this reads no label of a held-out pool)")
     ap.add_argument("--tag", default="", help="suffix of the files --write-level-events writes (e.g. _phys)")
     a = ap.parse_args()
-    global TAG
-    TAG = a.tag
+    global TAG, SPLIT
+    TAG, SPLIT = a.tag, a.level_split
+    assert not SPLIT or a.feat, "--level-split needs --feat"
     assert not a.feat or (a.mmap and len(a.feat) == len(a.mmap)), "--feat: one features dir per --mmap cache"
     if a.surrogate:
         return from_surrogate()

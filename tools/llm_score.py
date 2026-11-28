@@ -71,17 +71,24 @@ S = np.zeros((len(names), 5))   # per process sums of pred, true, pred^2, true^2
 EV = []   # --events-out: per event process index, true, pred, log F[, the standardized off-shellness slot], x
 OSH = getattr(exp, "_offshell_cols", None)
 # x = (log s_hat, Lmin - log s_hat[, E]) per event (experiment._level_events_x) from the loader's momenta: Lorentz
-# transformed (invariants kept) and divided by mom_div, so x * mom_div is GeV; E only with data.level_events (its legs)
-XS = a.events_out and not bool(cfg.data.get("dimensionless_inputs", False))
+# transformed (invariants kept) and divided by mom_div, so x * mom_div is GeV; E only with data.level_events (its legs).
+# Under dimensionless_inputs the momenta are also divided by sqrt(s_hat), whose log10 is the last order column
+XS = bool(a.events_out)
+DIMLESS = bool(cfg.data.get("dimensionless_inputs", False))
 LEV = json.load(open(os.path.join(ROOT, str(cfg.data.level_events)))) if XS and cfg.data.get("level_events") else None
 from experiment import AmplitudeExperiment  # noqa: E402
 
 
-def xcols(particles, ptr, p):
+def xcols(particles, ptr, p, order):
     """(events, 2 or 3) x of a batch, grouped by particle count"""
     pp = particles.double().cpu().numpy() * exp.mom_div
     ptr = ptr.cpu().numpy()
     cnt = np.diff(ptr)
+    if DIMLESS:
+        lrs = order[:, -1].double().cpu().numpy()
+        assert np.allclose(AmplitudeExperiment._level_events_x(pp[ptr[:1, None] + np.arange(cnt[0])])[:, 0], 0, atol=1e-3), \
+            "dimensionless_inputs: the loader's momenta are not per sqrt(s_hat)"
+        pp = pp * np.repeat(10.0 ** lrs, cnt)[:, None]
     out = np.zeros((len(cnt), 2 if LEV is None else 3))
     for c in np.unique(cnt):
         ev = np.flatnonzero(cnt == c)
@@ -109,7 +116,7 @@ with torch.no_grad():
         if a.events_out:
             ev = np.stack([p, t, q, np.broadcast_to(lf, p.shape)], 1)   # + the target factor log F (0 without)
             ev = np.concatenate([ev, osh], 1) if OSH else ev
-            EV.append(np.concatenate([ev, xcols(data[0], data[4], p)], 1) if XS else ev)
+            EV.append(np.concatenate([ev, xcols(data[0], data[4], p, data[3])], 1) if XS else ev)
         k += p.size
 assert logF is None or k == logF.size, (k, None if logF is None else logF.size)
 assert (n > 0).all(), [nm for nm, k in zip(names, n) if k == 0]

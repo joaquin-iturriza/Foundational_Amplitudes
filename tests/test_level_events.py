@@ -95,6 +95,8 @@ def test_mmap_pools_feat_target(tmp_path):
     assert np.allclose(raw["p1"](9)[:, -1], amp[4:9])
     assert np.allclose(tgt["p1"](9)[:, -1], amp[4:9] * np.exp(lF[4:9]))
     assert np.allclose(tgt["p0"](2)[:, -1], amp[:2] * np.exp(lF[:2]))
+    from perevent_level import LOGF_MEAN   # --level-split's known part: the mean log F of the events last read
+    assert np.isclose(LOGF_MEAN["p0"], lF[:2].mean()) and np.isclose(LOGF_MEAN["p1"], lF[4:9].mean())
 
 
 if __name__ == "__main__":
