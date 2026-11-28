@@ -28419,7 +28419,8 @@ entries:
       -> t t~ virtual with FT vs SCR-A2 vs V/B per D after the asym_sd fix (steps 24/35), the threshold scan sigma(sqrt s)
       at LO and NLO (step 4, slide 11 one-loop part), the KIT package (D573/D574) and the serve cost (step 33); then set done_when
       and notes_ref and close the entry.'
-  done_when: null
+  done_when: for l in kit-protB kit-slide10 kit-fairnlo kit-thrscan kit-package kit-emis kit-ttg kit-heldout kit-mc-madevent;
+    do grep -q "label{sec:$l}" docs/results.tex || exit 1; done && python3 tools/verify_claims.py --rev 23cde1700..b5652d66b
   notes_ref: sec:kit-protB
   match: kit_*
   evidence:
@@ -36648,6 +36649,7 @@ entries:
       if:
       - 'every finished step written up and verify_claims passes: plan check + plan ref + plan done'
       - 'a step''s numbers do not reproduce from a committed tool: fix the tool or re-read under REREAD, then write'
+  checked_before: ff7ca4962
 - id: ladder_figs
   title: 'draft figs 10 and 11: from-scratch line on top'
   question: Redraw rung_grid (the draft's figs 10 and 11) with the black from-scratch line on top and clearly visible (D362).
