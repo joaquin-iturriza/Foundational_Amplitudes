@@ -13548,6 +13548,303 @@ events with probability $x/x_{\max}$, and of both stages together.}
 \label{fig:kit-mc}
 \end{figure}
 
+\subsection{The singular-limit benchmark: asymptotic factor against emission scales (2026-11-27)}\label{sec:kit-emis}
+The question (D598, D600): away from the divergences, and in each limit with the other divergence variable held fixed,
+is the transformer with the asymptotic factor more accurate than the same transformer trained on the emission-scale
+target, also under a relative error that the largest amplitudes do not dominate? Every arm is trained from scratch on
+$10^5$ bulk events of the benchmark's $e^+e^-\to u\bar ug$ and $u\bar ugg$, one seed (D315). The emission-scale target
+runs twice: at the factor's hyperparameters, one switch away from the factor run, and at the best of its own DyHPO
+search, with the plain transformer as a third arm. The bulk core keeps the bulk events whose every singular variable lies
+above the point where the truth's median $\log|\mathcal M|^2$ stops following the limit's power law; it holds a share
+$0.043$ of the $u\bar ug$ bulk and $0.0084$ of the $u\bar ugg$ bulk. Every score is read at the checkpoint of lowest
+validation MSE of the mean prediction (\code{scripts/job\_kit.sh}). The design's bar is a ratio $R$ of the factor's
+error to the other arm's below $1/30$ (a win) or above $30$ (a loss), the spread of single-process transformers from
+scratch rerun at fixed hyperparameters (quoted under D315; the factor itself has no seed spread, one seed each); between
+the two the arms are not separated. At matched hyperparameters the factor wins everywhere. On $u\bar ug$ its MSE of $\ln|\mathcal M|^2$ is
+$4.93\times10^{-5}$ in the core against $2.56\times10^{-3}$, $1.05\times10^{-5}$ on the whole bulk against
+$2.99\times10^{-3}$, $0.0642$ in the deepest collinear bin ($y\approx1.3\times10^{-7}$ at $x\in[0.45,0.55]$) against
+$67.3$ and $0.0906$ in the deepest soft bin against $227$. On $u\bar ugg$ it is $1.62\times10^{-4}$ against $0.0107$ in
+the core, $3.34\times10^{-4}$ against $0.0122$ on the bulk, and $0.327$, $0.827$, $0.858$ against $65.6$, $53.1$, $536$
+in the deepest gluon-gluon collinear, quark-gluon collinear and soft bins. At their own search's best the
+emission-scale runs come closer but stay behind: core $1.74\times10^{-3}$ ($u\bar ug$) and $5.64\times10^{-3}$ ($u\bar ugg$), deepest collinear $34.4$
+and $30.8$, $58.9$; in the soft limit ($0.559$ against the factor's $0.0906$ on $u\bar ug$, $2.52$ against $0.858$ on
+$u\bar ugg$) the two are not separated at one seed. The relative measure gives the same order: the median of
+$|\Delta|$, $\Delta=|\mathcal M|^2_{\rm pred}/|\mathcal M|^2_{\rm true}-1$, in the core is $2.11\times10^{-3}$ for the
+factor against $7.62\times10^{-3}$ (matched) and $4.60\times10^{-3}$ (searched) on $u\bar ug$, $6.69\times10^{-3}$
+against $0.0426$ and $0.0413$ on $u\bar ugg$; in the deepest bins the factor's median $|\Delta|$ is $0.0283$ to $0.415$
+while the matched emission-scale run sits at $1.0$, an undershoot by orders of magnitude. In the core the factor is
+level with the plain transformer ($2.95\times10^{-5}$ on $u\bar ug$, $2.30\times10^{-4}$ on $u\bar ugg$): its gain is in
+the limits and in the part of the bulk that already follows them (Fig.~\ref{fig:kit-emis}). The design's branch: the
+factor wins; the benchmark package and the draft keep it.
+% src: python3 tools/kit_zoom.py summary @838e27c60
+% claim: ee_uug_me2.core_frac=0.043
+% claim: ee_uugg_me2.core_frac=0.0084
+% claim: ee_uug_me2.factor.core.mse=4.93e-5
+% claim: ee_uug_me2.emis_m.core.mse=2.56e-3
+% claim: ee_uug_me2.factor.bulk.mse=1.05e-5
+% claim: ee_uug_me2.emis_m.bulk.mse=2.99e-3
+% claim: ee_uug_me2.factor.coll_y.mse=0.0642
+% claim: ee_uug_me2.factor.coll_y.x=1.3e-7
+% claim: ee_uug_me2.emis_m.coll_y.mse=67.3
+% claim: ee_uug_me2.factor.soft_x.mse=0.0906
+% claim: ee_uug_me2.emis_m.soft_x.mse=227
+% claim: ee_uugg_me2.factor.core.mse=1.62e-4
+% claim: ee_uugg_me2.emis_m.core.mse=0.0107
+% claim: ee_uugg_me2.factor.bulk.mse=3.34e-4
+% claim: ee_uugg_me2.emis_m.bulk.mse=0.0122
+% claim: ee_uugg_me2.factor.coll_gg_y.mse=0.327
+% claim: ee_uugg_me2.factor.coll_qg_y.mse=0.827
+% claim: ee_uugg_me2.factor.soft_x.mse=0.858
+% claim: ee_uugg_me2.emis_m.coll_gg_y.mse=65.6
+% claim: ee_uugg_me2.emis_m.coll_qg_y.mse=53.1
+% claim: ee_uugg_me2.emis_m.soft_x.mse=536
+% claim: ee_uug_me2.emission.core.mse=1.74e-3
+% claim: ee_uugg_me2.emission.core.mse=5.64e-3
+% claim: ee_uug_me2.emission.coll_y.mse=34.4
+% claim: ee_uugg_me2.emission.coll_gg_y.mse=30.8
+% claim: ee_uugg_me2.emission.coll_qg_y.mse=58.9
+% claim: ee_uug_me2.emission.soft_x.mse=0.559
+% claim: ee_uugg_me2.emission.soft_x.mse=2.52
+% claim: ee_uug_me2.factor.core.relmed=2.11e-3
+% claim: ee_uug_me2.emis_m.core.relmed=7.62e-3
+% claim: ee_uug_me2.emission.core.relmed=4.60e-3
+% claim: ee_uugg_me2.factor.core.relmed=6.69e-3
+% claim: ee_uugg_me2.emis_m.core.relmed=0.0426
+% claim: ee_uugg_me2.emission.core.relmed=0.0413
+% claim: ee_uug_me2.factor.coll_y.relmed=0.0283
+% claim: ee_uugg_me2.factor.soft_x.relmed=0.415
+% claim: ee_uug_me2.emis_m.soft_x.relmed=1.0
+% claim: ee_uug_me2.scratch.core.mse=2.95e-5
+% claim: ee_uugg_me2.scratch.core.mse=2.30e-4
+% allow: 10^5 1 30 because they are the training size and the design's bar R<1/30
+% allow: 0.45 0.55 2 because they are the band of the other variable and the square of |M|
+
+\begin{figure}[H]
+\centering
+\includegraphics[height=0.44\textheight]{../analysis/kit_benchmark/figs/zoom/kitzoom_emis_mse_ee_uug_me2.pdf}
+\includegraphics[height=0.44\textheight]{../analysis/kit_benchmark/figs/zoom/kitzoom_emis_mse_ee_uugg_me2.pdf}
+\caption{MSE of $\ln|\mathcal M|^2$ against the distance to each limit, 5 bins a decade, the other divergence variable
+held in a band; networks trained from scratch on $10^5$ bulk events, one seed. Upper: $e^+e^-\to u\bar ug$, collinear
+$y=s_{qg}/s$ at $x\in[0.45,0.55]$ and soft $x=2E_g/\sqrt s$ at $y/x\in[0.28,0.32]$. Lower: $e^+e^-\to u\bar ugg$,
+gluon-gluon collinear at energy share $z\in[0.33,0.37]$, quark-gluon collinear at the collinear gluon's
+$x\in[0.25,0.35]$, soft at the softest gluon's angle $\min_i s_{ig}/(s\,x)\in[0.14,0.17]$. Transformer + asymptotic
+factor: the draft's Eq.~(asym); transformer, emission scales: the same network trained on $|\mathcal M|^2$ times the
+emission-scale factor, at the factor's hyperparameters and at its own search's best; transformer: the plain network.}
+% allow: 10^5 5 0.45 0.55 0.28 0.32 0.33 0.37 0.25 0.35 0.14 0.17 2 0.44 because they are bin counts, bands, the square of |M| and the figure height
+\label{fig:kit-emis}
+\end{figure}
+
+The draft's own arms in the same relative measure (D604: the draft's models, curves and names, its median figure drawn
+in median $|\Delta|$ over the whole hard strata, Fig.~\ref{fig:kit-paper-relmed}). In the deepest bin the asymptotic
+factor's median $|\Delta|$ is $0.047$ (collinear $u\bar ug$), $0.121$ (soft $u\bar ug$), $0.296$ (one-loop $t\bar t$
+threshold, $\beta\approx1.3\times10^{-4}$) and $0.452$ ($t\bar t$ at $\sqrt s\approx45$\,TeV), against $0.979$, $1.0$,
+$0.999$ and $0.872$ for the plain transformer and $0.395$, $0.264$, $0.915$, $0.456$ for the MLP on logarithmic
+invariants (on $t\bar t$ with $\log(s_{t\bar t}-4m_t^2)$ added). The factor is below the MLP in every limit but the
+high-energy one, where the two are level.
+% src: python3 tools/kit_zoom.py summary @838e27c60
+% claim: ee_uug_me2.factor.coll_y_all.relmed=0.047
+% claim: ee_uug_me2.factor.soft_x_all.relmed=0.121
+% claim: ee_tt_virt_finite.factor.threshold_beta_all.relmed=0.296
+% claim: ee_tt_virt_finite.factor.threshold_beta_all.x=1.3e-4
+% claim: ee_tt_virt_finite.factor.sudakov_sqrts_all.relmed=0.452
+% claim: ee_uug_me2.scratch.coll_y_all.relmed=0.979
+% claim: ee_uug_me2.scratch.soft_x_all.relmed=1.0
+% claim: ee_tt_virt_finite.scratch.threshold_beta_all.relmed=0.999
+% claim: ee_tt_virt_finite.scratch.sudakov_sqrts_all.relmed=0.872
+% claim: ee_uug_me2.MLP_log.coll_y_all.relmed=0.395
+% claim: ee_uug_me2.MLP_log.soft_x_all.relmed=0.264
+% claim: ee_tt_virt_finite.MLP_thr.threshold_beta_all.relmed=0.915
+% claim: ee_tt_virt_finite.MLP_thr.sudakov_sqrts_all.relmed=0.456
+% allow: 4 2 45 because they are the 4 of 4m_t^2, the square of |M| and the deepest Sudakov stratum's energy
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/kit_benchmark/figs/zoom/kitzoom_paper_relmed.pdf}
+\caption{Median $|\Delta|$, $\Delta=|\mathcal M|^2_{\rm pred}/|\mathcal M|^2_{\rm true}-1$ ($V$ in place of
+$|\mathcal M|^2$ for the one-loop $t\bar t$), against the distance to each limit over the whole hard strata, 5 bins a
+decade, networks trained on $10^5$ bulk events. Upper: $e^+e^-\to u\bar ug$, collinear and soft. Lower: one-loop
+$e^+e^-\to t\bar t$, high energy and threshold. The arms and names of the draft's Sec.~7 figures; MLP: the benchmark's
+reference network, our reruns at three seeds (median over seeds). Off the scale, on the axis edge: a value beyond the
+axis, drawn hollow on its edge.}
+% allow: 10^5 5 7 2 -1 because they are bin counts, a section number, the square of |M| and the -1 of Delta
+\label{fig:kit-paper-relmed}
+\end{figure}
+
+\subsection{The singular-limit benchmark: $e^+e^-\to t\bar tg$ (2026-11-27)}\label{sec:kit-ttg}
+The question (D600): on $e^+e^-\to t\bar tg$, where the top mass removes the collinear divergence and leaves the soft
+one, does the asymptotic factor (the massive eikonal of the gluon off the tops) still beat the emission-scale target and
+the plain transformer? The data follow the benchmark's layout: MadGraph standalone at $\sqrt s=1$\,TeV with stable tops,
+a flat bulk with $s_{tg}/s,s_{\bar tg}/s>0.01$, and hard strata in the soft gluon's $x$, in the gluon-top angle
+$1-\cos\theta_{tg}$ at $x\in[0.2,0.4]$ and in the pair's $\beta$ (\code{tools/kit\_ttg.py}). The truth rises as $x^{-2}$
+in the soft strata and is flat in the quasi-collinear ones below the dead-cone angle and at the pair threshold
+(Fig.~\ref{fig:kit-ttg-median}). All three arms run at the best clean trial of a 16-trial DyHPO search on the plain
+transformer (curve check passed, no validation jump above five), trained from scratch on $10^5$ bulk events, one seed.
+MSE of $\ln|\mathcal M|^2$, factor / emission scales / plain: in the deepest soft bin ($x\approx1.3\times10^{-7}$ at
+$1-\cos\theta_{tg}\in[0.8,1.2]$) $1.19$ / $21.5$ / $402$; in the deepest quasi-collinear bin (at $x\in[0.25,0.35]$)
+$0.00275$ / $0.533$ / $0.166$; at the pair threshold ($\beta\approx1.3\times10^{-4}$) $5.35\times10^{-5}$ /
+$5.29\times10^{-3}$ / $6.93\times10^{-5}$; in the bulk core (a share $0.41$ of the bulk) $1.35\times10^{-5}$ /
+$1.99\times10^{-3}$ / $2.16\times10^{-5}$; on the whole bulk $1.29\times10^{-5}$ / $2.02\times10^{-3}$ /
+$1.12\times10^{-4}$ (Fig.~\ref{fig:kit-ttg}). Against the plain transformer the factor wins the soft limit, where the
+plain network's median stays flat while the truth rises, and, unexpectedly, the dead-cone region, where plain and
+emission-scale networks sit above the flat truth; the threshold, the core and the whole bulk are not separated
+(under the same bar as Sec.~\ref{sec:kit-emis}, a factor $30$). Against the emission scales it wins everywhere but the
+soft limit, where the two are not separated at one seed; there the factor's median $|\Delta|$ is $1.25$, an overshoot
+with the right slope (Fig.~\ref{fig:kit-ttg-median}). The design's branch: the factor wins the remaining divergence
+against the plain transformer and the bulk against the emission scales, and the emission scales beat it nowhere; the benchmark package keeps the factor for massive
+emitters.
+% src: python3 tools/kit_zoom.py summary @838e27c60
+% claim: fa_ee_ttg_me2.factor.soft_x.x=1.3e-7
+% claim: fa_ee_ttg_me2.factor.soft_x.mse=1.19
+% claim: fa_ee_ttg_me2.emis_m.soft_x.mse=21.5
+% claim: fa_ee_ttg_me2.scratch.soft_x.mse=402
+% claim: fa_ee_ttg_me2.factor.coll_tg.mse=0.00275
+% claim: fa_ee_ttg_me2.emis_m.coll_tg.mse=0.533
+% claim: fa_ee_ttg_me2.scratch.coll_tg.mse=0.166
+% claim: fa_ee_ttg_me2.factor.threshold_beta.x=1.3e-4
+% claim: fa_ee_ttg_me2.factor.threshold_beta.mse=5.35e-5
+% claim: fa_ee_ttg_me2.emis_m.threshold_beta.mse=5.29e-3
+% claim: fa_ee_ttg_me2.scratch.threshold_beta.mse=6.93e-5
+% claim: fa_ee_ttg_me2.core_frac=0.41
+% claim: fa_ee_ttg_me2.factor.core.mse=1.35e-5
+% claim: fa_ee_ttg_me2.emis_m.core.mse=1.99e-3
+% claim: fa_ee_ttg_me2.scratch.core.mse=2.16e-5
+% claim: fa_ee_ttg_me2.factor.bulk.mse=1.29e-5
+% claim: fa_ee_ttg_me2.emis_m.bulk.mse=2.02e-3
+% claim: fa_ee_ttg_me2.scratch.bulk.mse=1.12e-4
+% claim: fa_ee_ttg_me2.factor.soft_x.relmed=1.25
+% allow: 1 0.01 0.2 0.4 0.8 1.2 0.25 0.35 because they are the energy, the cuts and the strata bands
+% allow: 16 10^5 -2 2 30 because they are the bar, the trial count, the training size, the soft power law and the square of |M|
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/kit_benchmark/figs/zoom/kitzoom_ttg_mse.pdf}
+\caption{MSE of $\ln|\mathcal M|^2$ on $e^+e^-\to t\bar tg$ at $\sqrt s=1$\,TeV against the soft gluon's $x$ (at
+$1-\cos\theta_{tg}\in[0.8,1.2]$), the gluon-top angle $1-\cos\theta_{tg}$ (at $x\in[0.25,0.35]$), the pair velocity
+$\beta$ (every event) and, for the bulk events, the gluon's $x$; 5 bins a decade. Networks trained from scratch on
+$10^5$ bulk events, one seed, all at one hyperparameter point. Transformer + asymptotic factor: the massive eikonal of
+the gluon off the tops on the output; transformer, emission scales: trained on $|\mathcal M|^2$ times the
+emission-scale factor; transformer: the plain network; divergence-free cut: the $x$ above which the bulk is its core.}
+% allow: 1 0.8 1.2 0.25 0.35 5 10^5 2 because they are the energy, bands, bin count, training size and the square of |M|
+\label{fig:kit-ttg}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/kit_benchmark/figs/zoom/kitzoom_ttg_median.pdf}
+\caption{Median $\ln|\mathcal M|^2$ on $e^+e^-\to t\bar tg$ against the soft gluon's $x$, the gluon-top angle
+$1-\cos\theta_{tg}$ and the pair velocity $\beta$, same strata, bands and arms as Fig.~\ref{fig:kit-ttg}; truth: the
+median of the exact $|\mathcal M|^2$ in the same bin.}
+% allow: 2 1 because they are the square of |M| and the 1 of 1-cos
+\label{fig:kit-ttg-median}
+\end{figure}
+
+\subsection{The singular-limit benchmark: fine-tuning with the target family held out (2026-11-27)}\label{sec:kit-heldout}
+The question (D575): does a network pretrained on the catalog with every $q\bar qg$ process held out, then fine-tuned on
+$10^5$ bulk events of the benchmark's $e^+e^-\to u\bar ug$ or $u\bar ugg$, reach the limits better than the same model
+trained from scratch? Both carry the asymptotic factor; the fine-tunes ran at the parent's learning rate, at $0.1$ and
+$0.5$ of it ($u\bar ug$ only) and at the best of a 16-trial DyHPO search of the fine-tune per process. The measure is the
+benchmark's MSE of $\log_{10}|\mathcal M|^2$ per stratum, as the median over a family's strata of
+$\log_{10}$(fine-tuned / from scratch); the design's bar is a factor $7$ either way ($0.85$ decades), better or worse,
+and level between. Each run is scored at its checkpoint of lowest validation MSE of the mean prediction. Fine-tunes run
+before the fix @ff4f2e0cf, which read the factor's output in the parent's units, are void and not shown. No fine-tune
+whose validation curve stayed clean beats the network from scratch on any family. The searched fine-tune is worse by
+$2.30$ decades on the collinear and $3.37$ on the soft strata of $u\bar ug$ and level in its bulk ($0.48$); on
+$u\bar ugg$ it is level everywhere, $0.12$ in the bulk and $0.14$, $0.26$, $0.13$, $0.65$ on the gluon-gluon collinear,
+quark-gluon collinear, azimuthal and soft strata. On $u\bar ug$ the search, which selects on bulk validation, picked a
+fine-tune far worse in the limits than the one at the parent's learning rate, which is better on the collinear strata
+($-1.72$ decades) and level on the soft ($0.11$); but that run's validation loss jumped more than fivefold about two
+thirds of the way through training and recovered, so it is listed apart. So is the one at half the rate (level on
+the collinear strata at $0.23$, worse by $1.78$ on the soft), whose validation loss jumped about a quarter of the way
+through and recovered only in the final cooldown, its best checkpoint the last. At $0.1$ of the rate the $u\bar ug$
+fine-tune is level on the collinear strata ($0.40$) and worse on the soft ($2.87$). On $u\bar ugg$ the parent's rate is
+worse by $1.40$ to $2.24$ decades on every family; $0.1$ of it is level on three ($0.18$ to $0.57$) and worse on
+the soft strata ($0.88$, just past the bar) (Fig.~\ref{fig:kit-heldout}). The design's branch: no transfer of the limits at this pretraining; the
+from-scratch model stays the benchmark's.
+% src: python3 tools/kit_readout.py analysis/kit_benchmark/data/kit_fig_heldoutqqg.json --vs kit_A_ee_uug_me2_n100000_t1831_heldoutqqg_scra2 @62545852b
+% claim: kit_A_ft_ee_uug_me2_n100000_t1831_heldoutqqg_ftbest.bulk.median=0.48
+% claim: kit_A_ft_ee_uug_me2_n100000_t1831_heldoutqqg_ftbest.coll_y.median=2.30
+% claim: kit_A_ft_ee_uug_me2_n100000_t1831_heldoutqqg_ftbest.soft_x.median=3.37
+% claim: kit_A_ft_ee_uug_me2_n100000_t1831_heldoutqqg_ftfix.coll_y.median=-1.72
+% claim: kit_A_ft_ee_uug_me2_n100000_t1831_heldoutqqg_ftfix.soft_x.median=0.11
+% claim: kit_A_ft_ee_uug_me2_n100000_t1831_heldoutqqg_ftfix01.coll_y.median=0.40
+% claim: kit_A_ft_ee_uug_me2_n100000_t1831_heldoutqqg_ftfix01.soft_x.median=2.87
+% claim: kit_A_ft_ee_uug_me2_n100000_t1831_heldoutqqg_ftfix05.coll_y.median=0.23
+% claim: kit_A_ft_ee_uug_me2_n100000_t1831_heldoutqqg_ftfix05.soft_x.median=1.78
+% src: python3 tools/kit_readout.py analysis/kit_benchmark/data/kit_fig_heldoutqqg.json --vs kit_A_ee_uugg_me2_n100000_t1831_heldoutqqg_scra2 @62545852b
+% claim: kit_A_ft_ee_uugg_me2_n100000_t1831_heldoutqqg_ftbest.bulk.median=0.12
+% claim: kit_A_ft_ee_uugg_me2_n100000_t1831_heldoutqqg_ftbest.coll_gg_y.median=0.14
+% claim: kit_A_ft_ee_uugg_me2_n100000_t1831_heldoutqqg_ftbest.coll_qg_y.median=0.26
+% claim: kit_A_ft_ee_uugg_me2_n100000_t1831_heldoutqqg_ftbest.azimuth_gg_y.median=0.13
+% claim: kit_A_ft_ee_uugg_me2_n100000_t1831_heldoutqqg_ftbest.soft_x.median=0.65
+% claim: kit_A_ft_ee_uugg_me2_n100000_t1831_heldoutqqg_ftfix.coll_qg_y.median=1.40
+% claim: kit_A_ft_ee_uugg_me2_n100000_t1831_heldoutqqg_ftfix.soft_x.median=2.24
+% claim: kit_A_ft_ee_uugg_me2_n100000_t1831_heldoutqqg_ftfix01.coll_qg_y.median=0.18
+% claim: kit_A_ft_ee_uugg_me2_n100000_t1831_heldoutqqg_ftfix01.coll_gg_y.median=0.57
+% claim: kit_A_ft_ee_uugg_me2_n100000_t1831_heldoutqqg_ftfix01.soft_x.median=0.88
+% allow: 10^5 0.1 0.5 16 10 2 7 0.85 because they are the bar, the training size, the learning-rate scales, the trial count, the log base and the square of |M|
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{../analysis/kit_benchmark/figs/kit_slide10_heldout.pdf}
+\caption{The benchmark's metrics in the bulk and the deepest stratum of each family ($y$ or $x$ in
+$[10^{-7},10^{-6}]$, azimuth at $y=10^{-7}$) on $e^+e^-\to u\bar ug$ and $u\bar ugg$: MSE of $\log_{10}|\mathcal M|^2$,
+the absolute bias of $\log_{10}|\mathcal M|^2$ (hollow: negative), the 99th percentile of its absolute error and the
+$|\mathcal M|^2$-weighted relative error. From scratch: the transformer with the asymptotic factor on $10^5$ bulk
+events; fine-tuned: the same from the pretraining with every $q\bar qg$ process held out, at the parent's learning
+rate, at $0.1$ and $0.5$ of it, and at the best of a 16-trial search (searched).}
+% allow: 10^{-7} 10^{-6} 10 99 2 10^5 0.1 0.5 16 because they are bin edges, the log base, the quantile, the square of |M|, the training size, the scales and the trial count
+\label{fig:kit-heldout}
+\end{figure}
+
+\subsection{The singular-limit benchmark: MadEvent on the surrogate (2026-11-27)}\label{sec:kit-mc-madevent}
+The question (D571, the benchmark's slide 11 done exactly): with the asymptotic-factor surrogate as MadEvent's
+integrand, is the cross section the exact one, and how efficient is the second unweighting stage that makes the sample
+exact? MadEvent integrates and unweights $10^5$ events on $|\hat{\mathcal M}|^2$ (50 parts, default run card) and,
+separately, on the exact $|\mathcal M|^2$ (MadGraph standalone). On $u\bar ug$ the cross section on the surrogate is
+$0.121674$\,pb against $0.121861$\,pb, $\hat\sigma/\sigma-1=-0.0015\pm0.0014$; on $u\bar ugg$ $0.0197574$\,pb against
+$0.0198228$\,pb, $-0.0033\pm0.0016$. The same bias read by reweighting the exact events, $E_{\rm exact}[u]-1$ with
+$u=|\hat{\mathcal M}|^2/|\mathcal M|^2$, is $-0.00162$ and $-0.00135$: the two estimates agree within $0.06$ and $1.2$
+Monte Carlo errors, so the wiring holds. The second-stage efficiency $\epsilon_2=\langle r\rangle/r_{\max}$,
+$r=|\mathcal M|^2/|\hat{\mathcal M}|^2$ on the surrogate's events, with $r_{\max}$ at the $0.99$, $0.999$, $0.9999$
+quantile and the maximum, is $0.996$, $0.990$, $0.977$, $0.943$ on $u\bar ug$ and $0.877$, $0.742$, $0.585$, $0.389$ on
+$u\bar ugg$ (Fig.~\ref{fig:kit-mc-madevent}); the flat-bulk reweighting of Sec.~\ref{sec:kit-mc} is the same test on
+the bulk test events.
+% src: python3 tools/kit_mc_madgraph.py summary analysis/kit_benchmark/data/kit_mc_madgraph_ee_uug.json analysis/kit_benchmark/data/kit_mc_madgraph_ee_uugg.json @62545852b
+% claim: ee_uug.surr.sigma_hat_pb=0.121674
+% claim: ee_uug.surr.sigma_pb=0.121861
+% claim: ee_uug.surr.bias=-0.0015
+% claim: ee_uug.surr.err=0.0014
+% claim: ee_uugg.surr.sigma_hat_pb=0.0197574
+% claim: ee_uugg.surr.sigma_pb=0.0198228
+% claim: ee_uugg.surr.bias=-0.0033
+% claim: ee_uugg.surr.err=0.0016
+% claim: ee_uug.exact.bias=-0.00162
+% claim: ee_uugg.exact.bias=-0.00135
+% claim: ee_uug.sep=0.06
+% claim: ee_uugg.sep=1.2
+% claim: ee_uug.surr.eps2_q99=0.996
+% claim: ee_uug.surr.eps2_q999=0.990
+% claim: ee_uug.surr.eps2_q9999=0.977
+% claim: ee_uug.surr.eps2_max=0.943
+% claim: ee_uugg.surr.eps2_q99=0.877
+% claim: ee_uugg.surr.eps2_q999=0.742
+% claim: ee_uugg.surr.eps2_q9999=0.585
+% claim: ee_uugg.surr.eps2_max=0.389
+% allow: 10^5 50 0.99 0.999 0.9999 1 2 11 because they are the part count, the quantiles, the slide number and the square of |M|
+
+\begin{figure}[H]
+\centering
+\includegraphics{../analysis/kit_benchmark/figs/kit_mc_slide11_tree.pdf}
+\caption{MadEvent on the asymptotic-factor surrogate of $e^+e^-\to u\bar ug$ and $u\bar ugg$ at $\sqrt s=1$\,TeV, $10^5$
+unweighted events each. Left: $\hat\sigma/\sigma-1$ against the process; MadEvent on surrogate: MadEvent's cross section
+on $|\hat{\mathcal M}|^2$ over that on $|\mathcal M|^2$; reweighted exact events: $E_{\rm exact}[u]-1$,
+$u=|\hat{\mathcal M}|^2/|\mathcal M|^2$, on the exact unweighted events. Right: $\epsilon_2=\langle r\rangle/r_{\max}$
+against $1-q$, $r_{\max}$ the $q$-quantile of $r=|\mathcal M|^2/|\hat{\mathcal M}|^2$ (the point at $1-q=10^{-5}$ is the
+maximum).}
+% allow: 1 10^5 10^{-5} 2 because they are the energy, the event count, the maximum's abscissa and the square of |M|
+\label{fig:kit-mc-madevent}
+\end{figure}
+
 \subsection{Hand-off: open items}\label{sec:div-open}
 Genuinely-unfinished / future work for this line (the completed findings are the subsection above):
 \begin{itemize}
