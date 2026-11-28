@@ -30572,6 +30572,10 @@ entries:
       sound. eps2 = <r>/r_max on the surrogate''s events: 0.996 (q 0.99), 0.990 (0.999), 0.977 (0.9999), 0.943 (max of 1e5);
       r_max 1.006/1.011/1.026/1.062. kit_mc_madgraph_ee_uug.json @2e4cae076 (stale surrogate_sample replaced), figure kit_mc_slide11_tree
       with both processes, deck rebuilt 26 pages 0 errors.'
+  - at: '2026-11-28T03:35:33+00:00'
+    text: '2026-11-28 sweep kit_hpo_smoke (CC, the 1-trial 50-step D395 smoke of the sweep launch path, FA-ccin2p3-f81cb1d0,
+      read 2026-11-12 ~20:20: result json with val_mse_curve and train_eval_mse_curve, sigma stage and plots present): no
+      step of the entry reads it (the entry has no next step and no wait names it); nothing to clear.'
   step_waits: {}
   handoff:
     state: '2026-11-28 ~05:00 CET (owner abff01bfc84c9bfbb). Steps 34, 39, 32 closed this session; the entry has no next step
