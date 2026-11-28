@@ -43969,6 +43969,11 @@ entries:
     29: 'step 26''s PARTLY branch (feature rule): the Breit-Wigner target arm''s own 8-trial DyHPO search over the template''s
       space (sweep_config_llmcmp_c_tprop.yaml, single fidelity 60,840 steps), best against part (c)''s best (trial_1860);
       ~128 GPU-h at ~16 h per trial, above 100: on Joaquin''s go; own design and review'
+    30: 'Step 28 next attempt (split level): the same writer with --level-split: the per-process level of log(|M|^2 F) = the
+      network on the pools'' log|M|^2 means (step 27''s estimator, its new-43 level error 0.055) + each pool''s own mean log
+      F over the same 2000 events (F is a function of the momenta, read from c_latest''s feat dirs; no label of a held-out
+      pool is read); GATE its new-43 median bias^2 < 0.314; then the smoke, the arm (2860) and its same-seed retrain (2861)
+      at trial_1860''s HPs as the passed step-28 design; own design and review first; ~36 GPU-h (D566)'
   done_when: null
   notes_ref: null
   match: llmcmp_*,tp_llmcmp_*
@@ -44340,6 +44345,13 @@ entries:
       - 'YES (best tprop trial''s held-out pooled RMSE below c_best''s 1.178 beyond the retrain spread, seen within 1.11x):
         part (c)''s setup takes the factor'
       - 'NO: the factor stays a per-family fix with a seen cost; reported'
+    30:
+      feeds: 'D566: does the per-process level lever (step 16, kept regardless of sampling in step 27''s control) carry to
+        part (c)''s setup, where the new-family level is the largest share of the held-out error'
+      if:
+      - 'GATE fail (writer bias^2 >= 0.314): no GPU job, the level lever is reported as not transferable to the emission-scale
+        target by a descriptor network, next attempt designed'
+      - 'GATE pass: smoke, then arm + retrain; YES/NO/UNRESOLVED by the step-28 outcome rule (b_c/g against R_b)'
   findings:
   - at: '2026-11-22T03:12:02+00:00'
     text: 'Mapping of the LLM run''s conditions onto run.py (2026-11-22): same-process batches = training.per_process_accumulation=round_robin,
