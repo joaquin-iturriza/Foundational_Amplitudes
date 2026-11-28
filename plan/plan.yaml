@@ -45523,6 +45523,13 @@ entries:
       level = the network on the log|M|^2 means + each pool''s own mean log F (label-free), perevent_level.py --level-split
       @96cd7ed21; also fixed tools/llm_score.py''s x columns under dimensionless_inputs (momenta times sqrt(s_hat) from the
       last order column), so c_best''s re-score gives the subset read its input.'
+  - at: '2026-11-28T03:10:15+00:00'
+    text: '2026-11-28 step 30: split-level writer FA-ccin2p3-cd2a06a7 GATE PASS: new-43 median bias^2 0.0438 nat^2 (< c_best
+      0.314; plain target fit 0.855), level error 0.133 all, 0.063/0.204/0.090/0.570 s_lo/s_hi/q_hard/q_soft; training processes
+      bias^2 0.0048. File analysis/catalog_daniel/data/level_file_B_diag_s30_physsplit.json @10988b222 (1491 levels, split
+      true, target phys). c_best re-score FA-ccin2p3-ac30ec7e (llm_score @96cd7ed21): held-out pooled RMSE 1.1782 over 1,390,000
+      events (= 1.178), CSV now carries log_shat, q (first rows log_shat ~11.6-11.9, sqrt(s_hat) ~330-380 GeV). D395 smoke
+      FA-ccin2p3-50ee56d8 submitted (interactive V100).'
   step_waits:
     '30': FA-ccin2p3-50ee56d8
   handoff:
