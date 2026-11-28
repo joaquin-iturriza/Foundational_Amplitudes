@@ -465,11 +465,12 @@ def summary():
             r = out.setdefault(p, {})[a] = {
                 "core": {"mse": LN ** 2 * _seedmed(o["core"]["arms"][a], "mse"), "relmed": _seedmed(o["core"]["arms"][a], "relmed")},
                 "bulk": {"mse": LN ** 2 * _seedmed(o["bulk"][a], "mse"), "relmed": _seedmed(o["bulk"][a], "relmed")}}
-            for f, F in o["fams"].items():
-                b = F["band"] if "band" in F else F["all"]
+            for f, F in o["fams"].items():   # <family>: in its band (where it has one), <family>_all: every event
                 i = -1 if f.startswith("sudakov") else 0
-                r[f] = {"x": b["x"][i], "mse": float(LN ** 2 * _seedmed(b["arms"][a], "mse")[i]),
-                        "relmed": float(_seedmed(b["arms"][a], "relmed")[i])}
+                for k, b in ((f, F.get("band", F["all"])), (f + "_all", F["all"])):
+                    r[k] = {"x": b["x"][i], "mse": float(LN ** 2 * _seedmed(b["arms"][a], "mse")[i]),
+                            "relmed": float(_seedmed(b["arms"][a], "relmed")[i])}
+        out[p]["core_frac"] = o["core"]["frac"]
     print(json.dumps(out, default=float))
 
 
