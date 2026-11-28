@@ -28412,11 +28412,7 @@ entries:
   - D493
   - D572
   - D573
-  next:
-    32: 'Slide 11 exact (design PASS 16:45): vector_size split read: 1024 survey zero (b9d55720), 32 passes (96ce4464: sigma_hat
-      0.12200+-0.00100 pb at 2000 events vs exact 0.121861). 1e5-event surrogate jobs at KIT_MC_VEC=32 FA-ccin2p3-b45a89e1
-      (uug, 6 h) 6360f286 (uugg, 12 h); on their end: wiring check sigma_hat/sigma vs E_exact[u], numbers, figure_exact with
-      the tt part (12d32b55), differences from slide 11 first (vector_size 32 noted as a repair: it only batches the calls)'
+  next: null
   done_when: null
   notes_ref: null
   match: kit_*
@@ -30578,14 +30574,7 @@ entries:
       sound. eps2 = <r>/r_max on the surrogate''s events: 0.996 (q 0.99), 0.990 (0.999), 0.977 (0.9999), 0.943 (max of 1e5);
       r_max 1.006/1.011/1.026/1.062. kit_mc_madgraph_ee_uug.json @2e4cae076 (stale surrogate_sample replaced), figure kit_mc_slide11_tree
       with both processes, deck rebuilt 26 pages 0 errors.'
-  step_why:
-    32:
-      feeds: 'D571/D575: slide 11 of Bakar''s slides done exactly'
-      if:
-      - 'wiring within 3 MC errors: numbers to Joaquin in the deck'
-      - 'beyond: KITSURR path fault, fix and rerun'
-  step_waits:
-    '32': FA-ccin2p3-220290ae
+  step_waits: {}
   handoff:
     state: '2026-11-27 ~20:45 CET (owner a1df8528ae678ee1d). Done this turn: step 36 closed (uugg held-out FT search 16/16,
       chosen hp1289 1.97e-4; KIT-scored, vs SCR-A2 every family slightly worse but inside 1/7..7: no transfer; slide10 heldout
